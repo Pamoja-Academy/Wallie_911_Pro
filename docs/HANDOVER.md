@@ -1,6 +1,6 @@
 # HANDOVER — Wallie_911_Pro (27 Sep 2026)
 
-Open this file in a **new Agent chat** (same workspace) so context stays sharp.
+**Fresh chat:** oop eers `docs/CHECKPOINT-FRESH-CHAT.md` (tip `da8b045`), dan hierdie lêer.
 
 ## Produkt
 Afrikaanse matric SOS-cockpit vir Wallie (#15 Springbok narratief). Hard-proctor + Pa afstand via ntfy.
