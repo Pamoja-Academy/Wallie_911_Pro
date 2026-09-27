@@ -1,18 +1,28 @@
 # Hoe om Wallie_911_Pro oop te maak
 
-## Aanbeveel (kamera werk)
+## Maklikste (geen Node nodig — kamera werk)
+
+Oop in Chrome/Edge:
+
+**https://pamoja-academy.github.io/Wallie_911_Pro/**
+
+1. Merk **waarneming-toestemming** (een keer)
+2. **Missie → Begin**
+3. Pa-PIN by slot: `9110`
+
+## Opsioneel: plaaslik met START-HIER.bat
+
+As Node.js geïnstalleer is:
 
 ```bash
-cd C:\Users\User\Projects\Wallie_911_Pro
-npx --yes serve -p 9110
+START-HIER.bat
 ```
 
-Blaaiier: **http://localhost:9110**
+→ http://localhost:9110
 
-Verstek Pa-PIN: `9110`
+Sonder Node maak `START-HIER.bat` outomaties die HTTPS-skakel hierbo oop.
 
-## Lêers
+## Pa afstand
 
-- `index.html` — cockpit
-- `docs/ontwerp.html` — ontwerp
-- `docs/plan.html` — plan
+- ntfy topic: `wallie911-pa-15sos-hanno`
+- Dashboard: https://pamoja-academy.github.io/Wallie_911_Pro/pa-afstand.html
