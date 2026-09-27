@@ -160,7 +160,17 @@
     <section class="view" id="view-pa">
       <div class="hero-strip">
         <h1>Pa-dashboard</h1>
-        <p class="lede">Lewendige status · waarskuwings · dag-opsomming. Video bly op sy masjien — jy sien slegs metadata.</p>
+        <p class="lede">Lewendige status · waarskuwings · dag-opsomming. Video bly op sy masjien — metadata + hartklop gaan afstand toe (ntfy).</p>
+      </div>
+      <div class="panel" id="remote-panel">
+        <h2>Afstand-waarneming (jy by kliente)</h2>
+        <p class="hint">
+          Foon-dashboard:
+          <a href="pa-afstand.html" target="_blank" rel="noopener">pa-afstand.html</a>
+          · Push-topic: <code id="remote-topic">wallie911-pa-15sos-hanno</code>
+          · <a href="https://ntfy.sh/app" target="_blank" rel="noopener">ntfy-app subscribe</a>
+        </p>
+        <p class="hint" id="remote-consent-status">Toestemming: …</p>
       </div>
       <div class="stats-row" id="pa-status-cards"></div>
       <div class="panel">
@@ -298,11 +308,31 @@
     </div>
   </div>
 
+  <!-- Afstand-waarneming toestemming (Wallie het reeds ingestem — bevestig een keer op hierdie toestel) -->
+  <div class="modal hidden" id="remote-consent-modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Waarneming &amp; verslaggewing</h2>
+      <p class="hint">
+        Hard-proctor stuur <strong>lewendige status, waarskuwings, slot-seine en ’n sessie-verslag</strong>
+        na Pa se foon (ntfy). Die kamera-beeld bly op <em>hierdie</em> skootrekenaar — nie in die wolk nie.
+        Jy het hiertoe ingestem; merk om voort te gaan op hierdie toestel.
+      </p>
+      <label class="field" style="display:flex;gap:.6rem;align-items:flex-start;margin:1rem 0">
+        <input type="checkbox" id="remote-consent-check" style="margin-top:.3rem" />
+        <span>Ek stem in tot afstand-waarneming van sessie-metadata en verslaggewing aan Pa vir hierdie matric-kamp.</span>
+      </label>
+      <div class="btn-row">
+        <button type="button" class="btn primary" id="remote-consent-save">Stoor &amp; gaan aan</button>
+      </div>
+    </div>
+  </div>
+
   <script src="assets/js/data.js"></script>
   <script src="assets/js/storage.js"></script>
   <script src="assets/js/schedule.js"></script>
   <script src="assets/js/surveys.js"></script>
   <script src="assets/js/proctor.js"></script>
+  <script src="assets/js/remote.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>

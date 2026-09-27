@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pa · Afstand-waarneming — Wallie_911_Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c1410;
+      --panel: #142018;
+      --line: #2a3d30;
+      --text: #e8f0ea;
+      --muted: #8aa192;
+      --gold: #c9a227;
+      --ok: #3dcf7a;
+      --warn: #e6a23c;
+      --lock: #e25555;
+      --off: #6a7a6e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #1a3324, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    h1 { font-family: "Libre Baskerville", Georgia, serif; font-size: 1.4rem; margin: 0 0 .35rem; }
+    .eyebrow { color: var(--gold); text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; margin: 0; }
+    .lede { color: var(--muted); margin: 0 0 1rem; font-size: .95rem; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      margin-bottom: .85rem;
+    }
+    .status {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+    .status.on { color: var(--ok); }
+    .status.warn { color: var(--warn); }
+    .status.lock { color: var(--lock); }
+    .status.off { color: var(--off); }
+    .meta { color: var(--muted); font-size: .9rem; line-height: 1.45; }
+    .meta b { color: var(--text); }
+    .pulse { display: inline-block; width: .65rem; height: .65rem; border-radius: 50%; margin-right: .4rem; background: var(--off); }
+    .pulse.on { background: var(--ok); box-shadow: 0 0 0 0 rgba(61,207,122,.7); animation: ping 1.4s infinite; }
+    .pulse.warn { background: var(--warn); animation: ping 1.1s infinite; }
+    .pulse.lock { background: var(--lock); }
+    @keyframes ping {
+      70% { box-shadow: 0 0 0 10px rgba(61,207,122,0); }
+      100% { box-shadow: 0 0 0 0 rgba(61,207,122,0); }
+    }
+    ul.reports { list-style: none; padding: 0; margin: 0; }
+    ul.reports li {
+      border-top: 1px solid var(--line);
+      padding: .75rem 0;
+      white-space: pre-wrap;
+      font-size: .88rem;
+      color: var(--muted);
+    }
+    ul.reports li strong { color: var(--text); display: block; margin-bottom: .25rem; }
+    code { background: #0a100c; padding: .1rem .35rem; border-radius: 4px; font-size: .8rem; }
+    a { color: var(--gold); }
+    .row { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .stat {
+      flex: 1 1 120px;
+      background: #0f1a13;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .75rem;
+    }
+    .stat b { display: block; font-size: 1.25rem; }
+    .stat span { color: var(--muted); font-size: .75rem; }
+    .stale { color: var(--lock); font-size: .85rem; margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <p class="eyebrow">Pa · afstand · soos remote invigilation</p>
+  <h1>Wallie — lewendige waarneming</h1>
+  <p class="lede">
+    Geen video in die wolk nie — wel hartklop, waarskuwings, slot, en ’n verslag ná elke sessie.
+    Sit hierdie bladsy op jou foon se tuisskerm. Kry ook push via
+    <a href="https://ntfy.sh/wallie911-pa-15sos-hanno" target="_blank" rel="noopener">ntfy</a>
+    (installeer die ntfy-app → subscribe topic <code>wallie911-pa-15sos-hanno</code>).
+  </p>
+
+  <div class="card">
+    <div id="status-line" class="status off"><span class="pulse" id="pulse"></span><span id="status-text">WAG OP SEIN…</span></div>
+    <p class="meta" id="detail">Nog geen hartklop. As hy ’n hard-sessie begin (toestemming + kamera), verskyn status hier binne ~20s.</p>
+    <p class="stale hidden" id="stale">⚠ Geen hartklop >45s — sessie dalk toe / WiFi af / blaaier gesluit.</p>
+  </div>
+
+  <div class="row" id="stats">
+    <div class="stat"><b id="s-vak">—</b><span>Vak</span></div>
+    <div class="stat"><b id="s-warn">—</b><span>Waarskuwings</span></div>
+    <div class="stat"><b id="s-left">—</b><span>Tyd oor</span></div>
+    <div class="stat"><b id="s-age">—</b><span>Laaste sein</span></div>
+  </div>
+
+  <div class="card" style="margin-top:1rem">
+    <h2 style="margin:0 0 .5rem;font-size:1rem">Sessie-verslae (vandag)</h2>
+    <ul class="reports" id="reports"><li>Wag vir “SESSIE-VERSLAG” push…</li></ul>
+  </div>
+
+  <p class="meta" style="margin-top:1rem">
+    Cockpit: <a href="./index.html">index.html</a> ·
+    Topic: <code>wallie911-pa-15sos-hanno</code>
+  </p>
+
+  <script>
+    const TOPIC = "wallie911-pa-15sos-hanno";
+    const SERVER = "https://ntfy.sh";
+    const STALE_MS = 45000;
+    let lastAt = 0;
+    let lastHb = null;
+    const reports = [];
+
+    const $ = (id) => document.getElementById(id);
+
+    function fmtLeft(ms) {
+      if (ms == null || Number.isNaN(ms)) return "—";
+      const s = Math.max(0, Math.round(ms / 1000));
+      const m = String(Math.floor(s / 60)).padStart(2, "0");
+      const r = String(s % 60).padStart(2, "0");
+      return m + ":" + r;
+    }
+
+    function setStatus(st, label) {
+      const el = $("status-text");
+      const line = $("status-line");
+      const pulse = $("pulse");
+      el.textContent = label;
+      line.className = "status " + st;
+      pulse.className = "pulse " + st;
+    }
+
+    function applyHb(hb, at) {
+      lastHb = hb;
+      lastAt = at || Date.now();
+      const st = hb.status || "off";
+      const map = {
+        active: ["on", "IN SESSIE"],
+        warned: ["warn", "WAARSKUWING"],
+        locked: ["lock", "SLOT"],
+        off: ["off", "AF"]
+      };
+      const [cls, label] = map[st] || ["off", st.toUpperCase()];
+      setStatus(cls, label);
+      $("s-vak").textContent = hb.subjectSlug || "—";
+      $("s-warn").textContent = String(hb.warnings ?? "—");
+      $("s-left").textContent = fmtLeft(hb.leftMs);
+      $("detail").textContent =
+        `Status ${st}` +
+        (hb.reason ? ` · ${hb.reason}` : "") +
+        (hb.task ? ` · Taak: ${hb.task}` : "");
+      tickAge();
+    }
+
+    function tickAge() {
+      if (!lastAt) return;
+      const age = Date.now() - lastAt;
+      $("s-age").textContent = Math.round(age / 1000) + "s";
+      const stale = $("stale");
+      if (lastHb && lastHb.status && lastHb.status !== "off" && age > STALE_MS) {
+        stale.classList.remove("hidden");
+        setStatus("lock", "SEIN WEG");
+      } else {
+        stale.classList.add("hidden");
+      }
+    }
+
+    function addReport(title, body, time) {
+      reports.unshift({ title, body, time });
+      $("reports").innerHTML = reports
+        .slice(0, 20)
+        .map((r) => `<li><strong>${r.title}</strong>${r.time}<br/>${escapeHtml(r.body)}</li>`)
+        .join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function handleMsg(msg) {
+      const title = msg.title || "";
+      const body = msg.message || "";
+      const at = (msg.time || Date.now() / 1000) * 1000;
+
+      if (title.startsWith("HB ") || (msg.tags || []).includes("heartbeat")) {
+        try {
+          const hb = JSON.parse(body);
+          applyHb(hb, at);
+        } catch (_) {}
+        return;
+      }
+      if (title.includes("IN SESSIE") || title.includes("WAARSKUWING") || title.includes("SLOT") || title.includes("SESSIE-VERSLAG") || title.includes("AF")) {
+        if (title.includes("SESSIE-VERSLAG") || title.includes("IN SESSIE") || title.includes("WAARSKUWING") || title.includes("SLOT")) {
+          addReport(title, body, new Date(at).toLocaleTimeString("af-ZA"));
+        }
+        if (title.includes("IN SESSIE")) {
+          applyHb({ status: "active", subjectSlug: "…", warnings: 0 }, at);
+        } else if (title.includes("WAARSKUWING")) {
+          applyHb({ ...(lastHb || {}), status: "warned", reason: body }, at);
+        } else if (title.includes("SLOT")) {
+          applyHb({ ...(lastHb || {}), status: "locked" }, at);
+        } else if (title.includes("AF")) {
+          applyHb({ status: "off" }, at);
+        }
+      }
+    }
+
+    /* Poll recent + live SSE */
+    async function poll() {
+      try {
+        const res = await fetch(`${SERVER}/${TOPIC}/json?poll=1&since=1h`);
+        const text = await res.text();
+        text
+          .trim()
+          .split("\n")
+          .filter(Boolean)
+          .forEach((line) => {
+            try {
+              handleMsg(JSON.parse(line));
+            } catch (_) {}
+          });
+      } catch (e) {
+        $("detail").textContent = "Kon nie ntfy bereik nie: " + e.message;
+      }
+    }
+
+    poll();
+    setInterval(tickAge, 1000);
+
+    try {
+      const es = new EventSource(`${SERVER}/${TOPIC}/sse`);
+      es.onmessage = (ev) => {
+        try {
+          handleMsg(JSON.parse(ev.data));
+        } catch (_) {}
+      };
+    } catch (e) {
+      setInterval(poll, 15000);
+    }
+  </script>
+</body>
+</html>

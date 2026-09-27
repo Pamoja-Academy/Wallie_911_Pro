@@ -213,9 +213,27 @@
     el.className = "camera-overlay " + (cls || "");
   }
 
+  function ensureRemoteConsent() {
+    if (WALLIE.REMOTE?.hasConsent()) return true;
+    $("#remote-consent-modal")?.classList.remove("hidden");
+    return false;
+  }
+
+  function refreshRemoteConsentLabel() {
+    const el = $("#remote-consent-status");
+    if (!el || !WALLIE.REMOTE) return;
+    el.textContent = WALLIE.REMOTE.hasConsent()
+      ? "Toestemming: JA op hierdie toestel · seinen gaan na Pa"
+      : "Toestemming: nog nie op hierdie toestel — sal gevra word vóór eerste sessie";
+  }
+
   async function startSessionFromUI(opts = {}) {
     if (locked) {
       alert("Sessie is gesluit. Pa moet eers ontsluit.");
+      return;
+    }
+    if (!ensureRemoteConsent()) {
+      alert("Merk eers die waarneming-toestemming sodat Pa afstand-seine kan kry.");
       return;
     }
     const subjectSlug = opts.subjectSlug || $("#session-subject").value;
@@ -241,10 +259,24 @@
         };
         persist();
         updateLiveDot();
+        WALLIE.REMOTE?.updateLive({
+          status: state.live.status,
+          subjectSlug,
+          warnings,
+          startedAt: state.live.startedAt,
+          leftMs: left,
+          task
+        });
       },
       onWarn: (n, reason) => {
         logEvent(`Waarskuwing ${n}: ${reason}`);
         setCameraStatus(`Waarskuwing ${n}/3 — ${reason}`, "warn");
+        WALLIE.REMOTE?.sessionWarn({
+          warnings: n,
+          reason,
+          subjectSlug,
+          leftMs: state.live?.leftMs
+        });
       },
       onLock: () => {
         locked = true;
@@ -254,6 +286,10 @@
         setCameraStatus("GESLUIT — Pa-PIN nodig", "lock");
         logEvent("Sessie gesluit ná 3 waarskuwings");
         updateLiveDot();
+        WALLIE.REMOTE?.sessionLock({
+          subjectSlug,
+          reason: "3 waarskuwings (tab/fokus)"
+        });
       },
       onEnd: (reason) => finishSession(reason)
     });
@@ -282,9 +318,10 @@
     persist();
     $("#start-session").disabled = true;
     $("#end-session").disabled = false;
-    setCameraStatus("LEWENDIG — hard-proctor", "live");
+    setCameraStatus("LEWENDIG — hard-proctor + Pa-sein", "live");
     logEvent(`Sessie begin: ${subjectBySlug(subjectSlug)?.naam || subjectSlug} (${minutes}m)`);
     updateLiveDot();
+    WALLIE.REMOTE?.sessionStart({ subjectSlug, minutes, task });
     showView("sessie");
   }
 
@@ -295,12 +332,15 @@
       : 0;
 
     let newSession = null;
+    const plannedMin = sessionMeta?.minutes;
+    const task = sessionMeta?.task;
+    const subjectSlug = sessionMeta?.subjectSlug;
     if (sessionMeta) {
       newSession = {
         id: "s_" + Date.now(),
         date: sessionMeta.date,
-        subjectSlug: sessionMeta.subjectSlug,
-        task: sessionMeta.task,
+        subjectSlug,
+        task,
         durationMin: Math.min(elapsedMin, sessionMeta.minutes),
         warnings,
         outcome
@@ -320,7 +360,19 @@
     logEvent(`Sessie klaar (${outcome})`);
     updateLiveDot();
     renderPa();
-    if (newSession) openWallieSurvey(newSession);
+    if (newSession) {
+      WALLIE.REMOTE?.sessionEnd({
+        subjectSlug,
+        durationMin: newSession.durationMin,
+        plannedMin,
+        outcome,
+        warnings,
+        task
+      });
+      openWallieSurvey(newSession);
+    } else {
+      WALLIE.REMOTE?.pingOffline();
+    }
   }
 
   function buildSurveyForm(formEl, fields, prefix) {
@@ -646,6 +698,34 @@
     persist();
     $("#wallie-survey-modal").classList.add("hidden");
     logEvent("Wallie-survey gestoor");
+    const a = result.answers;
+    WALLIE.REMOTE?.publish({
+      title: "SURVEY — Wallie ná sessie",
+      message: [
+        `Vak: ${subjectBySlug(form.dataset.subjectSlug)?.naam || form.dataset.subjectSlug}`,
+        `Fokus: ${a.fokus}/5`,
+        `Metode: ${a.metode}`,
+        `Blokkade: ${a.blokkade}`,
+        `Eerlikheid: ${a.eerlikheid}`,
+        a.help_more ? `Help: ${a.help_more}` : null
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      tags: ["memo", "speech_balloon"],
+      priority: 3
+    });
+  });
+
+  $("#remote-consent-save")?.addEventListener("click", () => {
+    const ok = $("#remote-consent-check")?.checked;
+    if (!ok) {
+      alert("Merk die kassie om toestemming te bevestig.");
+      return;
+    }
+    WALLIE.REMOTE.setConsent(true);
+    $("#remote-consent-modal").classList.add("hidden");
+    refreshRemoteConsentLabel();
+    logEvent("Afstand-waarneming toestemming gestoor");
   });
 
   $("#pa-survey-save").addEventListener("click", () => {
@@ -717,4 +797,7 @@
   ensurePlan();
   fromHash();
   if (!location.hash) showView("missie");
+  refreshRemoteConsentLabel();
+  renderMissie();
+  renderPa();
 })();

@@ -12,17 +12,17 @@ Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngo
 
 Jy het GEEN OneDrive nie. Kry die program so:
 
-📦 ZIP (laai af op JOU skootrekenaar):
+📦 ZIP:
 https://github.com/Pamoja-Academy/Wallie_911_Pro/releases/download/wallie-laptop-v1/Wallie_911_Pro-VIR-SY-LAPTOP.zip
 
-🌐 Of speel direk in browser (as WiFi werk):
+🌐 Of speel direk:
 https://pamoja-academy.github.io/Wallie_911_Pro/
 
 Stappe:
-1. Laai ZIP af → Extract All
-2. Dubbelklik START-HIER.bat
-3. Blaaiier: http://localhost:9110
-4. Missie → Begin by die 09:30-blok
+1. Laai ZIP / oop skakel → Extract All indien zip
+2. Dubbelklik START-HIER.bat (of oop Pages-skakel)
+3. Merk **waarneming-toestemming** (een keer) — Pa sien jou sessie-status op sy foon
+4. Missie → Begin by die 09:30-blok (kamera aan)
 5. Pa-PIN as jy slot kry: 9110
 
 Vandag matchday 1:
@@ -38,10 +38,14 @@ Jy’s die #15. Kickoff 09:30.
 
 ---
 
-## Pa: hoe om te stuur
+## Pa: afstand (jy by kliente — nie corrections officer by die deur)
 
-1. Kopieer die boodskap hierbo na WhatsApp (Cursor kan NIE WhatsApp stuur nie).
-2. Heg ook die zip as WhatsApp-dokument (backup as die GitHub-skakel nie by hom oopmaak nie):
-   `C:\Users\User\Projects\Wallie_911_Pro\Wallie_911_Pro-VIR-SY-LAPTOP.zip`
-3. As WiFi faal: USB-stok → loop na buitegebou.
-4. Sit by sy lessenaar om ~09:25 — help START-HIER.bat een keer.
+1. Installeer **ntfy** op jou foon → subscribe topic: `wallie911-pa-15sos-hanno`
+2. Bookmark op foon: https://pamoja-academy.github.io/Wallie_911_Pro/pa-afstand.html
+3. Jy kry push by: sessie-begin · waarskuwing · slot · sessie-verslag · survey
+4. Lewendige hartklop elke ~20s; as sein >45s stil is terwyl “IN SESSIE”, wys die dashboard SEIN WEG
+5. Kopieer WhatsApp hierbo aan Wallie; help hom een keer die toestemming-merk + eerste Begin
+
+## Pa: plaaslike zip-backup
+
+`C:\Users\User\Projects\Wallie_911_Pro\Wallie_911_Pro-VIR-SY-LAPTOP.zip` (of USB)
