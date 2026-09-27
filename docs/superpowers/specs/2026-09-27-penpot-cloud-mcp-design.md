@@ -2,7 +2,7 @@
 
 **Datum:** 2026-09-27  
 **Produk-konteks:** Wallie_911_Pro (matric SOS cockpit)  
-**Status:** Draft vir Pa-hersiening — **nie geïmplementeer nie**  
+**Status:** Goedgekeur deur “gaan voort” — **implementering** (docs + Pa setup; wag MCP Connected)  
 **Checkpoint:** `docs/CHECKPOINT-2026-09-27-penpot.md` @ `5f069b9`
 
 ## 1. Probleem

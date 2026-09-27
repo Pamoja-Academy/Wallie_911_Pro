@@ -45,8 +45,11 @@ Hy het Node NIET. Hy het ’n **stukkende/verkortte GitHub-URL** oopgemaak → �
 - file:// index.html as primêr (kamera swak)
 - Justice4Me/BICS Supabase vir Wallie data
 
-## Design-tool (brainstorm 27 Sep — wag Pa-hersiening)
-- Figma MCP Starter+View kwota vol → **Penpot Cloud + Cursor MCP** gekies (opsie 1)
+## Design-tool (Penpot — in progress 27 Sep)
+- Figma MCP Starter+View kwota vol → **Penpot Cloud + Cursor MCP**
 - Checkpoint: `docs/CHECKPOINT-2026-09-27-penpot.md`
-- Spes (hersien voor implementasie): `docs/superpowers/specs/2026-09-27-penpot-cloud-mcp-design.md`
-- Moenie writing-plans / Penpot-setup doen tot Pa spes goedkeur
+- Spes: `docs/superpowers/specs/2026-09-27-penpot-cloud-mcp-design.md`
+- Plan: `docs/superpowers/plans/2026-09-27-penpot-cloud-mcp.md`
+- **Pa doen nou:** `docs/PENPOT-SETUP.md` (account → MCP key → Cursor → plugin Connected)
+- Example config (geen secrets): `docs/penpot-mcp.json.example`
+- Ná Connected: nuwe chat → “bou Missie-skerm in oop Penpot-lêer”
