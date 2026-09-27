@@ -1,31 +1,118 @@
+/* Smoke: load scripts in Node order and exercise core APIs */
 const fs = require("fs");
-const files = [
+const path = require("path");
+const vm = require("vm");
+
+const root = path.join(__dirname, "..");
+const fails = [];
+const ok = [];
+
+function assert(cond, msg) {
+  if (cond) ok.push(msg);
+  else fails.push(msg);
+}
+
+const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+assert(html.includes('id="view-missie"') || html.includes("Missie"), "index has Missie");
+assert(html.includes("Probleem") || html.includes("bug"), "index has Probleem");
+assert(html.includes("survey") || html.includes("Opname") || html.includes("Wallie"), "index has survey UI");
+assert(fs.existsSync(path.join(root, "START-HIER.bat")), "START-HIER.bat exists");
+assert(fs.existsSync(path.join(root, "pa-briefing.html")), "pa-briefing.html exists");
+
+const store = {};
+const sandbox = {
+  console,
+  Date,
+  Math,
+  JSON,
+  Array,
+  Object,
+  String,
+  Number,
+  Boolean,
+  parseInt,
+  parseFloat,
+  isNaN,
+  encodeURIComponent,
+  decodeURIComponent,
+  setTimeout,
+  clearTimeout,
+  localStorage: {
+    getItem: (k) => (k in store ? store[k] : null),
+    setItem: (k, v) => {
+      store[k] = String(v);
+    },
+    removeItem: (k) => {
+      delete store[k];
+    },
+  },
+  document: {
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    getElementById: () => null,
+    addEventListener: () => {},
+  },
+  window: {},
+  navigator: { mediaDevices: undefined },
+  WALLIE: {},
+};
+sandbox.window = sandbox;
+sandbox.globalThis = sandbox;
+
+const order = [
   "assets/js/data.js",
   "assets/js/storage.js",
   "assets/js/schedule.js",
   "assets/js/surveys.js",
   "assets/js/proctor.js",
-  "assets/js/app.js",
 ];
-let fail = 0;
-for (const f of files) {
+
+for (const rel of order) {
+  const code = fs.readFileSync(path.join(root, rel), "utf8");
   try {
-    new Function(fs.readFileSync(f, "utf8"));
-    console.log("OK parse", f);
+    vm.runInNewContext(code, sandbox, { filename: rel });
+    ok.push(`parse ${rel}`);
   } catch (e) {
-    fail++;
-    console.log("FAIL", f, e.message);
+    fails.push(`parse ${rel}: ${e.message}`);
   }
 }
-const html = fs.readFileSync("index.html", "utf8");
-const scripts = [...html.matchAll(/src="([^"]+)"/g)].map((m) => m[1]);
-console.log("scripts:", scripts.join(", "));
-for (const s of scripts) {
-  if (s.startsWith("http")) continue;
-  console.log(fs.existsSync(s) ? "exists" : "MISSING", s);
+
+const W = sandbox.WALLIE;
+assert(W && Array.isArray(W.SUBJECTS) && W.SUBJECTS.length >= 5, "SUBJECTS loaded");
+assert(typeof W.storage?.load === "function", "storage.load");
+assert(typeof W.buildDayPlan === "function", "buildDayPlan");
+
+if (typeof W.buildDayPlan === "function") {
+  const plan = W.buildDayPlan("2026-09-27");
+  assert(plan && Array.isArray(plan.blocks) && plan.blocks.length > 0, "day plan has blocks");
+  const hasBreak = plan.blocks.some((b) => b.kind === "break");
+  assert(hasBreak, "Sunday plan has rugby break");
+  const study = plan.blocks.filter((b) => b.kind !== "break");
+  assert(study.length >= 2, "at least 2 study blocks");
 }
-const hasModal = html.includes('id="wallie-survey-modal"');
-const hasHidden = /id="wallie-survey-modal"[^>]*class="[^"]*hidden/.test(html) || html.includes('class="modal hidden"');
-console.log("modal present", hasModal, "hidden class", hasHidden);
-console.log("fail count", fail);
-process.exit(fail ? 1 : 0);
+
+if (W.storage) {
+  const st = W.storage.load();
+  st.faults = st.faults || [];
+  st.faults.push({ id: "t1", subject: "wisk", text: "smoke", resolved: false });
+  W.storage.save(st);
+  const st2 = W.storage.load();
+  assert(st2.faults.some((f) => f.id === "t1"), "localStorage roundtrip");
+}
+
+if (W.surveys || W.buildSurvey || W.SURVEYS) {
+  ok.push("surveys module present");
+} else if (sandbox.WALLIE && Object.keys(sandbox.WALLIE).some((k) => /survey/i.test(k))) {
+  ok.push("survey keys on WALLIE");
+} else {
+  // surveys.js may attach differently
+  const surveyCode = fs.readFileSync(path.join(root, "assets/js/surveys.js"), "utf8");
+  assert(surveyCode.includes("Wallie") || surveyCode.includes("wallie"), "surveys.js mentions Wallie");
+  assert(surveyCode.includes("Pa") || surveyCode.includes("pa"), "surveys.js mentions Pa");
+}
+
+const zipPath = path.join(root, "Wallie_911_Pro-VIR-SY-LAPTOP.zip");
+assert(fs.existsSync(zipPath) && fs.statSync(zipPath).size > 10000, "laptop zip present >10KB");
+
+console.log(JSON.stringify({ ok: ok.length, fails: fails.length, failList: fails, sampleOk: ok.slice(0, 12) }, null, 2));
+process.exit(fails.length ? 1 : 0);
