@@ -44,3 +44,9 @@ Hy het Node NIET. Hy het ’n **stukkende/verkortte GitHub-URL** oopgemaak → �
 - OneDrive as Wallie-pad (hy het nie)
 - file:// index.html as primêr (kamera swak)
 - Justice4Me/BICS Supabase vir Wallie data
+
+## Design-tool (brainstorm 27 Sep — wag Pa-hersiening)
+- Figma MCP Starter+View kwota vol → **Penpot Cloud + Cursor MCP** gekies (opsie 1)
+- Checkpoint: `docs/CHECKPOINT-2026-09-27-penpot.md`
+- Spes (hersien voor implementasie): `docs/superpowers/specs/2026-09-27-penpot-cloud-mcp-design.md`
+- Moenie writing-plans / Penpot-setup doen tot Pa spes goedkeur
