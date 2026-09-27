@@ -50,6 +50,6 @@ Hy het Node NIET. Hy het ’n **stukkende/verkortte GitHub-URL** oopgemaak → �
 - Checkpoint: `docs/CHECKPOINT-2026-09-27-penpot.md`
 - Spes: `docs/superpowers/specs/2026-09-27-penpot-cloud-mcp-design.md`
 - Plan: `docs/superpowers/plans/2026-09-27-penpot-cloud-mcp.md`
-- **Pa doen nou:** `docs/PENPOT-SETUP.md` (account → MCP key → Cursor → plugin Connected)
+- **Pa doen nou (BLOKKEERDER):** Login by https://design.penpot.app → dan `docs/PENPOT-SETUP.md` (MCP key → Cursor → plugin Connected). Penpot is nog NIE in `%USERPROFILE%\.cursor\mcp.json` nie.
 - Example config (geen secrets): `docs/penpot-mcp.json.example`
 - Ná Connected: nuwe chat → “bou Missie-skerm in oop Penpot-lêer”
