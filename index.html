@@ -31,7 +31,7 @@
       <button type="button" class="nav-btn" data-view="probleem">Probleem</button>
       <button type="button" class="nav-btn" data-view="docs">Docs</button>
     </nav>
-    <div class="countdown" id="countdown">
+    <div class="countdown" id="countdown" title="Tot 12 Okt 2026 09:00">
       <span class="countdown-num" id="days-left">—</span>
       <span class="countdown-label">dae tot openingswedstryd</span>
     </div>
@@ -40,23 +40,36 @@
   <main>
     <!-- MISSIE -->
     <section class="view active" id="view-missie">
+      <div class="stadium-clock" id="countdown-clock" aria-live="polite">
+        <p class="stadium-eyebrow">Wêreldbeker-klok · Matriek eindeksamen</p>
+        <h2 class="stadium-title">Openingswedstryd — <time datetime="2026-10-12">12 Oktober 2026</time> · 09:00</h2>
+        <div class="stadium-digits">
+          <div class="digit-block"><span id="cd-days">—</span><small>dae</small></div>
+          <span class="digit-sep" aria-hidden="true">:</span>
+          <div class="digit-block"><span id="cd-hours">—</span><small>uur</small></div>
+          <span class="digit-sep" aria-hidden="true">:</span>
+          <div class="digit-block"><span id="cd-mins">—</span><small>min</small></div>
+          <span class="digit-sep" aria-hidden="true">:</span>
+          <div class="digit-block"><span id="cd-secs">—</span><small>sek</small></div>
+        </div>
+        <p class="stadium-status" id="cd-status">Laai aftelling…</p>
+      </div>
+
       <div class="sos-banner">
         <p class="eyebrow">SOS · Lang skoot van Rassie Erasmus · trui #15</p>
         <h1>Wallie — jy’s die #15</h1>
         <p>
           Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngomezulu
-          het ’n misterieuse siekte. 16 dae tot die openingswedstryd. Rassie het jou gebel:
-          jy trek die <strong>#15</strong> aan en speel jouself in die Springbokspan —
-          deur hierdie matric-Wêreldbeker te wen.
-          Vandag begin die kamp om <strong>09:30</strong>. Rugby vs Australië is amptelike rus
-          <strong>11:30–13:45</strong>.
+          het ’n misterieuse siekte.
+          <strong><span id="missie-days-left">—</span> dae</strong> tot die openingswedstryd
+          (<strong>12 Okt</strong>). Rassie het jou gebel: jy trek die <strong>#15</strong> aan
+          en speel jouself in die Springbokspan — deur hierdie matric-Wêreldbeker te wen.
         </p>
         <div class="sos-meta">
           <span class="chip">Trui #15</span>
-          <span class="chip">Kickoff 09:30</span>
-          <span class="chip">Bokke-kyk 11:30–13:45</span>
-          <span class="chip">2de helfte 14:00+</span>
+          <span class="chip">12 Okt openingswedstryd</span>
           <span class="chip">Teiken: 60% · Wisk 80% · Engels 70%</span>
+          <span class="chip">Hard-proctor + Pa afstand</span>
         </div>
       </div>
       <div class="hero-strip">

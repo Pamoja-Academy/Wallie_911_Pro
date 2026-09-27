@@ -178,6 +178,24 @@ WALLIE.daysUntilExam = function daysUntilExam(from = new Date()) {
   return diff;
 };
 
+/** Lewendige stadium-klok tot openingswedstryd (12 Okt 09:00). */
+WALLIE.timeUntilExam = function timeUntilExam(from = new Date()) {
+  const kick = new Date(WALLIE.EXAM_KICKOFF || WALLIE.EXAM_START + "T09:00:00");
+  let ms = kick - from;
+  const past = ms <= 0;
+  if (past) ms = 0;
+  const sec = Math.floor(ms / 1000);
+  const days = Math.floor(sec / 86400);
+  const hours = Math.floor((sec % 86400) / 3600);
+  const minutes = Math.floor((sec % 3600) / 60);
+  const seconds = sec % 60;
+  return { days, hours, minutes, seconds, ms, past, kick };
+};
+
+WALLIE.pad2 = function pad2(n) {
+  return String(n).padStart(2, "0");
+};
+
 WALLIE.todayKey = function todayKey(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");

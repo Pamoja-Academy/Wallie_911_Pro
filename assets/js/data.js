@@ -1,7 +1,10 @@
 /* Wallie_911_Pro — vakdata & low-hanging fruit */
 window.WALLIE = window.WALLIE || {};
 
+/* Openingswedstryd = Matriek eindeksamen begin · 12 Okt 2026 09:00 */
 WALLIE.EXAM_START = "2026-10-12";
+WALLIE.EXAM_KICKOFF = "2026-10-12T09:00:00";
+WALLIE.EXAM_LABEL = "Openingswedstryd · Matriek eindeksamen";
 
 WALLIE.SUBJECTS = [
   {

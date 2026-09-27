@@ -91,9 +91,7 @@
     }
     th { color: var(--muted); font-weight: 600; font-size: .8rem; }
     .rooi { color: #ff8f7a; font-weight: 700; }
-    .break { color: var(--gold); font-weight: 700; }
     .ok { color: #6fd48a; }
-    .warn { color: var(--gold); }
     .danger { color: var(--danger); }
     code {
       background: #0a2215;
@@ -101,6 +99,7 @@
       border-radius: 4px;
       color: var(--gold);
       font-size: .88em;
+      word-break: break-all;
     }
     .callout {
       border-left: 3px solid var(--gold);
@@ -110,6 +109,7 @@
       margin: .75rem 0 0;
       font-size: .92rem;
     }
+    .callout.danger-edge { border-left-color: var(--danger); }
     .grid2 {
       display: grid;
       gap: .75rem;
@@ -133,11 +133,68 @@
     }
     a { color: var(--gold); }
     .print-hint { color: var(--muted); font-size: .8rem; margin-top: .5rem; }
+    .stadium {
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem 1.25rem;
+      margin-bottom: 1.25rem;
+      background:
+        linear-gradient(135deg, rgba(0,122,77,.5), rgba(6,26,15,.95)),
+        repeating-linear-gradient(-12deg, transparent, transparent 8px, rgba(200,168,75,.04) 8px, rgba(200,168,75,.04) 16px);
+    }
+    .stadium h2 { margin-bottom: .35rem; }
+    .stadium .sub { margin: 0 0 .85rem; color: #d5e6db; font-size: .92rem; }
+    .digits {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: .3rem;
+    }
+    .digit {
+      min-width: 3.4rem;
+      text-align: center;
+      background: rgba(0,0,0,.35);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: .5rem .4rem .35rem;
+    }
+    .digit b {
+      display: block;
+      font-family: var(--display);
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      color: var(--gold);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .digit small {
+      display: block;
+      margin-top: .2rem;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sep {
+      font-family: var(--display);
+      font-size: 1.5rem;
+      color: #9a7c2e;
+      padding-bottom: 1rem;
+    }
+    .cd-status { margin: .75rem 0 0; color: #d5e6db; font-size: .92rem; }
+    .wa-box {
+      white-space: pre-wrap;
+      font-size: .9rem;
+      background: #0a2215;
+      padding: .85rem;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
     @media print {
       body { background: #fff; color: #111; }
-      header, section { border-color: #ccc; background: #fff; }
-      .eyebrow, h2, .chip, code, a { color: #006644; }
-      header p, footer { color: #333; }
+      header, section, .stadium { border-color: #ccc; background: #fff; }
+      .eyebrow, h2, .chip, code, a, .digit b { color: #006644; }
+      header p, footer, .sub, .cd-status { color: #333; }
     }
   </style>
 </head>
@@ -145,113 +202,74 @@
   <div class="wrap">
     <header>
       <p class="eyebrow">Pa · Oorsiener · Afrigter-kantoor</p>
-      <h1>Wallie_911_Pro — sinopsis</h1>
+      <h1>Wallie_911_Pro — gameplan</h1>
       <p>
-        Sondag 27 Sep 2026. Wallie is <strong>#15</strong> in die Springbok SOS-kamp.
-        Kickoff-studie <strong>09:30</strong>. Bokke vs Australië <strong>11:30–13:45</strong> (amptelike rus).
-        Hy bly in die buitegebou — jy is naby, onder druk, maar die stelsel moet vir julle albei werk.
+        Matriek-Wêreldbeker. Wallie is <strong>#15</strong>. Openingswedstryd =
+        eindeksamen begin <strong>12 Oktober 2026 · 09:00</strong>.
+        Hy sit in die buitegebou; jy monitor op afstand — nie stap toe nie.
       </p>
       <div class="chips">
         <span class="chip">Trui #15</span>
-        <span class="chip">Kickoff 09:30</span>
+        <span class="chip">12 Okt kickoff</span>
         <span class="chip">Pa-PIN 9110</span>
-        <span class="chip">Teikens 60% / Wisk 80% / Engels 70%</span>
+        <span class="chip">60% / Wisk 80% / Engels 70%</span>
+        <span class="chip">WhatsApp 068 376 8239</span>
       </div>
-      <p class="print-hint">Oop in Chrome/Edge · Ctrl+P om te druk indien nodig</p>
+      <p class="print-hint">Oop in Chrome/Edge · Ctrl+P om te druk</p>
     </header>
 
+    <div class="stadium" aria-live="polite">
+      <p class="eyebrow">Lewendige stadium-klok</p>
+      <h2>Aftelling tot openingswedstryd</h2>
+      <p class="sub">Wêreldbeker-metafoor = Matriek eindeksamen · 12 Okt 2026 09:00</p>
+      <div class="digits">
+        <div class="digit"><b id="cd-days">—</b><small>dae</small></div>
+        <span class="sep" aria-hidden="true">:</span>
+        <div class="digit"><b id="cd-hours">—</b><small>uur</small></div>
+        <span class="sep" aria-hidden="true">:</span>
+        <div class="digit"><b id="cd-mins">—</b><small>min</small></div>
+        <span class="sep" aria-hidden="true">:</span>
+        <div class="digit"><b id="cd-secs">—</b><small>sek</small></div>
+      </div>
+      <p class="cd-status" id="cd-status">Laai…</p>
+    </div>
+
     <section>
-      <h2>1. Wat is die produk?</h2>
-      <p>
-        ’n Plaaslike HTML-reddingscockpit op <strong>Wallie se skootrekenaar</strong>
-        (nie net jou localhost nie). Hard-proctor sessies, daaglikse matchday-plan,
-        foutbank, dubbele surveys (hy + jy), en ’n Probleem-oortjie.
-      </p>
-      <div class="callout">
-        <strong>Hoe hy oopmaak:</strong>
-        OneDrive → <code>Wallie Matriek Eindeksamen\Wallie_911_Pro</code> →
-        dubbelklik <code>START-HIER.bat</code> → browser op
-        <code>http://localhost:9110</code> → Missie → Begin by 09:30.
+      <h2>1. Gameplan (wat ons doen)</h2>
+      <ol>
+        <li>
+          <strong>Wallie oop die HTTPS-app</strong> (geen Node, geen zip):
+          <br /><code>https://pamoja-academy.github.io/Wallie_911_Pro/</code>
+        </li>
+        <li>Merk waarneming-kassie → <strong>Missie</strong> → Begin sessie (kamera toelaat).</li>
+        <li>
+          <strong>Jy</strong> subscribe ntfy-topic <code>wallie911-pa-15sos-hanno</code>
+          + bookmark
+          <a href="pa-afstand.html">pa-afstand.html</a>
+          vir lewendige status.
+        </li>
+        <li>Hard-proctor: tab fokusus + kamera. 3× wegkyk → slot tot PIN <code>9110</code>.</li>
+        <li>Ná blokke: sy survey + jou Pa-survey → Verbeter-oortjie (MISMATCH = jou oë wen).</li>
+        <li>Elke dag tot 12 Okt: produksie + memo, nie “ek het gelees” nie.</li>
+      </ol>
+      <div class="callout danger-edge">
+        <strong>Moenie:</strong> afgekapte GitHub zip-URLs, <code>file://</code>, of OneDrive as sy pad.
+        Hy het Node nie — Pages is die pad.
       </div>
     </section>
 
     <section>
-      <h2>2. Vandag se rooster</h2>
-      <table>
-        <thead>
-          <tr><th>Tyd</th><th>Blok</th><th>Jou rol</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>09:25</td>
-            <td>Opstelling</td>
-            <td>By lessenaar: help <code>START-HIER.bat</code> een keer</td>
-          </tr>
-          <tr>
-            <td class="rooi">09:30–10:30</td>
-            <td class="rooi">Gasvryheid — kickoff</td>
-            <td>Hard-proctor aan; opsioneel mid-check</td>
-          </tr>
-          <tr>
-            <td class="rooi">10:35–11:25</td>
-            <td class="rooi">Afrikaans</td>
-            <td>Kort check; Pa-survey ná blok as jy kan</td>
-          </tr>
-          <tr>
-            <td class="break">11:30–13:45</td>
-            <td class="break">Bokke vs Aus</td>
-            <td>Saam kyk — amptelike rus, geen skuld</td>
-          </tr>
-          <tr>
-            <td>14:00+</td>
-            <td>2de helfte (RTT, LO, Engels, Wisk)</td>
-            <td>Herbegin proctor; Verbeter-oortjie snags</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>3. Narratief (vir konteks — hy ken dit)</h2>
+      <h2>2. Waarom die aftelling</h2>
       <p>
-        Rassie se SOS: Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en
-        Sacha Feinberg-Mngomezulu is “siek”. Wallie trek <strong>#15</strong> aan en
-        speel homself in die span deur matric te wen. Eksamen-openingswedstryd:
-        12 Okt (~16 dae).
+        Narratief: Rassie se SOS — vyf #15’s “siek”. Wallie speel homself in die span
+        deur die matric-Wêreldbeker te wen. Die <strong>openingswedstryd</strong> is
+        die eerste eindeksamen-dag: <strong>12 Oktober</strong>. Die klok hierbo
+        (en op sy Missie-skerm) hou die druk sigbaar — soos ’n stadium-klok voor kickoff.
       </p>
     </section>
 
     <section>
-      <h2>4. Jou oorsiener-gereedskap</h2>
-      <div class="grid2">
-        <div class="mini">
-          <strong>Pa-oortjie</strong>
-          Lewendige status, sessie-geskiedenis, PIN (<code>9110</code>),
-          Pa-survey (±60 sek ná jy by die buitegebou gekyk het).
-        </div>
-        <div class="mini">
-          <strong>Verbeter-oortjie</strong>
-          Vergelyk sy survey + joune. MISMATCH-vlae as hy “fokus 5” sê maar jy sien “besig”.
-          Aksies vir môre.
-        </div>
-        <div class="mini">
-          <strong>Probleem-oortjie</strong>
-          Hy rapporteer app/kode of kurrikulum-foute. Jy sien dieselfde lys onder Verbeter.
-        </div>
-        <div class="mini">
-          <strong>Hard-proctor</strong>
-          Kamera + tab-fokus. 3 waarskuwings → slot tot jou PIN.
-          Video bly op sy masjien — geen e-pos-alerts (nog nie).
-        </div>
-      </div>
-      <div class="callout">
-        Reël: <span class="danger">nie net sy woord as wet nie</span>.
-        As vertroue laag is of produksie “besig” lyk — vereis foutlog / skryfwerk te sien.
-      </div>
-    </section>
-
-    <section>
-      <h2>5. Teikens &amp; rooi vakke</h2>
+      <h2>3. Teikens &amp; rooi vakke</h2>
       <ul>
         <li>Alle vakke ≥ <strong>60%</strong></li>
         <li>Wiskundige Geletterdheid ≥ <strong>80%</strong></li>
@@ -262,48 +280,100 @@
         <li class="rooi">Gasvryheid 27% — begrip, nie inkram</li>
         <li class="rooi">Afrikaans HT 39% — moenie vermy</li>
         <li class="rooi">RTT/CAT 37% — werk insit</li>
-        <li>LO 49% · Engels lit swak · Toerisme-tegniek · Wisk daagliks</li>
+        <li>LO 49% · Engels lit · Toerisme · Wisk daagliks</li>
       </ul>
+    </section>
+
+    <section>
+      <h2>4. Jou gereedskap</h2>
+      <div class="grid2">
+        <div class="mini">
+          <strong>Cockpit (Wallie)</strong>
+          <a href="https://pamoja-academy.github.io/Wallie_911_Pro/" target="_blank" rel="noopener">Pages-app</a>
+          · Missie, Sessie, Vakke, Foutbank, Probleem
+        </div>
+        <div class="mini">
+          <strong>Pa afstand</strong>
+          <a href="pa-afstand.html">pa-afstand.html</a>
+          + ntfy <code>wallie911-pa-15sos-hanno</code>
+        </div>
+        <div class="mini">
+          <strong>PIN</strong>
+          Verstek <code>9110</code> — ontsluit bank/slot
+        </div>
+        <div class="mini">
+          <strong>Kontak Wallie</strong>
+          WA <code>068 376 8239</code> ·
+          <code>wallievanzyl356@gmail.com</code>
+        </div>
+      </div>
+      <div class="callout">
+        Reël: <span class="danger">nie net sy woord as wet nie</span>.
+        As produksie “besig” lyk — eis foutlog / skryfwerk te sien.
+      </div>
+    </section>
+
+    <section>
+      <h2>5. WhatsApp — plak 1:1 (068 376 8239)</h2>
+      <div class="wa-box" id="wa-paste">Wallie —
+
+Die zip-skakel was stukkend. Moenie Node of zip nodig he nie.
+
+1. Maak Edge/Chrome oop
+2. Plak HIERDIE HELE skakel:
+https://pamoja-academy.github.io/Wallie_911_Pro/
+3. Merk die waarneming-kassie
+4. Missie → Begin (kamera toelaat)
+5. Slot-PIN as nodig: 9110
+
+Kyk die Wêreldbeker-klok bo-aan — openingswedstryd is 12 Oktober.
+Stuur Pa ’n skermkiekie as die bladsy oop is.
+— Pa</div>
     </section>
 
     <section>
       <h2>6. Vinnige noodkontrole</h2>
       <ol>
-        <li>App oop? → <code>START-HIER.bat</code> / <code>http://localhost:9110</code></li>
-        <li>Kamera weier? → Chrome-toestemmings; nie <code>file://</code> as primêre pad</li>
-        <li>Sessie slot? → Pa-PIN <code>9110</code></li>
-        <li>Hy sê niks werk nie? → Probleem-oortjie + jy kyk Verbeter</li>
-        <li>OneDrive-kopie: <code>C:\Users\User\OneDrive\Wallie Matriek Eindeksamen\Wallie_911_Pro</code></li>
+        <li>“Not Found”? → hy het ’n afgekapte URL; stuur weer die Pages-skakel heeltemal</li>
+        <li>Kamera weier? → Edge/Chrome HTTPS (nie file://)</li>
+        <li>Sessie slot? → PIN <code>9110</code></li>
+        <li>Jy sien niks afstand? → ntfy subscribe + pa-afstand oop</li>
         <li>Dev-kopie: <code>C:\Users\User\Projects\Wallie_911_Pro</code></li>
       </ol>
     </section>
 
-    <section>
-      <h2>7. WhatsApp-teks (as jy nog moet stuur)</h2>
-      <p style="white-space:pre-wrap;font-size:.9rem;background:#0a2215;padding:.85rem;border-radius:8px;border:1px solid var(--line)">Wallie —
-
-Rassie het gebel. Dis ’n SOS. Jy trek die #15 aan.
-
-Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngomezulu is almal misterieus siek. 16 dae tot die openingswedstryd. Speel jouself in as nr 15 — deur jou matric-Wêreldbeker te wen.
-
-Vandag:
-🟢 09:30–10:30 Gasvryheid kickoff (kamera aan)
-🟢 10:35–11:25 Afrikaans
-🟡 11:30–13:45 Bokke vs Aus saam met ons
-🟢 14:00+ 2de helfte
-
-Op JOU skootrekenaar: OneDrive → Wallie Matriek Eindeksamen → Wallie_911_Pro → START-HIER.bat → Missie → Begin by 09:30.
-
-Jy’s die #15. Kickoff 09:30.
-— Pa</p>
-    </section>
-
     <footer>
-      Wallie_911_Pro · Pa/Afrigter briefing · 27 Sep 2026<br />
-      <a href="index.html">← Terug na cockpit</a>
+      Wallie_911_Pro · Pa briefing · bygewerk 27 Sep 2026<br />
+      <a href="index.html">← Cockpit</a>
       ·
-      <a href="BRIEFING-WHATSAPP.md">WhatsApp MD</a>
+      <a href="pa-afstand.html">Pa afstand</a>
+      ·
+      <a href="https://pamoja-academy.github.io/Wallie_911_Pro/pa-briefing.html">Live briefing</a>
     </footer>
   </div>
+
+  <script>
+    const KICKOFF = new Date("2026-10-12T09:00:00");
+    function pad(n) { return String(n).padStart(2, "0"); }
+    function tick() {
+      let ms = KICKOFF - new Date();
+      const past = ms <= 0;
+      if (past) ms = 0;
+      const sec = Math.floor(ms / 1000);
+      const days = Math.floor(sec / 86400);
+      const hours = Math.floor((sec % 86400) / 3600);
+      const minutes = Math.floor((sec % 3600) / 60);
+      const seconds = sec % 60;
+      document.getElementById("cd-days").textContent = pad(days);
+      document.getElementById("cd-hours").textContent = pad(hours);
+      document.getElementById("cd-mins").textContent = pad(minutes);
+      document.getElementById("cd-secs").textContent = pad(seconds);
+      document.getElementById("cd-status").textContent = past
+        ? "Kickoff — openingswedstryd is hier. Speel."
+        : days + " dae tot Matriek-Wêreldbeker openingswedstryd (12 Okt 09:00)";
+    }
+    tick();
+    setInterval(tick, 1000);
+  </script>
 </body>
 </html>

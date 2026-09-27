@@ -42,8 +42,33 @@
   }
 
   function renderCountdown() {
-    const d = WALLIE.daysUntilExam();
-    $("#days-left").textContent = d < 0 ? 0 : d;
+    const t = WALLIE.timeUntilExam();
+    const dEl = $("#days-left");
+    if (dEl) dEl.textContent = t.past ? "0" : String(t.days);
+
+    const set = (id, val) => {
+      const el = $(id);
+      if (el) el.textContent = val;
+    };
+    set("#cd-days", t.past ? "00" : WALLIE.pad2(t.days));
+    set("#cd-hours", t.past ? "00" : WALLIE.pad2(t.hours));
+    set("#cd-mins", t.past ? "00" : WALLIE.pad2(t.minutes));
+    set("#cd-secs", t.past ? "00" : WALLIE.pad2(t.seconds));
+
+    const status = $("#cd-status");
+    if (status) {
+      status.textContent = t.past
+        ? "Kickoff — openingswedstryd is hier. Speel."
+        : `${t.days} dae · ${WALLIE.pad2(t.hours)}:${WALLIE.pad2(t.minutes)}:${WALLIE.pad2(t.seconds)} tot Matriek-Wêreldbeker`;
+    }
+
+    const missieDays = $("#missie-days-left");
+    if (missieDays) {
+      missieDays.textContent = t.past ? "0" : String(t.days);
+    }
+
+    const clock = $("#countdown-clock");
+    if (clock) clock.classList.toggle("is-live", !t.past);
   }
 
   function renderMissie() {
@@ -794,6 +819,7 @@
 
   fillSubjectSelects();
   renderCountdown();
+  setInterval(renderCountdown, 1000);
   ensurePlan();
   fromHash();
   if (!location.hash) showView("missie");
