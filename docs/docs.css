@@ -1,0 +1,38 @@
+.doc-page .doc-body {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+.doc-page .doc-body h1 {
+  font-family: var(--display);
+  font-size: 2rem;
+  margin-top: 0;
+}
+.doc-page .doc-body h2 {
+  margin-top: 2rem;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.doc-page .doc-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.doc-page .nav-btn {
+  text-decoration: none;
+  display: inline-block;
+}
+.doc-page pre {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  color: var(--accent);
+}
+.doc-page a { color: var(--accent); }
+.doc-page code {
+  background: var(--panel);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}

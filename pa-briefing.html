@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pa / Afrigter briefing — Wallie_911_Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #061a0f;
+      --panel: #12301f;
+      --line: #2a5a3c;
+      --text: #f4f7f2;
+      --muted: #9bb5a4;
+      --gold: #c8a84b;
+      --green: #007a4d;
+      --danger: #e85d4c;
+      --font: "DM Sans", system-ui, sans-serif;
+      --display: "Libre Baskerville", Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background:
+        radial-gradient(ellipse 70% 40% at 10% 0%, rgba(0,122,77,.35), transparent),
+        radial-gradient(ellipse 50% 35% at 100% 0%, rgba(200,168,75,.15), transparent),
+        #061a0f;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    header {
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 1.25rem 1.35rem;
+      background: linear-gradient(120deg, rgba(0,122,77,.45), rgba(6,26,15,.95));
+      margin-bottom: 1.25rem;
+    }
+    .eyebrow {
+      margin: 0 0 .4rem;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      margin: 0 0 .5rem;
+    }
+    header p { margin: 0; color: #d5e6db; }
+    .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .85rem; }
+    .chip {
+      font-size: .75rem;
+      font-weight: 700;
+      padding: .3rem .55rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.25);
+      color: var(--gold);
+    }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+      margin-bottom: .9rem;
+    }
+    h2 {
+      margin: 0 0 .65rem;
+      font-size: 1.05rem;
+      color: var(--gold);
+    }
+    h3 { margin: 1rem 0 .4rem; font-size: .95rem; }
+    ul, ol { margin: 0; padding-left: 1.2rem; }
+    li { margin: .35rem 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .92rem;
+    }
+    th, td {
+      text-align: left;
+      padding: .55rem .4rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; font-size: .8rem; }
+    .rooi { color: #ff8f7a; font-weight: 700; }
+    .break { color: var(--gold); font-weight: 700; }
+    .ok { color: #6fd48a; }
+    .warn { color: var(--gold); }
+    .danger { color: var(--danger); }
+    code {
+      background: #0a2215;
+      padding: .1rem .35rem;
+      border-radius: 4px;
+      color: var(--gold);
+      font-size: .88em;
+    }
+    .callout {
+      border-left: 3px solid var(--gold);
+      padding: .65rem .85rem;
+      background: rgba(200,168,75,.08);
+      border-radius: 0 8px 8px 0;
+      margin: .75rem 0 0;
+      font-size: .92rem;
+    }
+    .grid2 {
+      display: grid;
+      gap: .75rem;
+    }
+    @media (min-width: 640px) {
+      .grid2 { grid-template-columns: 1fr 1fr; }
+    }
+    .mini {
+      background: #0a2215;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: .75rem .85rem;
+      font-size: .9rem;
+    }
+    .mini strong { display: block; margin-bottom: .25rem; color: var(--gold); }
+    footer {
+      margin-top: 1.25rem;
+      color: var(--muted);
+      font-size: .85rem;
+      text-align: center;
+    }
+    a { color: var(--gold); }
+    .print-hint { color: var(--muted); font-size: .8rem; margin-top: .5rem; }
+    @media print {
+      body { background: #fff; color: #111; }
+      header, section { border-color: #ccc; background: #fff; }
+      .eyebrow, h2, .chip, code, a { color: #006644; }
+      header p, footer { color: #333; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Pa · Oorsiener · Afrigter-kantoor</p>
+      <h1>Wallie_911_Pro — sinopsis</h1>
+      <p>
+        Sondag 27 Sep 2026. Wallie is <strong>#15</strong> in die Springbok SOS-kamp.
+        Kickoff-studie <strong>09:30</strong>. Bokke vs Australië <strong>11:30–13:45</strong> (amptelike rus).
+        Hy bly in die buitegebou — jy is naby, onder druk, maar die stelsel moet vir julle albei werk.
+      </p>
+      <div class="chips">
+        <span class="chip">Trui #15</span>
+        <span class="chip">Kickoff 09:30</span>
+        <span class="chip">Pa-PIN 9110</span>
+        <span class="chip">Teikens 60% / Wisk 80% / Engels 70%</span>
+      </div>
+      <p class="print-hint">Oop in Chrome/Edge · Ctrl+P om te druk indien nodig</p>
+    </header>
+
+    <section>
+      <h2>1. Wat is die produk?</h2>
+      <p>
+        ’n Plaaslike HTML-reddingscockpit op <strong>Wallie se skootrekenaar</strong>
+        (nie net jou localhost nie). Hard-proctor sessies, daaglikse matchday-plan,
+        foutbank, dubbele surveys (hy + jy), en ’n Probleem-oortjie.
+      </p>
+      <div class="callout">
+        <strong>Hoe hy oopmaak:</strong>
+        OneDrive → <code>Wallie Matriek Eindeksamen\Wallie_911_Pro</code> →
+        dubbelklik <code>START-HIER.bat</code> → browser op
+        <code>http://localhost:9110</code> → Missie → Begin by 09:30.
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Vandag se rooster</h2>
+      <table>
+        <thead>
+          <tr><th>Tyd</th><th>Blok</th><th>Jou rol</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>09:25</td>
+            <td>Opstelling</td>
+            <td>By lessenaar: help <code>START-HIER.bat</code> een keer</td>
+          </tr>
+          <tr>
+            <td class="rooi">09:30–10:30</td>
+            <td class="rooi">Gasvryheid — kickoff</td>
+            <td>Hard-proctor aan; opsioneel mid-check</td>
+          </tr>
+          <tr>
+            <td class="rooi">10:35–11:25</td>
+            <td class="rooi">Afrikaans</td>
+            <td>Kort check; Pa-survey ná blok as jy kan</td>
+          </tr>
+          <tr>
+            <td class="break">11:30–13:45</td>
+            <td class="break">Bokke vs Aus</td>
+            <td>Saam kyk — amptelike rus, geen skuld</td>
+          </tr>
+          <tr>
+            <td>14:00+</td>
+            <td>2de helfte (RTT, LO, Engels, Wisk)</td>
+            <td>Herbegin proctor; Verbeter-oortjie snags</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Narratief (vir konteks — hy ken dit)</h2>
+      <p>
+        Rassie se SOS: Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en
+        Sacha Feinberg-Mngomezulu is “siek”. Wallie trek <strong>#15</strong> aan en
+        speel homself in die span deur matric te wen. Eksamen-openingswedstryd:
+        12 Okt (~16 dae).
+      </p>
+    </section>
+
+    <section>
+      <h2>4. Jou oorsiener-gereedskap</h2>
+      <div class="grid2">
+        <div class="mini">
+          <strong>Pa-oortjie</strong>
+          Lewendige status, sessie-geskiedenis, PIN (<code>9110</code>),
+          Pa-survey (±60 sek ná jy by die buitegebou gekyk het).
+        </div>
+        <div class="mini">
+          <strong>Verbeter-oortjie</strong>
+          Vergelyk sy survey + joune. MISMATCH-vlae as hy “fokus 5” sê maar jy sien “besig”.
+          Aksies vir môre.
+        </div>
+        <div class="mini">
+          <strong>Probleem-oortjie</strong>
+          Hy rapporteer app/kode of kurrikulum-foute. Jy sien dieselfde lys onder Verbeter.
+        </div>
+        <div class="mini">
+          <strong>Hard-proctor</strong>
+          Kamera + tab-fokus. 3 waarskuwings → slot tot jou PIN.
+          Video bly op sy masjien — geen e-pos-alerts (nog nie).
+        </div>
+      </div>
+      <div class="callout">
+        Reël: <span class="danger">nie net sy woord as wet nie</span>.
+        As vertroue laag is of produksie “besig” lyk — vereis foutlog / skryfwerk te sien.
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Teikens &amp; rooi vakke</h2>
+      <ul>
+        <li>Alle vakke ≥ <strong>60%</strong></li>
+        <li>Wiskundige Geletterdheid ≥ <strong>80%</strong></li>
+        <li>Engels ≥ <strong>70%</strong></li>
+      </ul>
+      <h3>Prioriteit (prelim)</h3>
+      <ul>
+        <li class="rooi">Gasvryheid 27% — begrip, nie inkram</li>
+        <li class="rooi">Afrikaans HT 39% — moenie vermy</li>
+        <li class="rooi">RTT/CAT 37% — werk insit</li>
+        <li>LO 49% · Engels lit swak · Toerisme-tegniek · Wisk daagliks</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. Vinnige noodkontrole</h2>
+      <ol>
+        <li>App oop? → <code>START-HIER.bat</code> / <code>http://localhost:9110</code></li>
+        <li>Kamera weier? → Chrome-toestemmings; nie <code>file://</code> as primêre pad</li>
+        <li>Sessie slot? → Pa-PIN <code>9110</code></li>
+        <li>Hy sê niks werk nie? → Probleem-oortjie + jy kyk Verbeter</li>
+        <li>OneDrive-kopie: <code>C:\Users\User\OneDrive\Wallie Matriek Eindeksamen\Wallie_911_Pro</code></li>
+        <li>Dev-kopie: <code>C:\Users\User\Projects\Wallie_911_Pro</code></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>7. WhatsApp-teks (as jy nog moet stuur)</h2>
+      <p style="white-space:pre-wrap;font-size:.9rem;background:#0a2215;padding:.85rem;border-radius:8px;border:1px solid var(--line)">Wallie —
+
+Rassie het gebel. Dis ’n SOS. Jy trek die #15 aan.
+
+Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngomezulu is almal misterieus siek. 16 dae tot die openingswedstryd. Speel jouself in as nr 15 — deur jou matric-Wêreldbeker te wen.
+
+Vandag:
+🟢 09:30–10:30 Gasvryheid kickoff (kamera aan)
+🟢 10:35–11:25 Afrikaans
+🟡 11:30–13:45 Bokke vs Aus saam met ons
+🟢 14:00+ 2de helfte
+
+Op JOU skootrekenaar: OneDrive → Wallie Matriek Eindeksamen → Wallie_911_Pro → START-HIER.bat → Missie → Begin by 09:30.
+
+Jy’s die #15. Kickoff 09:30.
+— Pa</p>
+    </section>
+
+    <footer>
+      Wallie_911_Pro · Pa/Afrigter briefing · 27 Sep 2026<br />
+      <a href="index.html">← Terug na cockpit</a>
+      ·
+      <a href="BRIEFING-WHATSAPP.md">WhatsApp MD</a>
+    </footer>
+  </div>
+</body>
+</html>

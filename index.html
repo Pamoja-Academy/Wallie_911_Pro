@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wallie_911_Pro — Springbok SOS Kamp</title>
+  <link rel="stylesheet" href="assets/css/app.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">15<small>SOS</small></span>
+      <div>
+        <strong>Wallie_911_Pro</strong>
+        <span class="brand-sub">#15 · Springbok SOS · Matric-wêreldbekerkamp</span>
+      </div>
+    </div>
+    <nav class="nav" id="main-nav">
+      <button type="button" class="nav-btn active" data-view="missie">Missie</button>
+      <button type="button" class="nav-btn" data-view="sessie">Sessie</button>
+      <button type="button" class="nav-btn" data-view="vakke">Vakke</button>
+      <button type="button" class="nav-btn" data-view="foutbank">Foutbank</button>
+      <button type="button" class="nav-btn" data-view="oplaai">Oplaai</button>
+      <button type="button" class="nav-btn" data-view="pa">Pa</button>
+      <button type="button" class="nav-btn" data-view="verbeter">Verbeter</button>
+      <button type="button" class="nav-btn" data-view="probleem">Probleem</button>
+      <button type="button" class="nav-btn" data-view="docs">Docs</button>
+    </nav>
+    <div class="countdown" id="countdown">
+      <span class="countdown-num" id="days-left">—</span>
+      <span class="countdown-label">dae tot openingswedstryd</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- MISSIE -->
+    <section class="view active" id="view-missie">
+      <div class="sos-banner">
+        <p class="eyebrow">SOS · Lang skoot van Rassie Erasmus · trui #15</p>
+        <h1>Wallie — jy’s die #15</h1>
+        <p>
+          Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngomezulu
+          het ’n misterieuse siekte. 16 dae tot die openingswedstryd. Rassie het jou gebel:
+          jy trek die <strong>#15</strong> aan en speel jouself in die Springbokspan —
+          deur hierdie matric-Wêreldbeker te wen.
+          Vandag begin die kamp om <strong>09:30</strong>. Rugby vs Australië is amptelike rus
+          <strong>11:30–13:45</strong>.
+        </p>
+        <div class="sos-meta">
+          <span class="chip">Trui #15</span>
+          <span class="chip">Kickoff 09:30</span>
+          <span class="chip">Bokke-kyk 11:30–13:45</span>
+          <span class="chip">2de helfte 14:00+</span>
+          <span class="chip">Teiken: 60% · Wisk 80% · Engels 70%</span>
+        </div>
+      </div>
+      <div class="hero-strip">
+        <h1>Vandag se matchday-plan</h1>
+        <p class="lede">Hard-proctor soos ’n afrigter-sessie. Geen “ek het gelees”-illusie — net produksie + memo.</p>
+      </div>
+      <div class="stats-row" id="day-stats"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Blokke</h2>
+          <button type="button" class="btn ghost" id="regen-plan">Herbou plan</button>
+        </div>
+        <ol class="block-list" id="block-list"></ol>
+      </div>
+    </section>
+
+    <!-- SESSIE -->
+    <section class="view" id="view-sessie">
+      <div class="hero-strip">
+        <h1>Afrigter-sessie (hard observeerder)</h1>
+        <p class="lede">Kamera aan — Rassie kyk saam met Pa. Tab bly oop. Wegkyk = waarskuwing. 3× = bank tot Pa-PIN.</p>
+      </div>
+      <div class="session-grid">
+        <div class="panel camera-panel">
+          <video id="camera" autoplay playsinline muted></video>
+          <div class="camera-overlay" id="camera-status">Kamera af</div>
+        </div>
+        <div class="panel session-controls">
+          <label class="field">
+            <span>Vak</span>
+            <select id="session-subject"></select>
+          </label>
+          <label class="field">
+            <span>Duur (minute)</span>
+            <input type="number" id="session-minutes" min="10" max="120" value="45" />
+          </label>
+          <label class="field">
+            <span>Taak (bv. Vraag 1–3 toe-boek)</span>
+            <input type="text" id="session-task" placeholder="Skryf alles wat jy onthou, dan memo…" />
+          </label>
+          <div class="timer-display" id="timer-display">00:00</div>
+          <div class="warn-display" id="warn-display">Waarskuwings: 0 / 3</div>
+          <div class="btn-row">
+            <button type="button" class="btn primary" id="start-session">Begin sessie</button>
+            <button type="button" class="btn danger" id="end-session" disabled>Eindig sessie</button>
+          </div>
+          <div class="lock-box hidden" id="lock-box">
+            <p><strong>Sessie gesluit.</strong> Pa moet ontsluit.</p>
+            <input type="password" id="unlock-pin" placeholder="Pa-PIN" autocomplete="off" />
+            <button type="button" class="btn primary" id="unlock-btn">Ontsluit</button>
+          </div>
+          <ul class="event-log" id="session-events"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- VAKKE -->
+    <section class="view" id="view-vakke">
+      <div class="hero-strip">
+        <h1>Vakke &amp; low-hanging fruit</h1>
+        <p class="lede">Teikens: 60% alle · 80% Wisk. Gelett. · 70% Engels. Merk wat jy klaarmaak.</p>
+      </div>
+      <div class="subject-grid" id="subject-grid"></div>
+    </section>
+
+    <!-- FOUTBANK -->
+    <section class="view" id="view-foutbank">
+      <div class="hero-strip">
+        <h1>Foutbank</h1>
+        <p class="lede">Elke fout = hertoets later. Dit is jou egte leerplan.</p>
+      </div>
+      <div class="panel">
+        <form class="fault-form" id="fault-form">
+          <select id="fault-subject" required></select>
+          <input type="text" id="fault-text" placeholder="Wat was verkeerd / gemis?" required />
+          <button type="submit" class="btn primary">Voeg fout by</button>
+        </form>
+        <ul class="fault-list" id="fault-list"></ul>
+      </div>
+    </section>
+
+    <!-- OPLAAI -->
+    <section class="view" id="view-oplaai">
+      <div class="hero-strip">
+        <h1>Vraestelle oplaai</h1>
+        <p class="lede">Hibried: laai PDF / foto van vraestel + memo. Metadata bly in hierdie blaaier (lokaal).</p>
+      </div>
+      <div class="panel">
+        <form class="upload-form" id="upload-form">
+          <select id="upload-subject" required></select>
+          <input type="text" id="upload-title" placeholder="Titel (bv. NSC Nov 2024 Toerisme P1)" required />
+          <label class="file-label">Vraestel-lêer <input type="file" id="upload-file" accept=".pdf,image/*" /></label>
+          <label class="file-label">Memo (opsioneel) <input type="file" id="upload-memo" accept=".pdf,image/*" /></label>
+          <button type="submit" class="btn primary">Stoor plaaslik</button>
+        </form>
+        <ul class="paper-list" id="paper-list"></ul>
+      </div>
+    </section>
+
+    <!-- PA -->
+    <section class="view" id="view-pa">
+      <div class="hero-strip">
+        <h1>Pa-dashboard</h1>
+        <p class="lede">Lewendige status · waarskuwings · dag-opsomming. Video bly op sy masjien — jy sien slegs metadata.</p>
+      </div>
+      <div class="stats-row" id="pa-status-cards"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Pa-PIN</h2>
+        </div>
+        <p class="hint">Verstek-PIN is <code>9110</code>. Verander dit hier (word plaaslik gestoor).</p>
+        <div class="btn-row">
+          <input type="password" id="new-pin" placeholder="Nuwe PIN" autocomplete="off" />
+          <button type="button" class="btn ghost" id="save-pin">Stoor PIN</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Sessie-geskiedenis (vandag)</h2>
+        <ul class="event-log" id="pa-history"></ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Pa-survey (jou oë — nie net sy woord)</h2>
+        </div>
+        <p class="hint">Doen dit ná jy by die buitegebou gekyk het of ná ’n rooi-blok. ±60 sek.</p>
+        <label class="field">
+          <span>Koppel aan sessie</span>
+          <select id="pa-survey-session"></select>
+        </label>
+        <form id="pa-survey-form" class="survey-form"></form>
+        <button type="button" class="btn primary" id="pa-survey-save">Stoor Pa-survey</button>
+      </div>
+    </section>
+
+    <!-- VERBETER -->
+    <section class="view" id="view-verbeter">
+      <div class="hero-strip">
+        <h1>Daaglikse verbeter-lus</h1>
+        <p class="lede">Wallie se survey + jou Pa-check saam. Waar hulle bots, wen jou oë.</p>
+      </div>
+      <div class="stats-row" id="verbeter-stats"></div>
+      <div class="panel">
+        <h2>Vlae</h2>
+        <ul class="flag-list" id="verbeter-flags"></ul>
+      </div>
+      <div class="panel">
+        <h2>Aksies vir môre / volgende blok</h2>
+        <ul class="action-list" id="verbeter-aksies"></ul>
+      </div>
+      <div class="panel">
+        <h2>Rou terugvoer (vandag)</h2>
+        <ul class="event-log" id="verbeter-raw"></ul>
+      </div>
+      <div class="panel">
+        <h2>Probleem-rapportee (app / kurrikulum)</h2>
+        <ul class="event-log" id="verbeter-bugs"></ul>
+      </div>
+    </section>
+
+    <!-- PROBLEEM / ERROR REPORT -->
+    <section class="view" id="view-probleem">
+      <div class="hero-strip">
+        <h1>Iets werk nie</h1>
+        <p class="lede">Rapporteer gou — app/kode of kurrikulum/inhoud. Pa sien dit op Verbeter. Geen skaamte: foute help ons die kamp regmaak.</p>
+      </div>
+      <div class="panel">
+        <form id="bug-form" class="survey-form">
+          <div class="survey-q">
+            <label class="q-label">Wat is stukkend?</label>
+            <div class="choice-row" id="bug-tipe-row">
+              <label><input type="radio" name="bugTipe" value="app" required /> <span>App / knoppie / kamera / sessie (kode)</span></label>
+              <label><input type="radio" name="bugTipe" value="kurrikulum" required /> <span>Kurrikulum / vakinhoud / plan / vraestel</span></label>
+              <label><input type="radio" name="bugTipe" value="proctor" required /> <span>Proctor / kamera / slot / PIN</span></label>
+              <label><input type="radio" name="bugTipe" value="ander" required /> <span>Ander</span></label>
+            </div>
+          </div>
+          <label class="field">
+            <span>Vak (as dit pas)</span>
+            <select id="bug-subject">
+              <option value="">— nie vak-spesifiek —</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Hoe erg?</span>
+            <select id="bug-severity" required>
+              <option value="blokkeer">Blokkeer my — kan nie voortgaan nie</option>
+              <option value="irriterend" selected>Irriterend — werk halfpad</option>
+              <option value="klein">Klein / voorstel</option>
+            </select>
+          </label>
+          <div class="survey-q">
+            <label class="q-label">Beskryf wat gebeur het (en wat jy verwag het)</label>
+            <textarea id="bug-detail" name="detail" required placeholder="Bv. Ek klik Begin op Gasvryheid, kamera vra toestemming, dan niks… / Of: Die Afrikaans-blok sê verkeerde tyd…"></textarea>
+          </div>
+          <label class="field">
+            <span>Foutkode / skermteks (opsioneel — kopieer as jy ’n rooi boodskap sien)</span>
+            <input type="text" id="bug-code" placeholder="Bv. NotAllowedError, Failed to fetch…" />
+          </label>
+          <button type="submit" class="btn primary">Stuur probleem-rapport</button>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Jou rapportee (vandag)</h2>
+          <button type="button" class="btn ghost small" id="bug-refresh">Verfris</button>
+        </div>
+        <ul class="event-log" id="bug-list-wallie"></ul>
+      </div>
+    </section>
+
+    <!-- DOCS -->
+    <section class="view" id="view-docs">
+      <div class="hero-strip">
+        <h1>Dokumente</h1>
+        <p class="lede">Ontwerp en plan as HTML in die browser.</p>
+      </div>
+      <div class="doc-links">
+        <a class="doc-card" href="docs/ontwerp.html">Ontwerp-spesifikasie</a>
+        <a class="doc-card" href="docs/plan.html">Implementasieplan</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Wallie_911_Pro · Springbok SOS-kamp · plaaslik op sy skootrekenaar</span>
+    <span id="live-dot" class="live-dot off">AF</span>
+  </footer>
+
+  <!-- Wallie post-sessie survey (verpligtend) -->
+  <div class="modal hidden" id="wallie-survey-modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Sessie-terugvoer (#15)</h2>
+      <p class="hint">±90 sek. Wees eerlik — Pa se check word daarmee vergelyk. Dit verbeter die kamp.</p>
+      <p class="meta" id="wallie-survey-meta"></p>
+      <form id="wallie-survey-form" class="survey-form"></form>
+      <div class="btn-row">
+        <button type="button" class="btn primary" id="wallie-survey-save">Stuur &amp; klaar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/schedule.js"></script>
+  <script src="assets/js/surveys.js"></script>
+  <script src="assets/js/proctor.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

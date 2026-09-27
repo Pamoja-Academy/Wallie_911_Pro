@@ -88,13 +88,13 @@ Amptelike datums nog nie beskikbaar nie → beplan met **tipiese NSC-volgorde**-
 
 ## 4. Stelselargitektuur
 
-### Tegnestapel (diskresie)
+### Tegnestapel (diskresie — HTML-browser-uitgawe)
 
-- **Next.js** (App Router) + **Turbopack** (dev/build)  
-- **TypeScript**  
-- **Lokale-eerste data:** IndexedDB / SQLite-via-local (sessies, foutlogs, paper-metadata)  
-- **Pa-alerts:** minimale wolk of plaaslike LAN-push (sien §6) — **geen volle video in die wolk**  
-- UI Afrikaans; CSS-veranderlikes; video-presence panel (nie dekoratiewe “AI purple”-tema)
+- **Statiese HTML + CSS + JS** — oop in eksterne browser (`index.html` / `npx serve`)  
+- **Geen build-stap** vir daaglikse gebruik (Next.js/Turbopack opsioneel later as nodig)  
+- **Lokale-eerste data:** `localStorage` (sessies, foutlogs, paper-metadata)  
+- **Pa-alerts:** Pa-oortjie in dieselfde app — **geen volle video in die wolk**  
+- UI Afrikaans; CSS-veranderlikes; video-presence panel
 
 ### Kernmodules
 
@@ -208,7 +208,7 @@ Bronmap (bestaande):
 | Ure/dag | 6–7 |
 | Rooster | Tipiese NSC-plekhouer (B) |
 | Privaatheid | Hibried — geen volle video in wolk |
-| Stack | Next.js + Turbopack + TS + lokale-eerste |
+| Stack | Statiese HTML/CSS/JS (browser); Next.js opsioneel later |
 
 ---
 
