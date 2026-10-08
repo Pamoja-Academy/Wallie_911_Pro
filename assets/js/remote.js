@@ -14,6 +14,7 @@ WALLIE.REMOTE = {
   outboxKey: "wallie911_outbox_v1",
   outboxMax: 300,
   _flushing: false,
+  _flushAgain: false,
   _flushTimer: null,
   _hbTimer: null,
   _live: null,
@@ -44,21 +45,19 @@ WALLIE.REMOTE = {
 
   async publish({ title, message, tags, priority, extras, skipConsent }) {
     if (!skipConsent && !this.hasConsent()) return { ok: false, error: "geen_toestemming" };
-    const headers = {
-      Title: title || "Wallie_911_Pro",
-      Tags: (tags || []).join(","),
-      Priority: String(priority || 3),
-      "Content-Type": "text/plain; charset=utf-8"
-    };
+    /* Query-parameters, nie headers nie: “—” en “á” is nie geldige header-karakters nie en
+       fetch gooi dan stilweg ’n fout (slot-alarms het so nooit Pa se foon bereik nie). */
+    const params = new URLSearchParams({
+      title: title || "Wallie_911_Pro",
+      tags: (tags || []).join(","),
+      priority: String(priority || 3)
+    });
     if (extras) {
-      Object.entries(extras).forEach(([k, v]) => {
-        headers[k] = String(v);
-      });
+      Object.entries(extras).forEach(([k, v]) => params.set(k, String(v)));
     }
     try {
-      const res = await fetch(this.topicUrl(), {
+      const res = await fetch(`${this.topicUrl()}?${params}`, {
         method: "POST",
-        headers,
         body: message || ""
       });
       return { ok: res.ok, status: res.status };
@@ -257,6 +256,17 @@ WALLIE.REMOTE = {
     });
   },
 
+  sessionInterrupted({ sessionId, subject, startedAt, warnings }) {
+    if (!sessionId) return;
+    const begin = startedAt ? new Date(startedAt).toLocaleTimeString("af-ZA") : "?";
+    this.durable({
+      kind: "offline",
+      title: "ONDERBREEK — sessie nie klaargemaak nie",
+      text: `${this.subjectLabel(subject)} · begin ${begin} · waarskuwings ${warnings || 0}\nDie app of skootrekenaar is toe sonder “Eindig sessie”.`,
+      extra: { session_id: sessionId }
+    });
+  },
+
   pingOffline() {
     this.stopHeartbeat();
     this._live = null;
@@ -325,8 +335,13 @@ WALLIE.REMOTE = {
   },
 
   async flushOutbox() {
-    if (this._flushing) return;
+    if (this._flushing) {
+      this._flushAgain = true;
+      return;
+    }
     this._flushing = true;
+    this._flushAgain = false;
+    let stalled = false;
     try {
       const due = this.outboxLoad().queue.filter((q) => (q.nextTryAt || 0) <= Date.now());
       for (const item of due) {
@@ -349,11 +364,15 @@ WALLIE.REMOTE = {
           }
         });
         this.notifyDurable();
-        if (!res.ok && !res.permanent) break;
+        if (!res.ok && !res.permanent) {
+          stalled = true;
+          break;
+        }
       }
     } finally {
       this._flushing = false;
     }
+    if (this._flushAgain && !stalled) this.flushOutbox();
   },
 
   startOutbox() {

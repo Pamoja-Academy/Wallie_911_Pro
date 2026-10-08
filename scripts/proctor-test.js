@@ -255,6 +255,18 @@ assert(!P.active && timers.length === 0, "stop clears timers");
   box = R.outboxLoad();
   assert(box.queue.length === 0 && box.sentCount === 1, "outbox delivers once back online");
 
+  /* Gebeur wat in die middel van ’n stuur-rondte bykom, moet dadelik volg (nie 30s later nie) */
+  let release;
+  rpcReply = (name, args) =>
+    args?.p?.kind === "memo" ? new Promise((r) => (release = () => r({ ok: true }))) : Promise.resolve({ ok: true });
+  R.memoEvent({ subjectSlug: "wisk", open: false, minutes: 2 });
+  await new Promise((r) => setImmediate(r));
+  R.durable({ kind: "warn", title: "WAARSKUWING 1/3", text: "mid-flush" });
+  release();
+  for (let i = 0; i < 5; i++) await new Promise((r) => setImmediate(r));
+  assert(R.outboxLoad().queue.length === 0, "event queued during a flush is sent right after it");
+  rpcReply = async () => ({ ok: true });
+
   await R.sessionLock({ subjectSlug: "wisk", reason: "3 waarskuwings", locks: 1 });
   await new Promise((r) => setImmediate(r));
   const lockCall = rpcCalls.find((c) => c.args?.p?.kind === "lock");
