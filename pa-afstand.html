@@ -178,6 +178,7 @@
   <script>
     const TOKEN_KEY = "wallie911_pa_token";
     const STALE_MS = 45000;
+    const LOST_MS = 10 * 60 * 1000;
     const POLL_MS = 15000;
     const $ = (id) => document.getElementById(id);
 
@@ -309,14 +310,27 @@
       $("pulse").className = "pulse " + cls;
     }
 
+    function serverNowMs() {
+      return new Date(last.now).getTime() + (Date.now() - fetchedAt);
+    }
+
+    /* Oop sessie sonder sein vir 10 min = onderbreek (lid toe / krag af), nie meer “lewendig” nie */
+    function isLost(s) {
+      return !s.ended_at && serverNowMs() - new Date(s.last_seen).getTime() > LOST_MS;
+    }
+
     function currentSession() {
       if (!last) return null;
-      return (last.sessions || []).find((s) => !s.ended_at) || null;
+      return (
+        (last.sessions || [])
+          .filter((s) => !s.ended_at && !isLost(s))
+          .sort((a, b) => new Date(b.last_seen) - new Date(a.last_seen))[0] || null
+      );
     }
 
     function render() {
       if (!last) return;
-      const serverNow = new Date(last.now).getTime() + (Date.now() - fetchedAt);
+      const serverNow = serverNowMs();
       const isToday = last.day === sastDay(Date.now());
       const cur = isToday ? currentSession() : null;
 
@@ -358,7 +372,11 @@
       $("sessions").innerHTML = sessions.length
         ? sessions
             .map((s) => {
-              const st = s.ended_at ? `klaar ${sastTime(s.ended_at)} (${escapeHtml(s.outcome || "")})` : `<b>${escapeHtml(s.status)}</b>`;
+              const st = s.ended_at
+                ? `klaar ${sastTime(s.ended_at)} (${escapeHtml(s.outcome || "")})`
+                : isLost(s)
+                  ? `<b>onderbreek?</b> geen sein sedert ${sastTime(s.last_seen)}`
+                  : `<b>${escapeHtml(s.status)}</b>`;
               return `<div class="sess"><b>${escapeHtml(s.subject)}</b> · ${sastTime(s.started_at)} · ${st} · waarskuwings ${s.total_warnings} · slotte ${s.locks}${s.task ? `<br/><span class="meta">${escapeHtml(s.task)}</span>` : ""}</div>`;
             })
             .join("")

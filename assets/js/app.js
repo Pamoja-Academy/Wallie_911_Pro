@@ -370,6 +370,7 @@
         $("#warn-display").classList.toggle("hot", warnings > 0);
         state.live = {
           status: paused ? "locked" : warnings > 0 ? "warned" : "active",
+          sessionId: sessionMeta?.id,
           subject: subjectSlug,
           warnings,
           startedAt: sessionMeta?.startedAt || Date.now()
@@ -440,6 +441,7 @@
     };
     state.live = {
       status: "active",
+      sessionId: sessionMeta.id,
       subject: subjectSlug,
       warnings: 0,
       startedAt: sessionMeta.startedAt
@@ -1084,6 +1086,12 @@
   fromHash();
   if (!location.hash) showView("missie");
   refreshRemoteConsentLabel();
+  if (state.live?.status && state.live.status !== "off") {
+    /* Vorige sessie is nooit klaargemaak nie (lid toe / blaaier gesluit) — sê dit eerlik vir Pa */
+    WALLIE.REMOTE?.sessionInterrupted(state.live);
+    state.live = { status: "off", subject: null, warnings: 0, startedAt: null };
+    persist();
+  }
   if (WALLIE.REMOTE) {
     WALLIE.REMOTE.onDurableStatus = renderDurableStatus;
     renderDurableStatus();

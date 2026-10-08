@@ -133,8 +133,9 @@ begin
   end if;
 
   if k = 'offline' then
-    update wallie911.live set status = 'off', ended_at = coalesce(ended_at, now())
-    where ended_at is null and last_seen < now() - interval '2 minutes';
+    update wallie911.live set status = 'off', ended_at = coalesce(ended_at, now()), outcome = coalesce(outcome, 'onderbreek')
+    where ended_at is null
+      and (session_id = sid or (sid is null and last_seen < now() - interval '2 minutes'));
   end if;
 
   if k <> 'heartbeat' then
