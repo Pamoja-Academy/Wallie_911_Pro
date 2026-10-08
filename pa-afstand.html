@@ -79,178 +79,332 @@
     .stat b { display: block; font-size: 1.25rem; }
     .stat span { color: var(--muted); font-size: .75rem; }
     .stale { color: var(--lock); font-size: .85rem; margin-top: .5rem; }
+    .hidden { display: none !important; }
+    input, button, select {
+      font: inherit;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #0a100c;
+      color: var(--text);
+      padding: .6rem .75rem;
+    }
+    button { background: var(--gold); color: #10140f; font-weight: 700; border: 0; cursor: pointer; }
+    button.ghost { background: transparent; color: var(--gold); border: 1px solid var(--line); }
+    .form { display: grid; gap: .6rem; max-width: 360px; }
+    .err { color: var(--lock); font-size: .9rem; min-height: 1.2em; margin: 0; }
+    .still-wrap img { width: 100%; max-width: 480px; border-radius: 10px; display: block; background: #000; }
+    .sess { border-top: 1px solid var(--line); padding: .6rem 0; font-size: .9rem; }
+    .sess b { color: var(--text); }
+    .toolbar { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
   </style>
 </head>
 <body>
   <p class="eyebrow">Pa · afstand · soos remote invigilation</p>
-  <h1>Wallie — lewendige waarneming</h1>
-  <p class="lede">
-    Geen video in die wolk nie — wel hartklop, waarskuwings, slot, en ’n verslag ná elke sessie.
-    Sit hierdie bladsy op jou foon se tuisskerm. Kry ook push via
-    <a href="https://ntfy.sh/wallie911-pa-15sos-hanno" target="_blank" rel="noopener">ntfy</a>
-    (installeer die ntfy-app → subscribe topic <code>wallie911-pa-15sos-hanno</code>).
-  </p>
+  <h1>Wallie — lewendige konsole</h1>
 
-  <div class="card">
-    <div id="status-line" class="status off"><span class="pulse" id="pulse"></span><span id="status-text">WAG OP SEIN…</span></div>
-    <p class="meta" id="detail">Nog geen hartklop. As hy ’n hard-sessie begin (toestemming + kamera), verskyn status hier binne ~20s.</p>
-    <p class="stale hidden" id="stale">⚠ Geen hartklop >45s — sessie dalk toe / WiFi af / blaaier gesluit.</p>
+  <!-- LOGIN -->
+  <div class="card" id="login-card">
+    <form class="form" id="login-form">
+      <label class="meta" for="login-pass">Pa se wagwoord</label>
+      <input type="password" id="login-pass" autocomplete="current-password" required />
+      <button type="submit">Teken in</button>
+      <p class="err" id="login-err"></p>
+    </form>
+    <p class="meta"><a href="#" id="show-claim">Eerste keer? Ek het ’n eenmalige kode</a></p>
+    <form class="form hidden" id="claim-form">
+      <label class="meta" for="claim-code">Eenmalige kode (van die bou-agent, net een keer bruikbaar)</label>
+      <input type="text" id="claim-code" autocomplete="one-time-code" required />
+      <label class="meta" for="claim-pass">Kies jou wagwoord (minstens 8 karakters — nie Wallie se slot-PIN nie)</label>
+      <input type="password" id="claim-pass" autocomplete="new-password" minlength="8" required />
+      <input type="password" id="claim-pass2" autocomplete="new-password" minlength="8" placeholder="Herhaal wagwoord" required />
+      <button type="submit">Stel wagwoord &amp; teken in</button>
+      <p class="err" id="claim-err"></p>
+    </form>
   </div>
 
-  <div class="row" id="stats">
-    <div class="stat"><b id="s-vak">—</b><span>Vak</span></div>
-    <div class="stat"><b id="s-warn">—</b><span>Waarskuwings</span></div>
-    <div class="stat"><b id="s-left">—</b><span>Tyd oor</span></div>
-    <div class="stat"><b id="s-age">—</b><span>Laaste sein</span></div>
+  <!-- KONSOLE -->
+  <div id="console" class="hidden">
+    <div class="card">
+      <div id="status-line" class="status off"><span class="pulse" id="pulse"></span><span id="status-text">LAAI…</span></div>
+      <p class="meta" id="detail">Haal status…</p>
+      <p class="stale hidden" id="stale">⚠ Geen hartklop &gt;45s — skootrekenaar dalk toe, WiFi af of blaaier gesluit.</p>
+    </div>
+
+    <div class="row" id="stats">
+      <div class="stat"><b id="s-vak">—</b><span>Vak</span></div>
+      <div class="stat"><b id="s-left">—</b><span>Tyd oor</span></div>
+      <div class="stat"><b id="s-warn">—</b><span>Waarskuwings (nou / sessie)</span></div>
+      <div class="stat"><b id="s-locks">—</b><span>Slotte</span></div>
+      <div class="stat"><b id="s-age">—</b><span>Laaste hartklop</span></div>
+    </div>
+
+    <div class="card still-wrap hidden" id="still-card" style="margin-top:.85rem">
+      <h2 style="margin:0 0 .5rem;font-size:1rem">Kamera (elke 45 s, net tydens sessie)</h2>
+      <img id="still-img" alt="Laaste kamera-foto van Wallie se sessie" />
+      <p class="meta" id="still-meta"></p>
+    </div>
+
+    <div class="card" style="margin-top:.85rem">
+      <div class="toolbar" style="justify-content:space-between">
+        <h2 style="margin:0;font-size:1rem">Sessies</h2>
+        <input type="date" id="day-pick" aria-label="Kies dag" />
+      </div>
+      <div id="sessions"><p class="meta">Nog geen sessies vandag nie.</p></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 .5rem;font-size:1rem">Gebeure &amp; verslae</h2>
+      <ul class="reports" id="reports"><li>Nog niks vandag nie.</li></ul>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <button type="button" class="ghost" id="logout">Teken uit</button>
+        <button type="button" class="ghost" id="show-change">Verander wagwoord</button>
+      </div>
+      <form class="form hidden" id="change-form" style="margin-top:.75rem">
+        <input type="password" id="new-pass" autocomplete="new-password" minlength="8" placeholder="Nuwe wagwoord (8+)" required />
+        <button type="submit">Stoor (teken ander toestelle uit)</button>
+        <p class="err" id="change-err"></p>
+      </form>
+      <p class="meta" style="margin-top:.75rem">
+        Foon-push bly op ntfy: topic <code>wallie911-pa-15sos-hanno</code> ·
+        <a href="./index.html">Cockpit</a>
+      </p>
+    </div>
   </div>
 
-  <div class="card" style="margin-top:1rem">
-    <h2 style="margin:0 0 .5rem;font-size:1rem">Sessie-verslae (vandag)</h2>
-    <ul class="reports" id="reports"><li>Wag vir “SESSIE-VERSLAG” push…</li></ul>
-  </div>
-
-  <p class="meta" style="margin-top:1rem">
-    Cockpit: <a href="./index.html">index.html</a> ·
-    Topic: <code>wallie911-pa-15sos-hanno</code>
-  </p>
-
+  <script src="assets/js/live-config.js"></script>
   <script>
-    const TOPIC = "wallie911-pa-15sos-hanno";
-    const SERVER = "https://ntfy.sh";
+    const TOKEN_KEY = "wallie911_pa_token";
     const STALE_MS = 45000;
-    let lastAt = 0;
-    let lastHb = null;
-    const reports = [];
-
+    const POLL_MS = 15000;
     const $ = (id) => document.getElementById(id);
 
-    function fmtLeft(ms) {
-      if (ms == null || Number.isNaN(ms)) return "—";
-      const s = Math.max(0, Math.round(ms / 1000));
-      const m = String(Math.floor(s / 60)).padStart(2, "0");
-      const r = String(s % 60).padStart(2, "0");
-      return m + ":" + r;
-    }
-
-    function setStatus(st, label) {
-      const el = $("status-text");
-      const line = $("status-line");
-      const pulse = $("pulse");
-      el.textContent = label;
-      line.className = "status " + st;
-      pulse.className = "pulse " + st;
-    }
-
-    function applyHb(hb, at) {
-      lastHb = hb;
-      lastAt = at || Date.now();
-      const st = hb.status || "off";
-      const map = {
-        active: ["on", "IN SESSIE"],
-        warned: ["warn", "WAARSKUWING"],
-        locked: ["lock", "SLOT"],
-        off: ["off", "AF"]
-      };
-      const [cls, label] = map[st] || ["off", st.toUpperCase()];
-      setStatus(cls, label);
-      $("s-vak").textContent = hb.subjectSlug || "—";
-      $("s-warn").textContent = String(hb.warnings ?? "—");
-      $("s-left").textContent = fmtLeft(hb.leftMs);
-      $("detail").textContent =
-        `Status ${st}` +
-        (hb.reason ? ` · ${hb.reason}` : "") +
-        (hb.task ? ` · Taak: ${hb.task}` : "");
-      tickAge();
-    }
-
-    function tickAge() {
-      if (!lastAt) return;
-      const age = Date.now() - lastAt;
-      $("s-age").textContent = Math.round(age / 1000) + "s";
-      const stale = $("stale");
-      if (lastHb && lastHb.status && lastHb.status !== "off" && age > STALE_MS) {
-        stale.classList.remove("hidden");
-        setStatus("lock", "SEIN WEG");
-      } else {
-        stale.classList.add("hidden");
-      }
-    }
-
-    function addReport(title, body, time) {
-      reports.unshift({ title, body, time });
-      $("reports").innerHTML = reports
-        .slice(0, 20)
-        .map((r) => `<li><strong>${r.title}</strong>${r.time}<br/>${escapeHtml(r.body)}</li>`)
-        .join("");
-    }
+    let token = localStorage.getItem(TOKEN_KEY);
+    let pollTimer = null;
+    let last = null;
+    let fetchedAt = 0;
+    let stillId = null;
+    let stillAt = null;
 
     function escapeHtml(s) {
-      return String(s)
+      return String(s ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
 
-    function handleMsg(msg) {
-      const title = msg.title || "";
-      const body = msg.message || "";
-      const at = (msg.time || Date.now() / 1000) * 1000;
+    function fmtLeft(ms) {
+      if (ms == null || Number.isNaN(ms)) return "—";
+      const s = Math.max(0, Math.round(ms / 1000));
+      return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+    }
 
-      if (title.startsWith("HB ") || (msg.tags || []).includes("heartbeat")) {
-        try {
-          const hb = JSON.parse(body);
-          applyHb(hb, at);
-        } catch (_) {}
+    function fmtAge(ms) {
+      if (ms == null) return "—";
+      const s = Math.max(0, Math.round(ms / 1000));
+      return s < 120 ? s + "s" : Math.round(s / 60) + " min";
+    }
+
+    function sastDay(d) {
+      return new Date(d).toLocaleDateString("en-CA", { timeZone: "Africa/Johannesburg" });
+    }
+
+    function sastTime(d) {
+      return new Date(d).toLocaleTimeString("af-ZA", { timeZone: "Africa/Johannesburg" });
+    }
+
+    function showLogin(msg) {
+      token = null;
+      localStorage.removeItem(TOKEN_KEY);
+      clearInterval(pollTimer);
+      $("console").classList.add("hidden");
+      $("login-card").classList.remove("hidden");
+      $("login-err").textContent = msg || "";
+    }
+
+    function showConsole() {
+      $("login-card").classList.add("hidden");
+      $("console").classList.remove("hidden");
+      if (!$("day-pick").value) $("day-pick").value = sastDay(Date.now());
+      refresh();
+      clearInterval(pollTimer);
+      pollTimer = setInterval(refresh, POLL_MS);
+    }
+
+    const ERR = {
+      "bad password": "Verkeerde wagwoord.",
+      "not set": "Nog geen wagwoord nie — gebruik die eenmalige kode hieronder.",
+      "too many tries": "Te veel pogings. Wag 15 minute.",
+      "bad code": "Kode verkeerd.",
+      "already set": "Wagwoord is reeds gestel — teken bo in.",
+      "password too short": "Wagwoord moet minstens 8 karakters hê."
+    };
+
+    $("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      $("login-err").textContent = "…";
+      const r = await WALLIE.LIVE.rpc("wallie_pa_login", { p_password: $("login-pass").value }).catch((x) => ({ error: x.message }));
+      if (r.ok) {
+        token = r.token;
+        localStorage.setItem(TOKEN_KEY, token);
+        $("login-pass").value = "";
+        $("login-err").textContent = "";
+        showConsole();
+      } else {
+        $("login-err").textContent = ERR[r.error] || "Kon nie inteken nie: " + r.error;
+      }
+    });
+
+    $("show-claim").addEventListener("click", (e) => {
+      e.preventDefault();
+      $("claim-form").classList.toggle("hidden");
+    });
+
+    $("claim-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if ($("claim-pass").value !== $("claim-pass2").value) {
+        $("claim-err").textContent = "Wagwoorde stem nie ooreen nie.";
         return;
       }
-      if (title.includes("IN SESSIE") || title.includes("WAARSKUWING") || title.includes("SLOT") || title.includes("SESSIE-VERSLAG") || title.includes("AF")) {
-        if (title.includes("SESSIE-VERSLAG") || title.includes("IN SESSIE") || title.includes("WAARSKUWING") || title.includes("SLOT")) {
-          addReport(title, body, new Date(at).toLocaleTimeString("af-ZA"));
-        }
-        if (title.includes("IN SESSIE")) {
-          applyHb({ status: "active", subjectSlug: "…", warnings: 0 }, at);
-        } else if (title.includes("WAARSKUWING")) {
-          applyHb({ ...(lastHb || {}), status: "warned", reason: body }, at);
-        } else if (title.includes("SLOT")) {
-          applyHb({ ...(lastHb || {}), status: "locked" }, at);
-        } else if (title.includes("AF")) {
-          applyHb({ status: "off" }, at);
-        }
+      $("claim-err").textContent = "…";
+      const r = await WALLIE.LIVE.rpc("wallie_pa_claim", {
+        p_code: $("claim-code").value.trim(),
+        p_password: $("claim-pass").value
+      }).catch((x) => ({ error: x.message }));
+      if (r.ok) {
+        token = r.token;
+        localStorage.setItem(TOKEN_KEY, token);
+        $("claim-form").reset();
+        $("claim-err").textContent = "";
+        showConsole();
+      } else {
+        $("claim-err").textContent = ERR[r.error] || "Fout: " + r.error;
       }
+    });
+
+    $("logout").addEventListener("click", async () => {
+      const t = token;
+      showLogin("Uitgeteken.");
+      if (t) WALLIE.LIVE.rpc("wallie_pa_logout", { p_token: t }).catch(() => {});
+    });
+
+    $("show-change").addEventListener("click", () => $("change-form").classList.toggle("hidden"));
+    $("change-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const r = await WALLIE.LIVE.rpc("wallie_pa_change_password", { p_token: token, p_new: $("new-pass").value }).catch((x) => ({ error: x.message }));
+      $("change-err").textContent = r.ok ? "Gestoor." : ERR[r.error] || "Fout: " + r.error;
+      if (r.ok) $("new-pass").value = "";
+    });
+
+    $("day-pick").addEventListener("change", () => {
+      stillId = null;
+      refresh();
+    });
+
+    function setStatus(cls, label) {
+      $("status-text").textContent = label;
+      $("status-line").className = "status " + cls;
+      $("pulse").className = "pulse " + cls;
     }
 
-    /* Poll recent + live SSE */
-    async function poll() {
+    function currentSession() {
+      if (!last) return null;
+      return (last.sessions || []).find((s) => !s.ended_at) || null;
+    }
+
+    function render() {
+      if (!last) return;
+      const serverNow = new Date(last.now).getTime() + (Date.now() - fetchedAt);
+      const isToday = last.day === sastDay(Date.now());
+      const cur = isToday ? currentSession() : null;
+
+      if (cur) {
+        const age = serverNow - new Date(cur.last_seen).getTime();
+        const stale = age > STALE_MS;
+        const map = { active: ["on", "IN SESSIE"], warned: ["warn", "WAARSKUWING"], locked: ["lock", "SLOT — tyd gepouseer"] };
+        const [cls, label] = map[cur.status] || ["on", (cur.status || "").toUpperCase()];
+        if (stale) setStatus("lock", "SEIN WEG");
+        else setStatus(cls, label);
+        $("stale").classList.toggle("hidden", !stale);
+        let left = cur.left_ms;
+        if (left != null && cur.status !== "locked") left = left - age;
+        $("s-vak").textContent = cur.subject || "—";
+        $("s-left").textContent = fmtLeft(left);
+        $("s-warn").textContent = `${cur.warnings ?? 0} / ${cur.total_warnings ?? 0}`;
+        $("s-locks").textContent = String(cur.locks ?? 0);
+        $("s-age").textContent = fmtAge(age);
+        $("detail").textContent =
+          `Begin ${sastTime(cur.started_at)} · beplan ${cur.planned_min || "?"} min` + (cur.task ? ` · Taak: ${cur.task}` : "");
+      } else {
+        setStatus("off", isToday ? "AF — geen aktiewe sessie" : "Geskiedenis");
+        $("stale").classList.add("hidden");
+        ["s-vak", "s-left", "s-warn", "s-locks"].forEach((id) => ($(id).textContent = "—"));
+        const lastSeen = (last.sessions || [])[0]?.last_seen;
+        $("s-age").textContent = lastSeen ? fmtAge(serverNow - new Date(lastSeen).getTime()) : "—";
+        $("detail").textContent = isToday
+          ? "Wallie is nie nou in ’n hard-sessie nie. Hierdie bladsy verfris elke 15 s."
+          : `Wys ${last.day}.`;
+      }
+
+      const showStill = Boolean(cur && last.still && last.still.session_id === cur.session_id && stillAt);
+      $("still-card").classList.toggle("hidden", !showStill);
+      if (showStill) {
+        $("still-meta").textContent = `Foto van ${sastTime(stillAt)} (${fmtAge(serverNow - new Date(stillAt).getTime())} gelede)`;
+      }
+
+      const sessions = last.sessions || [];
+      $("sessions").innerHTML = sessions.length
+        ? sessions
+            .map((s) => {
+              const st = s.ended_at ? `klaar ${sastTime(s.ended_at)} (${escapeHtml(s.outcome || "")})` : `<b>${escapeHtml(s.status)}</b>`;
+              return `<div class="sess"><b>${escapeHtml(s.subject)}</b> · ${sastTime(s.started_at)} · ${st} · waarskuwings ${s.total_warnings} · slotte ${s.locks}${s.task ? `<br/><span class="meta">${escapeHtml(s.task)}</span>` : ""}</div>`;
+            })
+            .join("")
+        : `<p class="meta">Geen sessies op ${last.day} nie.</p>`;
+
+      const events = last.events || [];
+      $("reports").innerHTML = events.length
+        ? events
+            .map((e) => `<li><strong>${escapeHtml(e.title || e.kind)}</strong>${sastTime(e.created_at)}<br/>${escapeHtml(e.body)}</li>`)
+            .join("")
+        : "<li>Nog niks op hierdie dag nie.</li>";
+    }
+
+    async function refresh() {
+      if (!token) return;
+      const day = $("day-pick").value;
+      const isToday = !day || day === sastDay(Date.now());
+      let r;
       try {
-        const res = await fetch(`${SERVER}/${TOPIC}/json?poll=1&since=1h`);
-        const text = await res.text();
-        text
-          .trim()
-          .split("\n")
-          .filter(Boolean)
-          .forEach((line) => {
-            try {
-              handleMsg(JSON.parse(line));
-            } catch (_) {}
-          });
+        r = await WALLIE.LIVE.rpc("wallie_pa_live", { p_token: token, p_day: isToday ? null : day });
       } catch (e) {
-        $("detail").textContent = "Kon nie ntfy bereik nie: " + e.message;
+        $("detail").textContent = "Kon nie die konsole bereik nie (" + e.message + "). Probeer weer oor 15 s.";
+        setStatus("lock", "GEEN VERBINDING");
+        return;
       }
+      if (!r.ok) {
+        if (r.error === "auth") showLogin("Sessie het verval — teken weer in.");
+        else $("detail").textContent = "Fout: " + r.error;
+        return;
+      }
+      last = r;
+      fetchedAt = Date.now();
+      if (r.still && r.still.id !== stillId) {
+        const img = await WALLIE.LIVE.rpc("wallie_pa_still", { p_token: token, p_id: r.still.id }).catch(() => null);
+        if (img && img.ok) {
+          stillId = img.id;
+          stillAt = img.created_at;
+          $("still-img").src = "data:image/jpeg;base64," + img.jpeg_b64;
+        }
+      }
+      render();
     }
 
-    poll();
-    setInterval(tickAge, 1000);
-
-    try {
-      const es = new EventSource(`${SERVER}/${TOPIC}/sse`);
-      es.onmessage = (ev) => {
-        try {
-          handleMsg(JSON.parse(ev.data));
-        } catch (_) {}
-      };
-    } catch (e) {
-      setInterval(poll, 15000);
-    }
+    setInterval(render, 1000);
+    if (token) showConsole();
+    else showLogin("");
   </script>
 </body>
 </html>
