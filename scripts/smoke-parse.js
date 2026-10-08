@@ -89,7 +89,23 @@ if (typeof W.buildDayPlan === "function") {
   assert(hasBreak, "Sunday plan has rugby break");
   const study = plan.blocks.filter((b) => b.kind !== "break");
   assert(study.length >= 2, "at least 2 study blocks");
+
+  for (const d of ["2026-10-08", "2026-10-09", "2026-10-10", "2026-10-11"]) {
+    const p = W.buildDayPlan(d);
+    const eng = p.blocks.find((b) => b.subjectSlug === "engels");
+    const toe = p.blocks.find((b) => b.subjectSlug === "toerisme");
+    assert(eng && eng.minutes >= 40 && eng.minutes <= 50, `${d} Engels 40–50 min`);
+    assert(toe && toe.minutes >= 20 && toe.minutes <= 30, `${d} Toerisme 20–30 min`);
+  }
+  const rotated = ["2026-10-12", "2026-10-13", "2026-10-14"].map((d) =>
+    W.buildDayPlan(d).blocks.find((b) => b.id.endsWith("-geel"))?.subjectSlug
+  );
+  assert(new Set(rotated).size === 3, "geel rotates LO / Engels / Toerisme after kickoff");
 }
+
+assert(html.includes("js-export-log"), "export log button");
+assert(html.includes("wallie911_v2_bok"), "export names storage key");
+assert(html.includes("hannovz@gmail.com"), "export names Pa email");
 
 if (W.storage) {
   const st = W.storage.load();

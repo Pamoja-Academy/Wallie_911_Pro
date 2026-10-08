@@ -84,6 +84,21 @@
         </div>
         <ol class="block-list" id="block-list"></ol>
       </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Stuur my log na Pa</h2>
+        </div>
+        <p class="hint">
+          Laai die volle kamp-log (<code>wallie911_v2_bok</code>) af as JSON.
+          Deel dit in een tik na Pa — <strong>hannovz@gmail.com</strong> — via WhatsApp of e-pos.
+        </p>
+        <div class="btn-row">
+          <button type="button" class="btn primary js-export-log">Laai log af (JSON)</button>
+          <button type="button" class="btn ghost js-share-log">Deel met Pa</button>
+          <button type="button" class="btn ghost js-copy-log">Kopieer log</button>
+        </div>
+        <p class="hint js-export-status" aria-live="polite"></p>
+      </div>
     </section>
 
     <!-- SESSIE -->
@@ -184,6 +199,13 @@
           · <a href="https://ntfy.sh/app" target="_blank" rel="noopener">ntfy-app subscribe</a>
         </p>
         <p class="hint" id="remote-consent-status">Toestemming: …</p>
+        <p class="hint">As die foon stil is: vra Wallie om die log hier af te laai en te stuur.</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary js-export-log">Laai log af (JSON)</button>
+          <button type="button" class="btn ghost js-share-log">Deel met Pa</button>
+          <button type="button" class="btn ghost js-copy-log">Kopieer log</button>
+        </div>
+        <p class="hint js-export-status" aria-live="polite"></p>
       </div>
       <div class="stats-row" id="pa-status-cards"></div>
       <div class="panel">
