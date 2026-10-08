@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Gasvryheidstudie · Higiëne: Temperatuur-gevaarsone" font-family="Arial, Helvetica, sans-serif">
+<defs></defs>
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#d4472f"/><rect y="50" width="800" height="22" fill="#d4472f"/>
+<text x="24" y="27" font-size="15" fill="#ffffff" font-weight="800" letter-spacing="2">GASVRYHEIDSTUDIE · HIGIËNE</text>
+<text x="24" y="60" font-size="29" fill="#ffffff" font-weight="900">Temperatuur-gevaarsone</text>
+
+    <rect x="126" y="96" width="48" height="340" rx="24" fill="#e9efe9"/>
+    <rect x="136" y="220" width="28" height="220" rx="14" fill="#ff6b57"/>
+    <circle cx="150" cy="462" r="38" fill="#ff6b57" stroke="#e9efe9" stroke-width="6"/>
+    <line x1="174" y1="128" x2="210" y2="128" stroke="#e9efe9" stroke-width="3"/><line x1="174" y1="188" x2="210" y2="188" stroke="#e9efe9" stroke-width="3"/><line x1="174" y1="254" x2="210" y2="254" stroke="#e9efe9" stroke-width="3"/><line x1="174" y1="378" x2="210" y2="378" stroke="#e9efe9" stroke-width="3"/><line x1="174" y1="438" x2="210" y2="438" stroke="#e9efe9" stroke-width="3"/>
+    <rect x="220" y="96" width="556" height="58" rx="12" fill="#3ddc84"/><text x="240" y="136" font-size="30" fill="#10140f" font-weight="900">75 °C</text><text x="400" y="133" font-size="20" fill="#10140f" font-weight="700">Gaar &amp; herverhit: kern 75 °C+</text>
+    <rect x="220" y="160" width="556" height="58" rx="12" fill="#9be7b9"/><text x="240" y="200" font-size="30" fill="#10140f" font-weight="900">60 °C+</text><text x="400" y="197" font-size="20" fill="#10140f" font-weight="700">Warm hou: bo 60 °C</text>
+    <rect x="220" y="224" width="556" height="128" rx="12" fill="#ff6b57" stroke="#fff" stroke-width="4"/>
+    <text x="240" y="280" font-size="36" fill="#fff" font-weight="900">5 – 60 °C</text>
+    <text x="240" y="318" font-size="26" fill="#fff" font-weight="900" letter-spacing="2">GEVAARSONE</text>
+    <text x="450" y="270" font-size="21" fill="#fff" font-weight="700"><tspan x="450" dy="0">Bakterieë verdubbel</tspan><tspan x="450" dy="27">± elke 20 minute</tspan><tspan x="450" dy="27">Maks. 2 uur hier</tspan></text>
+    <circle cx="712" cy="262" r="11" fill="#ffe2dc"/><circle cx="738" cy="288" r="11" fill="#ffe2dc"/><circle cx="712" cy="314" r="11" fill="#ffe2dc"/>
+    <rect x="220" y="358" width="556" height="58" rx="12" fill="#5cc8ff"/><text x="240" y="398" font-size="30" fill="#10140f" font-weight="900">0 – 5 °C</text><text x="400" y="395" font-size="20" fill="#10140f" font-weight="700">Yskas: koud hou</text>
+    <rect x="220" y="422" width="556" height="58" rx="12" fill="#2f7fb0"/><text x="240" y="462" font-size="30" fill="#fff" font-weight="900">−18 °C</text><text x="400" y="459" font-size="20" fill="#fff" font-weight="700">Vrieskas: −18 °C of kouer</text>
+    <text x="150" y="510" font-size="10" fill="#f6f8f3" font-weight="700"></text>
+</svg>
