@@ -50,4 +50,6 @@ Sonder Node maak `START-HIER.bat` outomaties die HTTPS-skakel hierbo oop.
 - Foon-push bly op ntfy: topic `wallie911-pa-15sos-hanno` (net belangrike gebeure; geen hartklop meer nie).
 - Toetse: `node scripts/proctor-test.js` (slot + uitboks), `node scripts/smoke-parse.js`.
 
-**[Principal briefing (English)](principal-briefing.html)** — https://pamoja-academy.github.io/Wallie_911_Pro/principal-briefing.html
+**[Hoof-briefing (Afrikaans)](principal-briefing.html)** — https://pamoja-academy.github.io/Wallie_911_Pro/principal-briefing.html
+
+**[English](principal-briefing-en.html)** — https://pamoja-academy.github.io/Wallie_911_Pro/principal-briefing-en.html
