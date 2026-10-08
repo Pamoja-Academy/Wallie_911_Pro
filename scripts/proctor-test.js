@@ -65,6 +65,8 @@ const sandbox = {
   console,
   JSON,
   Math,
+  URL,
+  URLSearchParams,
   Date: FakeDate,
   setTimeout: (fn, ms) => schedule(fn, ms, false),
   clearTimeout: clear,
@@ -242,6 +244,7 @@ assert(!P.active && timers.length === 0, "stop clears timers");
   assert(box.queue.length === 1 && box.queue[0].payload.kind === "start", "offline: start event kept in outbox");
   assert(box.queue[0].payload.session_id === "s_1" && box.queue[0].payload.planned_min === 45, "start payload carries live fields");
   assert(ntfyCalls.length === 1, "start still pushes to ntfy once");
+  assert(new URL(ntfyCalls[0]).searchParams.get("title") === "IN SESSIE — begin", "ntfy title sent as UTF-8 query param");
 
   rpcReply = async () => ({ ok: true });
   advance(15000);
