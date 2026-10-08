@@ -131,6 +131,11 @@
             <button type="button" class="btn primary" id="start-session">Begin sessie</button>
             <button type="button" class="btn danger" id="end-session" disabled>Eindig sessie</button>
           </div>
+          <div class="btn-row">
+            <button type="button" class="btn ghost" id="memo-toggle">Maak memo oop (PDF)</button>
+            <input type="file" id="memo-file" accept=".pdf,image/*" hidden />
+          </div>
+          <p class="hint">Memo hier in die app tel nie as wegkyk nie (maks 15 min, Pa kry ’n sein). Tab-wissel of ’n ander program tel steeds.</p>
           <div class="lock-box hidden" id="lock-box">
             <p><strong>Sessie gesluit.</strong> Pa moet ontsluit.</p>
             <input type="password" id="unlock-pin" placeholder="Pa-PIN" autocomplete="off" />
@@ -138,6 +143,9 @@
           </div>
           <ul class="event-log" id="session-events"></ul>
         </div>
+      </div>
+      <div class="panel hidden" id="memo-viewer">
+        <iframe id="memo-frame" title="Memo" style="width:100%;height:75vh;border:0;border-radius:8px;background:#fff"></iframe>
       </div>
     </section>
 
@@ -188,17 +196,18 @@
     <section class="view" id="view-pa">
       <div class="hero-strip">
         <h1>Pa-dashboard</h1>
-        <p class="lede">Lewendige status · waarskuwings · dag-opsomming. Video bly op sy masjien — metadata + hartklop gaan afstand toe (ntfy).</p>
+        <p class="lede">Lewendige status · waarskuwings · dag-opsomming. Tydens ’n hard-sessie sien Pa lewendig (met wagwoord) status, tyd, waarskuwings en elke 45 s ’n kamera-foto. Geen deurlopende video nie.</p>
       </div>
       <div class="panel" id="remote-panel">
         <h2>Afstand-waarneming (jy by kliente)</h2>
         <p class="hint">
-          Foon-dashboard:
+          Pa-konsole (wagwoord):
           <a href="pa-afstand.html" target="_blank" rel="noopener">pa-afstand.html</a>
           · Push-topic: <code id="remote-topic">wallie911-pa-15sos-hanno</code>
           · <a href="https://ntfy.sh/app" target="_blank" rel="noopener">ntfy-app subscribe</a>
         </p>
         <p class="hint" id="remote-consent-status">Toestemming: …</p>
+        <p class="hint js-durable-status" aria-live="polite"></p>
         <p class="hint">As die foon stil is: vra Wallie om die log hier af te laai en te stuur.</p>
         <div class="btn-row">
           <button type="button" class="btn primary js-export-log">Laai log af (JSON)</button>
@@ -302,6 +311,7 @@
           </label>
           <button type="submit" class="btn primary">Stuur probleem-rapport</button>
         </form>
+        <p class="hint js-durable-status" aria-live="polite"></p>
       </div>
       <div class="panel">
         <div class="panel-head">
@@ -348,13 +358,14 @@
     <div class="modal-card">
       <h2>Waarneming &amp; verslaggewing</h2>
       <p class="hint">
-        Hard-proctor stuur <strong>lewendige status, waarskuwings, slot-seine en ’n sessie-verslag</strong>
-        na Pa se foon (ntfy). Die kamera-beeld bly op <em>hierdie</em> skootrekenaar — nie in die wolk nie.
-        Jy het hiertoe ingestem; merk om voort te gaan op hierdie toestel.
+        Hard-proctor stuur <strong>lewendige status, waarskuwings, slot-seine, ’n sessie-verslag en jou survey</strong>
+        na Pa se foon (ntfy) en na Pa se wagwoord-beskermde konsole. <strong>Nuut:</strong> tydens ’n sessie gaan
+        <strong>elke 45 sekondes ’n klein kamera-foto</strong> na Pa se konsole (net tydens sessies; ou foto’s word ná 3 dae uitgevee).
+        Geen deurlopende video of klank nie. Merk om voort te gaan op hierdie toestel.
       </p>
       <label class="field" style="display:flex;gap:.6rem;align-items:flex-start;margin:1rem 0">
         <input type="checkbox" id="remote-consent-check" style="margin-top:.3rem" />
-        <span>Ek stem in tot afstand-waarneming van sessie-metadata en verslaggewing aan Pa vir hierdie matric-kamp.</span>
+        <span>Ek stem in tot afstand-waarneming van sessie-metadata, kamera-foto’s tydens sessies en verslaggewing aan Pa vir hierdie matric-kamp.</span>
       </label>
       <div class="btn-row">
         <button type="button" class="btn primary" id="remote-consent-save">Stoor &amp; gaan aan</button>
@@ -367,6 +378,7 @@
   <script src="assets/js/schedule.js"></script>
   <script src="assets/js/surveys.js"></script>
   <script src="assets/js/proctor.js"></script>
+  <script src="assets/js/live-config.js"></script>
   <script src="assets/js/remote.js"></script>
   <script src="assets/js/app.js"></script>
 </body>

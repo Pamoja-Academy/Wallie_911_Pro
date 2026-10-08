@@ -237,6 +237,92 @@
     ul.prepend(li);
   }
 
+  let memoUrl = null;
+  let stillTimer = null;
+  const STILL_MS = 45000;
+
+  /* Klein JPEG van die kamera vir Pa se konsole — net tydens ’n aktiewe sessie */
+  function captureStill() {
+    const video = $("#camera");
+    if (!WALLIE.proctor.active || !video?.videoWidth) return;
+    const w = 320;
+    const h = Math.round((video.videoHeight / video.videoWidth) * w) || 240;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+    const b64 = canvas.toDataURL("image/jpeg", 0.6).split(",")[1];
+    WALLIE.REMOTE?.sendStill(b64);
+  }
+
+  function startStills() {
+    stopStills();
+    setTimeout(captureStill, 5000);
+    stillTimer = setInterval(captureStill, STILL_MS);
+  }
+
+  function stopStills() {
+    if (stillTimer) clearInterval(stillTimer);
+    stillTimer = null;
+  }
+
+  function openMemoPicker() {
+    if (WALLIE.proctor.active && WALLIE.proctor.locked) {
+      alert("Sessie is gesluit. Pa moet eers ontsluit.");
+      return;
+    }
+    /* Die lêer-dialoog steel fokus; grasie eindig sodra die venster fokus terugkry */
+    if (WALLIE.proctor.active) WALLIE.proctor.grace(60000, { untilFocus: true });
+    $("#memo-file").click();
+  }
+
+  function showMemo(file) {
+    if (memoUrl) URL.revokeObjectURL(memoUrl);
+    memoUrl = URL.createObjectURL(file);
+    const frame = $("#memo-frame");
+    frame.src = memoUrl;
+    $("#memo-viewer").classList.remove("hidden");
+    $("#memo-toggle").textContent = "Maak memo toe";
+    if (WALLIE.proctor.active) {
+      const wasOpen = Boolean(WALLIE.proctor.memoSince);
+      WALLIE.proctor.setMemoMode(true, frame);
+      logEvent(`Memo oop in app: ${file.name}`);
+      if (!wasOpen) {
+        WALLIE.REMOTE?.memoEvent({
+          subjectSlug: sessionMeta?.subjectSlug,
+          open: true,
+          fileName: file.name
+        });
+      }
+    }
+  }
+
+  function closeMemo(why) {
+    const viewer = $("#memo-viewer");
+    if (!viewer || viewer.classList.contains("hidden")) return;
+    viewer.classList.add("hidden");
+    $("#memo-frame").removeAttribute("src");
+    if (memoUrl) URL.revokeObjectURL(memoUrl);
+    memoUrl = null;
+    $("#memo-toggle").textContent = "Maak memo oop (PDF)";
+    if (WALLIE.proctor.memoSince) {
+      WALLIE.proctor.setMemoMode(false);
+      logEvent(`Memo toe${why ? ` (${why})` : ""}`);
+      WALLIE.REMOTE?.memoEvent({
+        subjectSlug: sessionMeta?.subjectSlug,
+        open: false,
+        minutes: WALLIE.proctor.memoMinutes()
+      });
+    }
+  }
+
+  function renderDurableStatus(text) {
+    const msg = text || WALLIE.REMOTE?.durableStatus() || "";
+    $$(".js-durable-status").forEach((el) => {
+      el.textContent = msg;
+    });
+  }
+
   function setCameraStatus(text, cls) {
     const el = $("#camera-status");
     el.textContent = text;
@@ -278,11 +364,12 @@
     const result = await WALLIE.proctor.start({
       minutes,
       onTick: (left, warnings) => {
-        $("#timer-display").textContent = formatMs(left);
+        const paused = WALLIE.proctor.locked;
+        $("#timer-display").textContent = formatMs(left) + (paused ? " ⏸" : "");
         $("#warn-display").textContent = `Waarskuwings: ${warnings} / 3`;
         $("#warn-display").classList.toggle("hot", warnings > 0);
         state.live = {
-          status: warnings > 0 ? "warned" : "active",
+          status: paused ? "locked" : warnings > 0 ? "warned" : "active",
           subject: subjectSlug,
           warnings,
           startedAt: sessionMeta?.startedAt || Date.now()
@@ -291,34 +378,42 @@
         updateLiveDot();
         WALLIE.REMOTE?.updateLive({
           status: state.live.status,
-          subjectSlug,
           warnings,
-          startedAt: state.live.startedAt,
-          leftMs: left,
-          task
+          totalWarnings: WALLIE.proctor.totalWarnings,
+          locks: WALLIE.proctor.locks,
+          leftMs: left
         });
       },
-      onWarn: (n, reason) => {
+      onWarn: (n, reason, total) => {
         logEvent(`Waarskuwing ${n}: ${reason}`);
         setCameraStatus(`Waarskuwing ${n}/3 — ${reason}`, "warn");
         WALLIE.REMOTE?.sessionWarn({
           warnings: n,
+          totalWarnings: total,
           reason,
           subjectSlug,
-          leftMs: state.live?.leftMs
+          leftMs: WALLIE.proctor.timeLeft()
         });
       },
-      onLock: () => {
+      onIgnore: (reason) => {
+        logEvent(`Nie getel nie (grasie ná begin/ontsluit): ${reason}`);
+      },
+      onMemoTimeout: () => {
+        closeMemo("15 min memo-limiet");
+      },
+      onLock: (n, reason) => {
         locked = true;
         state.live.status = "locked";
         persist();
+        closeMemo("slot");
         $("#lock-box").classList.remove("hidden");
-        setCameraStatus("GESLUIT — Pa-PIN nodig", "lock");
-        logEvent("Sessie gesluit ná 3 waarskuwings");
+        setCameraStatus("GESLUIT — tyd gepouseer · Pa-PIN nodig", "lock");
+        logEvent(`Sessie gesluit ná 3 waarskuwings (laaste: ${reason}). Tyd gepouseer.`);
         updateLiveDot();
         WALLIE.REMOTE?.sessionLock({
           subjectSlug,
-          reason: "3 waarskuwings (tab/fokus)"
+          reason: `3 waarskuwings (laaste: ${reason})`,
+          locks: WALLIE.proctor.locks
         });
       },
       onEnd: (reason) => finishSession(reason)
@@ -331,7 +426,11 @@
     }
 
     video.srcObject = result.stream;
+    if (!$("#memo-viewer").classList.contains("hidden")) {
+      WALLIE.proctor.setMemoMode(true, $("#memo-frame"));
+    }
     sessionMeta = {
+      id: "s_" + Date.now(),
       subjectSlug,
       minutes,
       task,
@@ -351,14 +450,27 @@
     setCameraStatus("LEWENDIG — hard-proctor + Pa-sein", "live");
     logEvent(`Sessie begin: ${subjectBySlug(subjectSlug)?.naam || subjectSlug} (${minutes}m)`);
     updateLiveDot();
-    WALLIE.REMOTE?.sessionStart({ subjectSlug, minutes, task });
+    WALLIE.REMOTE?.sessionStart({
+      sessionId: sessionMeta.id,
+      subjectSlug,
+      minutes,
+      task,
+      startedAt: sessionMeta.startedAt
+    });
+    startStills();
     showView("sessie");
   }
 
   function finishSession(outcome) {
-    const warnings = state.live?.warnings || 0;
+    closeMemo("sessie klaar");
+    const warnings = WALLIE.proctor.totalWarnings || 0;
+    const locks = WALLIE.proctor.locks || 0;
+    const memoMin = WALLIE.proctor.memoMinutes();
     const elapsedMin = sessionMeta
-      ? Math.max(1, Math.round((Date.now() - sessionMeta.startedAt) / 60000))
+      ? Math.max(
+          1,
+          Math.round((Date.now() - sessionMeta.startedAt - WALLIE.proctor.lockedTotalMs()) / 60000)
+        )
       : 0;
 
     let newSession = null;
@@ -367,18 +479,21 @@
     const subjectSlug = sessionMeta?.subjectSlug;
     if (sessionMeta) {
       newSession = {
-        id: "s_" + Date.now(),
+        id: sessionMeta.id,
         date: sessionMeta.date,
         subjectSlug,
         task,
         durationMin: Math.min(elapsedMin, sessionMeta.minutes),
         warnings,
+        locks,
+        memoMin,
         outcome
       };
       state.sessions.unshift(newSession);
       state.pendingSurveySessionId = newSession.id;
     }
 
+    stopStills();
     WALLIE.proctor.stop();
     $("#camera").srcObject = null;
     $("#start-session").disabled = false;
@@ -397,7 +512,11 @@
         plannedMin,
         outcome,
         warnings,
-        task
+        locks,
+        memoMin,
+        task,
+        date: newSession.date,
+        sessionId: newSession.id
       });
       openWallieSurvey(newSession);
     } else {
@@ -760,6 +879,15 @@
   });
 
   $("#start-session").addEventListener("click", () => startSessionFromUI());
+  $("#memo-toggle").addEventListener("click", () => {
+    if ($("#memo-viewer").classList.contains("hidden")) openMemoPicker();
+    else closeMemo();
+  });
+  $("#memo-file").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (file) showMemo(file);
+  });
   $("#end-session").addEventListener("click", () => {
     if (locked) {
       alert("Eers ontsluit met Pa-PIN.");
@@ -772,13 +900,22 @@
     const pin = $("#unlock-pin").value;
     if (pin === state.pin) {
       locked = false;
+      WALLIE.proctor.unlock();
       $("#lock-box").classList.add("hidden");
       $("#unlock-pin").value = "";
       state.live.status = "active";
+      state.live.warnings = 0;
       persist();
-      setCameraStatus("Ontsluit — gaan voort", "live");
-      logEvent("Pa het sessie ontsluit");
+      $("#warn-display").textContent = "Waarskuwings: 0 / 3";
+      $("#warn-display").classList.remove("hot");
+      setCameraStatus("Ontsluit — waarskuwings terug na 0, tyd loop weer", "live");
+      logEvent("Pa het sessie ontsluit · waarskuwings terug na 0/3 · tyd loop weer");
       updateLiveDot();
+      WALLIE.REMOTE?.sessionUnlock({
+        subjectSlug: sessionMeta?.subjectSlug,
+        leftMs: WALLIE.proctor.timeLeft(),
+        locks: WALLIE.proctor.locks
+      });
     } else {
       alert("Verkeerde PIN.");
     }
@@ -817,9 +954,8 @@
     $("#wallie-survey-modal").classList.add("hidden");
     logEvent("Wallie-survey gestoor");
     const a = result.answers;
-    WALLIE.REMOTE?.publish({
-      title: "SURVEY — Wallie ná sessie",
-      message: [
+    WALLIE.REMOTE?.wallieSurvey({
+      text: [
         `Vak: ${subjectBySlug(form.dataset.subjectSlug)?.naam || form.dataset.subjectSlug}`,
         `Fokus: ${a.fokus}/5`,
         `Metode: ${a.metode}`,
@@ -829,8 +965,7 @@
       ]
         .filter(Boolean)
         .join("\n"),
-      tags: ["memo", "speech_balloon"],
-      priority: 3
+      data: state.wallieSurveys[0]
     });
   });
 
@@ -868,6 +1003,24 @@
       answers: result.answers
     });
     persist();
+    const pa = result.answers;
+    const linked = state.sessions.find((s) => s.id === sessionId);
+    WALLIE.REMOTE?.paSurvey({
+      text: [
+        linked
+          ? `Sessie: ${subjectBySlug(linked.subjectSlug)?.naam || linked.subjectSlug} · ${linked.durationMin}m · ${linked.warnings}w`
+          : `Sessie: ${sessionId}`,
+        `Teenwoordig: ${pa.teenwoordig}`,
+        `Produksie: ${pa.produksie}`,
+        `Houding: ${pa.houding}`,
+        `Vertroue: ${pa.vertroue}`,
+        `Verandering: ${pa.verandering}`,
+        pa.nota ? `Nota: ${pa.nota}` : null
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      data: state.paSurveys[0]
+    });
     alert("Pa-survey gestoor. Kyk Verbeter vir die daaglikse lus.");
     renderVerbeter();
   });
@@ -894,11 +1047,25 @@
       href: location.href
     });
     persist();
+    const bug = state.bugReports[0];
+    WALLIE.REMOTE?.bugReport({
+      text: [
+        `Tipe: ${bug.tipe} · ${bug.severity}`,
+        bug.subjectSlug ? `Vak: ${subjectBySlug(bug.subjectSlug)?.naam || bug.subjectSlug}` : null,
+        bug.detail,
+        bug.code ? `Kode: ${bug.code}` : null,
+        `Bladsy: ${bug.href}`
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      data: bug,
+      blocking: bug.severity === "blokkeer"
+    });
     $("#bug-detail").value = "";
     $("#bug-code").value = "";
     document.querySelectorAll('input[name="bugTipe"]').forEach((r) => (r.checked = false));
     renderBugs();
-    alert("Dankie — probleem gestoor. Pa kan dit onder Verbeter sien.");
+    alert("Dankie — probleem gestoor en na Pa gestuur (push + e-pos-kopie). Pa sien dit ook onder Verbeter.");
   });
 
   $("#bug-refresh")?.addEventListener("click", () => renderBugs());
@@ -917,6 +1084,11 @@
   fromHash();
   if (!location.hash) showView("missie");
   refreshRemoteConsentLabel();
+  if (WALLIE.REMOTE) {
+    WALLIE.REMOTE.onDurableStatus = renderDurableStatus;
+    renderDurableStatus();
+    WALLIE.REMOTE.startOutbox();
+  }
   renderMissie();
   renderPa();
 })();
