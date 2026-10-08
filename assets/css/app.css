@@ -948,7 +948,7 @@ body.les-open { overflow: hidden; }
 .les-viewer.zone-groen .les-top { border-bottom-color: var(--groen); }
 .les-viewer.zone-slot .les-top { border-bottom-color: var(--slot); }
 .les-subject { font-weight: 800; font-size: 1.1rem; }
-.les-count { margin-left: auto; color: var(--muted); font-weight: 800; }
+.les-count { margin-left: auto; color: var(--muted); font-weight: 800; white-space: nowrap; flex-shrink: 0; }
 .les-close {
   width: var(--hit);
   height: var(--hit);
