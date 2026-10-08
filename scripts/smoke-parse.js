@@ -65,6 +65,7 @@ const order = [
   "assets/js/schedule.js",
   "assets/js/surveys.js",
   "assets/js/proctor.js",
+  "assets/js/lessons.js",
 ];
 
 for (const rel of order) {
@@ -106,6 +107,24 @@ if (typeof W.buildDayPlan === "function") {
 assert(html.includes("js-export-log"), "export log button");
 assert(html.includes("wallie911_v2_bok"), "export names storage key");
 assert(html.includes("hannovz@gmail.com"), "export names Pa email");
+
+assert(html.includes('id="les-viewer"'), "index has lesson viewer");
+assert(html.includes('id="view-leer"'), "index has Lesse view");
+assert(html.includes("assets/js/lesson-ui.js"), "index loads lesson-ui.js");
+if (W.LESSONS && Array.isArray(W.SUBJECTS)) {
+  const imgDir = path.join(root, "assets/img/lessons");
+  for (const slug of [...W.SUBJECTS.map((s) => s.slug), "foutbank"]) {
+    const les = W.LESSONS[slug];
+    assert(les && les.concepts.length >= 3, `${slug} has >=3 visual concepts`);
+    assert(fs.existsSync(path.join(imgDir, slug, "cover.svg")), `${slug} cover.svg exists`);
+    for (const c of les?.concepts || []) {
+      assert(fs.existsSync(path.join(imgDir, slug, `${c.id}.svg`)), `${slug}/${c.id}.svg exists`);
+      assert(c.cues.length >= 2 && c.cues.length <= 4 && c.memo.length > 0, `${slug}/${c.id} has 2-4 cues + memo`);
+    }
+  }
+} else {
+  fails.push("WALLIE.LESSONS loaded");
+}
 
 if (W.storage) {
   const st = W.storage.load();

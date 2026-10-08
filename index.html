@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Wallie_911_Pro — Springbok SOS Kamp</title>
   <link rel="stylesheet" href="assets/css/app.css" />
+  <link rel="icon" href="assets/img/lessons/ui/trui-15.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
@@ -20,16 +21,22 @@
         <span class="brand-sub">#15 · Springbok SOS · Matric-wêreldbekerkamp</span>
       </div>
     </div>
-    <nav class="nav" id="main-nav">
+    <nav class="nav" id="main-nav" aria-label="Hoofkieslys">
       <button type="button" class="nav-btn active" data-view="missie">Missie</button>
+      <button type="button" class="nav-btn" data-view="leer">Lesse</button>
       <button type="button" class="nav-btn" data-view="sessie">Sessie</button>
-      <button type="button" class="nav-btn" data-view="vakke">Vakke</button>
       <button type="button" class="nav-btn" data-view="foutbank">Foutbank</button>
-      <button type="button" class="nav-btn" data-view="oplaai">Oplaai</button>
-      <button type="button" class="nav-btn" data-view="pa">Pa</button>
-      <button type="button" class="nav-btn" data-view="verbeter">Verbeter</button>
-      <button type="button" class="nav-btn" data-view="probleem">Probleem</button>
-      <button type="button" class="nav-btn" data-view="docs">Docs</button>
+      <details class="nav-more">
+        <summary>Meer ▾</summary>
+        <div class="nav-more-menu">
+          <button type="button" class="nav-btn" data-view="vakke">Vakke</button>
+          <button type="button" class="nav-btn" data-view="oplaai">Oplaai</button>
+          <button type="button" class="nav-btn" data-view="pa">Pa</button>
+          <button type="button" class="nav-btn" data-view="verbeter">Verbeter</button>
+          <button type="button" class="nav-btn" data-view="probleem">Probleem</button>
+          <button type="button" class="nav-btn" data-view="docs">Docs</button>
+        </div>
+      </details>
     </nav>
     <div class="countdown" id="countdown" title="Tot 12 Okt 2026 09:00">
       <span class="countdown-num" id="days-left">—</span>
@@ -40,49 +47,43 @@
   <main>
     <!-- MISSIE -->
     <section class="view active" id="view-missie">
-      <div class="stadium-clock" id="countdown-clock" aria-live="polite">
-        <p class="stadium-eyebrow">Wêreldbeker-klok · Matriek eindeksamen</p>
-        <h2 class="stadium-title">Openingswedstryd — <time datetime="2026-10-12">12 Oktober 2026</time> · 09:00</h2>
-        <div class="stadium-digits">
-          <div class="digit-block"><span id="cd-days">—</span><small>dae</small></div>
-          <span class="digit-sep" aria-hidden="true">:</span>
-          <div class="digit-block"><span id="cd-hours">—</span><small>uur</small></div>
-          <span class="digit-sep" aria-hidden="true">:</span>
-          <div class="digit-block"><span id="cd-mins">—</span><small>min</small></div>
-          <span class="digit-sep" aria-hidden="true">:</span>
-          <div class="digit-block"><span id="cd-secs">—</span><small>sek</small></div>
+      <div class="md-hero">
+        <img class="md-trui" src="assets/img/lessons/ui/trui-15.svg" alt="Springbok-trui nommer 15" width="240" height="220" />
+        <div class="md-hero-text">
+          <p class="stadium-eyebrow">SOS · Rassie se oproep · trui #15</p>
+          <h1>Wallie — jy’s die #15</h1>
+          <p class="md-hero-line"><strong><span id="missie-days-left">—</span> dae</strong> tot die openingswedstryd. Wen die matric-Wêreldbeker: een blok, een prent, een toe-boek op ’n slag.</p>
+          <details class="md-story">
+            <summary>Lees Rassie se oproep</summary>
+            <p>
+              Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngomezulu
+              het ’n misterieuse siekte. Rassie het jou gebel: jy trek die <strong>#15</strong> aan
+              en speel jouself in die Springbokspan — deur hierdie matric-Wêreldbeker te wen.
+              Teiken: 60% alle vakke · Wisk. Gelett. 80% · Engels 70%. Hard-proctor + Pa kyk saam.
+            </p>
+          </details>
         </div>
-        <p class="stadium-status" id="cd-status">Laai aftelling…</p>
+        <div class="stadium-clock" id="countdown-clock" aria-live="polite">
+          <p class="stadium-eyebrow">Openingswedstryd · <time datetime="2026-10-12T09:00">12 Okt · 09:00</time></p>
+          <div class="stadium-digits">
+            <div class="digit-block"><span id="cd-days">—</span><small>dae</small></div>
+            <div class="digit-block"><span id="cd-hours">—</span><small>uur</small></div>
+            <div class="digit-block"><span id="cd-mins">—</span><small>min</small></div>
+            <div class="digit-block"><span id="cd-secs">—</span><small>sek</small></div>
+          </div>
+          <p class="stadium-status" id="cd-status">Laai aftelling…</p>
+        </div>
       </div>
 
-      <div class="sos-banner">
-        <p class="eyebrow">SOS · Lang skoot van Rassie Erasmus · trui #15</p>
-        <h1>Wallie — jy’s die #15</h1>
-        <p>
-          Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngomezulu
-          het ’n misterieuse siekte.
-          <strong><span id="missie-days-left">—</span> dae</strong> tot die openingswedstryd
-          (<strong>12 Okt</strong>). Rassie het jou gebel: jy trek die <strong>#15</strong> aan
-          en speel jouself in die Springbokspan — deur hierdie matric-Wêreldbeker te wen.
-        </p>
-        <div class="sos-meta">
-          <span class="chip">Trui #15</span>
-          <span class="chip">12 Okt openingswedstryd</span>
-          <span class="chip">Teiken: 60% · Wisk 80% · Engels 70%</span>
-          <span class="chip">Hard-proctor + Pa afstand</span>
-        </div>
-      </div>
-      <div class="hero-strip">
-        <h1>Vandag se matchday-plan</h1>
-        <p class="lede">Hard-proctor soos ’n afrigter-sessie. Geen “ek het gelees”-illusie — net produksie + memo.</p>
-      </div>
-      <div class="stats-row" id="day-stats"></div>
+      <div id="next-up" class="next-up" aria-live="polite"></div>
+      <div class="stats-row compact" id="day-stats"></div>
       <div class="panel">
         <div class="panel-head">
-          <h2>Blokke</h2>
+          <h2>Vandag se matchday-kaarte</h2>
           <button type="button" class="btn ghost" id="regen-plan">Herbou plan</button>
         </div>
-        <ol class="block-list" id="block-list"></ol>
+        <p class="hint">Tik die prent om die les te sien. <strong>Begin</strong> sit die kamera aan en wys die les langs jou.</p>
+        <ol class="block-list md-list" id="block-list"></ol>
       </div>
       <div class="panel">
         <div class="panel-head">
@@ -101,11 +102,21 @@
       </div>
     </section>
 
+    <!-- LESSE -->
+    <section class="view" id="view-leer">
+      <div class="hero-strip">
+        <h1>Lesse — kyk, toe-boek, memo</h1>
+        <p class="lede">Een konsep per skerm. Bestudeer die prent, maak toe, skryf wat jy onthou, kyk dan die memo. <strong id="leer-total"></strong></p>
+      </div>
+      <div class="leer-subjects" id="leer-subjects"></div>
+      <div class="leer-gallery" id="leer-gallery"></div>
+    </section>
+
     <!-- SESSIE -->
     <section class="view" id="view-sessie">
       <div class="hero-strip">
         <h1>Afrigter-sessie (hard observeerder)</h1>
-        <p class="lede">Kamera aan — Rassie kyk saam met Pa. Tab bly oop. Wegkyk = waarskuwing. 3× = bank tot Pa-PIN.</p>
+        <p class="lede">Kamera aan. Bly op hierdie oortjie: wegkyk = waarskuwing, 3× = slot tot Pa-PIN. Die les hieronder oop maak is veilig.</p>
       </div>
       <div class="session-grid">
         <div class="panel camera-panel">
@@ -147,13 +158,14 @@
       <div class="panel hidden" id="memo-viewer">
         <iframe id="memo-frame" title="Memo" style="width:100%;height:75vh;border:0;border-radius:8px;background:#fff"></iframe>
       </div>
+      <div class="panel session-lesson" id="session-lesson"></div>
     </section>
 
     <!-- VAKKE -->
     <section class="view" id="view-vakke">
       <div class="hero-strip">
-        <h1>Vakke &amp; low-hanging fruit</h1>
-        <p class="lede">Teikens: 60% alle · 80% Wisk. Gelett. · 70% Engels. Merk wat jy klaarmaak.</p>
+        <h1>Vakke</h1>
+        <p class="lede">Prelim → teiken per vak. Tik ’n prent vir die les; maklike punte-lys onderaan elke kaart.</p>
       </div>
       <div class="subject-grid" id="subject-grid"></div>
     </section>
@@ -373,6 +385,40 @@
     </div>
   </div>
 
+  <!-- Les-kyker: een konsep per skerm -->
+  <div class="les-viewer hidden" id="les-viewer" role="dialog" aria-modal="true" aria-labelledby="les-title">
+    <div class="les-top">
+      <span class="zone-tag" id="les-zone"></span>
+      <span class="les-subject" id="les-subject"></span>
+      <span class="les-count" id="les-count"></span>
+      <button type="button" class="les-close" id="les-close" aria-label="Maak toe">✕</button>
+    </div>
+    <div class="les-stage">
+      <figure class="les-figure" id="les-figure" title="Tik om te vergroot">
+        <img id="les-img" alt="" />
+      </figure>
+      <div class="les-recall" id="les-recall">
+        <p class="les-step">TOE-BOEK</p>
+        <p class="les-prompt" id="les-prompt"></p>
+        <p class="hint">Boek toe, prent weg. Skryf op papier wat jy onthou. Dan memo.</p>
+      </div>
+      <aside class="les-side">
+        <h2 id="les-title"></h2>
+        <ul class="les-cues" id="les-cues"></ul>
+        <div class="les-memo" id="les-memo">
+          <p class="les-step">MEMO</p>
+          <ul id="les-memo-list"></ul>
+        </div>
+        <div class="les-actions" id="les-actions"></div>
+      </aside>
+    </div>
+    <div class="les-nav">
+      <button type="button" class="btn ghost" id="les-prev">◀ Vorige</button>
+      <div class="les-dots" id="les-dots"></div>
+      <button type="button" class="btn ghost" id="les-next">Volgende ▶</button>
+    </div>
+  </div>
+
   <script src="assets/js/data.js"></script>
   <script src="assets/js/storage.js"></script>
   <script src="assets/js/schedule.js"></script>
@@ -380,6 +426,8 @@
   <script src="assets/js/proctor.js"></script>
   <script src="assets/js/live-config.js"></script>
   <script src="assets/js/remote.js"></script>
+  <script src="assets/js/lessons.js"></script>
+  <script src="assets/js/lesson-ui.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>

@@ -7,6 +7,15 @@
   let locked = false;
   let sessionMeta = null;
 
+  WALLIE.app = {
+    state: () => state,
+    persist,
+    showView,
+    renderMissie,
+    renderVakke,
+    startSession: startSessionFromUI
+  };
+
   function persist() {
     WALLIE.storage.save(state);
   }
@@ -85,40 +94,16 @@
       .filter((b) => state.completedBlocks[b.id])
       .reduce((s, b) => s + b.minutes, 0);
 
+    const les = WALLIE.lessonUI.masteredCount();
     $("#day-stats").innerHTML = `
-      <div class="stat"><b>${mins}m</b><span>Beplan vandag</span></div>
       <div class="stat"><b>${done}/${studyBlocks.length}</b><span>Blokke klaar</span></div>
-      <div class="stat"><b>${doneMins}m</b><span>Voltooi onder plan</span></div>
+      <div class="stat"><b>${doneMins}/${mins}m</b><span>Minute klaar</span></div>
+      <div class="stat"><b>${les.reg}/${les.total}</b><span>Lesse reg (toe-boek)</span></div>
       <div class="stat"><b>${state.faults.filter((f) => !f.resolved).length}</b><span>Oop foute</span></div>
     `;
 
-    $("#block-list").innerHTML = state.blocks
-      .map((b) => {
-        const doneCls = state.completedBlocks[b.id] ? "done" : "";
-        const breakCls = b.kind === "break" ? "break" : "";
-        const time =
-          b.start && b.end
-            ? `<span class="block-time">${b.start} – ${b.end}</span>`
-            : "";
-        const actions =
-          b.kind === "break"
-            ? `<button type="button" class="btn small ghost mark-done" data-id="${b.id}">Was daar ✓</button>`
-            : `<div class="btn-row" style="margin:0">
-            <button type="button" class="btn small primary start-block" data-slug="${b.subjectSlug}" data-min="${b.minutes}" data-title="${encodeURIComponent(b.title)}">Begin</button>
-            <button type="button" class="btn small ghost mark-done" data-id="${b.id}">✓</button>
-          </div>`;
-        return `
-        <li class="block-item ${doneCls} ${breakCls}" data-id="${b.id}">
-          <span class="kind ${b.kind}">${b.kind}</span>
-          <div>
-            ${time}
-            <h3>${b.title}</h3>
-            <p>${b.minutes} min · ${b.detail}</p>
-          </div>
-          ${actions}
-        </li>`;
-      })
-      .join("");
+    WALLIE.lessonUI.renderNextUp(state);
+    $("#block-list").innerHTML = WALLIE.lessonUI.renderBlocks(state);
   }
 
   function renderVakke() {
@@ -128,17 +113,25 @@
         .map((item, i) => {
           const key = `${s.slug}:${i}`;
           const on = state.checklist[key] ? "checked" : "";
-          return `<li><input type="checkbox" data-check="${key}" ${on} /><span>${item}</span></li>`;
+          return `<li><label><input type="checkbox" data-check="${key}" ${on} /><span>${item}</span></label></li>`;
         })
         .join("");
+      const doneCount = s.lowHanging.filter((_, i) => state.checklist[`${s.slug}:${i}`]).length;
       return `
-        <article class="subject-card">
+        <article class="subject-card zone-${s.zone}">
+          <button type="button" class="subject-cover" data-leer-open="${s.slug}" aria-label="Lesse vir ${s.naam}">
+            <img src="${WALLIE.lessonImg(s.slug, "cover")}" alt="" loading="lazy" />
+          </button>
           <header>
             <h3>${s.naam}</h3>
             <span class="badge ${crit}">Prelim ${s.prelim}% → ${s.teiken}%</span>
           </header>
-          <p class="meta">Jaar ${s.jaar}% · ${s.fokus}</p>
-          <ul class="checklist">${checks}</ul>
+          <p class="meta">${s.fokus}</p>
+          ${WALLIE.lessonUI.subjectStrip(s.slug)}
+          <details class="checklist-wrap">
+            <summary>Maklike punte-lys (${doneCount}/${s.lowHanging.length})</summary>
+            <ul class="checklist">${checks}</ul>
+          </details>
         </article>`;
     }).join("");
   }
@@ -461,6 +454,7 @@
     });
     startStills();
     showView("sessie");
+    WALLIE.lessonUI.onSessionStart(subjectSlug);
   }
 
   function finishSession(outcome) {
@@ -688,6 +682,8 @@
     $$(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.view === name));
     $(`#view-${name}`)?.classList.add("active");
     if (name === "missie") renderMissie();
+    if (name === "leer") WALLIE.lessonUI.renderLeer();
+    if (name === "sessie") WALLIE.lessonUI.renderSessionLesson(sessionMeta?.subjectSlug);
     if (name === "vakke") renderVakke();
     if (name === "foutbank") renderFaults();
     if (name === "oplaai") renderPapers();
@@ -821,6 +817,13 @@
       persist();
       renderMissie();
     }
+  });
+
+  $("#subject-grid").addEventListener("click", (e) => {
+    const cover = e.target.closest("[data-leer-open]");
+    if (!cover) return;
+    showView("leer");
+    WALLIE.lessonUI.renderLeer(cover.dataset.leerOpen);
   });
 
   $("#subject-grid").addEventListener("change", (e) => {
@@ -1099,4 +1102,6 @@
   }
   renderMissie();
   renderPa();
+
+  WALLIE.lessonUI.openFromQuery();
 })();

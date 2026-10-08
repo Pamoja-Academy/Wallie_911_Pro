@@ -60,7 +60,7 @@ WALLIE.SUBJECTS = [
   },
   {
     slug: "lo",
-    naam: "Lewensoriënering",
+    naam: "Lewensoriëntering",
     prelim: 49,
     jaar: 77,
     teiken: 60,

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Afrikaans Huistaal — voorblad" font-family="Arial, Helvetica, sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d4a2c"/><stop offset="1" stop-color="#04140b"/></linearGradient></defs>
+<rect width="800" height="520" rx="18" fill="url(#g)"/>
+<rect x="0" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="100" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="200" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="300" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="400" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="500" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="600" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="700" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/>
+<rect x="0" y="0" width="16" height="520" rx="8" fill="#d4472f"/>
+<rect x="40" y="34" width="170" height="40" rx="20" fill="#d4472f"/><text x="125" y="60.48" font-size="18" fill="#ffffff" font-weight="800" text-anchor="middle">ROOI-SONE</text>
+
+    <g transform="translate(70,140)">
+      <path d="M10,20 h200 a16,16 0 0 1 16,16 v120 a16,16 0 0 1 -16,16 h-120 l-50,44 v-44 h-30 a16,16 0 0 1 -16,-16 v-120 a16,16 0 0 1 16,-16 z" fill="#f2c94c"/>
+      <text x="113" y="128" font-size="92" font-weight="900" fill="#10140f" text-anchor="middle">Aa</text>
+    </g>
+<text x="340" y="190" font-size="48" fill="#f6f8f3" font-weight="900">Afrikaans Huistaal</text>
+<text x="340" y="240" font-size="22" fill="#b9d0c0" font-weight="600">Opdragwoorde + taal = maklike punte</text>
+<text x="340" y="312" font-size="20" fill="#ff6b57" font-weight="700">Prelim 39%</text><text x="760" y="312" font-size="20" fill="#f2c94c" font-weight="700" text-anchor="end">Teiken 60%</text>
+<rect x="340" y="326" width="420" height="30" rx="15" fill="#06120b" stroke="#2f6b47" stroke-width="2"/>
+<rect x="340" y="326" width="163.8" height="30" rx="15" fill="#ff6b57"/>
+<line x1="592" y1="316" x2="592" y2="366" stroke="#f2c94c" stroke-width="6"/>
+<text x="340" y="398" font-size="20" fill="#f6f8f3" font-weight="700">Gaping: 21 punte om te wen</text>
+<rect x="340" y="430" width="300" height="46" rx="23" fill="#f2c94c"/><text x="490" y="460.92" font-size="22" fill="#10140f" font-weight="800" text-anchor="middle">4 visuele lesse →</text>
+<text x="770" y="500" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="end">#15 · Springbok SOS</text>
+</svg>

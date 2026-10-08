@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Lewensoriëntering · Handves van Regte: Regte ↔ verantwoordelikhede" font-family="Arial, Helvetica, sans-serif">
+<defs></defs>
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#f2c94c"/><rect y="50" width="800" height="22" fill="#f2c94c"/>
+<text x="24" y="27" font-size="15" fill="#1a1400" font-weight="800" letter-spacing="2">LEWENSORIËNTERING · HANDVES VAN REGTE</text>
+<text x="24" y="60" font-size="29" fill="#1a1400" font-weight="900">Regte ↔ verantwoordelikhede</text>
+
+    <rect x="394" y="100" width="12" height="140" fill="#f2c94c"/>
+    <path d="M360,250 h80 l-40,-24 z" fill="#f2c94c"/>
+    <rect x="200" y="104" width="400" height="10" rx="5" fill="#f2c94c"/>
+    <line x1="232" y1="112" x2="200" y2="172" stroke="#b9d0c0" stroke-width="2"/><line x1="232" y1="112" x2="264" y2="172" stroke="#b9d0c0" stroke-width="2"/>
+    <line x1="568" y1="112" x2="536" y2="172" stroke="#b9d0c0" stroke-width="2"/><line x1="568" y1="112" x2="600" y2="172" stroke="#b9d0c0" stroke-width="2"/>
+    <path d="M176,172 h112 q-8,34 -56,34 q-48,0 -56,-34 z" fill="#5cc8ff"/>
+    <path d="M512,172 h112 q-8,34 -56,34 q-48,0 -56,-34 z" fill="#f2c94c"/>
+    <text x="232" y="238" font-size="24" fill="#5cc8ff" font-weight="900" text-anchor="middle">REGTE</text>
+    <text x="600" y="238" font-size="22" fill="#f2c94c" font-weight="900" text-anchor="middle">VERANTWOORDELIKHEDE</text>
+    <rect x="24" y="266" width="330" height="48" rx="10" fill="#0f3350" stroke="#5cc8ff" stroke-width="2"/><text x="40" y="298" font-size="20" fill="#f6f8f3" font-weight="700">Onderwys</text><text x="400" y="300" font-size="28" fill="#f6f8f3" font-weight="700" text-anchor="middle">↔</text><rect x="446" y="266" width="330" height="48" rx="10" fill="#4a3a10" stroke="#f2c94c" stroke-width="2"/><text x="462" y="298" font-size="18" fill="#f6f8f3" font-weight="700">Gaan skool toe, doen die werk</text><rect x="24" y="324" width="330" height="48" rx="10" fill="#0f3350" stroke="#5cc8ff" stroke-width="2"/><text x="40" y="356" font-size="20" fill="#f6f8f3" font-weight="700">Vryheid van spraak</text><text x="400" y="358" font-size="28" fill="#f6f8f3" font-weight="700" text-anchor="middle">↔</text><rect x="446" y="324" width="330" height="48" rx="10" fill="#4a3a10" stroke="#f2c94c" stroke-width="2"/><text x="462" y="356" font-size="18" fill="#f6f8f3" font-weight="700">Geen haatspraak nie</text><rect x="24" y="382" width="330" height="48" rx="10" fill="#0f3350" stroke="#5cc8ff" stroke-width="2"/><text x="40" y="414" font-size="20" fill="#f6f8f3" font-weight="700">Gelykheid</text><text x="400" y="416" font-size="28" fill="#f6f8f3" font-weight="700" text-anchor="middle">↔</text><rect x="446" y="382" width="330" height="48" rx="10" fill="#4a3a10" stroke="#f2c94c" stroke-width="2"/><text x="462" y="414" font-size="18" fill="#f6f8f3" font-weight="700">Moenie diskrimineer nie</text><rect x="24" y="440" width="330" height="48" rx="10" fill="#0f3350" stroke="#5cc8ff" stroke-width="2"/><text x="40" y="472" font-size="20" fill="#f6f8f3" font-weight="700">Veiligheid</text><text x="400" y="474" font-size="28" fill="#f6f8f3" font-weight="700" text-anchor="middle">↔</text><rect x="446" y="440" width="330" height="48" rx="10" fill="#4a3a10" stroke="#f2c94c" stroke-width="2"/><text x="462" y="472" font-size="18" fill="#f6f8f3" font-weight="700">Respekteer ander se liggaam</text>
+</svg>
