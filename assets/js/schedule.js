@@ -1,11 +1,22 @@
 /* Daaglikse plan — Sondag 27 Sep 2026 het rugby-venster */
 window.WALLIE = window.WALLIE || {};
 
+/** Dae sedert 27 Sep 2026 — vir geel-rotasie (LO / Engels / Toerisme). */
+WALLIE.geelDayIndex = function geelDayIndex(dateStr) {
+  const epoch = Date.parse("2026-09-27T00:00:00");
+  const day = Date.parse(dateStr + "T00:00:00");
+  return Math.round((day - epoch) / 86400000);
+};
+
 WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
   const byPri = [...WALLIE.SUBJECTS].sort((a, b) => a.prioriteit - b.prioriteit);
   const rooi = byPri.filter((s) => s.zone === "rooi");
   const geel = byPri.filter((s) => s.zone === "geel");
   const groen = byPri.find((s) => s.slug === "wiskgelett");
+  const beforeKickoff = dateStr < WALLIE.EXAM_START;
+  const geelSlot = beforeKickoff
+    ? geel[0]
+    : geel[((WALLIE.geelDayIndex(dateStr) % geel.length) + geel.length) % geel.length];
 
   /* Sondag 27 Sep: Springbokke vs Australië 11:30–13:45 */
   if (dateStr === "2026-09-27") {
@@ -63,12 +74,12 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       {
         id: `${dateStr}-geel`,
         kind: "geel",
-        subjectSlug: geel[0].slug,
+        subjectSlug: geelSlot.slug,
         minutes: 55,
         start: "15:40",
         end: "16:35",
-        title: `${geel[0].naam} — scenario-aanval`,
-        detail: geel[0].fokus
+        title: `${geelSlot.naam} — scenario-aanval`,
+        detail: geelSlot.fokus
       },
       {
         id: `${dateStr}-eng`,
@@ -136,11 +147,31 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
     {
       id: `${dateStr}-geel`,
       kind: "geel",
-      subjectSlug: geel[0].slug,
+      subjectSlug: geelSlot.slug,
       minutes: 70,
-      title: `${geel[0].naam} — geel-sone`,
-      detail: geel[0].fokus
+      title: `${geelSlot.naam} — geel-sone`,
+      detail: geelSlot.fokus
     },
+    ...(beforeKickoff
+      ? [
+          {
+            id: `${dateStr}-engels-lit`,
+            kind: "geel",
+            subjectSlug: "engels",
+            minutes: 45,
+            title: "Engels — letterkunde",
+            detail: "Teiken 70%. Die gat was lit 38%. Een quote-paragraaf of creative plan."
+          },
+          {
+            id: `${dateStr}-toerisme`,
+            kind: "geel",
+            subjectSlug: "toerisme",
+            minutes: 25,
+            title: "Toerisme — vraag-lees protokol",
+            detail: "20–30 min. Lees elke vraag 2×; onderstreep ‘nie’ / ‘behalwe’. Klein hoofstuk, toe-boek."
+          }
+        ]
+      : []),
     {
       id: `${dateStr}-rtt-or-third`,
       kind: "rooi",

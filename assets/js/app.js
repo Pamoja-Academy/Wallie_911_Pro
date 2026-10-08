@@ -13,8 +13,13 @@
 
   function ensurePlan() {
     const today = WALLIE.todayKey();
-    if (state.planDate !== today || !state.blocks?.length) {
-      const plan = WALLIE.buildDayPlan(today);
+    const plan = WALLIE.buildDayPlan(today);
+    const missingNewBlocks = ["engels", "toerisme"].some(
+      (slug) =>
+        plan.blocks.some((b) => b.subjectSlug === slug) &&
+        !(state.blocks || []).some((b) => b.subjectSlug === slug)
+    );
+    if (state.planDate !== today || !state.blocks?.length || missingNewBlocks) {
       state.planDate = plan.date;
       state.blocks = plan.blocks;
       persist();
@@ -577,6 +582,94 @@
   $("#main-nav").addEventListener("click", (e) => {
     const btn = e.target.closest(".nav-btn");
     if (btn) showView(btn.dataset.view);
+  });
+
+  function logFileName() {
+    return `wallie911-log-${WALLIE.todayKey()}.json`;
+  }
+
+  function rawLogText() {
+    const raw = localStorage.getItem(WALLIE.storage.KEY);
+    if (!raw) return "{\n}\n";
+    try {
+      return JSON.stringify(JSON.parse(raw), null, 2);
+    } catch {
+      return raw;
+    }
+  }
+
+  function setExportStatus(msg) {
+    $$(".js-export-status").forEach((el) => {
+      el.textContent = msg;
+    });
+  }
+
+  function downloadLog() {
+    const text = rawLogText();
+    const blob = new Blob([text], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = logFileName();
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    let empty = false;
+    try {
+      empty = Object.keys(JSON.parse(text)).length === 0;
+    } catch {
+      empty = !text.trim();
+    }
+    setExportStatus(
+      empty
+        ? "Geen log in hierdie blaaier nie — leë JSON afgelaai. Geen sessies bygemaak nie."
+        : `Log afgelaai: ${logFileName()}. Stuur die lêer na hannovz@gmail.com.`
+    );
+  }
+
+  async function copyLog() {
+    const text = rawLogText();
+    try {
+      await navigator.clipboard.writeText(text);
+      setExportStatus("Log is in die knipbord. Plak dit in WhatsApp of e-pos na hannovz@gmail.com.");
+      return true;
+    } catch {
+      setExportStatus("Kopieer het nie gewerk nie. Gebruik “Laai log af (JSON)”.");
+      return false;
+    }
+  }
+
+  async function shareLog() {
+    const text = rawLogText();
+    const name = logFileName();
+    const file = new File([text], name, { type: "application/json" });
+    const caption = `Wallie_911 kamp-log vir Pa · hannovz@gmail.com · ${WALLIE.todayKey()}`;
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: caption, text: caption });
+        setExportStatus("Deel-kieslys oop. Kies WhatsApp of e-pos na hannovz@gmail.com.");
+        return;
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+      }
+    }
+    await copyLog();
+    const subject = encodeURIComponent(`Wallie_911 log ${WALLIE.todayKey()}`);
+    const body = encodeURIComponent(
+      "Pa — Wallie se volle log (wallie911_v2_bok) is in die knipbord en/of die afgelaaide JSON-lêer. Plak dit hier as die lêer nie geheg is nie. Moenie ’n verkorte weergawe as die volle log behandel nie."
+    );
+    const mail = document.createElement("a");
+    mail.href = `mailto:hannovz@gmail.com?subject=${subject}&body=${body}`;
+    mail.click();
+    const wa = `https://wa.me/?text=${encodeURIComponent(caption + " — log is in die knipbord, plak dit in hierdie klets.")}`;
+    window.open(wa, "_blank", "noopener");
+  }
+
+  document.body.addEventListener("click", (e) => {
+    if (e.target.closest(".js-export-log")) downloadLog();
+    else if (e.target.closest(".js-share-log")) shareLog();
+    else if (e.target.closest(".js-copy-log")) copyLog();
   });
 
   $("#regen-plan").addEventListener("click", () => {
