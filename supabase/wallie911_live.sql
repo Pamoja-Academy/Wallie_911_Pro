@@ -71,7 +71,7 @@ alter table wallie911.login_fail enable row level security;
 -- ---------- helpers (not callable from the API) ----------
 
 create or replace function wallie911.today_sast() returns date
-language sql stable as $$ select (now() at time zone 'Africa/Johannesburg')::date $$;
+language sql stable set search_path = '' as $$ select (now() at time zone 'Africa/Johannesburg')::date $$;
 
 create or replace function wallie911.pa_ok(p_token text) returns boolean
 language sql stable security definer set search_path = '' as $$
