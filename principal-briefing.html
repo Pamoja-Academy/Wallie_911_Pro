@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wallie_911_Pro — Briefing for the Principal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --panel: #ffffff;
+      --ink: #1a1f1c;
+      --muted: #5a6660;
+      --line: #d9e0da;
+      --green: #0b6b45;
+      --green-soft: #e8f5ef;
+      --gold: #9a7b2f;
+      --rooi: #b33a2b;
+      --geel: #a67c00;
+      --font: "DM Sans", system-ui, sans-serif;
+      --display: "Libre Baskerville", Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.25rem 4rem; }
+    header {
+      background: linear-gradient(135deg, #0b6b45, #12301f);
+      color: #f4f7f2;
+      border-radius: 14px;
+      padding: 1.5rem 1.4rem 1.35rem;
+      margin-bottom: 1.1rem;
+    }
+    .eyebrow {
+      margin: 0 0 .45rem;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #c8a84b;
+    }
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(1.45rem, 3.5vw, 1.95rem);
+      margin: 0 0 .55rem;
+      line-height: 1.25;
+    }
+    header p { margin: 0; color: #d5e6db; max-width: 62ch; }
+    .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .9rem; }
+    .chip {
+      font-size: .74rem;
+      font-weight: 700;
+      padding: .28rem .55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(200,168,75,.45);
+      background: rgba(0,0,0,.2);
+      color: #e8d59a;
+    }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.15rem 1.25rem;
+      margin-bottom: .85rem;
+    }
+    h2 {
+      margin: 0 0 .7rem;
+      font-size: 1.05rem;
+      color: var(--green);
+    }
+    h3 { margin: 1rem 0 .4rem; font-size: .95rem; }
+    p { margin: 0 0 .7rem; }
+    p:last-child { margin-bottom: 0; }
+    ul, ol { margin: 0 0 .2rem; padding-left: 1.2rem; }
+    li { margin: .35rem 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+      margin-top: .4rem;
+    }
+    th, td {
+      text-align: left;
+      padding: .5rem .35rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; font-size: .78rem; }
+    .rooi { color: var(--rooi); font-weight: 700; }
+    .geel { color: var(--geel); font-weight: 700; }
+    .groen { color: var(--green); font-weight: 700; }
+    .callout {
+      border-left: 3px solid var(--green);
+      padding: .7rem .9rem;
+      background: var(--green-soft);
+      border-radius: 0 8px 8px 0;
+      margin: .85rem 0 0;
+      font-size: .93rem;
+    }
+    .callout.warn {
+      border-left-color: var(--gold);
+      background: #faf4e4;
+    }
+    .callout.honest {
+      border-left-color: var(--rooi);
+      /* removed bad rule */
+      background: #fdf0ee;
+    }
+    a { color: var(--green); font-weight: 600; }
+    code {
+      background: #eef3ef;
+      padding: .08rem .32rem;
+      border-radius: 4px;
+      font-size: .88em;
+      word-break: break-all;
+    }
+    .grid2 {
+      display: grid;
+      gap: .7rem;
+    }
+    @media (min-width: 640px) {
+      .grid2 { grid-template-columns: 1fr 1fr; }
+    }
+    .mini {
+      background: #f4f7f4;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: .75rem .85rem;
+      font-size: .9rem;
+    }
+    .mini strong { display: block; margin-bottom: .3rem; color: var(--green); }
+    footer {
+      margin-top: 1.1rem;
+      color: var(--muted);
+      font-size: .82rem;
+      text-align: center;
+    }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      align-items: center;
+      margin: .6rem 0;
+      font-size: .88rem;
+      font-weight: 600;
+    }
+    .flow span {
+      background: var(--green-soft);
+      border: 1px solid #b7d9c6;
+      color: var(--green);
+      padding: .35rem .55rem;
+      border-radius: 8px;
+    }
+    .flow i { font-style: normal; color: var(--muted); }
+    @media print {
+      body { background: #fff; }
+      header { break-inside: avoid; }
+      a { color: #000; text-decoration: underline; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">For the Principal · confidential briefing</p>
+      <h1>What Wallie_911_Pro is — and what it is not</h1>
+      <p>
+        A short, honest explanation of the matric rescue cockpit built for Wallie van Zyl:
+        the features, the learning science behind it, how it is put together, and what
+        success actually depends on if he follows the plan through to exams on
+        <strong>12 October 2026</strong>.
+      </p>
+      <div class="chips">
+        <span class="chip">Not an LMS</span>
+        <span class="chip">Not motivation theatre</span>
+        <span class="chip">Exam rescue system</span>
+        <span class="chip">Live for Wallie now</span>
+      </div>
+    </header>
+
+    <section>
+      <h2>1. In one sentence</h2>
+      <p>
+        <strong>Wallie_911_Pro</strong> is a focused Afrikaans study cockpit that turns
+        each afternoon into supervised, exam-style practice — with a camera lock when he
+        looks away, picture-first lessons, a fault bank that becomes tomorrow’s plan, and
+        a live parent console so Pa can see whether a session is real.
+      </p>
+      <p>
+        Try it here (browser only — no install):
+        <a href="https://pamoja-academy.github.io/Wallie_911_Pro/" target="_blank" rel="noopener">pamoja-academy.github.io/Wallie_911_Pro</a>
+      </p>
+    </section>
+
+    <section>
+      <h2>2. Why it exists</h2>
+      <p>
+        Prelims showed a clear pattern: avoidance, “I read it” without production, and
+        red-zone subjects far below a safe pass. Traditional homework and “study harder”
+        did not close that gap. The design brief (Sept 2026) chose a
+        <strong>rescue cockpit</strong>, not another content library:
+      </p>
+      <ul>
+        <li>Break avoidance with <strong>hard session observation</strong> (camera + tab focus).</li>
+        <li>Replace rereading with <strong>closed-book attempt → memo → fault log</strong>.</li>
+        <li>Prioritise the weakest subjects first, every day until 12 Oct.</li>
+        <li>Give Pa remote eyes when he cannot sit in the outbuilding.</li>
+      </ul>
+      <div class="callout">
+        Targets written into the app: every subject ≥ <strong>60%</strong>;
+        Mathematical Literacy ≥ <strong>80%</strong>; English ≥ <strong>70%</strong>;
+        ≥ <strong>90%</strong> of planned daily blocks completed under observer mode.
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Exact feature set (what the principal would see)</h2>
+
+      <h3>For Wallie (laptop)</h3>
+      <ul>
+        <li><strong>Mission board</strong> — daily plan (about 6–7 hours), countdown to 12 Oct 09:00, Springbok “#15” narrative so the clock feels like a match, not a lecture.</li>
+        <li><strong>Visual lessons (Lesse)</strong> — one concept per screen: study the picture → close the book → write what you remember → open the memo. Misses go into the fault bank.</li>
+        <li><strong>Hard observer session</strong> — camera on; leaving the tab or another program counts as a warning; 3 warnings lock the session until Pa’s PIN (<code>9110</code>). Opening the lesson or an in-app memo does <em>not</em> count as looking away.</li>
+        <li><strong>Subjects &amp; low-hanging fruit</strong> — each subject card shows prelim mark, target, and a short “easy marks” checklist (rubric language, definitions, timed drills).</li>
+        <li><strong>Fault bank (Foutbank)</strong> — every wrong answer becomes a retest item. That list <em>is</em> the real syllabus for the next days.</li>
+        <li><strong>Paper upload</strong> — hybrid: upload past paper + memo PDFs; metadata stays in the browser.</li>
+        <li><strong>Surveys &amp; improve loop</strong> — Wallie’s self-report plus Pa’s check; where they disagree, Pa’s eyes win.</li>
+        <li><strong>Export log</strong> — one-tap download/share of the full camp log to Pa.</li>
+      </ul>
+
+      <h3>For Pa (phone)</h3>
+      <ul>
+        <li><strong>Live console</strong>
+          (<a href="https://pamoja-academy.github.io/Wallie_911_Pro/pa-afstand.html" target="_blank" rel="noopener">pa-afstand.html</a>)
+          — password-gated. During a hard session: subject, time left, warnings, lock state, heartbeat age, and a small camera still about every 45 seconds. <em>No continuous cloud video.</em></li>
+        <li><strong>Push alerts</strong> (ntfy topic) for session start, lock, unlock, end — not a flood of heartbeats.</li>
+        <li><strong>Session history</strong> that survives longer than a 12-hour push cache.</li>
+      </ul>
+
+      <h3>Subject priority baked into the plan</h3>
+      <table>
+        <thead>
+          <tr><th>Subject</th><th>Prelim</th><th>Target</th><th>Zone</th><th>Focus</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rooi">Hospitality Studies</td><td>27%</td><td>60%</td><td>Red</td><td>Understand, don’t cram</td></tr>
+          <tr><td class="rooi">Afrikaans HL</td><td>39%</td><td>60%</td><td>Red</td><td>Stop avoiding; short forced blocks</td></tr>
+          <tr><td class="rooi">CAT / RTT</td><td>37%</td><td>60%</td><td>Red</td><td>Put the work in — theory + practical</td></tr>
+          <tr><td class="geel">Life Orientation</td><td>49%</td><td>60%</td><td>Yellow</td><td>Scenario + mark-scheme structure</td></tr>
+          <tr><td class="geel">English FAL</td><td>50%</td><td>70%</td><td>Yellow</td><td>Literature was the hole</td></tr>
+          <tr><td class="geel">Tourism</td><td>61%</td><td>60%+</td><td>Yellow</td><td>Read questions; kill silly errors</td></tr>
+          <tr><td class="groen">Math Lit</td><td>66%</td><td>80%</td><td>Green</td><td>Daily practice — 66% is not enough</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>4. Why this approach can work (the learning science)</h2>
+      <p>
+        The core methods are the two strategies Dunlosky and colleagues (2013) rated
+        <strong>high utility</strong> for learning:
+      </p>
+      <ol>
+        <li><strong>Practice testing with feedback</strong> — closed book → memo → mark faults → retest.</li>
+        <li><strong>Spaced repetition</strong> — the same weak point returns over days, not one marathon cram.</li>
+      </ol>
+      <p>Rescued for a short runway (~days until 12 Oct), that becomes:</p>
+      <ul>
+        <li><strong>Low-hanging fruit first</strong> — rubric language, definitions, short questions before deep essays.</li>
+        <li><strong>Exam behaviour every block</strong> — timing, instruction words, “read the question”.</li>
+        <li><strong>No “I read it” illusion</strong> — observer + blank-page production required.</li>
+        <li><strong>Fault log = syllabus</strong> — tomorrow prioritises open faults.</li>
+      </ul>
+      <div class="flow">
+        <span>Mission</span><i>→</i>
+        <span>Hard session</span><i>→</i>
+        <span>Picture / paper</span><i>→</i>
+        <span>Closed book</span><i>→</i>
+        <span>Memo</span><i>→</i>
+        <span>Fault bank</span><i>→</i>
+        <span>Pa sees it</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. How it is put together (architecture, plain language)</h2>
+      <div class="grid2">
+        <div class="mini">
+          <strong>What it runs on</strong>
+          Static HTML, CSS and JavaScript hosted on GitHub Pages. Wallie opens a normal browser link. No app store, no Node install required for daily use.
+        </div>
+        <div class="mini">
+          <strong>Where data lives</strong>
+          Study progress and logs start on the laptop (<code>localStorage</code>). Live session status and stills go to a small, isolated cloud schema so Pa’s phone can watch. Still images auto-expire after a few days. Full video is never uploaded.
+        </div>
+        <div class="mini">
+          <strong>Language &amp; UX</strong>
+          UI in Afrikaans for Wallie. Matchday metaphor (Mission, jersey #15, kickoff) to make the calendar visceral without turning it into a game that distracts from work.
+        </div>
+        <div class="mini">
+          <strong>Quality checks</strong>
+          Automated smoke and proctor tests run on the code (soft-lock rules, durable session outbox). Browser walkthroughs checked picture lessons and session behaviour before merge.
+        </div>
+      </div>
+      <p style="margin-top:.85rem">
+        Privacy posture (by design): Pa gets status, warnings, and occasional stills during a live hard session — not a continuous cloud CCTV archive. Wallie consents on-device (consent bumped when stills began leaving the laptop).
+      </p>
+    </section>
+
+    <section>
+      <h2>6. Assurances — what anyone can honestly claim</h2>
+      <p>
+        <strong>Nobody can guarantee a matric mark from software alone.</strong>
+        What this system <em>can</em> honestly offer is a disciplined path whose success
+        conditions are visible and checkable.
+      </p>
+
+      <h3>If Wallie completes every planned session as designed, you get:</h3>
+      <ol>
+        <li>Hours of <strong>supervised, timed, closed-book production</strong> instead of unsupervised “studying”.</li>
+        <li>A growing <strong>fault bank</strong> that forces rework of real weaknesses.</li>
+        <li>Daily pressure on the three red subjects that currently decide the pass.</li>
+        <li>Pa’s ability to verify — live — that a session happened, in which subject, with how many warnings.</li>
+        <li>A written success bar the family already agreed: 60% / 80% Math Lit / 70% English, and ≥90% of planned blocks done under observer mode.</li>
+      </ol>
+
+      <h3>What still has to be true (parent and school eyes)</h3>
+      <ul>
+        <li>He actually starts the blocks and accepts the camera consent.</li>
+        <li>Pa uses the live console or spot-checks — “his word” is not enough when production looks busy but empty.</li>
+        <li>Past papers and memos get used (hybrid upload), not only the built-in picture lessons.</li>
+        <li>Sleep, nutrition, and exam-day logistics remain adult responsibilities — the app does not replace parenting or teaching.</li>
+      </ul>
+
+      <div class="callout honest">
+        <strong>Honest limit:</strong> following the flow raises the <em>probability</em> of hitting the rescue targets because it implements high-utility study methods under observation. It does not manufacture understanding without effort, and it will not fix a day he simply does not open it.
+      </div>
+      <div class="callout warn">
+        <strong>What “success if they follow the flow” means here:</strong>
+        complete the Mission plan each day under hard sessions; do picture → closed book → memo; clear fault-bank items; keep Pa’s console open when you cannot sit with him. That is the contract. Marks follow effort against that contract — not the jersey story.
+      </div>
+    </section>
+
+    <section>
+      <h2>7. Suggested walkthrough for a 10-minute principal look</h2>
+      <ol>
+        <li>Open the cockpit:
+          <a href="https://pamoja-academy.github.io/Wallie_911_Pro/" target="_blank" rel="noopener">main app</a></li>
+        <li>Open a sample lesson:
+          <a href="https://pamoja-academy.github.io/Wallie_911_Pro/index.html?les=gasvryheid&amp;k=gevaarsone" target="_blank" rel="noopener">Hospitality — danger zone</a></li>
+        <li>See Pa’s remote view:
+          <a href="https://pamoja-academy.github.io/Wallie_911_Pro/pa-afstand.html" target="_blank" rel="noopener">live console</a>
+          (login is family-only)</li>
+      </ol>
+      <p>
+        Family Pa briefing (Afrikaans ops notes):
+        <a href="https://pamoja-academy.github.io/Wallie_911_Pro/pa-briefing.html" target="_blank" rel="noopener">pa-briefing.html</a>
+      </p>
+    </section>
+
+    <footer>
+      Prepared 8 Oct 2026 · Wallie_911_Pro · for Hanno van Zyl to share with Wallie’s principal<br />
+      Live app: <a href="https://pamoja-academy.github.io/Wallie_911_Pro/">pamoja-academy.github.io/Wallie_911_Pro</a>
+    </footer>
+  </div>
+</body>
+</html>
