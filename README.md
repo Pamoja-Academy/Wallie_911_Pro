@@ -1,6 +1,6 @@
 # Wallie_911_Pro
 
-Afrikaanse **reddingscockpit** vir Wallie se matric-finale (vanaf 12 Okt 2026).
+Afrikaanse **reddingscockpit** vir Wallie se matric-finale (eindeksamen vanaf 12 Okt 2026; eerste egte vraestel RTT/CAT praktiese, Di 13 Okt).
 
 ## Môre oggend — begin hier
 

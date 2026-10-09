@@ -1,10 +1,14 @@
 /* Wallie_911_Pro — vakdata & low-hanging fruit */
 window.WALLIE = window.WALLIE || {};
 
-/* Openingswedstryd = Matriek eindeksamen begin · 12 Okt 2026 09:00 */
-WALLIE.EXAM_START = "2026-10-12";
-WALLIE.EXAM_KICKOFF = "2026-10-12T09:00:00";
-WALLIE.EXAM_LABEL = "Openingswedstryd · Matriek eindeksamen";
+/* NSC-eksamenrooster: Ma 12 Okt = net die LO-herskryf (Wallie se aanloopdag).
+   Die EERSTE EGTE VRAESTEL is die RTT/CAT-praktiese eksamen op Di 13 Okt 2026 — dáárteen tel die klok af.
+   (Begintyd 09:00 is die gewone NSC-begintyd; pas EXAM_KICKOFF aan as die rooster iets anders sê.) */
+WALLIE.EXAM_PERIOD_START = "2026-10-12";
+WALLIE.EXAM_START = "2026-10-13";
+WALLIE.EXAM_KICKOFF = "2026-10-13T09:00:00";
+WALLIE.EXAM_LABEL = "Eerste vraestel · RTT (CAT) praktiese eksamen";
+WALLIE.EXAM_NOTE = "Ma 12 Okt is net die LO-herskryf";
 
 WALLIE.SUBJECTS = [
   {

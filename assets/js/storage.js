@@ -8,7 +8,17 @@ WALLIE.storage = {
     try {
       const raw = localStorage.getItem(this.KEY);
       if (!raw) return this.defaults();
-      return { ...this.defaults(), ...JSON.parse(raw) };
+      const d = this.defaults();
+      const s = { ...d, ...JSON.parse(raw) };
+      /* Ou weergawes kon null/ontbrekende lyste hê — die terugvul en UI verwag lyste */
+      ["sessions", "wallieSurveys", "paSurveys", "bugReports", "faults", "papers", "blocks"].forEach((k) => {
+        if (!Array.isArray(s[k])) s[k] = d[k];
+      });
+      ["completedBlocks", "checklist"].forEach((k) => {
+        if (!s[k] || typeof s[k] !== "object") s[k] = d[k];
+      });
+      if (!s.live || typeof s.live !== "object") s.live = d.live;
+      return s;
     } catch {
       return this.defaults();
     }
@@ -32,8 +42,16 @@ WALLIE.storage = {
     };
   },
 
+  /* Mag nooit gooi nie: ’n QuotaExceededError in persist() het finishSession() gestop vóór die
+     sessie-verslag na Pa kon gaan. Gee false terug as stoor misluk. */
   save(state) {
-    localStorage.setItem(this.KEY, JSON.stringify(state));
+    try {
+      localStorage.setItem(this.KEY, JSON.stringify(state));
+      return true;
+    } catch (e) {
+      this.lastError = e?.name || "stoor het misluk";
+      return false;
+    }
   },
 
   update(mutator) {

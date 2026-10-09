@@ -65,6 +65,9 @@ const order = [
   "assets/js/schedule.js",
   "assets/js/surveys.js",
   "assets/js/proctor.js",
+  "assets/js/live-config.js",
+  "assets/js/sync.js",
+  "assets/js/remote.js",
   "assets/js/lessons.js",
 ];
 
@@ -111,6 +114,8 @@ assert(html.includes("hannovz@gmail.com"), "export names Pa email");
 assert(html.includes('id="les-viewer"'), "index has lesson viewer");
 assert(html.includes('id="view-leer"'), "index has Lesse view");
 assert(html.includes("assets/js/lesson-ui.js"), "index loads lesson-ui.js");
+assert(html.indexOf("assets/js/sync.js") > -1 && html.indexOf("assets/js/sync.js") < html.indexOf("assets/js/remote.js"), "index loads sync.js before remote.js");
+assert(html.includes('id="sync-pill"'), "index has sync indicator");
 if (W.LESSONS && Array.isArray(W.SUBJECTS)) {
   const imgDir = path.join(root, "assets/img/lessons");
   for (const slug of [...W.SUBJECTS.map((s) => s.slug), "foutbank"]) {
@@ -146,8 +151,23 @@ if (W.surveys || W.buildSurvey || W.SURVEYS) {
   assert(surveyCode.includes("Pa") || surveyCode.includes("pa"), "surveys.js mentions Pa");
 }
 
+/* START-HIER.bat maak net die lewendige weergawe oop (geen plaaslike kopie / Node meer nie) */
+const bat = fs.readFileSync(path.join(root, "START-HIER.bat"), "utf8");
+assert(bat.includes('start "" "https://pamoja-academy.github.io/Wallie_911_Pro/#missie"'), "bat opens the live #missie URL");
+assert(!/\b(node|npx|serve|localhost)\b/i.test(bat), "bat no longer serves a local copy");
+
+/* Hanno: Wallie word NIE weer om toestemming gevra nie — die sleutel bly dieselfde */
+const remoteSrc = fs.readFileSync(path.join(root, "assets/js/remote.js"), "utf8");
+assert(remoteSrc.includes('consentKey: "wallie911_remote_consent_v2"'), "consent key unchanged (no re-ask)");
+
+/* Eerste egte vraestel = RTT/CAT praktiese, Di 13 Okt; Ma 12 Okt is net die LO-herskryf */
+assert(W.EXAM_START === "2026-10-13" && W.EXAM_KICKOFF.startsWith("2026-10-13"), "countdown targets Tue 13 Oct (CAT practical)");
+assert(W.EXAM_PERIOD_START === "2026-10-12", "exam period (LO rewrite) still starts Mon 12 Oct");
+
+/* Die zip is .gitignore'd (net op Pa se masjien) — toets dit net as dit bestaan */
 const zipPath = path.join(root, "Wallie_911_Pro-VIR-SY-LAPTOP.zip");
-assert(fs.existsSync(zipPath) && fs.statSync(zipPath).size > 10000, "laptop zip present >10KB");
+if (fs.existsSync(zipPath)) assert(fs.statSync(zipPath).size > 10000, "laptop zip >10KB");
+else ok.push("laptop zip nie in hierdie kloon nie (gitignored) — oorgeslaan");
 
 console.log(JSON.stringify({ ok: ok.length, fails: fails.length, failList: fails, sampleOk: ok.slice(0, 12) }, null, 2));
 process.exit(fails.length ? 1 : 0);

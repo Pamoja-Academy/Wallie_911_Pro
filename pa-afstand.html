@@ -96,6 +96,25 @@
     .sess { border-top: 1px solid var(--line); padding: .6rem 0; font-size: .9rem; }
     .sess b { color: var(--text); }
     .toolbar { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+    h2.t { margin: 0 0 .5rem; font-size: 1rem; }
+    table.plan { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    table.plan th, table.plan td { text-align: right; padding: .35rem .4rem; border-top: 1px solid var(--line); }
+    table.plan th:first-child, table.plan td:first-child { text-align: left; }
+    table.plan th { color: var(--muted); font-weight: 600; border-top: 0; font-size: .75rem; }
+    .scroll-x { overflow-x: auto; }
+    .b-done { color: var(--ok); } .b-partial { color: var(--warn); } .b-missed { color: var(--lock); } .b-planned { color: var(--muted); }
+    .blk { display: flex; gap: .5rem; align-items: baseline; border-top: 1px solid var(--line); padding: .45rem 0; font-size: .88rem; }
+    .blk .tag { font-weight: 700; min-width: 6.2rem; }
+    .banner { border: 1px solid var(--warn); color: var(--warn); border-radius: 10px; padding: .6rem .8rem; font-size: .85rem; margin-bottom: .85rem; }
+    .fb { border-top: 1px solid var(--line); padding: .7rem 0; }
+    .fb .when { color: var(--gold); font-size: .78rem; }
+    .fb pre { margin: .3rem 0 0; white-space: pre-wrap; font: inherit; font-size: .9rem; color: var(--text); }
+    .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: .5rem; }
+    .gal figure { margin: 0; }
+    .gal img, .gal .ph { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; background: #000; display: block; }
+    .gal .ph { display: grid; place-items: center; color: var(--muted); font-size: .75rem; cursor: pointer; border: 1px dashed var(--line); background: #0a100c; }
+    .gal figcaption { font-size: .72rem; color: var(--muted); margin-top: .15rem; }
+    .syncline.bad { color: var(--lock); }
   </style>
 </head>
 <body>
@@ -124,10 +143,16 @@
 
   <!-- KONSOLE -->
   <div id="console" class="hidden">
+    <div class="banner hidden" id="legacy-banner">
+      Die bediener is nog nie opgradeer vir die volle oorsig nie (<code>migrations/002_pa_overview.sql</code> wag vir Hanno se OK).
+      Hieronder sien jy die basiese weergawe: lewendige status, sessies en gebeure.
+    </div>
     <div class="card">
       <div id="status-line" class="status off"><span class="pulse" id="pulse"></span><span id="status-text">LAAI…</span></div>
       <p class="meta" id="detail">Haal status…</p>
-      <p class="stale hidden" id="stale">⚠ Geen hartklop &gt;45s — skootrekenaar dalk toe, WiFi af of blaaier gesluit.</p>
+      <p class="meta" id="presence"></p>
+      <p class="stale hidden" id="stale">⚠ Geen hartklop &gt;2½ min — skootrekenaar dalk toe, WiFi af of blaaier gesluit.</p>
+      <p class="meta syncline" id="syncline"></p>
     </div>
 
     <div class="row" id="stats">
@@ -146,14 +171,42 @@
 
     <div class="card" style="margin-top:.85rem">
       <div class="toolbar" style="justify-content:space-between">
-        <h2 style="margin:0;font-size:1rem">Sessies</h2>
+        <h2 class="t" style="margin:0" id="plan-title">Rooster teenoor werklikheid</h2>
         <input type="date" id="day-pick" aria-label="Kies dag" />
       </div>
+      <p class="meta" id="plan-note"></p>
+      <div class="scroll-x"><table class="plan" id="today-table"></table></div>
+      <div id="blocks"></div>
+    </div>
+
+    <div class="card" id="week-card">
+      <h2 class="t" id="week-title">Hierdie week</h2>
+      <div class="scroll-x"><table class="plan" id="week-table"></table></div>
+      <div class="scroll-x"><table class="plan" id="week-days" style="margin-top:.6rem"></table></div>
+    </div>
+
+    <div class="card">
+      <h2 class="t">Wallie se terugvoer (surveys) — woordeliks</h2>
+      <div id="feedback"><p class="meta">Nog geen surveys ontvang nie.</p></div>
+    </div>
+
+    <div class="card hidden" id="problems-card">
+      <h2 class="t">Probleem-rapporte</h2>
+      <div id="problems"></div>
+    </div>
+
+    <div class="card" id="gallery-card">
+      <h2 class="t">Kamera-foto's (elke 45 s tydens sessie · word ná 3 dae uitgevee)</h2>
+      <div class="gal" id="gallery"><p class="meta">Nog geen foto's nie.</p></div>
+    </div>
+
+    <div class="card" style="margin-top:.85rem">
+      <h2 class="t">Sessies van die gekose dag</h2>
       <div id="sessions"><p class="meta">Nog geen sessies vandag nie.</p></div>
     </div>
 
     <div class="card">
-      <h2 style="margin:0 0 .5rem;font-size:1rem">Gebeure &amp; verslae</h2>
+      <h2 class="t">Gebeure &amp; verslae</h2>
       <ul class="reports" id="reports"><li>Nog niks vandag nie.</li></ul>
     </div>
 
@@ -177,7 +230,8 @@
   <script src="assets/js/live-config.js"></script>
   <script>
     const TOKEN_KEY = "wallie911_pa_token";
-    const STALE_MS = 45000;
+    /* Hartklop kom elke 60 s (sync.js); 2½ min = twee gemis */
+    const STALE_MS = 150000;
     const LOST_MS = 10 * 60 * 1000;
     const POLL_MS = 15000;
     const $ = (id) => document.getElementById(id);
@@ -328,6 +382,26 @@
       );
     }
 
+    function renderPresenceAndSync(cur, serverNow) {
+      const parts = [];
+      if (cur && cur.visible != null) {
+        parts.push(cur.visible ? (cur.focused === false ? "oortjie sigbaar maar ander venster in fokus" : "oortjie sigbaar + gefokus") : "oortjie VERSTEEK");
+        if (cur.idle) parts.push("LEDIG (geen muis/sleutelbord vir minstens 5 min)");
+        if (cur.hidden_ms) parts.push(`tab weg ${Math.round(cur.hidden_ms / 60000)} min`);
+        if (cur.idle_ms) parts.push(`ledig ${Math.round(cur.idle_ms / 60000)} min`);
+      }
+      $("presence").textContent = parts.length ? "Nou: " + parts.join(" · ") : "";
+      const el = $("syncline");
+      if (ov && ov.device) {
+        const ageMs = ov.device.age_s * 1000 + (Date.now() - fetchedAt);
+        el.textContent = `Toestel laas suksesvol gesinkroniseer: ${sastTime(ov.device.last_sync_at)} (${fmtAge(ageMs)} gelede) · weergawe ${ov.device.app_version || "?"}`;
+        el.classList.toggle("bad", Boolean(cur) && ageMs > 10 * 60 * 1000);
+      } else {
+        el.textContent = ov ? "Toestel-sinkronisering: nog geen toestel het gestuur nie." : "Toestel se laaste sinkronisering: sigbaar ná die bediener-opgradering.";
+        el.classList.remove("bad");
+      }
+    }
+
     function render() {
       if (!last) return;
       const serverNow = serverNowMs();
@@ -362,6 +436,8 @@
           : `Wys ${last.day}.`;
       }
 
+      renderPresenceAndSync(cur, serverNow);
+
       const showStill = Boolean(cur && last.still && last.still.session_id === cur.session_id && stillAt);
       $("still-card").classList.toggle("hidden", !showStill);
       if (showStill) {
@@ -377,7 +453,7 @@
                 : isLost(s)
                   ? `<b>onderbreek?</b> geen sein sedert ${sastTime(s.last_seen)}`
                   : `<b>${escapeHtml(s.status)}</b>`;
-              return `<div class="sess"><b>${escapeHtml(s.subject)}</b> · ${sastTime(s.started_at)} · ${st} · waarskuwings ${s.total_warnings} · slotte ${s.locks}${s.task ? `<br/><span class="meta">${escapeHtml(s.task)}</span>` : ""}</div>`;
+              return `<div class="sess"><b>${escapeHtml(s.subject)}</b> · ${sastTime(s.started_at)} · ${st} · ${s.minutes != null ? `${s.minutes} min · ` : ""}waarskuwings ${s.total_warnings} · slotte ${s.locks}${s.task ? `<br/><span class="meta">${escapeHtml(s.task)}</span>` : ""}</div>`;
             })
             .join("")
         : `<p class="meta">Geen sessies op ${last.day} nie.</p>`;
@@ -390,34 +466,192 @@
         : "<li>Nog niks op hierdie dag nie.</li>";
     }
 
+    /* ---------- Oorsig (migrations/002): alles bediener-kant bereken ---------- */
+    let ov = null;
+    let legacy = false;
+    let legacyCheckedAt = 0;
+    const stillCache = new Map();
+    const BADGE = {
+      done: ["b-done", "✓ klaar"],
+      partial: ["b-partial", "◐ gedeeltelik"],
+      missed: ["b-missed", "✗ gemis"],
+      planned: ["b-planned", "○ gepland"]
+    };
+
+    function sastStamp(d) {
+      return sastDay(d) + " " + new Date(d).toLocaleTimeString("af-ZA", { timeZone: "Africa/Johannesburg", hour: "2-digit", minute: "2-digit" });
+    }
+
+    function dayLabel(day) {
+      return new Date(day + "T12:00:00Z").toLocaleDateString("af-ZA", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+    }
+
+    function subjectTable(el, rows, withSessions) {
+      if (!rows || !rows.length) {
+        el.innerHTML = "";
+        return;
+      }
+      const sum = (k) => rows.reduce((a, r) => a + (Number(r[k]) || 0), 0);
+      el.innerHTML =
+        `<tr><th>Vak</th><th>Gepland</th><th>Klaar</th><th>Gedeeltelik</th><th>Gemis</th><th>Nog te doen</th><th>Minute klaar / gepland</th>${withSessions ? "<th>Sessie-minute</th>" : ""}</tr>` +
+        rows
+          .map(
+            (r) =>
+              `<tr><td>${escapeHtml(r.subject)}</td><td>${r.planned}</td><td class="b-done">${r.done}</td><td class="b-partial">${r.partial}</td><td class="b-missed">${r.missed}</td><td class="b-planned">${r.upcoming}</td><td>${r.done_min} / ${r.planned_min}</td>${withSessions ? `<td>${r.session_min}</td>` : ""}</tr>`
+          )
+          .join("") +
+        `<tr><td><b>Totaal</b></td><td><b>${sum("planned")}</b></td><td class="b-done"><b>${sum("done")}</b></td><td class="b-partial"><b>${sum("partial")}</b></td><td class="b-missed"><b>${sum("missed")}</b></td><td class="b-planned"><b>${sum("upcoming")}</b></td><td><b>${sum("done_min")} / ${sum("planned_min")}</b></td>${withSessions ? `<td><b>${sum("session_min")}</b></td>` : ""}</tr>`;
+    }
+
+    async function loadStill(id) {
+      if (stillCache.has(id)) return stillCache.get(id);
+      const img = await WALLIE.LIVE.rpc("wallie_pa_still", { p_token: token, p_id: id });
+      const src = img && img.ok ? "data:image/jpeg;base64," + img.jpeg_b64 : null;
+      if (src) stillCache.set(id, src);
+      return src;
+    }
+
+    async function hydrateGallery() {
+      for (const el of document.querySelectorAll("#gallery .ph[data-auto='1']")) {
+        const src = await loadStill(Number(el.dataset.still));
+        if (src && el.isConnected) el.outerHTML = `<img src="${src}" alt="Kamera-foto" data-still="${el.dataset.still}" data-loaded="1" />`;
+      }
+    }
+
+    $("gallery").addEventListener("click", async (e) => {
+      const ph = e.target.closest(".ph");
+      if (!ph) return;
+      ph.textContent = "…";
+      const src = await loadStill(Number(ph.dataset.still));
+      if (src) ph.outerHTML = `<img src="${src}" alt="Kamera-foto" data-still="${ph.dataset.still}" data-loaded="1" />`;
+      else ph.textContent = "Kon nie laai nie";
+    });
+
+    function renderOverview(o) {
+      $("legacy-banner").classList.toggle("hidden", !legacy);
+      if (!o) {
+        $("plan-title").textContent = "Rooster teenoor werklikheid";
+        $("plan-note").textContent = "Beskikbaar sodra die bediener opgradeer is (migrations/002).";
+        ["today-table", "blocks", "week-table", "week-days"].forEach((id) => ($(id).innerHTML = ""));
+        $("week-title").textContent = "Hierdie week";
+        $("feedback").innerHTML = '<p class="meta">Beskikbaar sodra die bediener opgradeer is — intussen staan surveys onder “Gebeure &amp; verslae”.</p>';
+        $("problems-card").classList.add("hidden");
+        $("gallery").innerHTML = '<p class="meta">Die lewendige foto verskyn bo-aan tydens ’n sessie.</p>';
+        return;
+      }
+      $("plan-title").textContent = (o.day === o.today ? "Vandag" : dayLabel(o.day)) + " — rooster teenoor werklikheid";
+      $("plan-note").textContent = o.plan_received
+        ? "Klaar = minstens 75% van die blok se minute gedoen (of deur Wallie as klaar gemerk). Gemis = tyd verby en niks gedoen nie."
+        : "Wallie se toestel het nog nie hierdie dag se rooster gestuur nie — dit gebeur sodra sy app oop is en aanlyn.";
+      subjectTable($("today-table"), o.today_by_subject, false);
+      $("blocks").innerHTML = (o.blocks || [])
+        .map((b) => {
+          const [cls, label] = BADGE[b.status] || BADGE.planned;
+          const when = b.start && b.end ? `${b.start}–${b.end} · ` : "";
+          return `<div class="blk"><span class="tag ${cls}">${label}</span><span>${when}<b>${escapeHtml(b.title && String(b.title).startsWith(b.subject) ? b.title : b.subject + (b.title ? " — " + b.title : ""))}</b> · ${b.done_min}/${b.minutes} min${b.manual ? " · deur Wallie as klaar gemerk" : ""}</span></div>`;
+        })
+        .join("");
+      $("week-title").textContent = `Week ${dayLabel(o.week_start)} – ${dayLabel(o.week_end)}`;
+      subjectTable($("week-table"), o.week_by_subject, true);
+      $("week-days").innerHTML = (o.week_days || []).length
+        ? "<tr><th>Dag</th><th>Gepland</th><th>Klaar</th><th>Gedeeltelik</th><th>Gemis</th></tr>" +
+          o.week_days
+            .map((d) => `<tr><td>${dayLabel(d.day)}</td><td>${d.planned}</td><td class="b-done">${d.done}</td><td class="b-partial">${d.partial}</td><td class="b-missed">${d.missed}</td></tr>`)
+            .join("")
+        : "";
+
+      $("feedback").innerHTML = (o.surveys || []).length
+        ? o.surveys
+            .map(
+              (s) =>
+                `<div class="fb"><div class="when">${sastStamp(s.at)} · ${escapeHtml(s.subject || "")}${s.kind === "pa-survey" ? " · Pa se eie survey" : ""}${s.backfill ? " · uit die toestel se ou log" : ""}</div><pre>${escapeHtml(s.body)}</pre></div>`
+            )
+            .join("")
+        : '<p class="meta">Nog geen surveys ontvang nie.</p>';
+
+      $("problems-card").classList.toggle("hidden", !(o.problems || []).length);
+      $("problems").innerHTML = (o.problems || [])
+        .map((p) => `<div class="fb"><div class="when">${sastStamp(p.at)} · ${escapeHtml(p.title || "")}</div><pre>${escapeHtml(p.body)}</pre></div>`)
+        .join("");
+
+      const stills = o.stills || [];
+      $("gallery").innerHTML = stills.length
+        ? stills
+            .map((s, i) => {
+              const cached = stillCache.get(s.id);
+              const media = cached
+                ? `<img src="${cached}" alt="Kamera-foto" data-still="${s.id}" data-loaded="1" />`
+                : `<div class="ph" data-still="${s.id}" data-auto="${i < 8 ? 1 : 0}">${i < 8 ? "laai…" : "wys foto"}</div>`;
+              return `<figure>${media}<figcaption>${sastStamp(s.created_at)}</figcaption></figure>`;
+            })
+            .join("")
+        : '<p class="meta">Nog geen foto’s nie.</p>';
+      hydrateGallery();
+    }
+
+    function adaptOverview(o) {
+      const sessions = (o.sessions || []).map((s) => ({ ...s, total_warnings: s.warnings }));
+      if (o.current) {
+        const i = sessions.findIndex((s) => s.session_id === o.current.session_id);
+        const cur = { ...o.current, ended_at: null };
+        if (i >= 0) sessions[i] = { ...sessions[i], ...cur };
+        else sessions.unshift(cur);
+      }
+      return {
+        ok: true,
+        now: o.now,
+        day: o.day,
+        sessions,
+        events: o.events,
+        still: (o.stills || []).find((s) => o.current && s.session_id === o.current.session_id) || null
+      };
+    }
+
     async function refresh() {
       if (!token) return;
       const day = $("day-pick").value;
       const isToday = !day || day === sastDay(Date.now());
-      let r;
-      try {
+      let r = null;
+      if (!legacy || Date.now() - legacyCheckedAt > 5 * 60 * 1000) {
+        r = await WALLIE.LIVE.rpc("wallie_pa_overview", { p_token: token, p_day: isToday ? null : day });
+        if (r.missingFunction) {
+          legacy = true;
+          legacyCheckedAt = Date.now();
+          r = null;
+        } else if (r.ok) {
+          legacy = false;
+        }
+      }
+      if (!r || (!r.ok && !r.transient && r.error !== "auth")) {
         r = await WALLIE.LIVE.rpc("wallie_pa_live", { p_token: token, p_day: isToday ? null : day });
-      } catch (e) {
-        $("detail").textContent = "Kon nie die konsole bereik nie (" + e.message + "). Probeer weer oor 15 s.";
-        setStatus("lock", "GEEN VERBINDING");
-        return;
+        ov = null;
       }
       if (!r.ok) {
         if (r.error === "auth") showLogin("Sessie het verval — teken weer in.");
-        else $("detail").textContent = "Fout: " + r.error;
+        else if (r.transient) {
+          $("detail").textContent = "Kon nie die konsole bereik nie (" + r.error + "). Probeer weer oor 15 s.";
+          setStatus("lock", "GEEN VERBINDING");
+        } else $("detail").textContent = "Fout: " + r.error;
         return;
       }
-      last = r;
+      if (r.sessions && r.week_start) {
+        ov = r;
+        last = adaptOverview(r);
+      } else {
+        ov = null;
+        last = r;
+      }
       fetchedAt = Date.now();
-      if (r.still && r.still.id !== stillId) {
-        const img = await WALLIE.LIVE.rpc("wallie_pa_still", { p_token: token, p_id: r.still.id }).catch(() => null);
-        if (img && img.ok) {
-          stillId = img.id;
-          stillAt = img.created_at;
-          $("still-img").src = "data:image/jpeg;base64," + img.jpeg_b64;
+      if (last.still && last.still.id !== stillId) {
+        const src = await loadStill(last.still.id);
+        if (src) {
+          stillId = last.still.id;
+          stillAt = last.still.created_at;
+          $("still-img").src = src;
         }
       }
       render();
+      renderOverview(ov);
     }
 
     setInterval(render, 1000);
