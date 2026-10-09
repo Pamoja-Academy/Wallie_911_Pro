@@ -13,7 +13,8 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
   const rooi = byPri.filter((s) => s.zone === "rooi");
   const geel = byPri.filter((s) => s.zone === "geel");
   const groen = byPri.find((s) => s.slug === "wiskgelett");
-  const beforeKickoff = dateStr < WALLIE.EXAM_START;
+  /* Die dagplan skakel oor na eksamen-rotasie op 12 Okt (LO-herskryf-dag) */
+  const beforeKickoff = dateStr < WALLIE.EXAM_PERIOD_START;
   const geelSlot = beforeKickoff
     ? geel[0]
     : geel[((WALLIE.geelDayIndex(dateStr) % geel.length) + geel.length) % geel.length];
@@ -209,7 +210,7 @@ WALLIE.daysUntilExam = function daysUntilExam(from = new Date()) {
   return diff;
 };
 
-/** Lewendige stadium-klok tot openingswedstryd (12 Okt 09:00). */
+/** Lewendige stadium-klok tot die eerste egte vraestel (RTT/CAT praktiese, Di 13 Okt 09:00). */
 WALLIE.timeUntilExam = function timeUntilExam(from = new Date()) {
   const kick = new Date(WALLIE.EXAM_KICKOFF || WALLIE.EXAM_START + "T09:00:00");
   let ms = kick - from;

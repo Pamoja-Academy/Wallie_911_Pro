@@ -86,8 +86,8 @@
     const status = $("#cd-status");
     if (status) {
       status.textContent = t.past
-        ? "Kickoff — openingswedstryd is hier. Speel."
-        : `${t.days} dae · ${WALLIE.pad2(t.hours)}:${WALLIE.pad2(t.minutes)}:${WALLIE.pad2(t.seconds)} tot Matriek-Wêreldbeker`;
+        ? "Kickoff — die eerste vraestel is hier. Speel."
+        : `${t.days} dae · ${WALLIE.pad2(t.hours)}:${WALLIE.pad2(t.minutes)}:${WALLIE.pad2(t.seconds)} tot RTT/CAT-praktiese (Di 13 Okt) · ${WALLIE.EXAM_NOTE}`;
     }
 
     const missieDays = $("#missie-days-left");

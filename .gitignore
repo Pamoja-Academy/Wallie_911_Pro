@@ -8,3 +8,4 @@ dist/
 # Toetse
 node_modules/
 test-artifacts/playwright-output/
+test-artifacts/playwright-results.json

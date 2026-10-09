@@ -51,6 +51,9 @@ WALLIE.SYNC = {
       outageSince: null,
       serverV2: null,
       v2CheckedAt: 0,
+      planServer: null,
+      planCheckedAt: 0,
+      plansSyncedFor: null,
       backfilledAt: null,
       legacyMigrated: false
     };
@@ -194,6 +197,23 @@ WALLIE.SYNC = {
   /* Gee terug: "sent" | "parked" | "dead" | "retry" */
   async sendItem(item, box) {
     const now = Date.now();
+    /* Rooster (migrations/002): eie funksie; bestaan dit nog nie, wag dit geparkeer */
+    if (item.kind === "plan") {
+      if (box.planServer === false && now - (box.planCheckedAt || 0) < this.v2RecheckMs) {
+        return { result: "parked", error: "wag vir bediener-opgradering (002)" };
+      }
+      const pr = await this.rpc("wallie_ingest_plan", { p: item.payload });
+      box.planCheckedAt = now;
+      if (pr.ok) {
+        box.planServer = true;
+        return { result: "sent" };
+      }
+      if (pr.missingFunction) {
+        box.planServer = false;
+        return { result: "parked", error: "wag vir bediener-opgradering (002)" };
+      }
+      return pr.transient ? { result: "retry", error: pr.error } : { result: "dead", error: pr.error };
+    }
     const tryV2 = box.serverV2 !== false || now - (box.v2CheckedAt || 0) > this.v2RecheckMs;
     if (tryV2) {
       const res = await this.rpc("wallie_ingest_v2", { p: item.payload });
@@ -321,6 +341,8 @@ WALLIE.SYNC = {
       failingSince: box.failingSince,
       serverV2: box.serverV2,
       v2CheckedAt: box.v2CheckedAt,
+      planServer: box.planServer,
+      planCheckedAt: box.planCheckedAt,
       alertFor: fresh.alertFor
     });
     fresh.queue = fresh.queue.filter((q) => {
@@ -400,11 +422,50 @@ WALLIE.SYNC = {
     return box.queue.filter((q) => q.state !== "parked" && q.state !== "dead");
   },
 
+  /* ---------- rooster → bediener (Pa-konsole: gepland / klaar / gemis) ---------- */
+
+  hash(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(36);
+  },
+
+  /* Stuur die rooster van twee weke terug tot ’n week vorentoe. Dieselfde rooster = dieselfde id (ontdubbel). */
+  syncPlans(now = new Date()) {
+    if (!WALLIE.buildDayPlan || !WALLIE.todayKey) return 0;
+    let n = 0;
+    for (let off = -14; off <= 7; off++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off);
+      const day = WALLIE.todayKey(d);
+      let plan;
+      try {
+        plan = WALLIE.buildDayPlan(day);
+      } catch {
+        continue;
+      }
+      const blocks = (plan.blocks || []).map((b) => ({
+        id: b.id,
+        kind: b.kind,
+        subject_slug: b.subjectSlug,
+        subject: WALLIE.REMOTE?.subjectLabel(b.subjectSlug) || b.subjectSlug,
+        minutes: b.minutes,
+        start: b.start || null,
+        end: b.end || null,
+        title: b.title
+      }));
+      const hash = this.hash(JSON.stringify(blocks));
+      if (this.enqueue(`plan:${day}:${hash}`, { kind: "plan", day, plan_hash: hash, blocks, title: `ROOSTER ${day}` }, { noFlush: true })) n += 1;
+    }
+    this.update((b) => (b.plansSyncedFor = WALLIE.todayKey(now)));
+    return n;
+  },
+
   status() {
     const box = this.load();
     const pending = this.sendable(box).length;
-    const parked = box.queue.filter((q) => q.state === "parked").length;
-    const dead = box.queue.filter((q) => q.state === "dead").length;
+    /* Rooster-items (kind "plan") tel nie vir Wallie se aanwyser nie: dis agtergrond-inligting vir Pa */
+    const parked = box.queue.filter((q) => q.state === "parked" && q.kind !== "plan").length;
+    const dead = box.queue.filter((q) => q.state === "dead" && q.kind !== "plan").length;
     const failingFor = box.failingSince ? Date.now() - box.failingSince : 0;
     let level = "ok";
     if (pending) level = failingFor >= this.redAfterMs ? "bad" : "busy";
@@ -638,10 +699,17 @@ WALLIE.SYNC = {
     try {
       this.backfill(state);
     } catch {}
+    try {
+      this.syncPlans();
+    } catch {}
     this.notify();
     this.flush();
     if (this._timer) return;
     this._timer = setInterval(() => {
+      /* Nuwe dag (toestel bly dae lank oop): stuur die nuwe week se rooster */
+      try {
+        if (WALLIE.todayKey && this.load().plansSyncedFor !== WALLIE.todayKey()) this.syncPlans();
+      } catch {}
       this.flush();
       this.notify();
     }, this.tickMs);

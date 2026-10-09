@@ -151,6 +151,19 @@ if (W.surveys || W.buildSurvey || W.SURVEYS) {
   assert(surveyCode.includes("Pa") || surveyCode.includes("pa"), "surveys.js mentions Pa");
 }
 
+/* START-HIER.bat maak net die lewendige weergawe oop (geen plaaslike kopie / Node meer nie) */
+const bat = fs.readFileSync(path.join(root, "START-HIER.bat"), "utf8");
+assert(bat.includes('start "" "https://pamoja-academy.github.io/Wallie_911_Pro/#missie"'), "bat opens the live #missie URL");
+assert(!/\b(node|npx|serve|localhost)\b/i.test(bat), "bat no longer serves a local copy");
+
+/* Hanno: Wallie word NIE weer om toestemming gevra nie — die sleutel bly dieselfde */
+const remoteSrc = fs.readFileSync(path.join(root, "assets/js/remote.js"), "utf8");
+assert(remoteSrc.includes('consentKey: "wallie911_remote_consent_v2"'), "consent key unchanged (no re-ask)");
+
+/* Eerste egte vraestel = RTT/CAT praktiese, Di 13 Okt; Ma 12 Okt is net die LO-herskryf */
+assert(W.EXAM_START === "2026-10-13" && W.EXAM_KICKOFF.startsWith("2026-10-13"), "countdown targets Tue 13 Oct (CAT practical)");
+assert(W.EXAM_PERIOD_START === "2026-10-12", "exam period (LO rewrite) still starts Mon 12 Oct");
+
 /* Die zip is .gitignore'd (net op Pa se masjien) — toets dit net as dit bestaan */
 const zipPath = path.join(root, "Wallie_911_Pro-VIR-SY-LAPTOP.zip");
 if (fs.existsSync(zipPath)) assert(fs.statSync(zipPath).size > 10000, "laptop zip >10KB");

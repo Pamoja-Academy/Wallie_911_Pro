@@ -204,13 +204,13 @@
       <p class="eyebrow">Pa · Oorsiener · Afrigter-kantoor</p>
       <h1>Wallie_911_Pro — gameplan</h1>
       <p>
-        Matriek-Wêreldbeker. Wallie is <strong>#15</strong>. Openingswedstryd =
-        eindeksamen begin <strong>12 Oktober 2026 · 09:00</strong>.
+        Matriek-Wêreldbeker. Wallie is <strong>#15</strong>. Eindeksamen begin <strong>Ma 12 Oktober</strong> (net die LO-herskryf); die
+        eerste egte vraestel is <strong>RTT/CAT praktiese, Di 13 Oktober 2026 · 09:00</strong>.
         Hy sit in die buitegebou; jy monitor op afstand — nie stap toe nie.
       </p>
       <div class="chips">
         <span class="chip">Trui #15</span>
-        <span class="chip">12 Okt kickoff</span>
+        <span class="chip">13 Okt kickoff (CAT)</span>
         <span class="chip">Pa-PIN 9110</span>
         <span class="chip">60% / Wisk 80% / Engels 70%</span>
         <span class="chip">WhatsApp 068 376 8239</span>
@@ -220,8 +220,8 @@
 
     <div class="stadium" aria-live="polite">
       <p class="eyebrow">Lewendige stadium-klok</p>
-      <h2>Aftelling tot openingswedstryd</h2>
-      <p class="sub">Wêreldbeker-metafoor = Matriek eindeksamen · 12 Okt 2026 09:00</p>
+      <h2>Aftelling tot die eerste vraestel</h2>
+      <p class="sub">Wêreldbeker-metafoor = Matriek eindeksamen · eerste vraestel 13 Okt 2026 09:00</p>
       <div class="digits">
         <div class="digit"><b id="cd-days">—</b><small>dae</small></div>
         <span class="sep" aria-hidden="true">:</span>
@@ -250,7 +250,7 @@
         </li>
         <li>Hard-proctor: tab fokusus + kamera. 3× wegkyk → slot tot PIN <code>9110</code>.</li>
         <li>Ná blokke: sy survey + jou Pa-survey → Verbeter-oortjie (MISMATCH = jou oë wen).</li>
-        <li>Elke dag tot 12 Okt: produksie + memo, nie “ek het gelees” nie.</li>
+        <li>Elke dag tot 13 Okt: produksie + memo, nie “ek het gelees” nie.</li>
       </ol>
       <div class="callout danger-edge">
         <strong>Moenie:</strong> afgekapte GitHub zip-URLs, <code>file://</code>, of OneDrive as sy pad.
@@ -263,7 +263,7 @@
       <p>
         Narratief: Rassie se SOS — vyf #15’s “siek”. Wallie speel homself in die span
         deur die matric-Wêreldbeker te wen. Die <strong>openingswedstryd</strong> is
-        die eerste eindeksamen-dag: <strong>12 Oktober</strong>. Die klok hierbo
+        die eerste egte vraestel: <strong>RTT/CAT praktiese, 13 Oktober</strong> (12 Okt is net die LO-herskryf). Die klok hierbo
         (en op sy Missie-skerm) hou die druk sigbaar — soos ’n stadium-klok voor kickoff.
       </p>
     </section>
@@ -326,7 +326,7 @@ https://pamoja-academy.github.io/Wallie_911_Pro/
 4. Missie → Begin (kamera toelaat)
 5. Slot-PIN as nodig: 9110
 
-Kyk die Wêreldbeker-klok bo-aan — openingswedstryd is 12 Oktober.
+Kyk die Wêreldbeker-klok bo-aan — die eerste vraestel is Di 13 Oktober (RTT/CAT praktiese).
 Stuur Pa ’n skermkiekie as die bladsy oop is.
 — Pa</div>
     </section>
@@ -373,7 +373,7 @@ Stuur Pa ’n skermkiekie as die bladsy oop is.
   </div>
 
   <script>
-    const KICKOFF = new Date("2026-10-12T09:00:00");
+    const KICKOFF = new Date("2026-10-13T09:00:00"); /* eerste egte vraestel: RTT/CAT praktiese */
     function pad(n) { return String(n).padStart(2, "0"); }
     function tick() {
       let ms = KICKOFF - new Date();
@@ -389,8 +389,8 @@ Stuur Pa ’n skermkiekie as die bladsy oop is.
       document.getElementById("cd-mins").textContent = pad(minutes);
       document.getElementById("cd-secs").textContent = pad(seconds);
       document.getElementById("cd-status").textContent = past
-        ? "Kickoff — openingswedstryd is hier. Speel."
-        : days + " dae tot Matriek-Wêreldbeker openingswedstryd (12 Okt 09:00)";
+        ? "Kickoff — die eerste vraestel is hier. Speel."
+        : days + " dae tot die eerste vraestel: RTT/CAT praktiese, Di 13 Okt 09:00 (Ma 12 Okt = net LO-herskryf)";
     }
     tick();
     setInterval(tick, 1000);

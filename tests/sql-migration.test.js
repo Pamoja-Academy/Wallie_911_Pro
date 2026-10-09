@@ -4,29 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const assert = require("assert/strict");
 
-const root = path.join(__dirname, "..");
-
-/* PGlite het nie pgcrypto nie; die ingest-funksies gebruik dit nie. Stompe net vir Pa se wagwoord-funksies. */
-const PRELUDE = `
-create role anon nologin; create role authenticated nologin;
-create schema extensions;
-create function extensions.digest(t text, alg text) returns bytea language sql as $$ select decode(md5(t), 'hex') $$;
-create function extensions.gen_random_bytes(n int) returns bytea language sql as $$ select decode(md5(random()::text), 'hex') $$;
-create function extensions.gen_salt(t text, n int default 0) returns text language sql as $$ select 'salt' $$;
-create function extensions.crypt(p text, s text) returns text language sql as $$ select md5(p) $$;
-`;
-
-function baseSql() {
-  return fs
-    .readFileSync(path.join(root, "supabase/wallie911_live.sql"), "utf8")
-    .replace(/create extension if not exists pgcrypto[^;]*;/i, "");
-}
+const { newDb, migrationFiles, root } = require("./sql-helpers");
+const { overviewTests } = require("./sql-overview");
 
 async function main() {
-  const { PGlite } = await import("@electric-sql/pglite");
-  const db = new PGlite();
-  await db.exec(PRELUDE);
-  await db.exec(baseSql());
+  const db = await newDb({ migrations: false });
 
   const v1 = async (p) => (await db.query("select public.wallie_ingest($1::jsonb) r", [JSON.stringify(p)])).rows[0].r;
   const v2 = async (p) => (await db.query("select public.wallie_ingest_v2($1::jsonb) r", [JSON.stringify(p)])).rows[0].r;
@@ -37,6 +19,10 @@ async function main() {
     assert.ok(cond, msg);
     passed += 1;
   };
+  const eq = (a, b, msg) => {
+    assert.deepEqual(a, b, msg);
+    passed += 1;
+  };
 
   /* Bestaande gedrag van wallie_ingest waarop die kliënt-terugval staatmaak */
   ok((await v1({ kind: "idle" })).error === "bad kind", "v1 weier nuwe soort met 'bad kind'");
@@ -45,8 +31,7 @@ async function main() {
   ok((await v1({ kind: "probleem", data: { id: "bug_9" } })).ok, "v1 probleem sonder _event_id ok");
 
   /* Migrasie (twee keer: moet herloopbaar wees) */
-  const files = fs.readdirSync(path.join(root, "migrations")).filter((f) => f.endsWith(".sql")).sort();
-  for (const f of files) {
+  for (const f of migrationFiles()) {
     const sql = fs.readFileSync(path.join(root, "migrations", f), "utf8");
     await db.exec(sql);
     await db.exec(sql);
@@ -136,6 +121,7 @@ async function main() {
   )[0];
   ok(g.e === true && g.s === false, "anon: execute op v2, geen toegang tot skema nie");
 
+  await overviewTests(db, { ok, eq, v2 });
   console.log(JSON.stringify({ passed, fails: 0 }));
 }
 

@@ -106,7 +106,9 @@ test("terugvul: alle historiese log-inskrywings, een keer elk, ou bediener nou +
   await runUntil(page, async () => (await syncLabel(page)) === "Gesinkroniseer", { label: "groen ná terugvul" });
   for (const id of waitForV2) expect(mock.deliveredIds()).not.toContain(id);
   const q = await queue(page);
-  expect(q.filter((i) => i.state === "parked").map((i) => i.id).sort()).toEqual([...waitForV2].sort());
+  expect(q.filter((i) => i.state === "parked" && i.kind !== "plan").map((i) => i.id).sort()).toEqual([...waitForV2].sort());
+  /* Rooster (22 dae) wag ook vir migrations/002, maar tel nie vir Wallie se aanwyser nie */
+  expect(q.filter((i) => i.kind === "plan" && i.state === "parked")).toHaveLength(22);
   expect(await page.locator("#sync-pill").getAttribute("title")).toContain("3 wag vir Pa se bediener-opgradering");
 
   /* Presiese payload van die oudste sessie (ou formaat: id = einde-tyd) */
@@ -185,6 +187,9 @@ test("terugvul: alle historiese log-inskrywings, een keer elk, ou bediener nou +
   const blk = mock.delivered().find((x) => x.body.p.event_id === "block:2026-09-28-kickoff").body.p;
   expect(blk).toMatchObject({ kind: "block", block_id: "2026-09-28-kickoff", backfill: true });
 
+  await runUntil(page, async () => mock.plans.length === 22, { step: 60000, max: 40 * 60 * 1000, label: "rooster ná 002" });
+  expect(new Set(mock.plans.map((p) => p.day)).size).toBe(22);
+  expect(mock.plans[0].blocks[0]).toMatchObject({ id: expect.stringMatching(/^\d{4}-\d{2}-\d{2}-/), subject: expect.any(String), minutes: expect.any(Number) });
   const ids = mock.deliveredIds().filter((id) => !id.startsWith("hb:"));
   expect(new Set(ids).size, "elke historiese inskrywing presies een keer").toBe(ids.length);
   expect(ids.sort()).toEqual([...sendNow, ...waitForV2].sort());

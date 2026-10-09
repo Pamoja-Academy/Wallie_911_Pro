@@ -19,7 +19,7 @@ Afrikaanse matric SOS-cockpit vir Wallie (#15 Springbok narratief). Hard-proctor
 - **Pa afstand:** https://pamoja-academy.github.io/Wallie_911_Pro/pa-afstand.html
 - **Zip release:** https://github.com/Pamoja-Academy/Wallie_911_Pro/releases/download/wallie-laptop-v1/Wallie_911_Pro-VIR-SY-LAPTOP.zip
 - ntfy topic (Pa foon): `wallie911-pa-15sos-hanno`
-- **Openingswedstryd / Matriek eindeksamen:** 12 Okt 2026 09:00 (stadium-klok op Missie + briefing)
+- **Eerste egte vraestel:** RTT/CAT praktiese, Di 13 Okt 2026 09:00 (stadium-klok op Missie + briefing). Ma 12 Okt = net LO-herskryf.
 
 ## Wat Wallie nou moet doen
 Hy het Node NIET. Hy het ’n **stukkende/verkortte GitHub-URL** oopgemaak → “Not Found”.
@@ -32,7 +32,7 @@ Hy het Node NIET. Hy het ’n **stukkende/verkortte GitHub-URL** oopgemaak → �
 ## Tegnies
 - Static HTML/JS; `localStorage` key `wallie911_v2_bok`
 - Remote: `assets/js/remote.js` → ntfy heartbeats + reports (video bly plaaslik)
-- `START-HIER.bat` sonder Node → oop Pages HTTPS (commit `1d9c6d3`)
+- `START-HIER.bat` maak net die Pages-HTTPS-skakel oop (geen plaaslike kopie meer nie)
 - Supabase gratis-limiet vol — nie gebruik; ntfy pad
 
 ## Pa TODO
