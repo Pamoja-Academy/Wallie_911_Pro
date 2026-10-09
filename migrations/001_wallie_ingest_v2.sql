@@ -197,7 +197,9 @@ begin
       focused_ms = greatest(focused_ms, wallie911.safe_big(p->>'focused_ms')),
       hidden_ms = greatest(hidden_ms, wallie911.safe_big(p->>'hidden_ms')),
       idle_ms = greatest(idle_ms, wallie911.safe_big(p->>'idle_ms'))
-    where session_id = sid and (p ? 'visible_ms');
+    where session_id = sid and (p ? 'visible_ms')
+      -- Bugbot PR#6: 'n ou (vertraagde) hartklop mag nie nuwer sigbaar/fokus/ledig oorskryf nie
+      and least(at, now()) >= last_seen;
 
     if k = 'end' then
       update wallie911.live set
