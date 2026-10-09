@@ -4,3 +4,7 @@ scripts/_b64_one_line.txt
 scripts/_zip_b64.txt
 WHATSAPP-PLAK-HIER.txt
 dist/
+
+# Toetse
+node_modules/
+test-artifacts/playwright-output/

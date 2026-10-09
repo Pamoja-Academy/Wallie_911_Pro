@@ -96,7 +96,7 @@
           <h3>${esc(subjectName(slug))}</h3>
           ${c ? `<p class="md-concept"><small>Wat leer ek?</small>${esc(c.titel)}</p>` : `<p class="md-concept">${esc(b.detail)}</p>`}
           <div class="md-actions">
-            <button type="button" class="btn big primary start-block" data-slug="${slug}" data-concept="${c?.id || ""}" data-min="${b.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin ${b.minutes} min</button>
+            <button type="button" class="btn big primary start-block" data-block="${b.id}" data-slug="${slug}" data-concept="${c?.id || ""}" data-min="${b.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin ${b.minutes} min</button>
             ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${slug}" data-concept="${c.id}">Kyk les</button>` : ""}
             <button type="button" class="btn big ghost mark-done" data-id="${b.id}" aria-label="Merk klaar">✓</button>
           </div>
@@ -145,7 +145,7 @@
           <h2>${esc(subjectName(next.subjectSlug))}</h2>
           ${c ? `<p class="next-concept">${esc(c.titel)}</p><ul class="next-cues">${c.cues.slice(0, 3).map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
           <div class="md-actions">
-            <button type="button" class="btn big primary js-start" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" data-min="${next.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin nou</button>
+            <button type="button" class="btn big primary js-start" data-block="${next.id}" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" data-min="${next.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin nou</button>
             ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${next.subjectSlug}" data-concept="${c.id}">Kyk les eers</button>` : ""}
           </div>
         </div>
@@ -377,7 +377,7 @@
         return;
       }
       pendingConcept = js.dataset.concept ? { slug, id: js.dataset.concept } : null;
-      WALLIE.app?.startSession({ subjectSlug: slug, minutes: Number(js.dataset.min), task: decodeURIComponent(js.dataset.title || "") });
+      WALLIE.app?.startSession({ subjectSlug: slug, minutes: Number(js.dataset.min), task: decodeURIComponent(js.dataset.title || ""), blockId: js.dataset.block });
       return;
     }
     const leer = e.target.closest("[data-leer]");

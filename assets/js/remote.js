@@ -1,24 +1,22 @@
 /* Remote Pa-sink:
-   - Pa-konsole (Supabase via WALLIE.LIVE): hartklop elke 15s, sessie-gebeure, webcam-stills.
-     Duursaam — Pa sien vandag se sessies ure later nog.
+   - Pa-konsole (Supabase via WALLIE.SYNC → WALLIE.LIVE): elke sessie-gebeurtenis gaan deur die vanlyn-tou
+     met ’n vaste event_id; hartklop elke 60 s met tab-sigbaarheid, fokus en ledig-tyd; webcam-stills.
    - ntfy: net foon-push vir gebeure wat saak maak (ntfy.sh laat ~250 boodskappe/dag per IP toe,
-     dus geen hartklop meer daar nie). */
+     dus geen hartklop daar nie). */
 window.WALLIE = window.WALLIE || {};
 
 WALLIE.REMOTE = {
   /* Verander hierdie topic as jy wil — Pa en Wallie moet dieselfde hê */
   ntfyServer: "https://ntfy.sh",
   ntfyTopic: "wallie911-pa-15sos-hanno",
-  heartbeatMs: 15000,
-  staleMs: 45000,
-  outboxKey: "wallie911_outbox_v1",
-  outboxMax: 300,
-  _flushing: false,
-  _flushAgain: false,
-  _flushTimer: null,
+  heartbeatMs: 60000,
+  /* Geen muis/sleutelbord so lank nie = "ledig" (kan papierwerk wees — dis net inligting vir Pa) */
+  idleMs: 5 * 60 * 1000,
   _hbTimer: null,
+  _idleTimer: null,
   _live: null,
-  onDurableStatus: null,
+  _presence: null,
+  _listeners: null,
 
   /* v2: toestemming dek nou ook webcam-stills na Pa (v1 het gesê video bly plaaslik) */
   consentKey: "wallie911_remote_consent_v2",
@@ -70,12 +68,21 @@ WALLIE.REMOTE = {
     return WALLIE.SUBJECTS?.find((s) => s.slug === slug)?.naam || slug || "—";
   },
 
+  blockFields(block) {
+    if (!block) return { block_id: null };
+    return {
+      block_id: block.id,
+      block: { id: block.id, title: block.title, start: block.start, end: block.end, minutes: block.minutes, kind: block.kind }
+    };
+  },
+
   /* Momentopname van die lewendige sessie vir die Pa-konsole */
   liveFields() {
     const l = this._live || {};
     return {
       session_id: l.sessionId,
       subject: this.subjectLabel(l.subjectSlug),
+      subject_slug: l.subjectSlug || null,
       task: l.task || "",
       status: l.status || "active",
       warnings: l.warnings || 0,
@@ -83,11 +90,196 @@ WALLIE.REMOTE = {
       locks: l.locks || 0,
       left_ms: l.leftMs == null ? null : Math.round(l.leftMs),
       planned_min: l.minutes || null,
-      started_at: l.startedAt || Date.now()
+      started_at: l.startedAt || Date.now(),
+      ...this.blockFields(l.block)
     };
   },
 
-  async sessionStart({ sessionId, subjectSlug, minutes, task, startedAt }) {
+  enqueue(eventId, payload) {
+    /* Hartklop/sigbaarheid/ledig = deurlopende waarneming: net met toestemming (soos voorheen) */
+    if (["heartbeat", "visibility", "idle", "active"].includes(payload?.kind) && !this.hasConsent()) return null;
+    return WALLIE.SYNC?.enqueue(eventId, payload);
+  },
+
+  /* ---------- teenwoordigheid: sigbaarheid, fokus, ledig ---------- */
+
+  presenceNow() {
+    const p = this._presence;
+    if (!p) return null;
+    const now = Date.now();
+    const dt = now - p.since;
+    const out = { ...p };
+    if (out.visible) {
+      out.visibleMs += dt;
+      if (out.focused) out.focusedMs += dt;
+    } else {
+      out.hiddenMs += dt;
+    }
+    if (out.idle) out.idleMs += now - out.idleSince;
+    return out;
+  },
+
+  accrue() {
+    const p = this.presenceNow();
+    if (!p) return;
+    Object.assign(this._presence, {
+      visibleMs: p.visibleMs,
+      focusedMs: p.focusedMs,
+      hiddenMs: p.hiddenMs,
+      since: Date.now()
+    });
+  },
+
+  presenceFields() {
+    const p = this.presenceNow();
+    if (!p) return {};
+    return {
+      visible: p.visible,
+      focused: p.focused,
+      idle: p.idle,
+      visible_ms: Math.round(p.visibleMs),
+      focused_ms: Math.round(p.focusedMs),
+      hidden_ms: Math.round(p.hiddenMs),
+      idle_ms: Math.round(p.idleMs),
+      last_input_at: p.lastInputAt
+    };
+  },
+
+  startPresence() {
+    this.stopPresence();
+    const doc = typeof document !== "undefined" ? document : null;
+    const now = Date.now();
+    this._presence = {
+      since: now,
+      visible: doc ? !doc.hidden : true,
+      focused: doc?.hasFocus ? doc.hasFocus() : true,
+      lastInputAt: now,
+      idle: false,
+      idleSince: null,
+      visibleMs: 0,
+      focusedMs: 0,
+      hiddenMs: 0,
+      idleMs: 0,
+      idleCount: 0,
+      visibilityChanges: 0
+    };
+    let lastMove = 0;
+    const onInput = (e) => {
+      const p = this._presence;
+      if (!p) return;
+      const t = Date.now();
+      if (e?.type === "pointermove" || e?.type === "mousemove") {
+        if (t - lastMove < 2000) return;
+        lastMove = t;
+      }
+      p.lastInputAt = t;
+      if (p.idle) this.endIdle();
+    };
+    const onVis = () => this.presenceChange();
+    let blurTimer = null;
+    const onBlur = () => {
+      clearTimeout(blurTimer);
+      blurTimer = setTimeout(() => this.presenceChange(), 1500);
+    };
+    const onFocus = () => {
+      clearTimeout(blurTimer);
+      onInput();
+      this.presenceChange();
+    };
+    const inputs = ["pointerdown", "pointermove", "keydown", "wheel", "touchstart", "scroll"];
+    this._listeners = { onInput, onVis, onBlur, onFocus, inputs, clearBlur: () => clearTimeout(blurTimer) };
+    if (doc) {
+      doc.addEventListener("visibilitychange", onVis);
+      inputs.forEach((t) => doc.addEventListener(t, onInput, { passive: true, capture: true }));
+    }
+    if (typeof window !== "undefined" && window.addEventListener) {
+      window.addEventListener("blur", onBlur);
+      window.addEventListener("focus", onFocus);
+    }
+    this._idleTimer = setInterval(() => this.checkIdle(), 15000);
+  },
+
+  stopPresence() {
+    const l = this._listeners;
+    if (l) {
+      l.clearBlur();
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", l.onVis);
+        l.inputs.forEach((t) => document.removeEventListener(t, l.onInput, { capture: true }));
+      }
+      if (typeof window !== "undefined" && window.removeEventListener) {
+        window.removeEventListener("blur", l.onBlur);
+        window.removeEventListener("focus", l.onFocus);
+      }
+    }
+    this._listeners = null;
+    if (this._idleTimer) clearInterval(this._idleTimer);
+    this._idleTimer = null;
+  },
+
+  presenceChange() {
+    const p = this._presence;
+    if (!p || !this._live) return;
+    const doc = typeof document !== "undefined" ? document : null;
+    const visible = doc ? !doc.hidden : true;
+    const focused = visible && (doc?.hasFocus ? doc.hasFocus() : true);
+    if (visible === p.visible && focused === p.focused) return;
+    this.accrue();
+    p.visible = visible;
+    p.focused = focused;
+    p.visibilityChanges += 1;
+    const sid = this._live.sessionId;
+    this.enqueue(`vis:${sid}:${Date.now()}`, {
+      kind: "visibility",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      title: visible ? (focused ? "TERUG OP SKERM" : "SKERM SIGBAAR, ANDER VENSTER") : "TAB WEG / GEMINIMISEER",
+      body: `${this.subjectLabel(this._live.subjectSlug)} · ${visible ? (focused ? "sigbaar + fokus" : "sigbaar, geen fokus") : "versteek"}`
+    });
+    this.heartbeatTick();
+  },
+
+  checkIdle() {
+    const p = this._presence;
+    if (!p || p.idle || !this._live) return;
+    if (Date.now() - p.lastInputAt < this.idleMs) return;
+    p.idle = true;
+    p.idleSince = p.lastInputAt;
+    p.idleCount += 1;
+    const sid = this._live.sessionId;
+    this.enqueue(`idle:${sid}:${p.idleSince}`, {
+      kind: "idle",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      idle_since: p.idleSince,
+      title: "LEDIG — geen muis/sleutelbord",
+      body: `${this.subjectLabel(this._live.subjectSlug)} · geen invoer sedert ${new Date(p.idleSince).toLocaleTimeString("af-ZA")} (kan papierwerk wees)`
+    });
+  },
+
+  endIdle() {
+    const p = this._presence;
+    if (!p?.idle) return;
+    const idleFor = Date.now() - p.idleSince;
+    p.idleMs += idleFor;
+    p.idle = false;
+    const since = p.idleSince;
+    p.idleSince = null;
+    if (!this._live) return;
+    this.enqueue(`active:${this._live.sessionId}:${since}`, {
+      kind: "active",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      idle_since: since,
+      idle_for_ms: idleFor,
+      title: "WEER AKTIEF",
+      body: `${this.subjectLabel(this._live.subjectSlug)} · was ${Math.round(idleFor / 60000)} min ledig`
+    });
+  },
+
+  /* ---------- sessie-gebeure ---------- */
+
+  async sessionStart({ sessionId, subjectSlug, minutes, task, startedAt, block }) {
     this._live = {
       sessionId,
       subjectSlug,
@@ -98,10 +290,21 @@ WALLIE.REMOTE = {
       totalWarnings: 0,
       locks: 0,
       startedAt: startedAt || Date.now(),
-      leftMs: minutes * 60 * 1000
+      leftMs: minutes * 60 * 1000,
+      block: block || null,
+      hbSeq: 0
     };
-    const message = `${this.subjectLabel(subjectSlug)} · ${minutes}m\nTaak: ${task || "—"}\nPa-konsole: pa-afstand.html`;
-    this.durable({ kind: "start", title: "IN SESSIE — begin", text: message });
+    this.startPresence();
+    const blokTxt = block ? ` · blok ${block.start && block.end ? `${block.start}–${block.end}` : block.title || block.id}` : "";
+    const message = `${this.subjectLabel(subjectSlug)} · ${minutes}m${blokTxt}\nTaak: ${task || "—"}\nPa-konsole: pa-afstand.html`;
+    this.enqueue(`start:${sessionId}`, {
+      kind: "start",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      client_at: this._live.startedAt,
+      title: "IN SESSIE — begin",
+      body: message
+    });
     this.startHeartbeat();
     await this.publish({
       title: "IN SESSIE — begin",
@@ -114,7 +317,14 @@ WALLIE.REMOTE = {
   async sessionWarn({ warnings, reason, subjectSlug, leftMs, totalWarnings }) {
     this.updateLive({ status: "warned", warnings, totalWarnings, leftMs });
     const message = `${this.subjectLabel(subjectSlug)}\n${reason}${totalWarnings > warnings ? `\nTotaal hierdie sessie: ${totalWarnings}` : ""}`;
-    this.durable({ kind: "warn", title: `WAARSKUWING ${warnings}/3`, text: message });
+    this.enqueue(`warn:${this._live?.sessionId}:${totalWarnings}`, {
+      kind: "warn",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      reason,
+      title: `WAARSKUWING ${warnings}/3`,
+      body: message
+    });
     await this.publish({
       title: `WAARSKUWING ${warnings}/3`,
       message,
@@ -126,7 +336,14 @@ WALLIE.REMOTE = {
   async sessionLock({ subjectSlug, reason, locks }) {
     this.updateLive({ status: "locked", locks });
     const message = `${this.subjectLabel(subjectSlug)}\n${reason || "3 waarskuwings"}\nTyd is gepouseer. Ontsluit by sy skootrekenaar (Pa-PIN).`;
-    this.durable({ kind: "lock", title: "SLOT — Pa-PIN nodig", text: message });
+    this.enqueue(`lock:${this._live?.sessionId}:${locks}`, {
+      kind: "lock",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      reason,
+      title: "SLOT — Pa-PIN nodig",
+      body: message
+    });
     await this.publish({
       title: "SLOT — Pa-PIN nodig",
       message,
@@ -138,7 +355,13 @@ WALLIE.REMOTE = {
   async sessionUnlock({ subjectSlug, leftMs, locks }) {
     this.updateLive({ status: "active", warnings: 0, leftMs, locks });
     const message = `${this.subjectLabel(subjectSlug)}\nWaarskuwings terug na 0/3 · slot nr ${locks || 1} in hierdie sessie`;
-    this.durable({ kind: "unlock", title: "ONTSLUIT — sessie gaan voort", text: message });
+    this.enqueue(`unlock:${this._live?.sessionId}:${locks}`, {
+      kind: "unlock",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      title: "ONTSLUIT — sessie gaan voort",
+      body: message
+    });
     await this.publish({
       title: "ONTSLUIT — sessie gaan voort",
       message,
@@ -148,19 +371,28 @@ WALLIE.REMOTE = {
   },
 
   memoEvent({ subjectSlug, open, fileName, minutes }) {
-    this.durable({
+    this.enqueue(`memo:${this._live?.sessionId}:${open ? "oop" : "toe"}:${Date.now()}`, {
       kind: "memo",
+      ...this.liveFields(),
       title: open ? "MEMO oop" : "MEMO toe",
-      text: open
+      body: open
         ? `${this.subjectLabel(subjectSlug)}\nMemo in die app oop: ${fileName || "lêer"}`
         : `${this.subjectLabel(subjectSlug)}\nMemo toe · ${minutes || 0} min in memo in hierdie sessie`
     });
   },
 
-  async heartbeatTick() {
-    if (!this._live?.sessionId || !this.hasConsent() || !WALLIE.LIVE) return;
+  heartbeatTick() {
+    if (!this._live?.sessionId) return;
+    this.checkIdle();
+    const seq = (this._live.hbSeq = (this._live.hbSeq || 0) + 1);
+    this.enqueue(`hb:${this._live.sessionId}:${seq}`, {
+      kind: "heartbeat",
+      ...this.liveFields(),
+      ...this.presenceFields(),
+      seq
+    });
     try {
-      await WALLIE.LIVE.rpc("wallie_ingest", { p: { kind: "heartbeat", ...this.liveFields() } });
+      this.onHeartbeat?.(Date.now());
     } catch {}
   },
 
@@ -182,39 +414,73 @@ WALLIE.REMOTE = {
     });
   },
 
-  /* Webcam-still: net tydens ’n aktiewe sessie (bediener weier anders ook) */
+  /* Webcam-still: net tydens ’n aktiewe sessie en met toestemming (bediener weier anders ook).
+     Nie in die tou nie — ’n ou foto is waardeloos en te groot vir localStorage. */
   async sendStill(b64) {
     if (!this._live?.sessionId || !this.hasConsent() || !WALLIE.LIVE) return { ok: false };
-    try {
-      return await WALLIE.LIVE.rpc("wallie_still", { p_session_id: this._live.sessionId, p_jpeg_b64: b64 });
-    } catch (e) {
-      return { ok: false, error: e.message };
+    const res = await WALLIE.LIVE.rpc("wallie_still", { p_session_id: this._live.sessionId, p_jpeg_b64: b64 });
+    if (!res?.ok && res?.error === "no active session") {
+      /* Bediener het nog nie die hartklop nie (bv. tou het net weer aanlyn gekom) — stuur een en probeer weer */
+      this.heartbeatTick();
+      await WALLIE.SYNC?.flush();
+      return WALLIE.LIVE.rpc("wallie_still", { p_session_id: this._live.sessionId, p_jpeg_b64: b64 });
     }
+    return res;
   },
 
+  fmtMin(ms) {
+    return `${Math.round((ms || 0) / 60000)}m`;
+  },
+
+  /* report: { sessionId, subjectSlug, durationMin, actualMs, plannedMin, outcome, warnings, locks, memoMin,
+               lockedMs, task, date, startedAt, endedAt, block } */
   async sessionEnd(report) {
     this.stopHeartbeat();
+    const pres = this.presenceFields();
+    this.stopPresence();
     const lines = [
       `Vak: ${this.subjectLabel(report.subjectSlug)}`,
-      `Duur: ${report.durationMin}m (beplan ${report.plannedMin}m)`,
+      `Duur: ${report.durationMin}m werklik (beplan ${report.plannedMin}m)`,
+      report.block
+        ? `Blok: ${report.block.title || report.block.id}${report.block.start && report.block.end ? ` (${report.block.start}–${report.block.end})` : ""}`
+        : null,
       `Uitkoms: ${report.outcome}`,
       `Waarskuwings: ${report.warnings}`,
       report.locks ? `Slotte: ${report.locks}` : null,
       report.memoMin ? `Memo-tyd: ${report.memoMin}m` : null,
+      pres.visible_ms != null
+        ? `Op skerm: ${this.fmtMin(pres.focused_ms)} gefokus · tab weg: ${this.fmtMin(pres.hidden_ms)} · ledig: ${this.fmtMin(pres.idle_ms)}`
+        : null,
       report.task ? `Taak: ${report.task}` : null,
-      report.surveySummary ? `\nSurvey:\n${report.surveySummary}` : null,
-      `\nTyd: ${new Date().toLocaleString("af-ZA")}`
+      `\nTyd: ${new Date(report.endedAt || Date.now()).toLocaleString("af-ZA")}`
     ].filter(Boolean);
     const message = lines.join("\n");
     this.updateLive({ status: "off", totalWarnings: report.warnings, locks: report.locks });
-    this.durable({
+    const sessionId = report.sessionId || this._live?.sessionId;
+    this.enqueue(`end:${sessionId}`, {
       kind: "end",
+      ...this.liveFields(),
+      ...pres,
+      session_id: sessionId,
+      subject: this.subjectLabel(report.subjectSlug),
+      subject_slug: report.subjectSlug,
+      status: "off",
+      outcome: report.outcome,
+      duration_min: report.durationMin,
+      actual_ms: report.actualMs,
+      locked_ms: report.lockedMs || 0,
+      memo_min: report.memoMin || 0,
+      planned_min: report.plannedMin,
+      started_at: report.startedAt,
+      ended_at: report.endedAt || Date.now(),
+      client_at: report.endedAt || Date.now(),
+      ...this.blockFields(report.block),
       title: "SESSIE-VERSLAG",
-      text: message,
-      data: report,
-      extra: { outcome: report.outcome }
+      body: message,
+      data: { ...report, presence: pres }
     });
     this._live = null;
+    this._presence = null;
     await this.publish({
       title: "SESSIE-VERSLAG",
       message,
@@ -224,7 +490,16 @@ WALLIE.REMOTE = {
   },
 
   async wallieSurvey({ text, data }) {
-    this.durable({ kind: "survey", title: "SURVEY — Wallie ná sessie", text, data });
+    this.enqueue(`survey:${data?.id || Date.now()}`, {
+      kind: "survey",
+      session_id: data?.sessionId || null,
+      subject: this.subjectLabel(data?.subjectSlug),
+      subject_slug: data?.subjectSlug || null,
+      client_at: data?.at || Date.now(),
+      title: "SURVEY — Wallie ná sessie",
+      body: text,
+      data
+    });
     await this.publish({
       title: "SURVEY — Wallie ná sessie",
       message: text,
@@ -234,7 +509,14 @@ WALLIE.REMOTE = {
   },
 
   async paSurvey({ text, data }) {
-    this.durable({ kind: "pa-survey", title: "PA-SURVEY", text, data });
+    this.enqueue(`pa-survey:${data?.id || Date.now()}`, {
+      kind: "pa-survey",
+      session_id: data?.sessionId || null,
+      client_at: data?.at || Date.now(),
+      title: "PA-SURVEY",
+      body: text,
+      data
+    });
     await this.publish({
       title: "PA-SURVEY",
       message: text,
@@ -246,7 +528,14 @@ WALLIE.REMOTE = {
 
   async bugReport({ text, data, blocking }) {
     const title = blocking ? "PROBLEEM — blokkeer" : "PROBLEEM";
-    this.durable({ kind: "probleem", title, text, data });
+    this.enqueue(`probleem:${data?.id || Date.now()}`, {
+      kind: "probleem",
+      subject: data?.subjectSlug ? this.subjectLabel(data.subjectSlug) : null,
+      client_at: data?.at || Date.now(),
+      title,
+      body: text,
+      data
+    });
     await this.publish({
       title,
       message: text,
@@ -256,149 +545,83 @@ WALLIE.REMOTE = {
     });
   },
 
-  sessionInterrupted({ sessionId, subject, startedAt, warnings }) {
-    if (!sessionId) return;
-    const begin = startedAt ? new Date(startedAt).toLocaleTimeString("af-ZA") : "?";
-    this.durable({
-      kind: "offline",
-      title: "ONDERBREEK — sessie nie klaargemaak nie",
-      text: `${this.subjectLabel(subject)} · begin ${begin} · waarskuwings ${warnings || 0}\nDie app of skootrekenaar is toe sonder “Eindig sessie”.`,
-      extra: { session_id: sessionId }
+  blockDone(block, at) {
+    if (!block?.id) return;
+    this.enqueue(`block:${block.id}`, {
+      kind: "block",
+      ...this.blockFields(block),
+      subject: this.subjectLabel(block.subjectSlug),
+      subject_slug: block.subjectSlug,
+      client_at: at || Date.now(),
+      title: "BLOK KLAAR GEMERK",
+      body: `${block.title || block.id} (${block.start || "?"}–${block.end || "?"})`,
+      data: { blockId: block.id, done: true }
     });
+  },
+
+  /* Sessie kon nie begin nie (bv. kamera) — Pa moet weet hy het probeer */
+  startFailed({ subjectSlug, minutes, error, block }) {
+    const at = Date.now();
+    this.enqueue(`probleem:start_${at}`, {
+      kind: "probleem",
+      subject: this.subjectLabel(subjectSlug),
+      subject_slug: subjectSlug,
+      planned_min: minutes,
+      ...this.blockFields(block),
+      client_at: at,
+      title: "SESSIE KON NIE BEGIN NIE",
+      body: `${this.subjectLabel(subjectSlug)} · ${minutes}m\n${error}`,
+      data: { id: `start_${at}`, auto: true, error, subjectSlug, minutes }
+    });
+  },
+
+  /* Vorige sessie is nooit klaargemaak nie (lid toe / blaaier gesluit). Stuur ’n eerlike einde
+     met die tyd tot die laaste hartklop, sodat die gewerkte minute nie verlore gaan nie. */
+  sessionInterrupted(live) {
+    const sessionId = live?.sessionId;
+    if (!sessionId) return null;
+    const startedAt = live.startedAt || null;
+    const endedAt = live.lastBeatAt || startedAt || Date.now();
+    const actualMs = startedAt ? Math.max(0, endedAt - startedAt - (live.lockedMs || 0)) : 0;
+    const begin = startedAt ? new Date(startedAt).toLocaleTimeString("af-ZA") : "?";
+    const last = new Date(endedAt).toLocaleTimeString("af-ZA");
+    this.enqueue(`end:${sessionId}`, {
+      kind: "end",
+      session_id: sessionId,
+      subject: this.subjectLabel(live.subject),
+      subject_slug: live.subject || null,
+      task: live.task || "",
+      status: "off",
+      outcome: "onderbreek",
+      warnings: live.warnings || 0,
+      total_warnings: live.totalWarnings || live.warnings || 0,
+      locks: live.locks || 0,
+      planned_min: live.minutes || null,
+      duration_min: Math.round(actualMs / 60000),
+      actual_ms: actualMs,
+      started_at: startedAt,
+      ended_at: endedAt,
+      client_at: endedAt,
+      ...this.blockFields(live.block),
+      title: "ONDERBREEK — sessie nie klaargemaak nie",
+      body: `${this.subjectLabel(live.subject)} · begin ${begin} · laaste sein ${last} · waarskuwings ${live.warnings || 0}\nDie app of skootrekenaar is toe sonder “Eindig sessie”.`,
+      data: { ...live, outcome: "onderbreek" }
+    });
+    return { sessionId, startedAt, endedAt, actualMs };
   },
 
   pingOffline() {
     this.stopHeartbeat();
+    this.stopPresence();
     this._live = null;
-  },
-
-  /* ---------- Duursame uitboks → Pa-konsole ---------- */
-
-  outboxLoad() {
-    const empty = { queue: [], sentCount: 0, lastSentAt: null, lastError: null };
-    try {
-      return { ...empty, ...JSON.parse(localStorage.getItem(this.outboxKey) || "{}") };
-    } catch {
-      return empty;
-    }
-  },
-
-  outboxSave(box) {
-    try {
-      localStorage.setItem(this.outboxKey, JSON.stringify(box));
-    } catch {}
-  },
-
-  outboxUpdate(mutator) {
-    const box = this.outboxLoad();
-    mutator(box);
-    this.outboxSave(box);
-    return box;
-  },
-
-  /* Net vir egte gebeure — moet nooit sessies of surveys versin nie */
-  durable({ kind, title, text, data, extra }) {
-    const live = ["start", "warn", "lock", "unlock", "memo", "end"].includes(kind) ? this.liveFields() : {};
-    const item = {
-      id: `${kind}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      payload: {
-        ...live,
-        ...(extra || {}),
-        kind,
-        title,
-        body: text || "",
-        data: data || null,
-        client_at: Date.now()
-      },
-      createdAt: Date.now(),
-      tries: 0,
-      nextTryAt: 0
-    };
-    this.outboxUpdate((box) => {
-      box.queue.push(item);
-      if (box.queue.length > this.outboxMax) box.queue = box.queue.slice(-this.outboxMax);
-    });
-    this.notifyDurable();
-    this.flushOutbox();
-    return item.id;
-  },
-
-  async sendDurable(item) {
-    if (!WALLIE.LIVE) return { ok: false, error: "live-config.js ontbreek" };
-    try {
-      const res = await WALLIE.LIVE.rpc("wallie_ingest", { p: item.payload });
-      if (res && res.ok) return { ok: true };
-      return { ok: false, permanent: res?.error === "bad kind" || res?.error === "too big", error: res?.error || "onbekend" };
-    } catch (e) {
-      return { ok: false, error: e.message || "netwerk" };
-    }
-  },
-
-  async flushOutbox() {
-    if (this._flushing) {
-      this._flushAgain = true;
-      return;
-    }
-    this._flushing = true;
-    this._flushAgain = false;
-    let stalled = false;
-    try {
-      const due = this.outboxLoad().queue.filter((q) => (q.nextTryAt || 0) <= Date.now());
-      for (const item of due) {
-        const res = await this.sendDurable(item);
-        this.outboxUpdate((box) => {
-          const q = box.queue.find((x) => x.id === item.id);
-          if (res.ok || res.permanent) {
-            box.queue = box.queue.filter((x) => x.id !== item.id);
-            if (res.ok) {
-              box.sentCount = (box.sentCount || 0) + 1;
-              box.lastSentAt = Date.now();
-              box.lastError = null;
-            } else {
-              box.lastError = res.error;
-            }
-          } else if (q) {
-            q.tries = (q.tries || 0) + 1;
-            q.nextTryAt = Date.now() + Math.min(5 * 60 * 1000, 15000 * 2 ** Math.min(q.tries, 5));
-            box.lastError = res.error;
-          }
-        });
-        this.notifyDurable();
-        if (!res.ok && !res.permanent) {
-          stalled = true;
-          break;
-        }
-      }
-    } finally {
-      this._flushing = false;
-    }
-    if (this._flushAgain && !stalled) this.flushOutbox();
-  },
-
-  startOutbox() {
-    if (this._flushTimer) return;
-    this.flushOutbox();
-    this._flushTimer = setInterval(() => this.flushOutbox(), 30000);
-    if (typeof window !== "undefined" && window.addEventListener) {
-      window.addEventListener("online", () => this.flushOutbox());
-    }
+    this._presence = null;
   },
 
   durableStatus() {
-    const box = this.outboxLoad();
-    const waiting = box.queue.length;
-    const last = box.lastSentAt ? new Date(box.lastSentAt).toLocaleTimeString("af-ZA") : null;
-    if (!waiting) {
-      return box.sentCount
-        ? `Pa-konsole: alles gestoor (${box.sentCount} gebeure · laaste ${last}).`
-        : "Pa-konsole: niks om te stuur nie (net egte sessies, surveys en probleme word gestuur).";
-    }
-    return `Pa-konsole: ${waiting} wag om te stuur (${box.lastError || "nog nie probeer nie"}). Probeer outomaties weer — niks gaan verlore nie.`;
+    return WALLIE.SYNC ? WALLIE.SYNC.statusText() : "Pa-konsole: sync.js ontbreek.";
   },
 
-  notifyDurable() {
-    try {
-      this.onDurableStatus?.(this.durableStatus());
-    } catch {}
+  startOutbox(state) {
+    WALLIE.SYNC?.start(state);
   }
 };

@@ -65,6 +65,9 @@ const order = [
   "assets/js/schedule.js",
   "assets/js/surveys.js",
   "assets/js/proctor.js",
+  "assets/js/live-config.js",
+  "assets/js/sync.js",
+  "assets/js/remote.js",
   "assets/js/lessons.js",
 ];
 
@@ -111,6 +114,8 @@ assert(html.includes("hannovz@gmail.com"), "export names Pa email");
 assert(html.includes('id="les-viewer"'), "index has lesson viewer");
 assert(html.includes('id="view-leer"'), "index has Lesse view");
 assert(html.includes("assets/js/lesson-ui.js"), "index loads lesson-ui.js");
+assert(html.indexOf("assets/js/sync.js") > -1 && html.indexOf("assets/js/sync.js") < html.indexOf("assets/js/remote.js"), "index loads sync.js before remote.js");
+assert(html.includes('id="sync-pill"'), "index has sync indicator");
 if (W.LESSONS && Array.isArray(W.SUBJECTS)) {
   const imgDir = path.join(root, "assets/img/lessons");
   for (const slug of [...W.SUBJECTS.map((s) => s.slug), "foutbank"]) {
@@ -146,8 +151,10 @@ if (W.surveys || W.buildSurvey || W.SURVEYS) {
   assert(surveyCode.includes("Pa") || surveyCode.includes("pa"), "surveys.js mentions Pa");
 }
 
+/* Die zip is .gitignore'd (net op Pa se masjien) — toets dit net as dit bestaan */
 const zipPath = path.join(root, "Wallie_911_Pro-VIR-SY-LAPTOP.zip");
-assert(fs.existsSync(zipPath) && fs.statSync(zipPath).size > 10000, "laptop zip present >10KB");
+if (fs.existsSync(zipPath)) assert(fs.statSync(zipPath).size > 10000, "laptop zip >10KB");
+else ok.push("laptop zip nie in hierdie kloon nie (gitignored) — oorgeslaan");
 
 console.log(JSON.stringify({ ok: ok.length, fails: fails.length, failList: fails, sampleOk: ok.slice(0, 12) }, null, 2));
 process.exit(fails.length ? 1 : 0);

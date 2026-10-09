@@ -127,7 +127,7 @@
     <div class="card">
       <div id="status-line" class="status off"><span class="pulse" id="pulse"></span><span id="status-text">LAAI…</span></div>
       <p class="meta" id="detail">Haal status…</p>
-      <p class="stale hidden" id="stale">⚠ Geen hartklop &gt;45s — skootrekenaar dalk toe, WiFi af of blaaier gesluit.</p>
+      <p class="stale hidden" id="stale">⚠ Geen hartklop &gt;2½ min — skootrekenaar dalk toe, WiFi af of blaaier gesluit.</p>
     </div>
 
     <div class="row" id="stats">
@@ -177,7 +177,8 @@
   <script src="assets/js/live-config.js"></script>
   <script>
     const TOKEN_KEY = "wallie911_pa_token";
-    const STALE_MS = 45000;
+    /* Hartklop kom elke 60 s (sync.js); 2½ min = twee gemis */
+    const STALE_MS = 150000;
     const LOST_MS = 10 * 60 * 1000;
     const POLL_MS = 15000;
     const $ = (id) => document.getElementById(id);

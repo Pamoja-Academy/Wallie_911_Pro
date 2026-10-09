@@ -1,0 +1,14 @@
+{
+  "name": "wallie-911-pro",
+  "private": true,
+  "description": "Statiese app; package.json is net vir toetse (Playwright + PGlite).",
+  "scripts": {
+    "test": "node scripts/proctor-test.js && node scripts/smoke-parse.js && node tests/sql-migration.test.js && playwright test",
+    "test:sql": "node tests/sql-migration.test.js",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.7",
+    "@playwright/test": "1.55.0"
+  }
+}

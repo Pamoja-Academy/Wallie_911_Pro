@@ -39,6 +39,20 @@
     return WALLIE.SUBJECTS.find((s) => s.slug === slug);
   }
 
+  /* Watter rooster-blok hoort by hierdie sessie? Eksplisiet (Begin-knoppie op ’n blok), anders die
+     naaste onvoltooide blok van dieselfde vak vandag. */
+  function findBlock(blockId, subjectSlug) {
+    const blocks = state.blocks || [];
+    let b = blockId ? blocks.find((x) => x.id === blockId) : null;
+    if (!b && subjectSlug) {
+      const nowHm = new Date().toTimeString().slice(0, 5);
+      const same = blocks.filter((x) => x.subjectSlug === subjectSlug && !state.completedBlocks[x.id]);
+      b = same.find((x) => x.start && x.end && x.start <= nowHm && nowHm <= x.end) || same[0] || null;
+    }
+    if (!b) return null;
+    return { id: b.id, title: b.title, start: b.start || null, end: b.end || null, minutes: b.minutes, kind: b.kind, subjectSlug: b.subjectSlug };
+  }
+
   function fillSubjectSelects() {
     const opts = WALLIE.SUBJECTS.map(
       (s) => `<option value="${s.slug}">${s.naam}</option>`
@@ -309,11 +323,22 @@
     }
   }
 
-  function renderDurableStatus(text) {
-    const msg = text || WALLIE.REMOTE?.durableStatus() || "";
+  /* Sinkroniseer-aanwyser: altyd sigbaar bo-aan vir Wallie (en in Pa/Probleem-blaaie as teks) */
+  function renderDurableStatus() {
+    const sync = WALLIE.SYNC;
+    if (!sync) return;
+    const st = sync.status();
+    const msg = sync.statusText(st);
     $$(".js-durable-status").forEach((el) => {
       el.textContent = msg;
     });
+    const pill = $("#sync-pill");
+    if (pill) {
+      pill.className = `sync-pill sync-${st.level}`;
+      pill.dataset.level = st.level;
+      $("#sync-label").textContent = sync.label(st);
+      pill.title = msg;
+    }
   }
 
   function setCameraStatus(text, cls) {
@@ -346,8 +371,9 @@
       return;
     }
     const subjectSlug = opts.subjectSlug || $("#session-subject").value;
-    const minutes = Number(opts.minutes || $("#session-minutes").value) || 45;
+    const minutes = Math.round(Number(opts.minutes || $("#session-minutes").value)) || 45;
     const task = opts.task || $("#session-task").value;
+    const block = findBlock(opts.blockId, subjectSlug);
 
     $("#session-subject").value = subjectSlug;
     $("#session-minutes").value = minutes;
@@ -365,8 +391,16 @@
           status: paused ? "locked" : warnings > 0 ? "warned" : "active",
           sessionId: sessionMeta?.id,
           subject: subjectSlug,
+          task,
+          minutes,
+          block,
           warnings,
-          startedAt: sessionMeta?.startedAt || Date.now()
+          totalWarnings: WALLIE.proctor.totalWarnings,
+          locks: WALLIE.proctor.locks,
+          lockedMs: WALLIE.proctor.lockedTotalMs(),
+          startedAt: sessionMeta?.startedAt || Date.now(),
+          /* Laaste oomblik wat die app gelewe het — vir eerlike duur as die sessie onderbreek word */
+          lastBeatAt: Date.now()
         };
         persist();
         updateLiveDot();
@@ -414,6 +448,8 @@
     });
 
     if (!result.ok) {
+      /* Pa moet weet hy het probeer en hoekom dit nie gewerk het nie */
+      WALLIE.REMOTE?.startFailed({ subjectSlug, minutes, error: result.error, block });
       alert(result.error);
       setCameraStatus("Kamera af", "");
       return;
@@ -428,6 +464,7 @@
       subjectSlug,
       minutes,
       task,
+      block,
       warnings: 0,
       startedAt: Date.now(),
       date: WALLIE.todayKey()
@@ -436,22 +473,28 @@
       status: "active",
       sessionId: sessionMeta.id,
       subject: subjectSlug,
+      task,
+      minutes,
+      block,
       warnings: 0,
-      startedAt: sessionMeta.startedAt
+      startedAt: sessionMeta.startedAt,
+      lastBeatAt: sessionMeta.startedAt
     };
+    /* Stuur eers, stoor dan — ’n stoor-fout mag nooit die sein na Pa keer nie */
+    WALLIE.REMOTE?.sessionStart({
+      sessionId: sessionMeta.id,
+      subjectSlug,
+      minutes,
+      task,
+      startedAt: sessionMeta.startedAt,
+      block
+    });
     persist();
     $("#start-session").disabled = true;
     $("#end-session").disabled = false;
     setCameraStatus("LEWENDIG — hard-proctor + Pa-sein", "live");
     logEvent(`Sessie begin: ${subjectBySlug(subjectSlug)?.naam || subjectSlug} (${minutes}m)`);
     updateLiveDot();
-    WALLIE.REMOTE?.sessionStart({
-      sessionId: sessionMeta.id,
-      subjectSlug,
-      minutes,
-      task,
-      startedAt: sessionMeta.startedAt
-    });
     startStills();
     showView("sessie");
     WALLIE.lessonUI.onSessionStart(subjectSlug);
@@ -462,12 +505,10 @@
     const warnings = WALLIE.proctor.totalWarnings || 0;
     const locks = WALLIE.proctor.locks || 0;
     const memoMin = WALLIE.proctor.memoMinutes();
-    const elapsedMin = sessionMeta
-      ? Math.max(
-          1,
-          Math.round((Date.now() - sessionMeta.startedAt - WALLIE.proctor.lockedTotalMs()) / 60000)
-        )
-      : 0;
+    const endedAt = Date.now();
+    const lockedMs = WALLIE.proctor.lockedTotalMs();
+    const actualMs = sessionMeta ? Math.max(0, endedAt - sessionMeta.startedAt - lockedMs) : 0;
+    const elapsedMin = sessionMeta ? Math.max(1, Math.round(actualMs / 60000)) : 0;
 
     let newSession = null;
     const plannedMin = sessionMeta?.minutes;
@@ -480,11 +521,34 @@
         subjectSlug,
         task,
         durationMin: Math.min(elapsedMin, sessionMeta.minutes),
+        actualMin: Math.round(actualMs / 60000),
+        plannedMin,
+        startedAt: sessionMeta.startedAt,
+        endedAt,
+        block: sessionMeta.block || null,
         warnings,
         locks,
         memoMin,
         outcome
       };
+      /* Stuur eers die verslag (tou in localStorage) — dan die plaaslike staat */
+      WALLIE.REMOTE?.sessionEnd({
+        sessionId: newSession.id,
+        subjectSlug,
+        durationMin: newSession.actualMin,
+        actualMs,
+        lockedMs,
+        plannedMin,
+        outcome,
+        warnings,
+        locks,
+        memoMin,
+        task,
+        date: newSession.date,
+        startedAt: sessionMeta.startedAt,
+        endedAt,
+        block: sessionMeta.block || null
+      });
       state.sessions.unshift(newSession);
       state.pendingSurveySessionId = newSession.id;
     }
@@ -502,18 +566,6 @@
     updateLiveDot();
     renderPa();
     if (newSession) {
-      WALLIE.REMOTE?.sessionEnd({
-        subjectSlug,
-        durationMin: newSession.durationMin,
-        plannedMin,
-        outcome,
-        warnings,
-        locks,
-        memoMin,
-        task,
-        date: newSession.date,
-        sessionId: newSession.id
-      });
       openWallieSurvey(newSession);
     } else {
       WALLIE.REMOTE?.pingOffline();
@@ -808,12 +860,16 @@
       startSessionFromUI({
         subjectSlug: slug,
         minutes: Number(start.dataset.min),
-        task: decodeURIComponent(start.dataset.title || "")
+        task: decodeURIComponent(start.dataset.title || ""),
+        blockId: start.dataset.block
       });
     }
     const done = e.target.closest(".mark-done");
     if (done) {
-      state.completedBlocks[done.dataset.id] = true;
+      const at = Date.now();
+      WALLIE.REMOTE?.blockDone(state.blocks.find((b) => b.id === done.dataset.id) || { id: done.dataset.id }, at);
+      /* Tydstempel i.p.v. true (steeds "truthy" vir ou kode) sodat Pa weet wanneer */
+      state.completedBlocks[done.dataset.id] = at;
       persist();
       renderMissie();
     }
@@ -945,33 +1001,22 @@
       alert("Vul asseblief in: " + result.missing);
       return;
     }
-    state.wallieSurveys = state.wallieSurveys || [];
-    state.wallieSurveys.unshift({
+    const survey = {
       id: "ws_" + Date.now(),
       sessionId: form.dataset.sessionId,
       subjectSlug: form.dataset.subjectSlug,
       date: WALLIE.todayKey(),
       at: Date.now(),
       answers: result.answers
-    });
+    };
+    /* Alle antwoorde woordeliks (die ou teks het "moeilikheid" weggelaat) */
+    WALLIE.REMOTE?.wallieSurvey({ text: WALLIE.SYNC.surveyText(survey), data: survey });
+    state.wallieSurveys = state.wallieSurveys || [];
+    state.wallieSurveys.unshift(survey);
     state.pendingSurveySessionId = null;
     persist();
     $("#wallie-survey-modal").classList.add("hidden");
     logEvent("Wallie-survey gestoor");
-    const a = result.answers;
-    WALLIE.REMOTE?.wallieSurvey({
-      text: [
-        `Vak: ${subjectBySlug(form.dataset.subjectSlug)?.naam || form.dataset.subjectSlug}`,
-        `Fokus: ${a.fokus}/5`,
-        `Metode: ${a.metode}`,
-        `Blokkade: ${a.blokkade}`,
-        `Eerlikheid: ${a.eerlikheid}`,
-        a.help_more ? `Help: ${a.help_more}` : null
-      ]
-        .filter(Boolean)
-        .join("\n"),
-      data: state.wallieSurveys[0]
-    });
   });
 
   $("#remote-consent-save")?.addEventListener("click", () => {
@@ -999,15 +1044,15 @@
       alert("Geen sessie om aan te koppel nie — laat hom eers ’n blok klaarmaak.");
       return;
     }
-    state.paSurveys = state.paSurveys || [];
-    state.paSurveys.unshift({
+    const paEntry = {
       id: "ps_" + Date.now(),
       sessionId,
       date: WALLIE.todayKey(),
       at: Date.now(),
       answers: result.answers
-    });
-    persist();
+    };
+    state.paSurveys = state.paSurveys || [];
+    state.paSurveys.unshift(paEntry);
     const pa = result.answers;
     const linked = state.sessions.find((s) => s.id === sessionId);
     WALLIE.REMOTE?.paSurvey({
@@ -1024,8 +1069,9 @@
       ]
         .filter(Boolean)
         .join("\n"),
-      data: state.paSurveys[0]
+      data: paEntry
     });
+    persist();
     alert("Pa-survey gestoor. Kyk Verbeter vir die daaglikse lus.");
     renderVerbeter();
   });
@@ -1038,8 +1084,7 @@
       alert("Kies ’n tipe en beskryf die probleem.");
       return;
     }
-    state.bugReports = state.bugReports || [];
-    state.bugReports.unshift({
+    const bug = {
       id: "bug_" + Date.now(),
       date: WALLIE.todayKey(),
       at: Date.now(),
@@ -1050,9 +1095,9 @@
       code: $("#bug-code").value.trim(),
       userAgent: navigator.userAgent.slice(0, 120),
       href: location.href
-    });
-    persist();
-    const bug = state.bugReports[0];
+    };
+    state.bugReports = state.bugReports || [];
+    state.bugReports.unshift(bug);
     WALLIE.REMOTE?.bugReport({
       text: [
         `Tipe: ${bug.tipe} · ${bug.severity}`,
@@ -1066,6 +1111,7 @@
       data: bug,
       blocking: bug.severity === "blokkeer"
     });
+    persist();
     $("#bug-detail").value = "";
     $("#bug-code").value = "";
     document.querySelectorAll('input[name="bugTipe"]').forEach((r) => (r.checked = false));
@@ -1075,6 +1121,13 @@
 
   $("#bug-refresh")?.addEventListener("click", () => renderBugs());
 
+  /* Tik op die aanwyser = probeer dadelik weer stuur */
+  $("#sync-pill")?.addEventListener("click", () => {
+    WALLIE.SYNC?.update((b) => b.queue.forEach((q) => q.state === "retry" && (q.nextTryAt = 0)));
+    WALLIE.SYNC?.flush();
+    renderDurableStatus();
+  });
+
   /* Hash routing */
   function fromHash() {
     const name = (location.hash || "#missie").slice(1);
@@ -1082,26 +1135,59 @@
   }
   window.addEventListener("hashchange", fromHash);
 
-  fillSubjectSelects();
-  renderCountdown();
-  setInterval(renderCountdown, 1000);
-  ensurePlan();
-  fromHash();
-  if (!location.hash) showView("missie");
-  refreshRemoteConsentLabel();
-  if (state.live?.status && state.live.status !== "off") {
-    /* Vorige sessie is nooit klaargemaak nie (lid toe / blaaier gesluit) — sê dit eerlik vir Pa */
-    WALLIE.REMOTE?.sessionInterrupted(state.live);
-    state.live = { status: "off", subject: null, warnings: 0, startedAt: null };
-    persist();
+  /* Een stukkende skerm mag nooit die sinkronisering keer nie: elke stap apart */
+  function safe(fn, label) {
+    try {
+      fn();
+    } catch (e) {
+      console.error(`[wallie] ${label}:`, e);
+    }
   }
-  if (WALLIE.REMOTE) {
-    WALLIE.REMOTE.onDurableStatus = renderDurableStatus;
-    renderDurableStatus();
-    WALLIE.REMOTE.startOutbox();
-  }
-  renderMissie();
-  renderPa();
 
-  WALLIE.lessonUI.openFromQuery();
+  /* Sinkronisering eerste: onderbreekte sessie, ou uitboks en historiese log (terugvul) */
+  safe(() => {
+    if (state.live?.status && state.live.status !== "off") {
+      /* Vorige sessie is nooit klaargemaak nie (lid toe / blaaier gesluit) — sê dit eerlik vir Pa,
+         met die minute tot die laaste lewensteken */
+      const info = WALLIE.REMOTE?.sessionInterrupted(state.live);
+      if (info && !state.sessions.some((s) => s.id === info.sessionId)) {
+        state.sessions.unshift({
+          id: info.sessionId,
+          date: info.startedAt ? WALLIE.todayKey(new Date(info.startedAt)) : WALLIE.todayKey(),
+          subjectSlug: state.live.subject,
+          task: state.live.task || "",
+          durationMin: Math.round(info.actualMs / 60000),
+          actualMin: Math.round(info.actualMs / 60000),
+          plannedMin: state.live.minutes || null,
+          startedAt: info.startedAt,
+          endedAt: info.endedAt,
+          block: state.live.block || null,
+          warnings: state.live.totalWarnings || state.live.warnings || 0,
+          locks: state.live.locks || 0,
+          memoMin: 0,
+          outcome: "onderbreek"
+        });
+      }
+      state.live = { status: "off", subject: null, warnings: 0, startedAt: null };
+      persist();
+    }
+  }, "onderbreek");
+  safe(() => {
+    if (WALLIE.SYNC) WALLIE.SYNC.onStatus = renderDurableStatus;
+    WALLIE.REMOTE?.startOutbox(state);
+    setInterval(renderDurableStatus, 15000);
+    renderDurableStatus();
+  }, "sync");
+
+  safe(fillSubjectSelects, "vakke");
+  safe(renderCountdown, "aftelling");
+  setInterval(() => safe(renderCountdown, "aftelling"), 1000);
+  safe(ensurePlan, "plan");
+  safe(fromHash, "hash");
+  if (!location.hash) safe(() => showView("missie"), "missie");
+  safe(refreshRemoteConsentLabel, "toestemming");
+  safe(renderMissie, "missie");
+  safe(renderPa, "pa");
+
+  safe(() => WALLIE.lessonUI.openFromQuery(), "les");
 })();

@@ -38,6 +38,9 @@
         </div>
       </details>
     </nav>
+    <button type="button" class="sync-pill sync-busy" id="sync-pill" data-level="busy" aria-live="polite" title="Sinkronisering na Pa se konsole">
+      <span class="sync-dot" aria-hidden="true"></span><span id="sync-label">Sinkroniseer…</span>
+    </button>
     <div class="countdown" id="countdown" title="Tot 12 Okt 2026 09:00">
       <span class="countdown-num" id="days-left">—</span>
       <span class="countdown-label">dae tot openingswedstryd</span>
@@ -371,7 +374,8 @@
       <h2>Waarneming &amp; verslaggewing</h2>
       <p class="hint">
         Hard-proctor stuur <strong>lewendige status, waarskuwings, slot-seine, ’n sessie-verslag en jou survey</strong>
-        na Pa se foon (ntfy) en na Pa se wagwoord-beskermde konsole. <strong>Nuut:</strong> tydens ’n sessie gaan
+        na Pa se foon (ntfy) en na Pa se wagwoord-beskermde konsole. Elke minuut gaan ook of die oortjie sigbaar is
+        en of daar ’n paar minute geen muis/sleutelbord was nie (net ja/nee en tye — nooit wat jy tik nie). <strong>Nuut:</strong> tydens ’n sessie gaan
         <strong>elke 45 sekondes ’n klein kamera-foto</strong> na Pa se konsole (net tydens sessies; ou foto’s word ná 3 dae uitgevee).
         Geen deurlopende video of klank nie. Merk om voort te gaan op hierdie toestel.
       </p>
@@ -425,6 +429,7 @@
   <script src="assets/js/surveys.js"></script>
   <script src="assets/js/proctor.js"></script>
   <script src="assets/js/live-config.js"></script>
+  <script src="assets/js/sync.js"></script>
   <script src="assets/js/remote.js"></script>
   <script src="assets/js/lessons.js"></script>
   <script src="assets/js/lesson-ui.js"></script>
