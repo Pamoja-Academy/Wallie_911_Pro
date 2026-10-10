@@ -11,6 +11,6 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.7",
-    "@playwright/test": "1.55.0"
+    "@playwright/test": "1.64.0"
   }
 }
