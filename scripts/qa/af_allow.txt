@@ -83,3 +83,7 @@ afkeurredes
 afkeurreël
 ontwerprooster
 vakansieleeslys
+# C10 taalkontrole 2026-10-10 (geldige samestellings)
+attribuutwaarde
+handgetikte
+puntestaat
