@@ -372,12 +372,12 @@
     }
     const subjectSlug = opts.subjectSlug || $("#session-subject").value;
     const minutes = Math.round(Number(opts.minutes || $("#session-minutes").value)) || 45;
-    const task = opts.task || $("#session-task").value;
+    const task = window.Praktiese?.taskFor?.(subjectSlug) || opts.task || $("#session-task").value;
     const block = findBlock(opts.blockId, subjectSlug);
 
     $("#session-subject").value = subjectSlug;
     $("#session-minutes").value = minutes;
-    if (opts.task) $("#session-task").value = opts.task;
+    if (opts.task) $("#session-task").value = task;
 
     const video = $("#camera");
     const result = await WALLIE.proctor.start({
