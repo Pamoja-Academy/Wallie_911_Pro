@@ -1,0 +1,36 @@
+/* Praktiese blok (RTT): knoppie, kalm banier en eindboodskap. Hergebruik die bestaande kleure uit app.css. */
+.praktiese-start-row { flex-direction: column; align-items: stretch; }
+.praktiese-start-row[hidden], .praktiese-fout[hidden] { display: none; }
+.praktiese-start-row .btn { width: 100%; min-height: 48px; }
+.praktiese-sub { margin: 0; }
+.praktiese-fout { margin: 0; color: var(--danger); font-weight: 600; }
+
+.praktiese-banner-wrap:empty { display: none; }
+.praktiese-banner-wrap { margin: 0 0 0.75rem; }
+.praktiese-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 0.7rem 1rem;
+  background: var(--bok-green-deep);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.praktiese-banner .pb-titel { flex: 1 1 14rem; margin: 0; font-weight: 700; font-size: 1.05rem; color: var(--text); }
+.praktiese-banner .pb-tyd { margin: 0; color: var(--accent); font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+.praktiese-banner .btn { min-height: 44px; flex: 0 1 auto; }
+.praktiese-boodskap {
+  margin: 0;
+  padding: 0.7rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .praktiese-banner .btn { width: 100%; }
+}

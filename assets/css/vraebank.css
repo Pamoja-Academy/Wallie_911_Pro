@@ -1,0 +1,35 @@
+/* Oefenvrae (RTT V1): gebruik die bestaande veranderlikes uit app.css */
+#oefenvrae-root { max-width: 60rem; }
+#oefenvrae-root h1 { font-family: var(--display); margin: 0 0 0.5rem; }
+.ov-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.ov-item {
+  display: flex; flex-direction: column; gap: 0.25rem; width: 100%; min-height: 48px; padding: 0.6rem 0.8rem;
+  text-align: left; font: inherit; color: var(--text); background: var(--bg-2);
+  border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer;
+}
+.ov-item:hover, .ov-item:focus-visible { border-color: var(--accent); }
+.ov-kop { display: flex; gap: 0.75rem; align-items: center; }
+.ov-id { font-weight: 700; color: var(--accent); }
+.ov-vlak { color: var(--muted); font-size: 0.85rem; }
+.ov-merk { margin-left: auto; font-weight: 700; font-size: 1.1rem; }
+.ov-reg { color: var(--ok); }
+.ov-gedeeltelik { color: var(--geel); }
+.ov-fout { color: var(--danger); }
+.ov-open { overflow-wrap: anywhere; }
+.oe-nav .btn, .oe-nasien .btn, .oe-memo-knoppie { min-height: 44px; }
+.oe-titel { font-size: 1.15rem; }
+.oe-vraag, .oe-teks { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+.oe-vraag { margin-bottom: 0.75rem; }
+.oe-bron { margin: 0.5rem 0 1rem; color: var(--muted); font-size: 0.9rem; overflow-wrap: anywhere; }
+.oe-memo { margin-top: 1rem; padding: 0.75rem 1rem; background: var(--bg-2); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); }
+.oe-memo[hidden] { display: none; }
+.oe-blok h3, .oe-nasien h3 { font-size: 0.95rem; margin: 0.75rem 0 0.35rem; color: var(--accent); }
+.oe-kode {
+  margin: 0; padding: 0.6rem 0.75rem; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+  font-family: ui-monospace, Consolas, monospace; font-size: 0.9rem;
+  white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; overflow-x: auto;
+}
+.oe-rig { margin: 0; padding-left: 1.2rem; overflow-wrap: anywhere; }
+.oe-nasien { margin-top: 1.25rem; }
+.oe-gestoor { margin: 0.25rem 0 0; color: var(--ok); font-weight: 600; min-height: 1.4em; }
+@media (max-width: 480px) { .oe-nav .btn { flex: 1 1 auto; } }
