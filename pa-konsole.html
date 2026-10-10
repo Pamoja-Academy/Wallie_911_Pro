@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="af" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark light" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://jxfmzxebekqzwnlurtxg.supabase.co; base-uri 'none'; form-action 'self'; object-src 'none'" />
+<meta name="referrer" content="no-referrer" />
+<title>Pa-konsole v2 · Wallie 911 Pro</title>
+<!-- Voorskou-wag MOET eerste wees: buite pamoja-academy.github.io word Supabase/ntfy geblokkeer en die konsole loop op voorbeelddata. -->
+<script src="assets/js/preview-guard.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/pa-konsole.css" />
+</head>
+<body>
+<!-- ================= AANMELDING ================= -->
+<div class="login" id="login-view" hidden>
+  <div class="card">
+    <h1>Pa-konsole</h1>
+    <form id="login-form" class="login" style="margin:0;padding:0;display:grid;gap:10px">
+      <label for="login-pass">Pa se wagwoord</label>
+      <input type="password" id="login-pass" autocomplete="current-password" required />
+      <button class="btn" type="submit">Teken in</button>
+      <p class="err" id="login-err" role="alert"></p>
+    </form>
+    <button class="linkbtn" type="button" id="show-claim">Eerste keer? Ek het ’n eenmalige kode</button>
+    <form id="claim-form" hidden style="display:grid;gap:10px">
+      <label for="claim-code">Eenmalige kode</label>
+      <input type="text" id="claim-code" autocomplete="one-time-code" required />
+      <label for="claim-pass">Kies jou wagwoord (minstens 8 karakters)</label>
+      <input type="password" id="claim-pass" autocomplete="new-password" minlength="8" required />
+      <label for="claim-pass2">Herhaal wagwoord</label>
+      <input type="password" id="claim-pass2" autocomplete="new-password" minlength="8" required />
+      <button class="btn" type="submit">Stel wagwoord &amp; teken in</button>
+      <p class="err" id="claim-err" role="alert"></p>
+    </form>
+    <p class="conn"><a href="./pa-afstand.html">Ou konsole</a></p>
+  </div>
+</div>
+
+<!-- ================= KONSOLE ================= -->
+<div id="console-view" hidden>
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><small>Wallie 911 Pro · Pa</small><b>Pa-konsole</b></div>
+    <span class="badge-demo demo-only" id="demo-badge" role="status" hidden>⚠ Voorbeelddata</span>
+    <button class="iconbtn" id="themeBtn" type="button">◐ Tema: Outo</button>
+    <button class="iconbtn" id="motionBtn" type="button" aria-pressed="false">Minder beweging</button>
+  </div>
+  <nav class="jump" aria-label="Spring na afdeling">
+    <a href="#hero">Nou</a><a href="#vandag">Vandag</a><a href="#eksamens">Eksamens</a><a href="#alerts">Waarskuwings</a>
+    <a href="#stills">Kamera</a><a href="#heatmap">Vak-tyd</a><a href="#week">Week</a><a href="#sync">Stelsel</a>
+  </nav>
+</header>
+
+
+<main id="main">
+  <div class="demo-note demo-only" id="demo-note" hidden><p><b>Voorskou met VOORBEELDDATA</b>: niks hier is Wallie se regte data nie, en niks word na die bediener gestuur nie.</p></div>
+  <h1 class="sr">Pa-konsole: Wallie se studie-aktiwiteit</h1>
+  <!-- HELD -->
+  <section class="card" id="hero" data-s="off" aria-labelledby="hero-h">
+    <h2 class="sr" id="hero-h">Lewendige status</h2>
+    <div class="hero-grid">
+      <div class="orb" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="core">W</span></div>
+      <div>
+        <p class="eyebrow">Wallie · nou</p>
+        <p class="status" id="status-text" aria-live="polite">LAAI…</p>
+        <p class="what" id="what-text"></p>
+        <div class="row" style="margin-top:10px" id="chips"></div>
+      </div>
+    </div>
+    <div class="timers">
+      <div class="timer"><b id="t-elapsed">—</b><span>Besig vir</span></div>
+      <div class="timer"><b id="t-left">—</b><span>Tyd oor in blok</span></div>
+      <div class="timer"><b><span class="heart" id="heart" aria-hidden="true">♥</span> <span id="t-seen">—</span></b><span>Laaste sein</span></div>
+    </div>
+    <div class="blockbar" aria-hidden="true"><i id="bb-fill"></i></div>
+    <div class="bbmeta"><span id="bb-label">—</span><span id="bb-counts">—</span></div>
+    <p class="stale-msg" id="stale-msg">⚠ Geen hartklop vir meer as 2½ min — skootrekenaar dalk toe, WiFi af of blaaier gesluit.</p>
+    <div class="demo-switch demo-only" id="demo-switch" hidden>
+      <p class="eyebrow" style="margin-bottom:6px">Voorskou · wissel status</p>
+      <div class="row" id="state-btns">
+        <button type="button" data-s="on" aria-pressed="true">In sessie</button>
+        <button type="button" data-s="warn" aria-pressed="false">Waarskuwing</button>
+        <button type="button" data-s="lock" aria-pressed="false">Slot</button>
+        <button type="button" data-s="lost" aria-pressed="false">Sein weg</button>
+        <button type="button" data-s="off" aria-pressed="false">Af</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOKUS-RING -->
+  <section class="card" id="ring" aria-labelledby="ring-h">
+    <h2 id="ring-h">◎ Fokus &amp; teenwoordigheid</h2>
+    <p class="sub" id="ring-sub">Hierdie sessie · minute volgens die app se sigbaar/fokus/ledig-sein</p>
+    <div class="ringwrap">
+      <div id="ringChart" role="img" aria-label="Ring: minute gefokus, sigbaar maar ander venster, versteek en ledig in hierdie sessie"></div>
+      <div class="legend" id="ring-legend"></div>
+    </div>
+  </section>
+
+  <!-- KPI -->
+  <section class="card" id="kpis" aria-label="Die gekose dag in syfers">
+    <div class="kpi"><b><span id="k-min" data-count="0">0</span> <small>min</small></b><span>Gestudeer</span></div>
+    <div class="kpi"><b><span id="k-done" data-count="0">0</span> <small id="k-done-of">van 0</small></b><span>Blokke klaar</span></div>
+    <div class="kpi"><b><span id="k-sess" data-count="0">0</span></b><span>Sessies</span></div>
+    <div class="kpi"><b><span id="k-warn" data-count="0">0</span></b><span>Waarskuwings</span></div>
+    <div class="kpi"><b><span id="k-locks" data-count="0">0</span></b><span>Slotte</span></div>
+  </section>
+
+  <!-- VANDAG -->
+  <section class="card" id="vandag" aria-labelledby="gantt-h">
+    <div class="ctrl" style="justify-content:space-between">
+      <h2 id="gantt-h">▤ <span id="plan-title">Vandag — rooster teenoor werklikheid</span></h2>
+      <label class="sr" for="day-pick">Kies dag</label><input type="date" id="day-pick" />
+    </div>
+    <p class="sub" id="plan-note">Rame = gepland, soliede balke = werklike sessies · lyn = nou</p>
+    <div class="legend-inline">
+      <span><i style="background:var(--ok)"></i>✓ Klaar</span><span><i style="background:var(--warn)"></i>◐ Gedeeltelik</span>
+      <span><i style="background:var(--lock)"></i>✗ Gemis</span><span><i style="background:var(--s-rtt)"></i>● Besig</span><span><i style="background:var(--off)"></i>○ Nog te kom</span>
+    </div>
+    <div id="ganttChart" class="chart" role="img" aria-label="Tydlyn van beplande blokke teenoor werklike sessies"></div>
+    <ul class="agenda" id="agenda"></ul>
+    <details class="tbl"><summary>Wys as tabel</summary><table id="gantt-table"></table></details>
+  </section>
+
+  <!-- EKSAMENS -->
+  <section class="card" id="eksamens" aria-labelledby="ex-h">
+    <h2 id="ex-h">⏳ Eksamen-aftelling</h2>
+    <p class="sub">Per vraestel · DBE NSS-rooster Okt/Nov 2026</p>
+    <div class="next-exam" id="next-exam">
+      <div class="lbl">Volgende vraestel</div>
+      <div class="nm" id="next-name">—</div>
+      <div class="flip" aria-live="off">
+        <div><b id="cd-d">0</b><span>dae</span></div><div><b id="cd-h">00</b><span>uur</span></div>
+        <div><b id="cd-m">00</b><span>min</span></div><div><b id="cd-s">00</b><span>sek</span></div>
+      </div>
+    </div>
+    <ul class="exams" id="exam-list"></ul>
+  </section>
+
+  <!-- HITTEKAART -->
+  <section class="card" id="heatmap" aria-labelledby="heat-h">
+    <h2 id="heat-h">▦ Vak-tyd · laaste 14 dae</h2>
+    <p class="sub">Minute gestudeer per vak per dag (net tyd)</p>
+    <div id="heatChart" class="chart" role="img" aria-label="Hittekaart van minute per vak per dag oor die laaste 14 dae"></div>
+    <details class="tbl"><summary>Wys as tabel</summary><table id="heat-table"></table></details>
+  </section>
+
+  <!-- WAARSKUWINGS -->
+  <section class="card" id="alerts" aria-labelledby="al-h">
+    <h2 id="al-h">🔔 Waarskuwings &amp; gebeure</h2>
+    <p class="sub">Nuutste bo</p>
+    <div class="filters" id="filters" role="group" aria-label="Filter">
+      <button type="button" data-f="all" aria-pressed="true">Alles</button>
+      <button type="button" data-f="lock" aria-pressed="false">Belangrik</button>
+      <button type="button" data-f="warn" aria-pressed="false">Waarskuwings</button>
+      <button type="button" data-f="ok" aria-pressed="false">Sessies</button>
+      <button type="button" data-f="info" aria-pressed="false">Terugvoer</button>
+    </div>
+    <ul class="feed" id="feed" tabindex="0" aria-label="Lys van waarskuwings en gebeure"></ul>
+  </section>
+
+  <!-- WEEK -->
+  <section class="card" id="week" aria-labelledby="wk-h">
+    <h2 id="wk-h">▥ <span id="week-title">Hierdie week</span> · minute per dag</h2>
+    <p class="sub">Gestapel per vak</p>
+    <div id="weekChart" class="chart" role="img" aria-label="Gestapelde kolomgrafiek van minute per dag hierdie week"></div>
+  </section>
+
+  <!-- KAMERA -->
+  <section class="card" id="stills" aria-labelledby="st-h">
+    <h2 id="st-h">📷 Kamera-strook</h2>
+    <p class="sub">Elke 45 s tydens 'n sessie · word ná 3 dae uitgevee · tik om groot te sien</p>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <!-- STELSEL -->
+  <section class="card" id="sync" aria-labelledby="sy-h">
+    <h2 id="sy-h">⇅ Stelsel-gesondheid</h2>
+    <p class="sub">Is die data vars?</p>
+    <div class="health">
+      <div class="poll" id="poll" aria-hidden="true"></div>
+      <div><b id="health-text">—</b><div class="muted" style="font-size:.8rem">Volgende verfris oor <span id="poll-s">—</span> s</div></div>
+    </div>
+    <div class="muted" style="font-size:.76rem">Hartklop · sedert die bladsy oop is</div>
+    <div class="beats" id="beats" role="img" aria-label="Hartklop-strook"></div>
+    <dl class="kv">
+      <dt>Laaste sinkronisering</dt><dd id="kv-sync">—</dd>
+      <dt>Toestel-weergawe</dt><dd id="kv-ver">—</dd>
+      <dt>Gebeure ontvang</dt><dd id="kv-ev">—</dd>
+      <dt>Rooster van die dag</dt><dd id="kv-plan">—</dd>
+    </dl>
+    <p class="conn" id="conn" aria-live="polite"></p>
+  </section>
+</main>
+
+<footer>
+  <div class="card">
+    <b>Pa-konsole v2</b> · Grafieke: Apache ECharts (Apache-2.0) · Animasie: Motion (MIT) · Respekteer "verminder beweging". Geen punte of persentasies oor Wallie se prestasie nie.
+    <div class="row">
+      <button class="btn ghost" type="button" id="logout">Teken uit</button>
+      <button class="btn ghost" type="button" id="show-change">Verander wagwoord</button>
+      <a class="btn ghost" href="./pa-afstand.html" style="text-decoration:none">Ou konsole</a>
+    </div>
+    <form id="change-form" hidden style="display:grid;gap:8px;max-width:360px;margin-top:10px" class="ctrl">
+      <label for="new-pass">Nuwe wagwoord (8+)</label>
+      <input type="password" id="new-pass" autocomplete="new-password" minlength="8" required />
+      <button class="btn" type="submit">Stoor (teken ander toestelle uit)</button>
+      <p class="err" id="change-err" role="alert"></p>
+    </form>
+  </div>
+</footer>
+</div>
+
+<dialog id="lightbox" aria-label="Kamera-foto"><img id="lb-img" alt="" src="data:," /><p class="muted" id="lb-cap" style="margin:8px 0"></p><form method="dialog"><button class="iconbtn" type="submit">Maak toe</button></form></dialog>
+
+<!-- ECharts laai asinchroon (1 MB): die status-held verskyn eers, grafieke teken sodra dit gelaai is -->
+<script id="echarts-js" src="assets/vendor/echarts-6.1.0.min.js" integrity="sha384-C2iskrW/uPW46KzOjrvJIQo4YkV8lkD+QS0CrDN18IIPIpT/g2USu8bTP3nvmIAD" async></script>
+<script src="assets/vendor/motion-14.1.0.js" integrity="sha384-FpYOvvj1o1Sqndyu6Vr6Br51rLTjr7Jfdoh93bJ/KHTRpGlif7cwAM4nIxt19cxV" defer></script>
+<script src="assets/js/live-config.js" defer></script>
+<script src="assets/js/pa-konsole/exams.js" defer></script>
+<script src="assets/js/pa-konsole/demo.js" defer></script>
+<script src="assets/js/pa-konsole/data.js" defer></script>
+<script src="assets/js/pa-konsole/ui.js" defer></script>
+</body>
+</html>
