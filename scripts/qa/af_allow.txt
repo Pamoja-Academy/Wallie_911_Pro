@@ -69,3 +69,11 @@ saamvoegveld
 lêereienskappe
 einddatum
 regterkante
+# C8 taalkontrole 2026-10-10 (geldige samestellings)
+afleidingsreël
+dubbelsydig
+dubbelsydige
+linkerbladsye
+regterbladsy
+regterbladsye
+sportorganiseerder
