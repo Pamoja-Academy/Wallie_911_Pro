@@ -56,7 +56,7 @@ Voorbeeldblokke (aanpasbaar):
 
 1. **Opwarm (20–30 min):** Wisk. Gelett. of Engels-taal (momentum + teikenvakke)  
 2. **Rooi-sone (2× 70–90 min):** Gasvryheid / Afrikaans / RTT — hard-proctor  
-3. **Geel-sone (60–90 min):** LO / Engels-letterkunde / Toerisme-tegniek  
+3. **Geel-sone (60–90 min):** Engels-letterkunde / Toerisme-tegniek  
 4. **Groen-sone (45–60 min):** Wisk. Gelett. doelgerigte oefening na 80%  
 5. **Slot (20 min):** Foutlog-hersiening + môre se top-3  
 
@@ -77,12 +77,11 @@ Amptelike datums nog nie beskikbaar nie → beplan met **tipiese NSC-volgorde**-
 | Gasvryheidstudie | 27% | 45% | 60% | Inkram i.p.v. verstaan | Begrip-eers: konsep → toepassingvrae; nie memoriseer-lyste alleen |
 | Afrikaans HT | 39% | 39% | 60% | Vermy vak; slegs eie notas | Low-hanging: taalstrukture, rubrieke, ou vrae; kort geforseerde sessies |
 | RTT (CAT) | 37% | 46% | 60% | Glad nie geleer | Praktiese take-checklist + theory short-marks; “MOET DIE WERK INSIT” |
-| LO | 49% | 77% | 60% | Antwoorde te breed | Scenario-gebaseerd; uitbrei volgens merkpunt-skemas |
 | Engels FAL | 50% | 56% | 70% | Letterkunde 38% verwaarloos | Letterkunde + creative writing blokke; taal hou |
 | Toerisme | 61% | 61% | 60%+ | Dom foute; klein hoofstukke | Vraag-lees protokol; klein-hoofstuk spoedboor |
 | Wisk. Gelett. | 66% | 66% | 80% | Geen ekstra oefening | Daaglikse retrieval + gemengde/tydige vraestelle |
 
-**Prioriteit-gewig (tot rooster kom):** Gasvryheid > Afrikaans > RTT > LO/Engels-lit > Toerisme-tegniek > Wisk.Gelett. (daagliks klein + teiken 80%).
+**Prioriteit-gewig (tot rooster kom):** Gasvryheid > Afrikaans > RTT > Engels-lit > Toerisme-tegniek > Wisk.Gelett. (daagliks klein + teiken 80%).
 
 ---
 

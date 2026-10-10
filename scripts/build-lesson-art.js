@@ -177,14 +177,6 @@ const ICON = {
       <rect x="62" y="78" width="48" height="24" fill="${C.gold}"/>
       <rect x="90" y="160" width="40" height="30" fill="${C.blue}"/><rect x="50" y="188" width="120" height="14" rx="7" fill="${C.blue}"/>
     </g>`,
-  lo: (x, y) => `
-    <g transform="translate(${x},${y})">
-      <circle cx="110" cy="110" r="100" fill="none" stroke="${C.gold}" stroke-width="14"/>
-      <circle cx="110" cy="110" r="80" fill="${C.panel}"/>
-      <path d="M110,40 L132,110 L110,180 L88,110 Z" fill="${C.red}"/><path d="M110,110 L132,110 L110,180 L88,110 Z" fill="#fff"/>
-      <circle cx="110" cy="110" r="10" fill="${C.gold}"/>
-      <text x="110" y="32" font-size="22" font-weight="900" fill="${C.gold}" text-anchor="middle">N</text>
-    </g>`,
   engels: (x, y) => `
     <g transform="translate(${x},${y})">
       <path d="M110,40 Q60,10 0,24 v150 Q60,160 110,190 Z" fill="#fff"/>
@@ -727,132 +719,6 @@ ART["rtt/netwerke"] = () =>
     ${T(494, 400, ["Stede / lande", "Internet = grootste WAN"], { size: 17, weight: 600, lh: 22 })}
     ${T(626, 486, "Deel: lêers · drukker · internet", { size: 17, anchor: "middle", fill: C.muted, weight: 700 })}`
   });
-
-/* LO */
-ART["lo/antwoord-trap"] = () =>
-  frame({
-    zone: "geel",
-    kicker: "Lewensoriëntering · Eksamentegniek",
-    title: "Antwoord-trap: nie stort nie",
-    body: `
-    ${R(24, 92, 470, 120, { fill: C.paper, r: 10 })}
-    ${T(42, 126, "Vraag", { size: 16, fill: "#6b7f72", ls: 2 })}
-    ${T(42, 158, ["Bespreek hoe Thabo se maats sy", "keuses oor alkohol beïnvloed.   (4)"], { size: 20, fill: C.ink, lh: 26 })}
-    ${pill(514, 104, 262, 46, C.gold, "(4) = 2 punte × 2", { size: 20 })}
-    ${T(524, 182, ["elke punt: idee +", "uitbreiding"], { size: 18, fill: C.muted, weight: 600, lh: 22 })}
-    ${R(24, 382, 236, 118, { fill: "#0a8f5a", r: 10 })}
-    ${num(56, 414, 1, "#fff")}${T(86, 422, "STELLING", { size: 21, fill: "#fff", weight: 900 })}
-    ${T(44, 456, ["Wat is dit? 1 sin.", "bv. Groepsdruk is …"], { size: 17, fill: "#fff", weight: 600, lh: 22 })}
-    ${R(276, 306, 236, 194, { fill: "#d08b16", r: 10 })}
-    ${num(308, 338, 2, "#fff")}${T(338, 346, "TOEPASSING", { size: 21, fill: "#fff", weight: 900 })}
-    ${T(296, 380, ["Koppel aan die", "scenario: noem", "Thabo by naam."], { size: 17, fill: "#fff", weight: 600, lh: 22 })}
-    ${R(528, 230, 248, 270, { fill: "#d4472f", r: 10 })}
-    ${num(560, 262, 3, "#fff")}${T(590, 270, "VOORBEELD", { size: 21, fill: "#fff", weight: 900 })}
-    ${T(548, 304, ["Wat gebeur dan?", "bv. hy drink om in", "te pas → swak", "punte, gevaar."], { size: 17, fill: "#fff", weight: 600, lh: 22 })}
-    <path d="M740,230 v-40" stroke="#fff" stroke-width="4"/><path d="M740,190 l30,10 l-30,10 z" fill="${C.gold}"/>
-    ${T(24, 300, ["✗ Moenie ‘alles wat ek", "weet’ skryf nie."], { size: 19, fill: C.red, lh: 24 })}`
-  });
-
-ART["lo/konflik"] = () => {
-  const rows = [
-    ["1", "Onderhandeling", "Julle twee praat self · wen-wen", C.green, 2, 0],
-    ["2", "Bemiddeling", "Neutrale 3de help · julle besluit", C.gold, 2, 1],
-    ["3", "Arbitrasie", "3de persoon besluit · bindend", "#ff9b4a", 2, 2],
-    ["4", "Hof", "Regter besluit · duur & lank", C.red, 2, 3]
-  ];
-  return frame({
-    zone: "geel",
-    kicker: "Lewensoriëntering · Konflikhantering",
-    title: "Konflik-leer: begin onder",
-    body: `
-    ${A(52, 492, 52, 112, C.muted, 4)}
-    <text x="40" y="320" font-size="17" font-weight="800" fill="${C.muted}" transform="rotate(-90 40 320)" text-anchor="middle">meer formeel · minder beheer</text>
-    ${rows
-      .map(([n, t, sub, col, , i]) => {
-        const y = 404 - i * 102;
-        const x = 84 + i * 40;
-        const w = 692 - i * 40;
-        let icons = person(x + 44, y + 52, "#fff", 0.8) + person(x + 92, y + 52, "#fff", 0.8);
-        if (i >= 1) icons += person(x + 140, y + 52, C.ink, 0.8);
-        return (
-          R(x, y, w, 90, { fill: col, r: 12 }) +
-          icons +
-          T(x + 180, y + 40, `${n}. ${t}`, { size: 26, fill: C.ink, weight: 900 }) +
-          T(x + 180, y + 72, sub, { size: 19, fill: C.ink, weight: 700 })
-        );
-      })
-      .join("")}`
-  });
-};
-
-ART["lo/regte"] = () => {
-  const pairs = [
-    ["Onderwys", "Gaan skool toe, doen die werk"],
-    ["Vryheid van spraak", "Geen haatspraak nie"],
-    ["Gelykheid", "Moenie diskrimineer nie"],
-    ["Veiligheid", "Respekteer ander se liggaam"]
-  ];
-  return frame({
-    zone: "geel",
-    kicker: "Lewensoriëntering · Handves van Regte",
-    title: "Regte ↔ verantwoordelikhede",
-    body: `
-    <rect x="394" y="100" width="12" height="140" fill="${C.gold}"/>
-    <path d="M360,250 h80 l-40,-24 z" fill="${C.gold}"/>
-    <rect x="200" y="104" width="400" height="10" rx="5" fill="${C.gold}"/>
-    ${L(232, 112, 200, 172, C.muted, 2)}${L(232, 112, 264, 172, C.muted, 2)}
-    ${L(568, 112, 536, 172, C.muted, 2)}${L(568, 112, 600, 172, C.muted, 2)}
-    <path d="M176,172 h112 q-8,34 -56,34 q-48,0 -56,-34 z" fill="${C.blue}"/>
-    <path d="M512,172 h112 q-8,34 -56,34 q-48,0 -56,-34 z" fill="${C.gold}"/>
-    ${T(232, 238, "REGTE", { size: 24, anchor: "middle", fill: C.blue, weight: 900 })}
-    ${T(600, 238, "VERANTWOORDELIKHEDE", { size: 22, anchor: "middle", fill: C.gold, weight: 900 })}
-    ${pairs
-      .map(([a, b], i) => {
-        const y = 266 + i * 58;
-        return (
-          R(24, y, 330, 48, { fill: "#0f3350", stroke: C.blue, sw: 2, r: 10 }) +
-          T(40, y + 32, a, { size: 20 }) +
-          T(400, y + 34, "↔", { size: 28, anchor: "middle", fill: C.text }) +
-          R(446, y, 330, 48, { fill: "#4a3a10", stroke: C.gold, sw: 2, r: 10 }) +
-          T(462, y + 32, b, { size: 18 })
-        );
-      })
-      .join("")}`
-  });
-};
-
-ART["lo/werksoek"] = () => {
-  const steps = [
-    ["Ken jouself", ["belangstelling,", "vaardighede"]],
-    ["Vind die pos", ["advertensie,", "netwerk"]],
-    ["CV + dekbrief", ["kort, netjies,", "geen foute"]],
-    ["Onderhoud", ["voorberei, betyds,", "oogkontak"]],
-    ["Aanbod", ["lees die", "kontrak"]]
-  ];
-  const xs = [86, 243, 400, 557, 714];
-  const money = [
-    ["NSFAS", ["staatsbefondsing", "vir studie"], C.green],
-    ["Beurs", ["hoef nie terug te betaal", "nie (voorwaardes)"], C.gold],
-    ["Studielening", ["betaal terug", "+ rente"], C.red]
-  ];
-  return frame({
-    zone: "geel",
-    kicker: "Lewensoriëntering · Loopbane",
-    title: "Van skool na werk / studie",
-    body: `
-    ${L(86, 160, 714, 160, C.line, 10)}
-    ${steps
-      .map(([t, sub], i) => num(xs[i], 160, i + 1, i === 4 ? C.green : C.gold, 34) + T(xs[i], 228, t, { size: 19, anchor: "middle" }) + T(xs[i], 256, sub, { size: 15, anchor: "middle", fill: C.muted, weight: 600, lh: 19 }))
-      .join("")}
-    ${T(24, 334, "STUDIEGELD", { size: 16, fill: C.muted, ls: 2 })}
-    ${money
-      .map(([t, sub, col], i) => {
-        const x = 24 + i * 254;
-        return R(x, 346, 242, 150, { fill: C.panel, stroke: col, sw: 4 }) + T(x + 18, 390, t, { size: 26, fill: col, weight: 900 }) + T(x + 18, 428, sub, { size: 17, weight: 600, lh: 23 });
-      })
-      .join("")}`
-  });
-};
 
 /* ENGELS */
 ART["engels/peel"] = () => {
@@ -1398,7 +1264,6 @@ const COVERS = {
   gasvryheid: "Begrip eers — konsep → toepassing",
   afrikaans: "Opdragwoorde + taal = maklike punte",
   rtt: "Sigblad, databasis, netwerke",
-  lo: "Struktuur wen — nie lengte nie",
   engels: "Literature + writing = 70%",
   toerisme: "Lees die vraag. Bereken reg.",
   wiskgelett: "Daagliks. Teiken 80%.",

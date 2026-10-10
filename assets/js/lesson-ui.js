@@ -107,6 +107,7 @@
   function renderBlocks(state) {
     const seen = {};
     return state.blocks
+      .filter((b) => !WALLIE.isVerborgeVak(b.subjectSlug))
       .map((b) => {
         const occ = seen[b.subjectSlug] || 0;
         seen[b.subjectSlug] = occ + 1;
@@ -118,7 +119,9 @@
   function renderNextUp(state) {
     const el = $("#next-up");
     if (!el) return;
-    const next = state.blocks.find((b) => b.kind !== "break" && !state.completedBlocks[b.id]);
+    const next = state.blocks.find(
+      (b) => b.kind !== "break" && !WALLIE.isVerborgeVak(b.subjectSlug) && !state.completedBlocks[b.id]
+    );
     if (!next) {
       el.innerHTML = `
         <div class="next-card all-done">

@@ -1,14 +1,14 @@
 /* Wallie_911_Pro — vakdata & low-hanging fruit */
 window.WALLIE = window.WALLIE || {};
 
-/* NSC-eksamenrooster: Ma 12 Okt = net die LO-herskryf (Wallie se aanloopdag).
+/* NSC-eksamenrooster: Ma 12 Okt is die laaste voorbereidingsdag (Wallie se aanloopdag).
    Die EERSTE EGTE VRAESTEL is die RTT/CAT-praktiese eksamen op Di 13 Okt 2026 — dáárteen tel die klok af.
    (Begintyd 09:00 is die gewone NSC-begintyd; pas EXAM_KICKOFF aan as die rooster iets anders sê.) */
-WALLIE.EXAM_PERIOD_START = "2026-10-12";
+WALLIE.EXAM_PERIOD_START = "2026-10-13";
 WALLIE.EXAM_START = "2026-10-13";
 WALLIE.EXAM_KICKOFF = "2026-10-13T09:00:00";
 WALLIE.EXAM_LABEL = "Eerste vraestel · RTT (CAT) praktiese eksamen";
-WALLIE.EXAM_NOTE = "Ma 12 Okt is net die LO-herskryf";
+WALLIE.EXAM_NOTE = "Ma 12 Okt is die laaste voorbereidingsdag";
 
 WALLIE.SUBJECTS = [
   {
@@ -63,23 +63,6 @@ WALLIE.SUBJECTS = [
     ]
   },
   {
-    slug: "lo",
-    naam: "Lewensoriëntering",
-    prelim: 49,
-    jaar: 77,
-    teiken: 60,
-    prioriteit: 4,
-    zone: "geel",
-    fokus: "Antwoorde te breed → scenario + merkpunt-struktuur.",
-    lowHanging: [
-      "Elke antwoord: definisie → toepassing → voorbeeld",
-      "Scenario-vrae: noem die scenario eksplisiet in sin 1",
-      "Moenie ‘alles wat ek weet’ stort nie — volg die merke",
-      "Oefen 3 scenario-vrae met timer",
-      "Vergelyk jou antwoord met memo se bullets"
-    ]
-  },
-  {
     slug: "engels",
     naam: "Engels EAT",
     prelim: 50,
@@ -131,5 +114,10 @@ WALLIE.SUBJECTS = [
     ]
   }
 ];
+
+/* Ou rekords van ’n vak wat nie meer deel van die app is nie, word nooit uitgevee nie — net nie vertoon nie. */
+WALLIE.isVerborgeVak = function isVerborgeVak(slug) {
+  return slug === "lo";
+};
 
 WALLIE.DEFAULT_PIN = "9110";

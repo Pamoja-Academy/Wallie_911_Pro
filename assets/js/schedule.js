@@ -1,7 +1,7 @@
 /* Daaglikse plan — Sondag 27 Sep 2026 het rugby-venster */
 window.WALLIE = window.WALLIE || {};
 
-/** Dae sedert 27 Sep 2026 — vir geel-rotasie (LO / Engels / Toerisme). */
+/** Dae sedert 27 Sep 2026 — vir geel-rotasie (Engels / Toerisme). */
 WALLIE.geelDayIndex = function geelDayIndex(dateStr) {
   const epoch = Date.parse("2026-09-27T00:00:00");
   const day = Date.parse(dateStr + "T00:00:00");
@@ -13,11 +13,26 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
   const rooi = byPri.filter((s) => s.zone === "rooi");
   const geel = byPri.filter((s) => s.zone === "geel");
   const groen = byPri.find((s) => s.slug === "wiskgelett");
-  /* Die dagplan skakel oor na eksamen-rotasie op 12 Okt (LO-herskryf-dag) */
+  /* Die dagplan skakel oor na eksamen-rotasie op 13 Okt (RTT/CAT-praktiese). Voor dit is die geel-blok
+     ’n RTT V1-oefenblok (Oefenvrae). */
   const beforeKickoff = dateStr < WALLIE.EXAM_PERIOD_START;
   const geelSlot = beforeKickoff
-    ? geel[0]
+    ? null
     : geel[((WALLIE.geelDayIndex(dateStr) % geel.length) + geel.length) % geel.length];
+
+  /* Geel-blok: voor 13 Okt 'n RTT V1-oefenblok (kind "rooi", dieselfde id), daarna die geel-rotasie. */
+  const geelBlock = (minutes, geelTitle, extra) =>
+    geelSlot
+      ? { id: `${dateStr}-geel`, kind: "geel", subjectSlug: geelSlot.slug, minutes, ...extra, title: geelTitle(geelSlot), detail: geelSlot.fokus }
+      : {
+          id: `${dateStr}-geel`,
+          kind: "rooi",
+          subjectSlug: "rtt",
+          minutes,
+          ...extra,
+          title: "RTT V1 — praktiese oefening (Oefenvrae)",
+          detail: "Kies 'n oefenvraag in Oefenvrae (RTT V1) en doen dit in Excel, Word of Access."
+        };
 
   /* Sondag 27 Sep: Springbokke vs Australië 11:30–13:45 */
   if (dateStr === "2026-09-27") {
@@ -72,16 +87,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         title: `${rooi[2].naam} — 2de helfte`,
         detail: "MOET DIE WERK INSIT. Teorie + praktyk."
       },
-      {
-        id: `${dateStr}-geel`,
-        kind: "geel",
-        subjectSlug: geelSlot.slug,
-        minutes: 55,
-        start: "15:40",
-        end: "16:35",
-        title: `${geelSlot.naam} — scenario-aanval`,
-        detail: geelSlot.fokus
-      },
+      geelBlock(55, (g) => `${g.naam} — scenario-aanval`, { start: "15:40", end: "16:35" }),
       {
         id: `${dateStr}-eng`,
         kind: "geel",
@@ -145,14 +151,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       title: `${rooi[1].naam} — rooi-sone`,
       detail: rooi[1].fokus
     },
-    {
-      id: `${dateStr}-geel`,
-      kind: "geel",
-      subjectSlug: geelSlot.slug,
-      minutes: 70,
-      title: `${geelSlot.naam} — geel-sone`,
-      detail: geelSlot.fokus
-    },
+    geelBlock(70, (g) => `${g.naam} — geel-sone`),
     ...(beforeKickoff
       ? [
           {

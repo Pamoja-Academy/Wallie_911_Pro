@@ -19,7 +19,7 @@ Afrikaanse matric SOS-cockpit vir Wallie (#15 Springbok narratief). Hard-proctor
 - **Pa afstand:** https://pamoja-academy.github.io/Wallie_911_Pro/pa-afstand.html
 - **Zip release:** https://github.com/Pamoja-Academy/Wallie_911_Pro/releases/download/wallie-laptop-v1/Wallie_911_Pro-VIR-SY-LAPTOP.zip
 - ntfy topic (Pa foon): `wallie911-pa-15sos-hanno`
-- **Eerste egte vraestel:** RTT/CAT praktiese, Di 13 Okt 2026 09:00 (stadium-klok op Missie + briefing). Ma 12 Okt = net LO-herskryf.
+- **Eerste egte vraestel:** RTT/CAT praktiese, Di 13 Okt 2026 09:00 (stadium-klok op Missie + briefing). Ma 12 Okt = laaste voorbereidingsdag.
 
 ## Wat Wallie nou moet doen
 Hy het Node NIET. Hy het ’n **stukkende/verkortte GitHub-URL** oopgemaak → “Not Found”.

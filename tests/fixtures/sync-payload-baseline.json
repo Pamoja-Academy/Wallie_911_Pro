@@ -1,0 +1,327 @@
+{
+  "scenario": "v1-bediener: begin → hartklop → minimiseer (20 s) → waarskuwing → einde",
+  "entries": [
+    {
+      "channel": "rpc:wallie_ingest_plan",
+      "kind": "plan",
+      "shape": {
+        "p": {
+          "app_version": "string",
+          "backfill": "boolean",
+          "blocks": {
+            "array": [
+              {
+                "end": "null",
+                "id": "string",
+                "kind": "string",
+                "minutes": "number",
+                "start": "null",
+                "subject": "string",
+                "subject_slug": "string",
+                "title": "string"
+              }
+            ]
+          },
+          "client_at": "number",
+          "day": "string",
+          "device_id": "string",
+          "event_id": "string",
+          "kind": "string",
+          "plan_hash": "string",
+          "title": "string"
+        }
+      }
+    },
+    {
+      "channel": "rpc:wallie_ingest_v2",
+      "kind": "start",
+      "shape": {
+        "p": {
+          "app_version": "string",
+          "backfill": "boolean",
+          "block": {
+            "end": "null",
+            "id": "string",
+            "kind": "string",
+            "minutes": "number",
+            "start": "null",
+            "title": "string"
+          },
+          "block_id": "string",
+          "body": "string",
+          "client_at": "number",
+          "device_id": "string",
+          "event_id": "string",
+          "focused": "boolean",
+          "focused_ms": "number",
+          "hidden_ms": "number",
+          "idle": "boolean",
+          "idle_ms": "number",
+          "kind": "string",
+          "last_input_at": "number",
+          "left_ms": "number",
+          "locks": "number",
+          "planned_min": "number",
+          "session_id": "string",
+          "started_at": "number",
+          "status": "string",
+          "subject": "string",
+          "subject_slug": "string",
+          "task": "string",
+          "title": "string",
+          "total_warnings": "number",
+          "visible": "boolean",
+          "visible_ms": "number",
+          "warnings": "number"
+        }
+      }
+    },
+    {
+      "channel": "rpc:wallie_ingest",
+      "kind": "start",
+      "shape": {
+        "p": {
+          "app_version": "string",
+          "backfill": "boolean",
+          "block": {
+            "end": "null",
+            "id": "string",
+            "kind": "string",
+            "minutes": "number",
+            "start": "null",
+            "title": "string"
+          },
+          "block_id": "string",
+          "body": "string",
+          "client_at": "number",
+          "data": {
+            "_event_id": "string",
+            "value": "null"
+          },
+          "device_id": "string",
+          "event_id": "string",
+          "focused": "boolean",
+          "focused_ms": "number",
+          "hidden_ms": "number",
+          "idle": "boolean",
+          "idle_ms": "number",
+          "kind": "string",
+          "last_input_at": "number",
+          "left_ms": "number",
+          "locks": "number",
+          "planned_min": "number",
+          "session_id": "string",
+          "started_at": "number",
+          "status": "string",
+          "subject": "string",
+          "subject_slug": "string",
+          "task": "string",
+          "title": "string",
+          "total_warnings": "number",
+          "visible": "boolean",
+          "visible_ms": "number",
+          "warnings": "number"
+        }
+      }
+    },
+    {
+      "channel": "rpc:wallie_ingest",
+      "kind": "heartbeat",
+      "shape": {
+        "p": {
+          "app_version": "string",
+          "backfill": "boolean",
+          "block": {
+            "end": "null",
+            "id": "string",
+            "kind": "string",
+            "minutes": "number",
+            "start": "null",
+            "title": "string"
+          },
+          "block_id": "string",
+          "client_at": "number",
+          "data": {
+            "_event_id": "string",
+            "value": "null"
+          },
+          "device_id": "string",
+          "event_id": "string",
+          "focused": "boolean",
+          "focused_ms": "number",
+          "hidden_ms": "number",
+          "idle": "boolean",
+          "idle_ms": "number",
+          "kind": "string",
+          "last_input_at": "number",
+          "left_ms": "number",
+          "locks": "number",
+          "planned_min": "number",
+          "seq": "number",
+          "session_id": "string",
+          "started_at": "number",
+          "status": "string",
+          "subject": "string",
+          "subject_slug": "string",
+          "task": "string",
+          "total_warnings": "number",
+          "visible": "boolean",
+          "visible_ms": "number",
+          "warnings": "number"
+        }
+      }
+    },
+    {
+      "channel": "rpc:wallie_still",
+      "kind": null,
+      "shape": {
+        "p_jpeg_b64": "string",
+        "p_session_id": "string"
+      }
+    },
+    {
+      "channel": "rpc:wallie_ingest",
+      "kind": "warn",
+      "shape": {
+        "p": {
+          "app_version": "string",
+          "backfill": "boolean",
+          "block": {
+            "end": "null",
+            "id": "string",
+            "kind": "string",
+            "minutes": "number",
+            "start": "null",
+            "title": "string"
+          },
+          "block_id": "string",
+          "body": "string",
+          "client_at": "number",
+          "data": {
+            "_event_id": "string",
+            "value": "null"
+          },
+          "device_id": "string",
+          "event_id": "string",
+          "focused": "boolean",
+          "focused_ms": "number",
+          "hidden_ms": "number",
+          "idle": "boolean",
+          "idle_ms": "number",
+          "kind": "string",
+          "last_input_at": "number",
+          "left_ms": "number",
+          "locks": "number",
+          "planned_min": "number",
+          "reason": "string",
+          "session_id": "string",
+          "started_at": "number",
+          "status": "string",
+          "subject": "string",
+          "subject_slug": "string",
+          "task": "string",
+          "title": "string",
+          "total_warnings": "number",
+          "visible": "boolean",
+          "visible_ms": "number",
+          "warnings": "number"
+        }
+      }
+    },
+    {
+      "channel": "rpc:wallie_ingest",
+      "kind": "end",
+      "shape": {
+        "p": {
+          "actual_ms": "number",
+          "app_version": "string",
+          "backfill": "boolean",
+          "block": {
+            "end": "null",
+            "id": "string",
+            "kind": "string",
+            "minutes": "number",
+            "start": "null",
+            "title": "string"
+          },
+          "block_id": "string",
+          "body": "string",
+          "client_at": "number",
+          "data": {
+            "_event_id": "string",
+            "actualMs": "number",
+            "block": {
+              "end": "null",
+              "id": "string",
+              "kind": "string",
+              "minutes": "number",
+              "start": "null",
+              "subjectSlug": "string",
+              "title": "string"
+            },
+            "date": "string",
+            "durationMin": "number",
+            "endedAt": "number",
+            "lockedMs": "number",
+            "locks": "number",
+            "memoMin": "number",
+            "outcome": "string",
+            "plannedMin": "number",
+            "presence": {
+              "focused": "boolean",
+              "focused_ms": "number",
+              "hidden_ms": "number",
+              "idle": "boolean",
+              "idle_ms": "number",
+              "last_input_at": "number",
+              "visible": "boolean",
+              "visible_ms": "number"
+            },
+            "sessionId": "string",
+            "startedAt": "number",
+            "subjectSlug": "string",
+            "task": "string",
+            "warnings": "number"
+          },
+          "device_id": "string",
+          "duration_min": "number",
+          "ended_at": "number",
+          "event_id": "string",
+          "focused": "boolean",
+          "focused_ms": "number",
+          "hidden_ms": "number",
+          "idle": "boolean",
+          "idle_ms": "number",
+          "kind": "string",
+          "last_input_at": "number",
+          "left_ms": "number",
+          "locked_ms": "number",
+          "locks": "number",
+          "memo_min": "number",
+          "outcome": "string",
+          "planned_min": "number",
+          "session_id": "string",
+          "started_at": "number",
+          "status": "string",
+          "subject": "string",
+          "subject_slug": "string",
+          "task": "string",
+          "title": "string",
+          "total_warnings": "number",
+          "visible": "boolean",
+          "visible_ms": "number",
+          "warnings": "number"
+        }
+      }
+    },
+    {
+      "channel": "ntfy",
+      "kind": null,
+      "shape": {
+        "body": "string",
+        "priority": "string",
+        "title": "string"
+      }
+    }
+  ]
+}

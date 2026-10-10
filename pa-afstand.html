@@ -418,7 +418,7 @@
         $("stale").classList.toggle("hidden", !stale);
         let left = cur.left_ms;
         if (left != null && cur.status !== "locked") left = left - age;
-        $("s-vak").textContent = cur.subject || "—";
+        $("s-vak").textContent = (!isVerborge(cur) && cur.subject) || "—";
         $("s-left").textContent = fmtLeft(left);
         $("s-warn").textContent = `${cur.warnings ?? 0} / ${cur.total_warnings ?? 0}`;
         $("s-locks").textContent = String(cur.locks ?? 0);
@@ -444,7 +444,7 @@
         $("still-meta").textContent = `Foto van ${sastTime(stillAt)} (${fmtAge(serverNow - new Date(stillAt).getTime())} gelede)`;
       }
 
-      const sessions = last.sessions || [];
+      const sessions = sigbaar(last.sessions);
       $("sessions").innerHTML = sessions.length
         ? sessions
             .map((s) => {
@@ -486,7 +486,15 @@
       return new Date(day + "T12:00:00Z").toLocaleDateString("af-ZA", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
     }
 
+    /* Ou bediener-rekords van 'n vak wat nie meer deel van die app is nie: nooit uitgevee, net nie vertoon nie. */
+    function isVerborge(x) {
+      const v = String((x && (x.subject ?? x.subjectSlug ?? x.subject_slug)) || "").trim().toLowerCase();
+      return v === "lo" || v.startsWith("lewens");
+    }
+    const sigbaar = (list) => (list || []).filter((x) => !isVerborge(x));
+
     function subjectTable(el, rows, withSessions) {
+      rows = sigbaar(rows);
       if (!rows || !rows.length) {
         el.innerHTML = "";
         return;
@@ -544,7 +552,7 @@
         ? "Klaar = minstens 75% van die blok se minute gedoen (of deur Wallie as klaar gemerk). Gemis = tyd verby en niks gedoen nie."
         : "Wallie se toestel het nog nie hierdie dag se rooster gestuur nie — dit gebeur sodra sy app oop is en aanlyn.";
       subjectTable($("today-table"), o.today_by_subject, false);
-      $("blocks").innerHTML = (o.blocks || [])
+      $("blocks").innerHTML = sigbaar(o.blocks)
         .map((b) => {
           const [cls, label] = BADGE[b.status] || BADGE.planned;
           const when = b.start && b.end ? `${b.start}–${b.end} · ` : "";
@@ -560,7 +568,7 @@
             .join("")
         : "";
 
-      $("feedback").innerHTML = (o.surveys || []).length
+      $("feedback").innerHTML = sigbaar(o.surveys).length
         ? o.surveys
             .map(
               (s) =>

@@ -129,6 +129,8 @@ WALLIE.proctor = {
 
   warn(reason) {
     if (!this.active || this.locked) return;
+    /* Praktiese RTT-blok (praktiese.js): oorskakel na Word/Excel/Access tel nie as wegkyk nie */
+    if (window.Praktiese?.suppressWarn?.()) return;
     if (Date.now() < this.graceUntil) {
       this._cb.onIgnore?.(reason, "grasie");
       return;
