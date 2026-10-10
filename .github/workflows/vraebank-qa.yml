@@ -1,0 +1,48 @@
+# Vraebank RTT V1: toetse + vrystellingshek. Raak nie die Pages-ontplooiing nie.
+# Die DBE-korpus is nie in die (publieke) repo nie, daarom loop item_gate met NONE: G2/G3/G6 word oorgeslaan
+# en loop net plaaslik op Hanno se masjien. G5 (hunspell af_ZA) en G7 (LibreOffice) loop hier.
+name: vraebank-qa
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - master
+      - gh-pages
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: LibreOffice Calc + hunspell (af)
+        run: sudo apt-get update && sudo apt-get install -y libreoffice-calc hunspell hunspell-af
+
+      - name: openpyxl
+        run: pip install openpyxl
+
+      - name: npm ci
+        run: npm ci
+
+      - name: Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Toetse (npm run test:skoon)
+        run: npm run test:skoon
+
+      - name: Vrystellingshek (sonder korpus)
+        run: python3 scripts/qa/item_gate.py data/vraebank-rtt-v1.json NONE
