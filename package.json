@@ -3,9 +3,11 @@
   "private": true,
   "description": "Statiese app; package.json is net vir toetse (Playwright + PGlite).",
   "scripts": {
-    "test": "node scripts/proctor-test.js && node scripts/smoke-parse.js && node tests/sql-migration.test.js && playwright test",
+    "test": "node scripts/proctor-test.js && node scripts/smoke-parse.js && node tests/sql-migration.test.js && playwright test && node tests/vraebank-store.test.js && node tests/vraebank.test.js && node tests/preview-guard.test.js",
+    "test:skoon": "node scripts/test-skoon.js",
     "test:sql": "node tests/sql-migration.test.js",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "build:vraebank": "node scripts/build-vraebank.js"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.7",

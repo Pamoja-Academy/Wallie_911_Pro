@@ -9,3 +9,5 @@ dist/
 node_modules/
 test-artifacts/playwright-output/
 test-artifacts/playwright-results.json
+gate_report.json
+scripts/qa/__pycache__/

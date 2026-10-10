@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { expect } = require("@playwright/test");
 
-const ARTIFACTS = path.join(__dirname, "..", "..", "test-artifacts");
+const ARTIFACTS = process.env.WALLIE_ARTIFACTS_DIR ? path.resolve(process.env.WALLIE_ARTIFACTS_DIR) : path.join(__dirname, "..", "..", "test-artifacts");
 fs.mkdirSync(ARTIFACTS, { recursive: true });
 
 const CONSENT = "wallie911_remote_consent_v2";
