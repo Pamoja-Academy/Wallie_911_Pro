@@ -1282,9 +1282,9 @@ window.VRAEBANK_RTT_V1 = [
       }
     },
     "vak": "rtt",
-    "verduideliking": "Die woord EN in die vraag beteken hier dat albei groepe in die lys moet verskyn, dus is dit in Access 'n OR tussen twee rye. Die tweede groep het self twee voorwaardes wat saam moet geld (nie 'Fantasy' nie EN gradering bo 7), en daarom staan <>\"Fantasy\" en >7 op dieselfde ry. 'Poetry' staan op die 'or'-ry, sonder 'n gradering, omdat AL die 'Poetry'-boeke gevra word. Omdat die gradering 'n heelgetal is, is >=8 dieselfde as >7. Algemene foute: >7 ook op die 'Poetry'-ry sit (dan val die 'Poetry'-boeke met 'n gradering van 7 of laer uit), al die kriteria op een ry sit, en >=7 in plaas van >7.",
-    "vlak": 2,
-    "vraag": "Die biblioteek se tblBooks-tabel het onder andere die velde 'Title', 'Genre' en 'Rating' (dit is 'n heelgetal van 1 tot 10). Maak die qryReadingList-navraag, wat op die tblBooks-tabel gebaseer is, in 'Design View' oop. Wysig die navraag sodat dit twee groepe boeke vertoon:\n• elke 'Poetry'-boek, ongeag die gradering, EN\n• elke boek wat nie 'Fantasy' is nie en waarvan die gradering ('rating') bo 7 is.\nStoor en maak die navraag toe.",
+    "verduideliking": "Afleidingsreël: skryf die versoek eers as groepe boeke wat ELK op die lys moet kom (groep 1 OF groep 2), en dan die voorwaardes binne elke groep wat SAAM moet geld. Groep 1 is al die 'Poetry'-boeke, sonder 'n gradering. Groep 2 is boeke wat nie 'Fantasy' is nie EN hoër as 7 gegradeer is. Die woord 'daarby' in die versoek beteken dus 'n OR tussen twee rye in Access, nie 'n AND nie. Die twee voorwaardes van groep 2 staan op dieselfde ry: <>\"Fantasy\" en >7. 'Poetry' staan op die 'or'-ry sonder 'n gradering, omdat die bibliotekaris ook die swak gegradeerde digbundels wil hê. Die 'Fantasy'-uitsluiting hoef nie op die 'Poetry'-ry nie, want 'n 'Poetry'-boek is nooit 'n 'Fantasy'-boek nie. Omdat die gradering 'n heelgetal is, is >=8 dieselfde as >7. Algemene foute: >7 ook op die 'Poetry'-ry sit (dan val die 'Poetry'-boeke met 'n gradering van 7 of laer uit), al die kriteria op een ry sit, en >=7 in plaas van >7.",
+    "vlak": 3,
+    "vraag": "Die biblioteek se tblBooks-tabel het onder andere die velde 'Title', 'Genre' en 'Rating' ('n heelgetal van 1 tot 10). Die bibliotekaris beskryf die vakansieleeslys so: \"Ek wil al ons digbundels ('Poetry') op die lys hê, ook dié wat swak gegradeer is. Daarby wil ek enige ander boek hê wat hoër as 7 gegradeer is, maar geen 'Fantasy'-boeke nie, want hulle het reeds hul eie uitstalling.\" Maak die qryReadingList-navraag, wat op die tblBooks-tabel gebaseer is, in 'Design View' oop. Ontleed die versoek, lei self af watter kriteria nodig is en hoe hulle in die ontwerprooster gekombineer moet word, en wysig die navraag sodat presies hierdie boeke vertoon word. Stoor en maak die navraag toe.",
     "vraestel": 1
   },
   {
@@ -1359,7 +1359,7 @@ window.VRAEBANK_RTT_V1 = [
     },
     "vak": "rtt",
     "verduideliking": "Die nuwe naam vervang `Expr1` voor die dubbelpunt. `Left([Surname],4)` neem die eerste vier karakters van die van; sonder die 4 neem Access net een letter. `Year([JoinDate])` haal die jaar uit die datum, en & heg die twee stukke aan mekaar. Die punte word gegee vir die nuwe naam, die `Left`-funksie op [Surname], die getal 4 en die &-teken. Algemene foute: + in plaas van & (met + probeer Access getalle optel en kan 'n fout gee), `Right` in plaas van `Left`, en om die naam by `Expr1` te laat staan of dit sonder dubbelpunt te tik.",
-    "vlak": 3,
+    "vlak": 2,
     "vraag": "Maak die qryMembers-navraag, wat op die tblMembers-tabel gebaseer is, in 'Design View' oop. Die tabel het onder andere die velde 'Surname' en 'JoinDate'. Iemand het reeds probeer om 'n kode vir elke lid te skep, maar die berekende veld lees tans net `Expr1: Left([Surname])`. Hernoem die berekende veld na 'MemberCode' en sorg dat 'n kombinasie van funksies 'n kode soos volg skep:\n• Die eerste vier letters van die van ('Surname'), gevolg deur\n• Die jaar van die 'JoinDate'-veld.\nStoor en maak die navraag toe.",
     "vraestel": 1
   },
@@ -1691,6 +1691,9 @@ window.VRAEBANK_RTT_V1 = [
             "B6": "No",
             "B7": "No",
             "B8": "Yes",
+            "E6": "Convenor",
+            "E7": "Member",
+            "E8": "Member",
             "F6": "Member",
             "F7": "Convenor",
             "F8": "Member",
@@ -1722,9 +1725,9 @@ window.VRAEBANK_RTT_V1 = [
       }
     },
     "vak": "rtt",
-    "verduideliking": "Afleidingsreël: herskryf elke reël as iets waaraan die persoon MOET voldoen om te mag dien: 'nie 'n graad 12-klasonderwyser nie' word B6<>\"Yes\", 'nie sameroeper in 2025 nie' word F6<>\"Convenor\" en 'nie sameroeper in 2026 nie' word G6<>\"Convenor\". Omdat AL die reëls moet geld, kombineer jy hulle met AND. AND gee TRUE net as AL die voorwaardes waar is. Hier is daar drie voorwaardes, en elkeen is 'n 'NIE'-voorwaarde, daarom gebruik jy die teken <> (nie gelyk aan nie). Vir kolom B is B6=\"No\" dieselfde as B6<>\"Yes\", omdat daar net twee moontlike waardes is. Die rol moet in BEIDE jare getoets word: F6 en G6. Vier punte: die <>-teken, die toets vir kolom B, die toets vir F6, en die toets vir G6. Algemene foute: OR in plaas van AND (dan is een 'Convenor'-jaar genoeg om deur te kom), = in plaas van <>, net een van die twee jare toets, of IF gebruik terwyl die vraag 'n AND-funksie vra.",
+    "verduideliking": "Afleidingsreël: die afkeurreël is 'graad 12-klas OF sameroeper in jaar 1 OF sameroeper in jaar 2'. 'Mag dien' is die teenoorgestelde daarvan, en die teenoorgestelde van 'X OF Y OF Z' is 'nie X EN nie Y EN nie Z'. Daarom word die OF'e 'n AND, en elke = word <>. Die twee jaar direk voor 2027 is 2025 en 2026, dus kolomme F en G; kolom E (2024) is nie ter sake nie, want wie net vroeër sameroeper was, mag dien. So kry jy B6<>\"Yes\", F6<>\"Convenor\" en G6<>\"Convenor\" binne een AND. AND gee TRUE net as AL die voorwaardes waar is. Vir kolom B is B6=\"No\" dieselfde as B6<>\"Yes\", omdat daar net twee moontlike waardes is. Vier punte: die <>-teken, die toets vir kolom B, die toets vir F6, en die toets vir G6. Algemene foute: die afkeurreël net oorskryf as =AND(B6=\"Yes\",F6=\"Convenor\",G6=\"Convenor\") (dit gee TRUE net vir iemand wat aan AL die afkeurredes voldoen), OR in plaas van AND (dan is een 'Convenor'-jaar genoeg om deur te kom), kolom E ook toets (dan word iemand wat net in 2024 sameroeper was verkeerdelik afgekeur), of net een van die twee jare toets.",
     "vlak": 3,
-    "vraag": "Die Komitee-werkblad lys die personeel wat moontlik kan dien in die komitee wat die 2027-matriekafskeid reël. Die hoof het twee reëls gestel: graad 12-klasonderwysers het reeds te veel werk met hul eie klasse, en die komitee moet nuwe leiers kry, dus mag niemand wat in 2025 of in 2026 die sameroeper ('Convenor') was, weer dien nie. Kolom B toon of die persoon 'n graad 12-klasonderwyser is ('Yes' of 'No'), kolom F toon die persoon se rol in 2025 en kolom G die rol in 2026 (bv. 'Member' of 'Convenor'). Lei uit die hoof se reëls af aan watter voorwaardes 'n personeellid moet voldoen, en voeg 'n AND-funksie in sel H6 in wat TRUE gee as die personeellid in ry 6 in die komitee mag dien.",
+    "vraag": "Die Komitee-werkblad lys die personeel wat moontlik kan dien in die komitee wat die 2027-matriekafskeid reël. Kolom B toon of die persoon 'n graad 12-klasonderwyser is ('Yes' of 'No'), en kolomme E, F en G toon die persoon se rol in 2024, 2025 en 2026 (bv. 'Member' of 'Convenor'). Die hoof het die reël as 'n AFKEURREËL gestel: 'n personeellid word afgekeur as die persoon 'n graad 12-klas het, of as die persoon in een van die twee jaar direk voor 2027 die sameroeper ('Convenor') was. Wie net vroeër sameroeper was, word nie afgekeur nie. Sel H6 moet egter TRUE wys vir 'n persoon wat MAG dien, en jy mag net een AND-funksie gebruik (geen OR, NOT of IF nie). Ontleed die afkeurreël, besluit watter kolomme ter sake is, en voeg die AND-funksie in sel H6 in vir die personeellid in ry 6.",
     "vraestel": 1
   }
 ];

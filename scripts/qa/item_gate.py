@@ -35,7 +35,7 @@ def strip_terms(s):
     s=re.sub(r"\b[A-Za-z]+_[A-Za-z0-9_]+\b",' ',s)
     s=re.sub(r"\b("+'|'.join(PROD)+r")\b(-)?",' ',s)
     s=re.sub(r"\b[A-Z][A-Za-z0-9]*-(?=[a-z])"," ",s)
-    s=re.sub(r"(^|\s)'n\s",r"\1n_lw ",s)
+    s=re.sub(r"(^|[\s(\u201c\"])'n\s",r"\1n_lw ",s)   # ook "('n heelgetal"
     s=re.sub(r"\b[A-Za-z]*[A-Z]{2,}[A-Za-z]*(-\w+)?",' ',s)
     s=re.sub(r"`[^`]*`|'[^']*'|\"[^\"]*\"|<[^>]*>|=[A-Z][A-Za-z0-9_.,:$!()\"<>=*&% -]*|\[[^\]]*\]",' ',s)
     s=re.sub(r"\b[a-z]+=",' ',s)            # HTML-attribuut voor '=' (alt=, title=)
