@@ -111,8 +111,9 @@ test("Pa-konsole: lewendige status, rooster teenoor werklikheid, surveys woordel
   expect(week).toMatch(/Wiskundige Geletterdheid 14 2 1 2 9 70 \/ 560 70/);
   /* Engels: 7 gepland; Ma klaar (45), Di gemis, Wo gedeeltelik (lewendig), 4 nog te doen */
   expect(week).toMatch(/Engels EAT 7 1 1 1 4 /);
-  /* RTT: Di klaar via blok-koppeling (70/70), Ma gemis, 5 nog te doen */
-  expect(week).toMatch(/RTT \(CAT\) 7 1 0 1 5 70 \/ 490 70/);
+  /* RTT: 14 gepland (7 rtt-or-third + 7 RTT V1-oefenblokke wat die ou geel-blok vervang het); Di klaar via blok-koppeling (70/70),
+     3 gemis (Ma + Di se oefenblok, Ma se diep werk), 10 nog te doen */
+  expect(week).toMatch(/RTT \(CAT\) 14 1 0 3 10 70 \/ 980 70/);
   /* Afrikaans: Di gedeeltelik (40/80), Ma gemis */
   expect(week).toMatch(/Afrikaans Huistaal 7 0 1 1 5 40 \/ 560 40/);
   const days = flat(await pa.locator("#week-days").innerText());

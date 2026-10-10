@@ -20,6 +20,9 @@
     WALLIE.storage.save(state);
   }
 
+  /* Rekords van 'n verborge vak (ou data) bly in die berging, maar word nie vertoon nie. */
+  const vis = (list) => (list || []).filter((x) => !WALLIE.isVerborgeVak(x?.subjectSlug));
+
   function ensurePlan() {
     const today = WALLIE.todayKey();
     const plan = WALLIE.buildDayPlan(today);
@@ -101,7 +104,7 @@
 
   function renderMissie() {
     ensurePlan();
-    const studyBlocks = state.blocks.filter((b) => b.kind !== "break");
+    const studyBlocks = vis(state.blocks).filter((b) => b.kind !== "break");
     const done = studyBlocks.filter((b) => state.completedBlocks[b.id]).length;
     const mins = studyBlocks.reduce((s, b) => s + b.minutes, 0);
     const doneMins = studyBlocks
@@ -113,7 +116,7 @@
       <div class="stat"><b>${done}/${studyBlocks.length}</b><span>Blokke klaar</span></div>
       <div class="stat"><b>${doneMins}/${mins}m</b><span>Minute klaar</span></div>
       <div class="stat"><b>${les.reg}/${les.total}</b><span>Lesse reg (toe-boek)</span></div>
-      <div class="stat"><b>${state.faults.filter((f) => !f.resolved).length}</b><span>Oop foute</span></div>
+      <div class="stat"><b>${vis(state.faults).filter((f) => !f.resolved).length}</b><span>Oop foute</span></div>
     `;
 
     WALLIE.lessonUI.renderNextUp(state);
@@ -151,7 +154,7 @@
   }
 
   function renderFaults() {
-    const list = [...state.faults].sort((a, b) => (a.resolved ? 1 : 0) - (b.resolved ? 1 : 0));
+    const list = [...vis(state.faults)].sort((a, b) => (a.resolved ? 1 : 0) - (b.resolved ? 1 : 0));
     $("#fault-list").innerHTML = list.length
       ? list
           .map((f) => {
@@ -179,8 +182,9 @@
   }
 
   function renderPapers() {
-    $("#paper-list").innerHTML = state.papers.length
-      ? state.papers
+    const papers = vis(state.papers);
+    $("#paper-list").innerHTML = papers.length
+      ? papers
           .map((p) => {
             const sub = subjectBySlug(p.subjectSlug)?.naam || p.subjectSlug;
             return `<li><div><strong>${p.title}</strong><br/><span class="meta">${sub} · ${p.fileName || "lêer"}</span></div></li>`;
@@ -200,7 +204,7 @@
             ? "GESLUIT"
             : "AF";
     const today = WALLIE.todayKey();
-    const todays = state.sessions.filter((s) => s.date === today);
+    const todays = vis(state.sessions).filter((s) => s.date === today);
     const mins = todays.reduce((a, s) => a + (s.durationMin || 0), 0);
 
     $("#pa-status-cards").innerHTML = `
@@ -660,7 +664,7 @@
     const sel = $("#pa-survey-session");
     if (!sel) return;
     const today = WALLIE.todayKey();
-    const list = state.sessions.filter((s) => s.date === today);
+    const list = vis(state.sessions).filter((s) => s.date === today);
     sel.innerHTML = list.length
       ? list
           .map((s) => {
@@ -673,7 +677,10 @@
 
   function renderVerbeter() {
     const today = WALLIE.todayKey();
-    const syn = WALLIE.synthesizeDay(state, today);
+    const syn = WALLIE.synthesizeDay(
+      { ...state, sessions: vis(state.sessions), wallieSurveys: vis(state.wallieSurveys) },
+      today
+    );
     $("#verbeter-stats").innerHTML = `
       <div class="stat"><b>${syn.sessionCount}</b><span>Sessies</span></div>
       <div class="stat"><b>${syn.wallieCount}</b><span>Wallie-surveys</span></div>
@@ -687,12 +694,12 @@
       : `<li>Geen vlae — nog min data of alles lyk in lyn.</li>`;
     $("#verbeter-aksies").innerHTML = syn.aksies.map((a) => `<li>${a}</li>`).join("");
 
-    const wallie = (state.wallieSurveys || []).filter((s) => s.date === today);
+    const wallie = vis(state.wallieSurveys).filter((s) => s.date === today);
     const pa = (state.paSurveys || []).filter((s) => s.date === today);
     const raw = [
       ...wallie.map(
         (w) =>
-          `<li><strong>Wallie</strong> ${subjectBySlug(w.subjectSlug)?.naam}: fokus ${w.answers.fokus}/5 · metode ${w.answers.metode} · blokkade ${w.answers.blokkade} · eerlikheid ${w.answers.eerlikheid}${w.answers.help_more ? ` · “${w.answers.help_more}”` : ""}</li>`
+          `<li><strong>Wallie</strong> ${subjectBySlug(w.subjectSlug)?.naam || w.subjectSlug}: fokus ${w.answers.fokus}/5 · metode ${w.answers.metode} · blokkade ${w.answers.blokkade} · eerlikheid ${w.answers.eerlikheid}${w.answers.help_more ? ` · “${w.answers.help_more}”` : ""}</li>`
       ),
       ...pa.map(
         (p) =>
@@ -701,7 +708,7 @@
     ];
     $("#verbeter-raw").innerHTML = raw.length ? raw.join("") : "<li>Nog geen surveys vandag nie.</li>";
 
-    const bugs = (state.bugReports || []).filter((b) => b.date === today);
+    const bugs = vis(state.bugReports).filter((b) => b.date === today);
     $("#verbeter-bugs").innerHTML = bugs.length
       ? bugs
           .map((b) => {
@@ -716,7 +723,7 @@
 
   function renderBugs() {
     const today = WALLIE.todayKey();
-    const bugs = (state.bugReports || []).filter((b) => b.date === today);
+    const bugs = vis(state.bugReports).filter((b) => b.date === today);
     const el = $("#bug-list-wallie");
     if (!el) return;
     el.innerHTML = bugs.length

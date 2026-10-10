@@ -101,10 +101,21 @@ if (typeof W.buildDayPlan === "function") {
     assert(eng && eng.minutes >= 40 && eng.minutes <= 50, `${d} Engels 40–50 min`);
     assert(toe && toe.minutes >= 20 && toe.minutes <= 30, `${d} Toerisme 20–30 min`);
   }
-  const rotated = ["2026-10-12", "2026-10-13", "2026-10-14"].map((d) =>
+  const rotated = ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16"].map((d) =>
     W.buildDayPlan(d).blocks.find((b) => b.id.endsWith("-geel"))?.subjectSlug
   );
-  assert(new Set(rotated).size === 3, "geel rotates LO / Engels / Toerisme after kickoff");
+  assert(new Set(rotated).size === 2 && !rotated.includes("rtt"), "geel rotates Engels / Toerisme after kickoff");
+  for (const d of ["2026-10-10", "2026-10-11", "2026-10-12"]) {
+    const g = W.buildDayPlan(d).blocks.find((b) => b.id === `${d}-geel`);
+    assert(g && g.subjectSlug === "rtt" && g.kind === "rooi" && g.title === "RTT V1 — praktiese oefening (Oefenvrae)", `${d} geel-blok is RTT V1`);
+  }
+  let loBlocks = 0;
+  for (let t = Date.parse("2026-09-27T12:00:00Z"); t <= Date.parse("2026-11-30T12:00:00Z"); t += 86400000) {
+    const d = new Date(t).toISOString().slice(0, 10);
+    loBlocks += W.buildDayPlan(d).blocks.filter((b) => b.subjectSlug === "lo").length;
+  }
+  assert(loBlocks === 0, "geen blok met subjectSlug lo van 27 Sep tot 30 Nov");
+  assert(!W.SUBJECTS.some((s) => s.slug === "lo"), "geen lo-vak in SUBJECTS");
 }
 
 assert(html.includes("js-export-log"), "export log button");
@@ -160,9 +171,9 @@ assert(!/\b(node|npx|serve|localhost)\b/i.test(bat), "bat no longer serves a loc
 const remoteSrc = fs.readFileSync(path.join(root, "assets/js/remote.js"), "utf8");
 assert(remoteSrc.includes('consentKey: "wallie911_remote_consent_v2"'), "consent key unchanged (no re-ask)");
 
-/* Eerste egte vraestel = RTT/CAT praktiese, Di 13 Okt; Ma 12 Okt is net die LO-herskryf */
+/* Eerste egte vraestel = RTT/CAT praktiese, Di 13 Okt; Ma 12 Okt is die laaste voorbereidingsdag */
 assert(W.EXAM_START === "2026-10-13" && W.EXAM_KICKOFF.startsWith("2026-10-13"), "countdown targets Tue 13 Oct (CAT practical)");
-assert(W.EXAM_PERIOD_START === "2026-10-12", "exam period (LO rewrite) still starts Mon 12 Oct");
+assert(W.EXAM_PERIOD_START === "2026-10-13", "exam period starts with the RTT practical on Tue 13 Oct");
 
 /* Die zip is .gitignore'd (net op Pa se masjien) — toets dit net as dit bestaan */
 const zipPath = path.join(root, "Wallie_911_Pro-VIR-SY-LAPTOP.zip");
