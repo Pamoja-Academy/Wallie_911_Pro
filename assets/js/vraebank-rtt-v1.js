@@ -302,7 +302,7 @@ window.VRAEBANK_RTT_V1 = [
         "punte": 1
       },
       {
-        "kriterium": "Tabelreeks: `Coaches!$A$2:$D$19` OF `Coaches!$A$1:$D$19` OF `Coaches!A2:D19` OF `Coaches!A1:D19`",
+        "kriterium": "Tabelreeks: `Coaches!$A$2:$D$19` OF `Coaches!$A$1:$D$19` OF `Coaches!A2:D19` OF `Coaches!A1:D19` (net hierdie vier vorme: met of sonder die opskrifry, en óf heeltemal absoluut óf heeltemal relatief)",
         "punte": 1
       },
       {
@@ -734,7 +734,7 @@ window.VRAEBANK_RTT_V1 = [
     "vraestel": 1
   },
   {
-    "antwoord": "'File' → 'Info' → 'Show All Properties' → klik by 'Status' en tik Ready for print.\nOF 'File' → 'Info' → 'Properties' → 'Advanced Properties' → oortjie 'Custom' → 'Status' → 'Value': Ready for print → 'Add' → 'OK'.",
+    "antwoord": "'File' → 'Info' → 'Show All Properties' → klik by 'Status' en tik 'Ready for print'.\nOF 'File' → 'Info' → 'Properties' → 'Advanced Properties' → oortjie 'Custom' → 'Status' → 'Value': 'Ready for print' → 'Add' → 'OK'.",
     "bron": {
       "bladsy": 5,
       "memo_bladsy": 2,
@@ -743,7 +743,7 @@ window.VRAEBANK_RTT_V1 = [
     "id": "rtt-v1-W03",
     "nasienriglyn": [
       {
-        "kriterium": "'Status': 'Ready for print'",
+        "kriterium": "'Status'-eienskap bevat presies 'Ready for print' (via 'Show All Properties' OF 'Advanced Properties' → 'Custom'; geen punt vir die oopmaak van die dialoog self nie)",
         "punte": 1
       }
     ],
@@ -754,9 +754,9 @@ window.VRAEBANK_RTT_V1 = [
       "handmatig": "Kontroleer onder 'File' → 'Info' → 'Show All Properties' dat 'Status' presies Ready for print bevat."
     },
     "vak": "rtt",
-    "verduideliking": "Die eienskappe van 'n dokument is inligting OOR die lêer, nie teks in die dokument self nie. 'Status' wys nie by die eerste paar eienskappe op die 'Info'-blad nie; jy moet eers op 'Show All Properties' klik. Die teks moet presies so gespel wees. Algemene foute: die teks in 'Title', 'Tags' of 'Comments' tik, of dit bo-aan die dokument intik.",
+    "verduideliking": "Die eienskappe van 'n dokument is inligting OOR die lêer, nie teks in die dokument self nie. 'Status' wys nie by die eerste paar eienskappe op die 'Info'-blad nie; jy moet eers op 'Show All Properties' klik. In Office 2016/365 werk die 'Custom'-oortjie van 'Advanced Properties' ook; die 'Summary'-oortjie het egter GEEN 'Status'-veld nie. Die teks moet presies so gespel wees, met dieselfde hoofletters. Daar is net een punt: die 'Status'-eienskap bevat 'Ready for print', ongeag watter van die twee roetes jy gebruik. Algemene foute: die teks in 'Title', 'Tags' of 'Comments' tik, of dit bo-aan die dokument intik.",
     "vlak": 1,
-    "vraag": "Voeg die teks 'Ready for print' in die 'Status'-eienskap van die Nuusbrief-dokument in.",
+    "vraag": "Voeg die teks 'Ready for print' in die 'Status'-eienskap van die Nuusbrief-dokument in. ('Status' is een van die lêereienskappe ('Properties') onder 'File' → 'Info', nie teks op die bladsy nie.)",
     "vraestel": 1
   },
   {
@@ -829,7 +829,7 @@ window.VRAEBANK_RTT_V1 = [
     "id": "rtt-v1-W06",
     "nasienriglyn": [
       {
-        "kriterium": "Teks: 'netball' vervang",
+        "kriterium": "Teks: 'netball' in 'Find what' ('Replace with' leeg gelaat OF 'netball')",
         "punte": 1
       },
       {
@@ -837,7 +837,7 @@ window.VRAEBANK_RTT_V1 = [
         "punte": 1
       },
       {
-        "kriterium": "Regte getal veranderinge ('Match case' en 'Find whole words only')",
+        "kriterium": "Regte getal veranderinge: elke 'netball' in kleinletters as hele woord, en geen 'Netball' of 'netballers' nie ('Match case' en 'Find whole words only')",
         "punte": 1
       }
     ],
@@ -924,9 +924,9 @@ window.VRAEBANK_RTT_V1 = [
       "handmatig": "Kies die vier reëls en open 'Tabs…': daar moet 'n tabelstop op 9 cm wees ('Center', 'Leader' 2) en een op 14 cm ('Right'). Die liniaal wys dieselfde merke vir al vier reëls."
     },
     "vak": "rtt",
-    "verduideliking": "'n Tabelstop het drie eienskappe: die posisie, die inlynstelling ('Left', 'Center', 'Right', 'Decimal') en die vuller ('Leader'). Vuller 2 is die kolletjies, 3 die strepies en 4 'n soliede lyn. Jy moet AL vier reëls eers kies, anders kry net een reël die tabelstoppe. Druk 'Set' ná elke tabelstop, anders word net die laaste een gestoor. Punte: die tweede tabelstop se posisie (9 cm), inlynstelling ('Center') en vuller (2), en die derde tabelstop se inlynstelling ('Right'). Algemene foute: spasies tik in plaas van tabelstoppe, die vuller op die derde tabelstop sit, of 'Left' laat staan vir die aankomstye.",
+    "verduideliking": "'n Tabelstop het drie eienskappe: die posisie, die inlynstelling ('Left', 'Center', 'Right', 'Decimal') en die vuller ('Leader'). Vuller 2 is die kolletjies, 3 die strepies en 4 'n soliede lyn. Die vraag noem nie die belyning nie; jy moet hulle uit die uitleg aflei. As die middel van die teks op die merk lê, is dit 'Center'; as die teks by die merk eindig, is dit 'Right' (by 'Left' begin die teks by die merk). Jy moet AL vier reëls eers kies, anders kry net een reël die tabelstoppe. Druk 'Set' ná elke tabelstop, anders word net die laaste een gestoor. Punte: die tweede tabelstop se posisie (9 cm), inlynstelling ('Center') en vuller (2), en die derde tabelstop se inlynstelling ('Right'). Algemene foute: spasies tik in plaas van tabelstoppe, die vuller op die derde tabelstop sit, of 'Left' laat staan vir die aankomstye.",
     "vlak": 3,
-    "vraag": "Onder die opskrif 'Bus Timetable' in die Uitstappie-dokument staan vier reëls. Op elke reël is die plek, die vertrektyd en die aankomstyd met 'Tab'-karakters geskei. Die eerste tabelstop (2 cm, 'Left') is reeds gestel. Formateer die vier reëls so:\n• Die tweede tabelstop staan op 9 cm, is gesentreer, en die spasie voor die vertrektyd word met kolletjies gevul (soos ……… 07:30).\n• Die derde tabelstop staan op 14 cm, en die aankomstye is regs in lyn.",
+    "vraag": "Onder die opskrif 'Bus Timetable' in die Uitstappie-dokument staan vier reëls. Op elke reël is die plek, die vertrektyd en die aankomstyd met 'Tab'-karakters geskei. Die eerste tabelstop (2 cm, 'Left') is reeds gestel. Op die liniaal moet die voltooide reëls so lyk:\n• Die middelpunt van elke vertrektyd lê presies by die 9 cm-merk, en die spasie tussen die plek en die vertrektyd is met kolletjies gevul (soos Durban ……… 07:30).\n• Die laaste syfer van elke aankomstyd eindig presies by die 14 cm-merk, sodat die aankomstye se regterkante in 'n reguit lyn onder mekaar staan.\nLei uit hierdie uitleg af watter tabelstoppe nodig is, en stel hulle vir die vier reëls.",
     "vraestel": 1
   },
   {
@@ -1018,15 +1018,15 @@ window.VRAEBANK_RTT_V1 = [
         "punte": 1
       },
       {
-        "kriterium": "BookingDate: `Between #2026/03/01#` OF >=#2026/03/01# OF >#2026/02/28#",
+        "kriterium": "BookingDate-kriterium, begindatum: `Between #2026/03/01#` OF >=#2026/03/01# OF >#2026/02/28#",
         "punte": 1
       },
       {
-        "kriterium": "`And`",
+        "kriterium": "BookingDate-kriterium, koppelwoord: `And` (afsonderlike punt)",
         "punte": 1
       },
       {
-        "kriterium": "#2026/05/31# OF <=#2026/05/31# OF <#2026/06/01#",
+        "kriterium": "BookingDate-kriterium, einddatum: #2026/05/31# OF <=#2026/05/31# OF <#2026/06/01#",
         "punte": 1
       },
       {

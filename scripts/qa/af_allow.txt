@@ -65,3 +65,7 @@ seksiebreuk
 sluitingsmerker
 sluitingsmerkers
 saamvoegveld
+# C6 taalkontrole 2026-10-10 (geldige samestellings)
+lêereienskappe
+einddatum
+regterkante

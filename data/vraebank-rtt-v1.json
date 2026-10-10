@@ -143,7 +143,7 @@
   "verduideliking": "VLOOKUP soek die opsoekwaarde (B5) in die EERSTE kolom van die tabelreeks en gee dan die waarde uit die kolom met die gegewe nommer terug. Die tabelreeks begin by kolom A (die ID-nommers) en loop tot by kolom D. Die van staan in die derde kolom van die reeks, dus is die kolomnommer 3. Die opskrifry mag ingesluit word of nie, en die absolute selverwysings (met $) is net nodig as jy die formule na ander selle kopieer. Omdat die ID-nommers gesorteer is, werk die funksie sonder 'n vierde argument. Algemene foute: die reeks by kolom B laat begin (dan soek VLOOKUP die ID-nommer tussen die voorname en vind dit nie), of die kolomnommer verkeerd tel: 2 gee die voornaam en 4 die selfoonnommer. Vergeet ook nie die naam van die werkblad en die uitroepteken (`Coaches!`) voor die reeks nie.",
   "nasienriglyn": [
    {"kriterium": "Opsoekwaarde: B5", "punte": 1},
-   {"kriterium": "Tabelreeks: `Coaches!$A$2:$D$19` OF `Coaches!$A$1:$D$19` OF `Coaches!A2:D19` OF `Coaches!A1:D19`", "punte": 1},
+   {"kriterium": "Tabelreeks: `Coaches!$A$2:$D$19` OF `Coaches!$A$1:$D$19` OF `Coaches!A2:D19` OF `Coaches!A1:D19` (net hierdie vier vorme: met of sonder die opskrifry, en óf heeltemal absoluut óf heeltemal relatief)", "punte": 1},
    {"kriterium": "Kolomnommer: 3", "punte": 1}
   ],
   "bron": {
@@ -341,11 +341,11 @@
  {
   "id": "rtt-v1-W03",
   "vak": "rtt", "vraestel": 1, "onderwerp": "woordverwerking", "vlak": 1, "tipe": "stappe", "punte": 1,
-  "vraag": "Voeg die teks 'Ready for print' in die 'Status'-eienskap van die Nuusbrief-dokument in.",
-  "antwoord": "'File' → 'Info' → 'Show All Properties' → klik by 'Status' en tik Ready for print.\nOF 'File' → 'Info' → 'Properties' → 'Advanced Properties' → oortjie 'Custom' → 'Status' → 'Value': Ready for print → 'Add' → 'OK'.",
-  "verduideliking": "Die eienskappe van 'n dokument is inligting OOR die lêer, nie teks in die dokument self nie. 'Status' wys nie by die eerste paar eienskappe op die 'Info'-blad nie; jy moet eers op 'Show All Properties' klik. Die teks moet presies so gespel wees. Algemene foute: die teks in 'Title', 'Tags' of 'Comments' tik, of dit bo-aan die dokument intik.",
+  "vraag": "Voeg die teks 'Ready for print' in die 'Status'-eienskap van die Nuusbrief-dokument in. ('Status' is een van die lêereienskappe ('Properties') onder 'File' → 'Info', nie teks op die bladsy nie.)",
+  "antwoord": "'File' → 'Info' → 'Show All Properties' → klik by 'Status' en tik 'Ready for print'.\nOF 'File' → 'Info' → 'Properties' → 'Advanced Properties' → oortjie 'Custom' → 'Status' → 'Value': 'Ready for print' → 'Add' → 'OK'.",
+  "verduideliking": "Die eienskappe van 'n dokument is inligting OOR die lêer, nie teks in die dokument self nie. 'Status' wys nie by die eerste paar eienskappe op die 'Info'-blad nie; jy moet eers op 'Show All Properties' klik. In Office 2016/365 werk die 'Custom'-oortjie van 'Advanced Properties' ook; die 'Summary'-oortjie het egter GEEN 'Status'-veld nie. Die teks moet presies so gespel wees, met dieselfde hoofletters. Daar is net een punt: die 'Status'-eienskap bevat 'Ready for print', ongeag watter van die twee roetes jy gebruik. Algemene foute: die teks in 'Title', 'Tags' of 'Comments' tik, of dit bo-aan die dokument intik.",
   "nasienriglyn": [
-   {"kriterium": "'Status': 'Ready for print'", "punte": 1}
+   {"kriterium": "'Status'-eienskap bevat presies 'Ready for print' (via 'Show All Properties' OF 'Advanced Properties' → 'Custom'; geen punt vir die oopmaak van die dialoog self nie)", "punte": 1}
   ],
   "bron": {
    "verwysing": "DBE Junie 2025 V1 V1.1",
@@ -401,9 +401,9 @@
   "antwoord": "Ctrl+H ('Find and Replace') → 'Find what': netball → klik 'More >>' → merk 'Match case' en 'Find whole words only' → klik in 'Replace with' (laat dit leeg of tik netball) → 'Format' → 'Style' → kies 'Sport Char' → 'Replace All'.",
   "verduideliking": "Die styl word op die VERVANG-kant gestel: die wyser moet in die 'Replace with'-blokkie wees as jy 'Format' → 'Style' kies. As die blokkie leeg is, hou Word die oorspronklike teks en verander net die formaat. 'Match case' sorg dat 'Netball' met 'n hoofletter nie verander nie, en 'Find whole words only' sorg dat 'netballers' nie verander nie. Daarvoor is die derde punt: die regte getal veranderinge. Algemene foute: die styl op die 'Find what'-kant stel, of een van die twee merkblokkies vergeet, sodat te veel woorde verander.",
   "nasienriglyn": [
-   {"kriterium": "Teks: 'netball' vervang", "punte": 1},
+   {"kriterium": "Teks: 'netball' in 'Find what' ('Replace with' leeg gelaat OF 'netball')", "punte": 1},
    {"kriterium": "Formaat: 'Style': 'Sport Char'", "punte": 1},
-   {"kriterium": "Regte getal veranderinge ('Match case' en 'Find whole words only')", "punte": 1}
+   {"kriterium": "Regte getal veranderinge: elke 'netball' in kleinletters as hele woord, en geen 'Netball' of 'netballers' nie ('Match case' en 'Find whole words only')", "punte": 1}
   ],
   "bron": {
    "verwysing": "DBE Junie 2025 V1 V1.4",
@@ -438,9 +438,9 @@
  {
   "id": "rtt-v1-W08",
   "vak": "rtt", "vraestel": 1, "onderwerp": "woordverwerking", "vlak": 3, "tipe": "stappe", "punte": 4,
-  "vraag": "Onder die opskrif 'Bus Timetable' in die Uitstappie-dokument staan vier reëls. Op elke reël is die plek, die vertrektyd en die aankomstyd met 'Tab'-karakters geskei. Die eerste tabelstop (2 cm, 'Left') is reeds gestel. Formateer die vier reëls so:\n• Die tweede tabelstop staan op 9 cm, is gesentreer, en die spasie voor die vertrektyd word met kolletjies gevul (soos ……… 07:30).\n• Die derde tabelstop staan op 14 cm, en die aankomstye is regs in lyn.",
+  "vraag": "Onder die opskrif 'Bus Timetable' in die Uitstappie-dokument staan vier reëls. Op elke reël is die plek, die vertrektyd en die aankomstyd met 'Tab'-karakters geskei. Die eerste tabelstop (2 cm, 'Left') is reeds gestel. Op die liniaal moet die voltooide reëls so lyk:\n• Die middelpunt van elke vertrektyd lê presies by die 9 cm-merk, en die spasie tussen die plek en die vertrektyd is met kolletjies gevul (soos Durban ……… 07:30).\n• Die laaste syfer van elke aankomstyd eindig presies by die 14 cm-merk, sodat die aankomstye se regterkante in 'n reguit lyn onder mekaar staan.\nLei uit hierdie uitleg af watter tabelstoppe nodig is, en stel hulle vir die vier reëls.",
   "antwoord": "Kies die vier reëls → 'Paragraph'-dialoog → 'Tabs…' → 'Tab stop position': 9 cm → 'Alignment': 'Center' → 'Leader': 2 (……) → 'Set' → 'Tab stop position': 14 cm → 'Alignment': 'Right' → 'Set' → 'OK'.",
-  "verduideliking": "'n Tabelstop het drie eienskappe: die posisie, die inlynstelling ('Left', 'Center', 'Right', 'Decimal') en die vuller ('Leader'). Vuller 2 is die kolletjies, 3 die strepies en 4 'n soliede lyn. Jy moet AL vier reëls eers kies, anders kry net een reël die tabelstoppe. Druk 'Set' ná elke tabelstop, anders word net die laaste een gestoor. Punte: die tweede tabelstop se posisie (9 cm), inlynstelling ('Center') en vuller (2), en die derde tabelstop se inlynstelling ('Right'). Algemene foute: spasies tik in plaas van tabelstoppe, die vuller op die derde tabelstop sit, of 'Left' laat staan vir die aankomstye.",
+  "verduideliking": "'n Tabelstop het drie eienskappe: die posisie, die inlynstelling ('Left', 'Center', 'Right', 'Decimal') en die vuller ('Leader'). Vuller 2 is die kolletjies, 3 die strepies en 4 'n soliede lyn. Die vraag noem nie die belyning nie; jy moet hulle uit die uitleg aflei. As die middel van die teks op die merk lê, is dit 'Center'; as die teks by die merk eindig, is dit 'Right' (by 'Left' begin die teks by die merk). Jy moet AL vier reëls eers kies, anders kry net een reël die tabelstoppe. Druk 'Set' ná elke tabelstop, anders word net die laaste een gestoor. Punte: die tweede tabelstop se posisie (9 cm), inlynstelling ('Center') en vuller (2), en die derde tabelstop se inlynstelling ('Right'). Algemene foute: spasies tik in plaas van tabelstoppe, die vuller op die derde tabelstop sit, of 'Left' laat staan vir die aankomstye.",
   "nasienriglyn": [
    {"kriterium": "Tweede tabelstop: posisie 9 cm", "punte": 1},
    {"kriterium": "Tweede tabelstop: inlynstelling 'Center'", "punte": 1},
@@ -492,9 +492,9 @@
   "verduideliking": "Die navraag het die 'BookingDate'-veld nodig om die kriterium op te sit, al vra die vraag net om 'Guest' en 'Amount' te vertoon (jy mag die 'Show'-blokkie van 'BookingDate' afmerk). Datums staan in Access tussen #-tekens. 'Tot en met 31 Mei' sluit 31 Mei in, daarom <=#2026/05/31# of <#2026/06/01#; `Between … And` sluit albei datums in. Die twee helftes word met `And` verbind omdat 'n datum aan albei moet voldoen. Algemene foute: `Or` in plaas van `And` (dan kom AL die besprekings deur), <#2026/05/31# (dan val 31 Mei uit), datums sonder #-tekens of tussen aanhalingstekens, en om die sortering op 'Amount' in plaas van 'Guest' te sit.",
   "nasienriglyn": [
    {"kriterium": "Navraag geskep met die velde Guest, Amount en BookingDate", "punte": 1},
-   {"kriterium": "BookingDate: `Between #2026/03/01#` OF >=#2026/03/01# OF >#2026/02/28#", "punte": 1},
-   {"kriterium": "`And`", "punte": 1},
-   {"kriterium": "#2026/05/31# OF <=#2026/05/31# OF <#2026/06/01#", "punte": 1},
+   {"kriterium": "BookingDate-kriterium, begindatum: `Between #2026/03/01#` OF >=#2026/03/01# OF >#2026/02/28#", "punte": 1},
+   {"kriterium": "BookingDate-kriterium, koppelwoord: `And` (afsonderlike punt)", "punte": 1},
+   {"kriterium": "BookingDate-kriterium, einddatum: #2026/05/31# OF <=#2026/05/31# OF <#2026/06/01#", "punte": 1},
    {"kriterium": "Gesorteer: 'Guest'-veld stygend ('Ascending')", "punte": 1}
   ],
   "bron": {
