@@ -104,18 +104,18 @@ test("Pa-konsole: lewendige status, rooster teenoor werklikheid, surveys woordel
   expect(blocks).toMatch(/◐ gedeeltelik Engels EAT — Engels — letterkunde/);
   expect(blocks).toMatch(/○ gepland Gasvryheidstudie/);
 
-  /* Week (Ma 5 – So 11 Okt): 7 dae × 8 blokke. Wisk. Gelett.: 14 gepland, 2 klaar (Ma + Wo opwarm), 1 gedeeltelik (Ma groen 10/50),
-     2 gemis (Di), 9 nog te doen; 70 van 560 min; 70 sessie-minute. */
+  /* Week (Ma 5 – So 11 Okt): 7 dae × 8 blokke. Wisk. Gelett.: 12 gepland (plan v3: geen WG op So 11 Okt), 2 klaar (Ma + Wo opwarm), 1 gedeeltelik (Ma groen 10/50),
+     2 gemis (Di), 7 nog te doen; 70 van 480 min; 70 sessie-minute. */
   await expect(pa.locator("#week-title")).toContainText("Week");
   const week = flat(await pa.locator("#week-table").innerText());
-  expect(week).toMatch(/Wiskundige Geletterdheid 14 2 1 2 9 70 \/ 560 70/);
+  expect(week).toMatch(/Wiskundige Geletterdheid 12 2 1 2 7 70 \/ 480 70/);
   /* Engels: 7 gepland; Ma klaar (45), Di gemis, Wo gedeeltelik (lewendig), 4 nog te doen */
   expect(week).toMatch(/Engels EAT 7 1 1 1 4 /);
-  /* RTT: 14 gepland (7 rtt-or-third + 7 RTT V1-oefenblokke wat die ou geel-blok vervang het); Di klaar via blok-koppeling (70/70),
+  /* RTT: 16 gepland (6 rtt-or-third + 6 RTT V1-oefenblokke Ma–Sa, plus 4 RTT V1-blokke op So 11 Okt volgens plan v3); Di klaar via blok-koppeling (70/70),
      3 gemis (Ma + Di se oefenblok, Ma se diep werk), 10 nog te doen */
-  expect(week).toMatch(/RTT \(CAT\) 14 1 0 3 10 70 \/ 980 70/);
-  /* Afrikaans: Di gedeeltelik (40/80), Ma gemis */
-  expect(week).toMatch(/Afrikaans Huistaal 7 0 1 1 5 40 \/ 560 40/);
+  expect(week).toMatch(/RTT \(CAT\) 16 1 0 3 12 70 \/ 1215 70/);
+  /* Afrikaans: Di gedeeltelik (40/80), Ma gemis; plan v3: geen Afrikaans op So 11 Okt */
+  expect(week).toMatch(/Afrikaans Huistaal 6 0 1 1 4 40 \/ 480 40/);
   const days = flat(await pa.locator("#week-days").innerText());
   expect(days).toMatch(/Ma. 5 Okt. 8 2 1 5/);
   expect(days).toMatch(/Di. 6 Okt. 8 1 1 6/);

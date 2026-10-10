@@ -34,6 +34,53 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
           detail: "Kies 'n oefenvraag in Oefenvrae (RTT V1) en doen dit in Excel, Word of Access."
         };
 
+  /* Plan v3 (Hanno, 10 Okt): So 11 en Ma 12 Okt is RTT V1-fokusdae voor die praktiese eksamen (Di 13 Okt).
+     Geen Wiskundige Geletterdheid, Gasvryheid, Afrikaans of Toerisme op hierdie twee dae nie.
+     Een RTT V1-blok per dag dra die `${dateStr}-geel`-id, sodat completedBlocks stabiel bly. */
+  const VASTE_PLANNE = {
+    "2026-10-11": [
+      ["geel", "rooi", "rtt", "09:00", "12:00", "RTT V1 — volledig getimed (DBE Junie 2026 V1, met datalêers)", "Eksamentoestande: 3 uur, Praktiese modus aan, stoor gereeld. Gebruik die DBE-datalêers."],
+      ["middag", "break", "break", "12:00", "13:00", "Middagete en rus", "Weg van die skerm. Eet, beweeg, drink water."],
+      ["merk", "rooi", "rtt", "13:00", "14:30", "RTT V1 — merk met die nasienriglyn", "Merk eerlik met die DBE-nasienriglyn. Elke fout gaan in die Foutbank."],
+      ["db-html", "rooi", "rtt", "15:00", "16:15", "RTT V1 — DBE Nov 2024 V1: databasis (V5) en HTML (V6), getimed", "Getimed soos in die eksamen. Merk daarna met die nasienriglyn."],
+      ["oefenvrae", "rooi", "rtt", "16:30", "17:00", "Oefenvrae: RTT V1 (30 items)", "Kies items in Oefenvrae (RTT V1) wat jy nog nie reg het nie."],
+      ["engels", "geel", "engels", "17:00", "17:30", "Engels V3 — lees DBE Nov 2025 EAT V3 en die rubrieke", "Lees die vraestel en rubrieke; let op wat elke teksoort vra."],
+      ["slot", "slot", "foutbank", "17:35", "17:55", "Foutlog + môre se plan", "Top-3 foute van vandag. Kyk môre se blokke."]
+    ],
+    "2026-10-12": [
+      ["geel", "rooi", "rtt", "09:00", "10:30", "RTT V1 — Woordverwerking (V1 en V2) uit DBE Nov 2023 V1, getimed", "Getimed, Praktiese modus aan. Merk daarna met die nasienriglyn."],
+      ["sigblad", "rooi", "rtt", "10:45", "12:00", "RTT V1 — Sigblad (V3 en V4) uit DBE Junie 2025 V1, getimed en merk", "Getimed, dan merk met die nasienriglyn. Foute in die Foutbank."],
+      ["middag", "break", "break", "12:00", "13:00", "Middagete en rus", "Weg van die skerm. Eet, beweeg, drink water."],
+      ["db-html", "rooi", "rtt", "13:00", "14:00", "RTT V1 — Databasis (V5) en HTML (V6) uit DBE Junie 2025 V1, getimed en merk", "Getimed, dan merk met die nasienriglyn."],
+      ["foutbank", "rooi", "foutbank", "14:15", "15:15", "Herdoen al die Foutbank-items van die naweek", "Doen elke foutbank-item weer, toe-boek, en merk dit eers dan as reg."],
+      ["kontrolelys", "rooi", "rtt", "15:30", "16:00", "Eksamenkontrolelys", "Lêername, gereeld stoor, streekinstellings en lysskeier, Notepad++ vir HTML."],
+      ["engels", "geel", "engels", "16:15", "17:00", "Engels V3 — kort stuk: transaksionele teks (DBE Junie 2026 EAT V3 Afd C)", "30 min getimed skryf, dan 15 min selfkontrole met die rubriek."],
+      ["slot", "slot", "foutbank", "17:05", "17:15", "Aand: niks nuuts nie. Pak die eksamentas en slaap vroeg.", "Môre 09:00 is die RTT/CAT-praktiese. Jy is gereed."]
+    ]
+  };
+  if (VASTE_PLANNE[dateStr]) {
+    const mins = (a, b) => {
+      const [ah, am] = a.split(":").map(Number);
+      const [bh, bm] = b.split(":").map(Number);
+      return bh * 60 + bm - (ah * 60 + am);
+    };
+    const blocks = VASTE_PLANNE[dateStr].map(([suffix, kind, subjectSlug, start, end, title, detail]) => ({
+      id: `${dateStr}-${suffix}`,
+      kind,
+      subjectSlug,
+      minutes: mins(start, end),
+      start,
+      end,
+      title,
+      detail
+    }));
+    return {
+      date: dateStr,
+      blocks,
+      totalMinutes: blocks.filter((b) => b.kind !== "break").reduce((s, b) => s + b.minutes, 0)
+    };
+  }
+
   /* Sondag 27 Sep: Springbokke vs Australië 11:30–13:45 */
   if (dateStr === "2026-09-27") {
     const blocks = [
