@@ -177,15 +177,15 @@
     const img = c ? WALLIE.lessonImg(slug, c.id) : WALLIE.lessonImg(slug, "cover");
     const werk = ctx.werk || null;
     const opsomming = werkOpsomming(b, werk);
-    /* Met ’n vraestel is DIE VRAESTEL die taak; die les-kaart is net ekstra. */
+    /* Die LES is die hoofsaak op elke kaart, vir elke vak. ’n Vraestel kom as ’n ekstra reël daaronder
+       by — dit vervang nooit die les nie. */
     const task = werk ? `${b.title} · ${DBE()?.werkLabel(werk) || ""}` : c ? `${b.title} · ${c.titel}` : b.title;
     const label = blockLabel(b);
-    const hoofReel = opsomming
-      ? `<p class="md-concept md-werk"><small>${werk ? "Vraestel" : "Lêers"}</small>${esc(opsomming)}</p>` +
-        (c ? `<p class="md-ekstra">Ekstra: kort les — ${esc(c.titel)}</p>` : "")
-      : c
+    const hoofReel =
+      (c
         ? `<p class="md-concept"><small>Wat leer ek?</small>${esc(c.titel)}</p>`
-        : `<p class="md-concept">${esc(b.detail)}</p>`;
+        : `<p class="md-concept">${esc(b.detail)}</p>`) +
+      (opsomming ? `<p class="md-werk"><small>${werk ? "Vraestel" : "Lêers"}</small>${esc(opsomming)}</p>` : "");
     return `
       <li class="md-card kind-${b.kind} ${done ? "done" : ""}" data-id="${b.id}">
         <button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c?.id || ""}" aria-label="Kyk les: ${esc(c?.titel || subjectName(slug))}">
@@ -255,8 +255,8 @@
           <p class="next-kicker"><span class="zone-tag ${next.kind}">${KIND_LABEL[next.kind] || next.kind}</span> Volgende blok · ${time}${next.minutes} min</p>
           <h2>${esc(subjectName(next.subjectSlug))}</h2>
           <p class="next-titel">${esc(next.title)}</p>
-          ${opsomming ? `<p class="next-concept next-werk">${esc(opsomming)}</p>` : ""}
-          ${c && !opsomming ? `<p class="next-concept">${esc(c.titel)}</p><ul class="next-cues">${c.cues.slice(0, 3).map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
+          ${c ? `<p class="next-concept">${esc(c.titel)}</p><ul class="next-cues">${c.cues.slice(0, 3).map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
+          ${opsomming ? `<p class="next-werk"><small>${werk ? "Vraestel" : "Lêers"}</small>${esc(opsomming)}</p>` : ""}
           <div class="md-actions">
             <button type="button" class="btn big primary js-start" data-block="${next.id}" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" data-min="${next.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin nou</button>
             ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${next.subjectSlug}" data-concept="${c.id}">Kyk les eers</button>` : ""}
@@ -434,23 +434,8 @@
     }
     /* Dieselfde kaart as die blok se kaart op die Missie-skerm (vas per blok-id). */
     const c = (conceptId && lesson(slug).concepts.find((x) => x.id === conceptId)) || pickConcept(slug, 0, sessieBlokId);
-    /* Is daar ’n vraestel vir hierdie blok, dan is die les net ekstra en toegevou. */
-    const ekstraLes = !$("#session-werk")?.hidden;
-    el.innerHTML = ekstraLes
-      ? `<details class="session-les-ekstra">
-          <summary>Ekstra: kort les</summary>
-          <div class="session-lesson-main">
-            <button type="button" class="session-lesson-img open-lesson" data-slug="${slug}" data-concept="${c.id}" aria-label="Maak les groot oop">
-              <img src="${WALLIE.lessonImg(slug, c.id)}" alt="${esc(c.titel)}" loading="lazy" />
-            </button>
-            <div>
-              <h3>${esc(c.titel)}</h3>
-              <ul class="next-cues">${c.cues.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>
-              <button type="button" class="btn big ghost open-lesson" data-slug="${slug}" data-concept="${c.id}" data-mode="toe">Toe-boek nou</button>
-            </div>
-          </div>
-        </details>`
-      : `
+    /* Die les staan altyd oop op die sessieskerm — ook by ’n blok met ’n DBE-vraestel. */
+    el.innerHTML = `
       <div class="panel-head"><h2>Les vir hierdie sessie</h2><span class="hint">Oop hier binne — dit tel nie as wegkyk nie.</span></div>
       <div class="session-lesson-main">
         <button type="button" class="session-lesson-img open-lesson" data-slug="${slug}" data-concept="${c.id}" aria-label="Maak les groot oop">

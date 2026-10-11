@@ -147,11 +147,10 @@ test("3. So 11 Okt: eerste toets-blok wys drie knoppies, memo bly toe tot die ty
   await expect(memo).not.toHaveAttribute("href", /./);
   await expect(paneel).toContainText("Memo sluit oop wanneer die tyd verstreke is");
 
-  /* Die les is nou net ekstra, toegevou — nie die hooftaak nie */
-  const ekstra = page.locator("#session-lesson details.session-les-ekstra");
-  await expect(ekstra).toHaveCount(1);
-  await expect(ekstra).not.toHaveAttribute("open", /.*/);
-  await expect(ekstra.locator("summary")).toHaveText("Ekstra: kort les");
+  /* Die les staan oop langs die vraestel — nie toegevou nie (sien tests/e2e/les-terug.spec.js) */
+  await expect(page.locator("#session-lesson .session-lesson-img")).toBeVisible();
+  await expect(page.locator("#session-lesson .next-cues > li").first()).toBeVisible();
+  await expect(page.locator("#session-lesson details")).toHaveCount(0);
 
   /* 20 min verby → die sessie eindig en die memo sluit oop */
   await page.clock.fastForward(20 * 60 * 1000 + 2000);
@@ -393,7 +392,7 @@ test("7. drie herlaaie verander niks: elke blok hou sy les-kaart en sy werk", as
     );
   }
 
-  /* Ook die sessieskerm se "Ekstra: kort les" is dieselfde kaart as die blok se kaart. */
+  /* Ook die sessieskerm se les is dieselfde kaart as die blok se kaart. */
   const blok = eerste.find((k) => k.id === "2026-10-11-diagnose");
   await page.locator('#block-list .md-card[data-id="2026-10-11-diagnose"] .start-block').click();
   await runUntil(page, async () => mock.byKind("start").length === 1, { label: "sessie begin" });
