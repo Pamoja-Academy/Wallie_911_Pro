@@ -1,0 +1,45 @@
+/* Skryfwerk (V3): gebruik die bestaande veranderlikes uit app.css. Alles moet by 390 px pas sonder
+   horisontale rol — vandaar overflow-wrap op elke blok wat lang teks of lang woorde kan bevat. */
+#skryfwerk-root { max-width: 60rem; }
+#skryfwerk-root h1 { font-family: var(--display); margin: 0 0 0.5rem; }
+.sw-afdeling { font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 1rem 0 0.4rem; }
+.sw-groep h2 { overflow-wrap: anywhere; }
+.sw-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.sw-item {
+  display: flex; flex-direction: column; gap: 0.25rem; width: 100%; min-height: 48px; padding: 0.6rem 0.8rem;
+  text-align: left; font: inherit; color: var(--text); background: var(--bg-2);
+  border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer;
+}
+.sw-item:hover, .sw-item:focus-visible { border-color: var(--accent); }
+.sw-kop { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.sw-id { font-weight: 700; color: var(--accent); }
+.sw-teksoort { color: var(--text); font-size: 0.9rem; overflow-wrap: anywhere; }
+.sw-merk { margin-left: auto; font-weight: 700; font-size: 1.1rem; }
+.sw-reg { color: var(--ok); }
+.sw-gedeeltelik { color: var(--geel); }
+.sw-fout { color: var(--danger); }
+.sw-opsomming { color: var(--muted); font-size: 0.85rem; overflow-wrap: anywhere; }
+
+.sw-nav .btn, .sw-nasien .btn, .sw-memo-knoppie { min-height: 44px; }
+.sw-titel { font-size: 1.1rem; overflow-wrap: anywhere; }
+.sw-vraag, .sw-teks { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+.sw-vraag { margin-bottom: 0.75rem; }
+.sw-bron { margin: 0.5rem 0 1rem; color: var(--muted); font-size: 0.9rem; overflow-wrap: anywhere; }
+.sw-memo { margin-top: 1rem; padding: 0.75rem 1rem; background: var(--bg-2); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); }
+.sw-memo[hidden] { display: none; }
+.sw-blok h3, .sw-nasien h3 { font-size: 0.95rem; margin: 0.75rem 0 0.35rem; color: var(--accent); }
+.sw-punte, .sw-kontrolelys, .sw-bande { margin: 0; padding-left: 1.2rem; overflow-wrap: anywhere; }
+.sw-kontrolelys { list-style: none; padding-left: 0; display: grid; gap: 0.3rem; }
+.sw-kontrole { display: flex; gap: 0.5rem; align-items: flex-start; cursor: pointer; }
+.sw-kontrole input { margin-top: 0.3rem; flex: 0 0 auto; }
+.sw-woordtelling { margin: 0 0 0.35rem; color: var(--muted); font-size: 0.85rem; }
+.sw-rubriek-naam { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.9rem; overflow-wrap: anywhere; }
+.sw-kriterium { margin-bottom: 0.6rem; }
+.sw-kriterium h4 { margin: 0 0 0.25rem; font-size: 0.9rem; }
+.sw-bande { list-style: none; padding-left: 0; display: grid; gap: 0.25rem; font-size: 0.9rem; }
+.sw-bande li { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.sw-band-vlak { font-weight: 700; color: var(--accent); flex: 0 0 auto; }
+.sw-band-kern { color: var(--muted); min-width: 0; overflow-wrap: anywhere; }
+.sw-nasien { margin-top: 1.25rem; }
+.sw-gestoor { margin: 0.25rem 0 0; color: var(--ok); font-weight: 600; min-height: 1.4em; }
+@media (max-width: 480px) { .sw-nav .btn { flex: 1 1 auto; } }
