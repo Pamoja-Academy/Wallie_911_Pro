@@ -34,13 +34,107 @@
     return progress()[`${slug}:${id}`]?.status || null;
   }
 
-  function pickConcept(slug, occurrence = 0) {
+  /* Les-kaart sonder herhaling. Die verskuiwing is GLOBAAL: ’n teller in die geskiedenis wat met elke
+     nuwe kaart aanskuif. Voorheen het die eerste blok van ELKE dag konsep [0] gewys — Wallie het 10 en
+     11 Okt presies dieselfde kaart gekry. Die kaart van ’n blok word een keer gekies en gestoor, dus
+     verander ’n herlaai (of ’n "reg"-merk) dit nie. */
+  function pickConcept(slug, occurrence = 0, blockId = null) {
     const L = lesson(slug);
     if (!L) return null;
+    const g = WALLIE.rttGeskiedenis;
+    if (blockId && g) {
+      const vas = g.kaartVanBlok(blockId);
+      const c = vas ? L.concepts.find((x) => x.id === vas) : null;
+      if (c) return c;
+    }
+    const basis = (g ? g.teller(slug) : 0) + (blockId ? 0 : occurrence);
     const open = L.concepts.filter((c) => statusOf(slug, c.id) !== "reg");
-    if (open.length) return open[occurrence % open.length];
-    const day = Math.floor(Date.now() / 86400000);
-    return L.concepts[(day + occurrence) % L.concepts.length];
+    /* Met net een oop konsep sou elke blok dieselfde kaart kry — dan roteer ons oor al die konsepte. */
+    const poel = open.length > 1 ? open : L.concepts;
+    const keuse = poel[((basis % poel.length) + poel.length) % poel.length];
+    if (blockId && g && keuse) g.noteKaart(blockId, slug, keuse.id);
+    return keuse;
+  }
+
+  /* ---------- DBE-werk per blok ---------- */
+
+  const DBE = () => WALLIE.DBE || null;
+  let werkKas = { sleutel: null, kaart: null };
+
+  /* Elke blok se werk, in rooster-orde opgelos sodat twee blokke langs mekaar nooit dieselfde werk kry nie. */
+  function werkKaart(state) {
+    const blocks = state?.blocks || [];
+    const dag = state?.planDate || WALLIE.todayKey();
+    const sleutel = `${dag}|${blocks.map((b) => b.id).join("|")}`;
+    if (werkKas.sleutel === sleutel && werkKas.kaart) return werkKas.kaart;
+    const kaart = {};
+    const gebruik = [];
+    let vorige = null;
+    blocks.forEach((b) => {
+      const w = WALLIE.werkVirBlok?.(b, { dag, vorige, gebruik }) || null;
+      if (!w) return;
+      kaart[b.id] = w;
+      gebruik.push(w);
+      vorige = w;
+    });
+    werkKas = { sleutel, kaart };
+    return kaart;
+  }
+
+  function vergeetWerkKas() {
+    werkKas = { sleutel: null, kaart: null };
+  }
+
+  function werkVan(blockId) {
+    const st = appState();
+    if (!st || !blockId) return null;
+    return werkKaart(st)[blockId] || null;
+  }
+
+  function blokById(blockId) {
+    const st = appState();
+    return (st?.blocks || []).find((b) => b.id === blockId) || null;
+  }
+
+  /* Geen blok gekies (bv. ná ’n herlaai): die blok waarin ons NOU is, vir die vak op die skerm. */
+  function huidigeBlok() {
+    const st = appState();
+    if (!st) return null;
+    const slug = $("#session-subject")?.value || "rtt";
+    const nou = new Date().toTimeString().slice(0, 5);
+    return (
+      (st.blocks || []).find(
+        (b) => b.subjectSlug === slug && b.kind !== "break" && b.start && b.end && b.start <= nou && nou <= b.end
+      ) || null
+    );
+  }
+
+  /* "Doen: V3 (19) · V4 (22) — 41 punte" */
+  function vraeReel(werk, blok) {
+    const d = DBE();
+    if (!d || !werk) return "";
+    const nrs = d.vraagNommers(werk);
+    const punte = d.punte(werk, blok);
+    if (!nrs.length && punte == null) return "";
+    const wysPer = nrs.length > 1;
+    const dele = nrs.map((n) => {
+      const p = wysPer ? d.vraagPunte(werk, n) : null;
+      return p ? `${d.vraagLabel(n)} (${p})` : d.vraagLabel(n);
+    });
+    const tot = punte != null ? ` — ${punte} punte` : "";
+    return `<p class="werk-vrae"><strong>Doen:</strong> ${esc(dele.join(" · "))}${tot}</p>`;
+  }
+
+  /* Een reël vir die matchday-kaart: "DBE Mei/Junie 2026 V1 (Afr) · V5 · 35 punte" */
+  function werkOpsomming(blok, werk) {
+    const d = DBE();
+    if (!d) return "";
+    if (werk) {
+      const punte = d.punte(werk, blok);
+      return `${d.werkLabel(werk)}${punte != null ? ` · ${punte} punte` : ""}`;
+    }
+    if ((blok?.werk_ekstra || []).length) return `${blok.werk_ekstra.length} vraestelle + datalêers`;
+    return "";
   }
 
   function masteredCount() {
@@ -57,12 +151,14 @@
 
   /* ---------- Missie ---------- */
 
+  /* Die blok se eie naam op die kaart: "Vak — naam" wys net die naam (die vak staan al in die opskrif),
+     ’n titel sonder streep wys heeltemal (die plan v4-blokke heet bv. "Jun 2026 V5 Databasis"). */
   function blockLabel(b) {
     const parts = String(b.title || "").split(" — ");
-    return parts.length > 1 ? parts.slice(1).join(" — ") : "";
+    return parts.length > 1 ? parts.slice(1).join(" — ") : String(b.title || "");
   }
 
-  function matchdayCard(b, done, occurrence) {
+  function matchdayCard(b, done, occurrence, ctx = {}) {
     const kindLabel = KIND_LABEL[b.kind] || b.kind;
     const time = b.start && b.end ? `${b.start}–${b.end}` : `${b.minutes} min`;
     if (b.kind === "break") {
@@ -77,10 +173,19 @@
       </li>`;
     }
     const slug = b.subjectSlug;
-    const c = pickConcept(slug, occurrence);
+    const c = pickConcept(slug, occurrence, b.id);
     const img = c ? WALLIE.lessonImg(slug, c.id) : WALLIE.lessonImg(slug, "cover");
-    const task = c ? `${b.title} · ${c.titel}` : b.title;
+    const werk = ctx.werk || null;
+    const opsomming = werkOpsomming(b, werk);
+    /* Met ’n vraestel is DIE VRAESTEL die taak; die les-kaart is net ekstra. */
+    const task = werk ? `${b.title} · ${DBE()?.werkLabel(werk) || ""}` : c ? `${b.title} · ${c.titel}` : b.title;
     const label = blockLabel(b);
+    const hoofReel = opsomming
+      ? `<p class="md-concept md-werk"><small>${werk ? "Vraestel" : "Lêers"}</small>${esc(opsomming)}</p>` +
+        (c ? `<p class="md-ekstra">Ekstra: kort les — ${esc(c.titel)}</p>` : "")
+      : c
+        ? `<p class="md-concept"><small>Wat leer ek?</small>${esc(c.titel)}</p>`
+        : `<p class="md-concept">${esc(b.detail)}</p>`;
     return `
       <li class="md-card kind-${b.kind} ${done ? "done" : ""}" data-id="${b.id}">
         <button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c?.id || ""}" aria-label="Kyk les: ${esc(c?.titel || subjectName(slug))}">
@@ -94,7 +199,7 @@
             ${label ? `<span class="md-label">${esc(label)}</span>` : ""}
           </div>
           <h3>${esc(subjectName(slug))}</h3>
-          ${c ? `<p class="md-concept"><small>Wat leer ek?</small>${esc(c.titel)}</p>` : `<p class="md-concept">${esc(b.detail)}</p>`}
+          ${hoofReel}
           <div class="md-actions">
             <button type="button" class="btn big primary start-block" data-block="${b.id}" data-slug="${slug}" data-concept="${c?.id || ""}" data-min="${b.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin ${b.minutes} min</button>
             ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${slug}" data-concept="${c.id}">Kyk les</button>` : ""}
@@ -106,12 +211,13 @@
 
   function renderBlocks(state) {
     const seen = {};
+    const kaart = werkKaart(state);
     return state.blocks
       .filter((b) => !WALLIE.isVerborgeVak(b.subjectSlug))
       .map((b) => {
         const occ = seen[b.subjectSlug] || 0;
         seen[b.subjectSlug] = occ + 1;
-        return matchdayCard(b, !!state.completedBlocks[b.id], occ);
+        return matchdayCard(b, !!state.completedBlocks[b.id], occ, { werk: kaart[b.id] || null });
       })
       .join("");
   }
@@ -135,9 +241,11 @@
       return;
     }
     const seen = state.blocks.filter((b) => b.subjectSlug === next.subjectSlug).indexOf(next);
-    const c = pickConcept(next.subjectSlug, Math.max(0, seen));
+    const c = pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
+    const werk = werkKaart(state)[next.id] || null;
+    const opsomming = werkOpsomming(next, werk);
     const time = next.start && next.end ? `${next.start}–${next.end} · ` : "";
-    const task = c ? `${next.title} · ${c.titel}` : next.title;
+    const task = werk ? `${next.title} · ${DBE()?.werkLabel(werk) || ""}` : c ? `${next.title} · ${c.titel}` : next.title;
     el.innerHTML = `
       <div class="next-card kind-${next.kind}">
         <button type="button" class="next-img open-lesson" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" aria-label="Kyk les">
@@ -146,7 +254,9 @@
         <div class="next-body">
           <p class="next-kicker"><span class="zone-tag ${next.kind}">${KIND_LABEL[next.kind] || next.kind}</span> Volgende blok · ${time}${next.minutes} min</p>
           <h2>${esc(subjectName(next.subjectSlug))}</h2>
-          ${c ? `<p class="next-concept">${esc(c.titel)}</p><ul class="next-cues">${c.cues.slice(0, 3).map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
+          <p class="next-titel">${esc(next.title)}</p>
+          ${opsomming ? `<p class="next-concept next-werk">${esc(opsomming)}</p>` : ""}
+          ${c && !opsomming ? `<p class="next-concept">${esc(c.titel)}</p><ul class="next-cues">${c.cues.slice(0, 3).map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
           <div class="md-actions">
             <button type="button" class="btn big primary js-start" data-block="${next.id}" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" data-min="${next.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin nou</button>
             ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${next.subjectSlug}" data-concept="${c.id}">Kyk les eers</button>` : ""}
@@ -211,9 +321,108 @@
     return `<div class="concept-strip">${conceptTiles(slug)}</div>`;
   }
 
-  /* ---------- Sessie ---------- */
+  /* ---------- Sessie: die vraestel ---------- */
 
   let pendingConcept = null;
+  /* Watter blok se werk wys die sessieskerm nou, en vir watter blokke is die memo al oop? */
+  let sessieBlokId = null;
+  const memoOop = new Set();
+  let memoTimer = null;
+
+  /* Memo bly toe tydens ’n getimede toets; by merk/herdoen (en enige ander blok) is dit dadelik oop. */
+  function memoGesluit(blok) {
+    if (!blok || blok.soort !== "toets") return false;
+    if (memoOop.has(blok.id)) return false;
+    const links = WALLIE.proctor?.active ? WALLIE.proctor.timeLeft() : null;
+    if (links != null && links <= 0) return false;
+    /* Die blok se venster is verby (bv. die sessie is vroeër gestop): die memo mag oop. */
+    const nou = new Date().toTimeString().slice(0, 5);
+    if (!WALLIE.proctor?.active && blok.end && nou > blok.end) return false;
+    return true;
+  }
+
+  function werkKnoppies(werk, gesluit) {
+    const sk = DBE()?.skakels(werk);
+    if (!sk) return "";
+    const memo = gesluit
+      ? `<a class="btn ghost werk-knoppie is-gesluit" data-werk="memo" role="button" aria-disabled="true">Memo</a>`
+      : `<a class="btn ghost werk-knoppie" data-werk="memo" href="${esc(sk.memo)}" target="_blank" rel="noopener noreferrer">Memo</a>`;
+    return `
+        <div class="btn-row werk-knoppies">
+          <a class="btn primary werk-knoppie" data-werk="vraestel" href="${esc(sk.vraestel)}" target="_blank" rel="noopener noreferrer">Vraestel (PDF)</a>
+          <a class="btn werk-knoppie" data-werk="data" href="${esc(sk.data)}" target="_blank" rel="noopener noreferrer">Datalêers</a>
+          ${memo}
+        </div>`;
+  }
+
+  function werkBlok(werk, blok, { hoof = false, gesluit = false } = {}) {
+    const d = DBE();
+    const sk = d?.skakels(werk);
+    if (!sk) return "";
+    return `
+      <div class="${hoof ? "werk-hoof" : "werk-ekstra"}">
+        <p class="werk-titel">${esc(d.werkLabel(werk))}</p>
+        ${hoof ? vraeReel(werk, blok) : ""}
+        ${werkKnoppies(werk, gesluit)}
+        <p class="hint werk-data-nota">${esc(sk.datatipe)} — ${esc(d.DATA_NOTA)}</p>
+        ${hoof && gesluit ? `<p class="hint werk-memo-wenk">Memo sluit oop wanneer die tyd verstreke is</p>` : ""}
+      </div>`;
+  }
+
+  /* Die vraestel-paneel: drie knoppies (vraestel, datalêers, memo) vir die blok se eie werk. */
+  function renderSessionWerk(blockId) {
+    const el = $("#session-werk");
+    if (!el) return;
+    if (blockId) sessieBlokId = blockId;
+    const blok = blokById(sessieBlokId) || huidigeBlok();
+    if (blok) sessieBlokId = blok.id;
+    const werk = blok ? werkVan(blok.id) : null;
+    const ekstra = (blok?.werk_ekstra || []).filter((w) => DBE()?.skakels(w));
+    const hoof = DBE()?.skakels(werk) ? werk : null;
+    if (!blok || (!hoof && !ekstra.length)) {
+      el.hidden = true;
+      el.innerHTML = "";
+      stopMemoTimer();
+      return;
+    }
+    const gesluit = memoGesluit(blok);
+    el.hidden = false;
+    el.innerHTML = `
+      <div class="panel-head"><h2>Vandag se vraestel</h2><span class="hint">Amptelike DBE-lêers · maak in ’n nuwe oortjie oop</span></div>
+      <p class="werk-blok-titel">${esc(blok.title)}</p>
+      ${hoof ? werkBlok(hoof, blok, { hoof: true, gesluit }) : ""}
+      ${ekstra.length ? `<p class="werk-ekstra-kop">${hoof ? "Ook hierdie blok:" : "Laai alles hier af:"}</p>` : ""}
+      ${ekstra.map((w) => werkBlok(w, blok)).join("")}`;
+    if (gesluit) startMemoTimer();
+    else stopMemoTimer();
+  }
+
+  function startMemoTimer() {
+    if (memoTimer) return;
+    memoTimer = setInterval(() => {
+      const blok = blokById(sessieBlokId);
+      if (!blok) return;
+      if (!memoGesluit(blok)) {
+        memoOop.add(blok.id);
+        renderSessionWerk();
+      }
+    }, 1000);
+  }
+
+  function stopMemoTimer() {
+    if (memoTimer) clearInterval(memoTimer);
+    memoTimer = null;
+  }
+
+  function onSessionEnd(outcome) {
+    const blok = blokById(sessieBlokId);
+    /* Die tyd is om: die memo mag nou oop (dit is die hele punt van ’n getimede blok). */
+    if (blok && outcome === "tyd_klaar") memoOop.add(blok.id);
+    vergeetWerkKas();
+    renderSessionWerk();
+  }
+
+  /* ---------- Sessie: die les ---------- */
 
   function renderSessionLesson(slug, conceptId) {
     const el = $("#session-lesson");
@@ -223,8 +432,25 @@
       el.innerHTML = "";
       return;
     }
-    const c = (conceptId && lesson(slug).concepts.find((x) => x.id === conceptId)) || pickConcept(slug);
-    el.innerHTML = `
+    /* Dieselfde kaart as die blok se kaart op die Missie-skerm (vas per blok-id). */
+    const c = (conceptId && lesson(slug).concepts.find((x) => x.id === conceptId)) || pickConcept(slug, 0, sessieBlokId);
+    /* Is daar ’n vraestel vir hierdie blok, dan is die les net ekstra en toegevou. */
+    const ekstraLes = !$("#session-werk")?.hidden;
+    el.innerHTML = ekstraLes
+      ? `<details class="session-les-ekstra">
+          <summary>Ekstra: kort les</summary>
+          <div class="session-lesson-main">
+            <button type="button" class="session-lesson-img open-lesson" data-slug="${slug}" data-concept="${c.id}" aria-label="Maak les groot oop">
+              <img src="${WALLIE.lessonImg(slug, c.id)}" alt="${esc(c.titel)}" loading="lazy" />
+            </button>
+            <div>
+              <h3>${esc(c.titel)}</h3>
+              <ul class="next-cues">${c.cues.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>
+              <button type="button" class="btn big ghost open-lesson" data-slug="${slug}" data-concept="${c.id}" data-mode="toe">Toe-boek nou</button>
+            </div>
+          </div>
+        </details>`
+      : `
       <div class="panel-head"><h2>Les vir hierdie sessie</h2><span class="hint">Oop hier binne — dit tel nie as wegkyk nie.</span></div>
       <div class="session-lesson-main">
         <button type="button" class="session-lesson-img open-lesson" data-slug="${slug}" data-concept="${c.id}" aria-label="Maak les groot oop">
@@ -239,7 +465,9 @@
       <div class="concept-strip">${conceptTiles(slug, c.id)}</div>`;
   }
 
-  function onSessionStart(slug) {
+  function onSessionStart(slug, blockId) {
+    vergeetWerkKas();
+    renderSessionWerk(blockId || null);
     renderSessionLesson(slug, pendingConcept?.slug === slug ? pendingConcept.id : null);
     pendingConcept = null;
   }
@@ -351,7 +579,10 @@
     if (active === "view-missie") WALLIE.app?.renderMissie?.();
     if (active === "view-leer") renderLeer();
     if (active === "view-vakke") WALLIE.app?.renderVakke?.();
-    if (active === "view-sessie") renderSessionLesson();
+    if (active === "view-sessie") {
+      renderSessionWerk();
+      renderSessionLesson();
+    }
   }
 
   /* ---------- Gebeure ---------- */
@@ -448,7 +679,12 @@
     renderNextUp,
     renderLeer,
     renderSessionLesson,
+    renderSessionWerk,
+    werkVan,
+    werkKaart,
+    vergeetWerkKas,
     onSessionStart,
+    onSessionEnd,
     subjectStrip,
     masteredCount,
     openViewer,

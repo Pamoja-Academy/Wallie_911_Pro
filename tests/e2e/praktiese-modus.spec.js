@@ -9,7 +9,10 @@ const { MockBackend } = require("./mock-backend");
 const { boot, runUntil, hideTab, showTab, shot, expectNoLeaks, T0 } = require("./helpers");
 
 const FIXTURE = path.join(__dirname, "..", "fixtures", "sync-payload-baseline.json");
+/* Die merk noem sedert plan v4 ook WATTER DBE-werk die blok is ("· <werk-id>"), sodat ’n herbegin nooit
+   net die kaal merk wys nie. Die 9 Okt-blok kry sy werk uit die rotasie. */
 const MERK = "Praktiese blok: RTT V1";
+const MERK_PATROON = /^Praktiese blok: RTT V1(?: · [\w.\- ,]+)?$/;
 const VB_KEY = "wallie911_vraebank_v1";
 const MAX_MS = (3 * 60 + 15) * 60 * 1000;
 
@@ -83,7 +86,9 @@ for (const vp of VIEWPORTS) {
       const r = await page.evaluate(() => Praktiese.start());
       expect(r.ok).toBe(true);
       expect(await page.evaluate(() => Praktiese.active())).toBe(true);
-      await expect(page.locator("#session-task")).toHaveValue(MERK);
+      await expect(page.locator("#session-task")).toHaveValue(MERK_PATROON);
+      const merk = await page.locator("#session-task").inputValue();
+      expect(merk).toContain(MERK);
 
       const hbBefore = mock.byKind("heartbeat").length;
       const visBefore = mock.byKind("visibility").length;
@@ -102,12 +107,12 @@ for (const vp of VIEWPORTS) {
 
       /* Die merk loop deur die BESTAANDE taak-veld in die volgende hartklop */
       const hbs = mock.byKind("heartbeat");
-      expect(hbs[hbs.length - 1].body.p.task).toBe(MERK);
+      expect(hbs[hbs.length - 1].body.p.task).toBe(merk);
       await page.screenshot({ path: shot(`fase1/praktiese-aktief-${vp.name}.png`) });
 
       await page.locator("#end-session").click();
       await runUntil(page, async () => mock.byKind("end").length === 1, { label: "einde afgelewer" });
-      expect(mock.byKind("end")[0].body.p).toMatchObject({ task: MERK, warnings: 0, locks: 0 });
+      expect(mock.byKind("end")[0].body.p).toMatchObject({ task: merk, warnings: 0, locks: 0 });
       await page.clock.runFor(5000);
       expectNoLeaks(mock);
     });
@@ -166,6 +171,7 @@ for (const vp of VIEWPORTS) {
       await page.clock.runFor(60000);
       await page.reload();
       expect(await page.evaluate(() => Praktiese.active())).toBe(true);
+      /* Geen sessie, geen blok → geen werk bekend: presies die ou merk */
       await expect(page.locator("#session-task")).toHaveValue(MERK);
       const left = await page.evaluate(() => Praktiese.remainingMs());
       expect(left).toBeLessThanOrEqual(MAX_MS - 60000);

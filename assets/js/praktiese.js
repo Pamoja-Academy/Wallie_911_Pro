@@ -20,7 +20,8 @@
      remainingMs()    → millisekondes oor in die blok (0 as nie aktief nie)
      onChange(fn)     → fn({ active, remainingMs, rede }) by begin/einde; gee ’n afmeld-funksie terug
      suppressWarn()   → (vir proctor.js) true as ’n wegkyk-waarskuwing nou NIE mag tel nie
-     taskFor(slug)    → (vir app.js) MERK as ’n RTT-sessie tydens ’n blok begin, anders null
+     taskFor(slug)    → (vir app.js) die merk as ’n RTT-sessie tydens ’n blok begin, anders null
+     merk()           → die merk vir die taak-veld: MERK, plus " · <werk-id>" as die blok se DBE-werk bekend is
      MAX_MS, MERK, SUBJECT — konstantes */
 (function () {
   const MAX_MS = (3 * 60 + 15) * 60 * 1000;
@@ -63,11 +64,19 @@
     });
   }
 
+  /* Die merk sê ook WATTER werk dit is (bv. "Praktiese blok: RTT V1 · dbe-2026-jun-v1 V5"), sodat ’n
+     herbegin nooit net die kaal merk wys nie. Sonder dbe-vraestelle.js bly dit presies die ou merk. */
+  function merk() {
+    const id = window.WALLIE?.DBE?.aktiefId?.() || "";
+    return id ? `${MERK} · ${id}` : MERK;
+  }
+
   function markTask() {
+    const m = merk();
     const el = byId("session-task");
-    if (el && el.value !== MERK) el.value = MERK;
+    if (el && el.value !== m) el.value = m;
     /* Loop ’n sessie reeds: die bestaande taak-veld in die volgende hartklop/einde (geen nuwe veld nie) */
-    if (window.WALLIE?.proctor?.active) window.WALLIE.REMOTE?.updateLive?.({ task: MERK });
+    if (window.WALLIE?.proctor?.active) window.WALLIE.REMOTE?.updateLive?.({ task: m });
   }
 
   function schedule(rec) {
@@ -94,6 +103,7 @@
     MAX_MS,
     MERK,
     SUBJECT,
+    merk,
 
     canStart() {
       if (!store()) return false;
@@ -148,7 +158,7 @@
     },
 
     taskFor(subjectSlug) {
-      return subjectSlug === SUBJECT && this.active() ? MERK : null;
+      return subjectSlug === SUBJECT && this.active() ? merk() : null;
     }
   };
 

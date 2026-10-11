@@ -34,28 +34,158 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
           detail: "Kies 'n oefenvraag in Oefenvrae (RTT V1) en doen dit in Excel, Word of Access."
         };
 
-  /* Plan v3 (Hanno, 10 Okt): So 11 en Ma 12 Okt is RTT V1-fokusdae voor die praktiese eksamen (Di 13 Okt).
+  /* Plan v4 (Hanno, 11 Okt): So 11 en Ma 12 Okt is RTT V1-fokusdae voor die praktiese eksamen (Di 13 Okt).
      Geen Wiskundige Geletterdheid, Gasvryheid, Afrikaans of Toerisme op hierdie twee dae nie.
-     Een RTT V1-blok per dag dra die `${dateStr}-geel`-id, sodat completedBlocks stabiel bly. */
+     Elke werk-blok sê PRESIES watter amptelike DBE-vraestel en watter vrae: `werk` (en `werk_ekstra`)
+     verwys na assets/js/dbe-vraestelle.js, sodat die sessieskerm die vraestel, datalêers en memo kan oopmaak.
+       werk: { tipe: "vraestel", id }            → volledige vraestel
+       werk: { tipe: "vrae", id, nrs: [...] }    → net dié vrae ("5" of "5.2")
+     `soort`: "toets" (getimed, memo bly toe tot die tyd om is) · "merk" / "herdoen" (memo dadelik oop) ·
+              "les" · "opstel" · "pouse".
+     Engels V3 was die enigste nie-RTT-blok wat nie met die nuwe blokke oorvleuel nie: op 11 Okt skuif dit
+     na die naaste vrye venster (17:00 → 10:15); op 12 Okt val dit weg (Hanno, 11 Okt) — die dag voor die
+     praktiese eksamen is heeltemal RTT. */
   const VASTE_PLANNE = {
     "2026-10-11": [
-      ["geel", "rooi", "rtt", "09:00", "12:00", "RTT V1 — volledig getimed (DBE Junie 2026 V1, met datalêers)", "Eksamentoestande: 3 uur, Praktiese modus aan, stoor gereeld. Gebruik die DBE-datalêers."],
-      ["middag", "break", "break", "12:00", "13:00", "Middagete en rus", "Weg van die skerm. Eet, beweeg, drink water."],
-      ["merk", "rooi", "rtt", "13:00", "14:30", "RTT V1 — merk met die nasienriglyn", "Merk eerlik met die DBE-nasienriglyn. Elke fout gaan in die Foutbank."],
-      ["db-html", "rooi", "rtt", "15:00", "16:15", "RTT V1 — DBE Nov 2024 V1: databasis (V5) en HTML (V6), getimed", "Getimed soos in die eksamen. Merk daarna met die nasienriglyn."],
-      ["oefenvrae", "rooi", "rtt", "16:30", "17:00", "Oefenvrae: RTT V1 (30 items)", "Kies items in Oefenvrae (RTT V1) wat jy nog nie reg het nie."],
-      ["engels", "geel", "engels", "17:00", "17:30", "Engels V3 — lees DBE Nov 2025 EAT V3 en die rubrieke", "Lees die vraestel en rubrieke; let op wat elke teksoort vra."],
-      ["slot", "slot", "foutbank", "17:35", "17:55", "Foutlog + môre se plan", "Top-3 foute van vandag. Kyk môre se blokke."]
+      { suffix: "engels", kind: "geel", slug: "engels", start: "10:15", end: "10:45", soort: "les",
+        title: "Engels V3 — lees DBE Nov 2025 EAT V3 en die rubrieke",
+        detail: "Lees die vraestel en rubrieke; let op wat elke teksoort vra." },
+      { suffix: "opstel", start: "10:45", end: "11:00", soort: "opstel",
+        title: "Opstel: lêers en rekenaar",
+        detail: "Laai die 4 datalêers af (skakels in die tabel). Hardloop elke .exe op Windows; die wagwoord staan op bladsy 1–2 van die vraestel. Maak 'n gids WALLIE-OEFEN met een subgids per vraestel. Maak 'n Foutlog-blad (papier): kolomme Vraestel | Vraag | Wat ek gedoen het | Wat die memo wil hê | Reël.",
+        werk_ekstra: [
+          { tipe: "vraestel", id: "dbe-2026-jun-v1" },
+          { tipe: "vraestel", id: "dbe-2025-nov-v1" },
+          { tipe: "vraestel", id: "dbe-2024-nov-v1" },
+          { tipe: "vraestel", id: "dbe-2025-jun-v1" }
+        ] },
+      { suffix: "diagnose", start: "11:00", end: "11:20", soort: "toets", punte: 18,
+        title: "Diagnose (20 min, getimed)",
+        detail: "Jun 2025 V6.1 (HTML, 10 punte: 6.1.1–6.1.6) + V5.1 (databasis-veldeienskappe, 8 punte: 5.1.1–5.1.4). Geen hulp, geen memo. Doel: wys waar hy staan.",
+        werk: { tipe: "vrae", id: "dbe-2025-jun-v1", nrs: ["6.1", "5.1"] } },
+      { suffix: "merk-diagnose", start: "11:20", end: "11:35", soort: "merk",
+        title: "Merk diagnose met memo + foutlog",
+        detail: "Pa of Wallie merk punt-vir-punt met die Jun 2025-memo. Elke punt wat verloor is, gaan in die foutlog. Telling: ≥12/18 = begin by Kaart 3 (sigblad); <12 = bly by Kaart 1 en 2.",
+        werk: { tipe: "vrae", id: "dbe-2025-jun-v1", nrs: ["6.1", "5.1"] } },
+      { suffix: "kaart12", start: "11:35", end: "11:55", soort: "les",
+        title: "Les: Punte-kaart 1 (Databasis) + 2 (HTML)",
+        detail: "Lees elke kaart. Bedek dan die voorbeelde en skryf hulle uit die kop neer (herroeping). Kyk na. Herhaal die wat verkeerd was." },
+      { suffix: "jun-v5", start: "11:55", end: "12:40", soort: "toets", punte: 35,
+        title: "Jun 2026 V5 Databasis (35 punte, 42 min)",
+        detail: "Getimed. Volgorde: 5.1.1–5.1.5 (veldeienskappe, toevoermasker, valideringsreël) eerste, dan navrae 5.3–5.5, dan verslag 5.6, vorm 5.2 laaste. Stoor ná elke subvraag.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [5] } },
+      { suffix: "merk-jun-v5", start: "12:40", end: "13:00", soort: "merk",
+        title: "Merk V5 met memo + foutlog",
+        detail: "Merk elke ✓ apart. Skryf die 'Verwagte rekords'-getal by elke navraag neer en vergelyk.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [5] } },
+      { suffix: "middag", kind: "break", slug: "break", start: "13:00", end: "13:40", soort: "pouse",
+        title: "Middagete + stap buite", detail: "Geen skerm." },
+      { suffix: "herdoen-jun-v5", start: "13:40", end: "14:00", soort: "herdoen",
+        title: "Herdoen V5-foute",
+        detail: "Doen net die subvrae wat punte verloor het weer, sonder om na die memo te kyk. Dan kyk.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [5] } },
+      { suffix: "jun-v6", start: "14:00", end: "14:18", soort: "toets", punte: 15,
+        title: "Jun 2026 V6 HTML (15 punte, 18 min)",
+        detail: "Getimed. Teksredigeerder (Notepad/Notepad++), nie Word nie. Stoor, herlaai in die blaaier, kyk.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [6] } },
+      { suffix: "merk-jun-v6", start: "14:18", end: "14:30", soort: "merk",
+        title: "Merk V6 + foutlog", detail: "Merk met die memo. Herdoen foute dadelik.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [6] } },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "14:30", end: "14:45", soort: "pouse",
+        title: "Pouse", detail: "Water, beweeg." },
+      { suffix: "kaart3", start: "14:45", end: "15:00", soort: "les",
+        title: "Les: Punte-kaart 3 (Sigblad)",
+        detail: "Lees; bedek; skryf die 10 funksies met hul memo-vorm uit die kop neer." },
+      { suffix: "jun-v34", start: "15:00", end: "15:50", soort: "toets", punte: 41,
+        title: "Jun 2026 V3 + V4 Sigblad (41 punte, 50 min)",
+        detail: "Getimed. Eers al die 1–2-punt-items (3.1, 3.2, 3.3, 4.1, 4.2, 4.3), dan die groter items. Skryf altyd iets in die sel: deelpunte tel.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [3, 4] } },
+      { suffix: "merk-jun-v34", start: "15:50", end: "16:10", soort: "merk",
+        title: "Merk V3+V4 + foutlog", detail: "Let op: elke deel van die formule kry sy eie punt.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [3, 4] } },
+      { suffix: "pouse2", kind: "break", slug: "break", start: "16:10", end: "16:25", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "kaart4", start: "16:25", end: "16:40", soort: "les",
+        title: "Les: Punte-kaart 4 (Woordverwerking)",
+        detail: "Lees; bedek; skryf die roetine-lys uit die kop neer." },
+      { suffix: "jun-v12", start: "16:40", end: "17:35", soort: "toets", punte: 45,
+        title: "Jun 2026 V1 + V2 Woordverwerking (45 punte, 55 min)",
+        detail: "Getimed. Eksamennommer in die bladsyboskrif eerste. Doen eers die vinnige roetine-items (eienskappe, onderskrif, watermerk, soek-en-vervang).",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [1, 2] } },
+      { suffix: "merk-jun-v12", start: "17:35", end: "17:55", soort: "merk",
+        title: "Merk V1+V2 + foutlog", detail: "",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [1, 2] } },
+      { suffix: "aandete", kind: "break", slug: "break", start: "17:55", end: "18:45", soort: "pouse",
+        title: "Aandete + rus", detail: "Geen skerm." },
+      { suffix: "nov25-v5", start: "18:45", end: "19:25", soort: "toets", punte: 35,
+        title: "Nov 2025 V5 Databasis (35 punte, 40 min)",
+        detail: "Tweede databasis, nuwe lêer (vervleg: dieselfde vaardighede, ander konteks). Gebruik die foutlog-reëls.",
+        werk: { tipe: "vrae", id: "dbe-2025-nov-v1", nrs: [5] } },
+      { suffix: "merk-nov25-v5", start: "19:25", end: "19:45", soort: "merk",
+        title: "Merk Nov 2025 V5 + foutlog", detail: "Vergelyk met vanmiddag se telling.",
+        werk: { tipe: "vrae", id: "dbe-2025-nov-v1", nrs: [5] } },
+      { suffix: "kaart5", start: "19:45", end: "20:00", soort: "les",
+        title: "Herroeping + Punte-kaart 5 (Eksamentegniek)",
+        detail: "Lees die foutlog hardop. Lees Kaart 5. Klaar, skerm af om 21:00, slaap teen 22:00." }
     ],
     "2026-10-12": [
-      ["geel", "rooi", "rtt", "09:00", "10:30", "RTT V1 — Woordverwerking (V1 en V2) uit DBE Nov 2023 V1, getimed", "Getimed, Praktiese modus aan. Merk daarna met die nasienriglyn."],
-      ["sigblad", "rooi", "rtt", "10:45", "12:00", "RTT V1 — Sigblad (V3 en V4) uit DBE Junie 2025 V1, getimed en merk", "Getimed, dan merk met die nasienriglyn. Foute in die Foutbank."],
-      ["middag", "break", "break", "12:00", "13:00", "Middagete en rus", "Weg van die skerm. Eet, beweeg, drink water."],
-      ["db-html", "rooi", "rtt", "13:00", "14:00", "RTT V1 — Databasis (V5) en HTML (V6) uit DBE Junie 2025 V1, getimed en merk", "Getimed, dan merk met die nasienriglyn."],
-      ["foutbank", "rooi", "foutbank", "14:15", "15:15", "Herdoen al die Foutbank-items van die naweek", "Doen elke foutbank-item weer, toe-boek, en merk dit eers dan as reg."],
-      ["kontrolelys", "rooi", "rtt", "15:30", "16:00", "Eksamenkontrolelys", "Lêername, gereeld stoor, streekinstellings en lysskeier, Notepad++ vir HTML."],
-      ["engels", "geel", "engels", "16:15", "17:00", "Engels V3 — kort stuk: transaksionele teks (DBE Junie 2026 EAT V3 Afd C)", "30 min getimed skryf, dan 15 min selfkontrole met die rubriek."],
-      ["slot", "slot", "foutbank", "17:05", "17:15", "Aand: niks nuuts nie. Pak die eksamentas en slaap vroeg.", "Môre 09:00 is die RTT/CAT-praktiese. Jy is gereed."]
+      { suffix: "herroep", start: "08:00", end: "08:15", soort: "les",
+        title: "Herroeping op leë papier",
+        detail: "Skryf uit die kop: toevoermasker-simbole, Between…And, Like \"*\", Group By/Sum, 6 HTML-merkers, 8 sigbladfunksies. Kyk teen die kaarte." },
+      { suffix: "proef-nov24", start: "08:15", end: "11:15", soort: "toets", punte: 150,
+        title: "Volledige proef: Nov 2024 V1 (150 punte, 3 uur)",
+        detail: "Eksamentoestande. Volgorde soos Kaart 5: V6 → V5 → V1 → V2 → V3 → V4 → V7. Stoor gereeld. Geen foon.",
+        werk: { tipe: "vraestel", id: "dbe-2024-nov-v1" } },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "11:15", end: "11:30", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "merk-proef", start: "11:30", end: "12:30", soort: "merk",
+        title: "Merk Nov 2024 met memo + foutlog",
+        detail: "Tel punte per vraag. Merk in die foutlog die 3 kategorieë wat die meeste punte gekos het.",
+        werk: { tipe: "vraestel", id: "dbe-2024-nov-v1" } },
+      { suffix: "middag", kind: "break", slug: "break", start: "12:30", end: "13:15", soort: "pouse",
+        title: "Middagete + stap", detail: "" },
+      { suffix: "herdoen-proef", start: "13:15", end: "13:45", soort: "herdoen",
+        title: "Herdoen die top-3 foute van die proef",
+        detail: "Net die subvrae wat punte verloor het, weer in die Nov 2024-lêers.",
+        werk: { tipe: "vraestel", id: "dbe-2024-nov-v1" } },
+      { suffix: "jun25-v5", start: "13:45", end: "14:20", soort: "toets", punte: 27,
+        title: "Jun 2025 V5.2–5.7 Databasis (27 punte, 32 min)",
+        detail: "Vorm, navrae, verslag. (5.1 is gister in die diagnose gedoen.)",
+        werk: { tipe: "vrae", id: "dbe-2025-jun-v1", nrs: ["5.2", "5.3", "5.4", "5.5", "5.6", "5.7"] } },
+      { suffix: "merk-jun25-v5", start: "14:20", end: "14:35", soort: "merk",
+        title: "Merk + foutlog", detail: "",
+        werk: { tipe: "vrae", id: "dbe-2025-jun-v1", nrs: ["5.2", "5.3", "5.4", "5.5", "5.6", "5.7"] } },
+      { suffix: "pouse2", kind: "break", slug: "break", start: "14:35", end: "14:50", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "nov25-v63", start: "14:50", end: "15:40", soort: "toets", punte: 37,
+        title: "Nov 2025 V6 + V3 (HTML + sigblad, 37 punte, 45 min)",
+        detail: "V6 eerste (15), dan V3 (22).",
+        werk: { tipe: "vrae", id: "dbe-2025-nov-v1", nrs: [6, 3] } },
+      { suffix: "merk-nov25-v63", start: "15:40", end: "16:00", soort: "merk",
+        title: "Merk + foutlog", detail: "",
+        werk: { tipe: "vrae", id: "dbe-2025-nov-v1", nrs: [6, 3] } },
+      { suffix: "pouse3", kind: "break", slug: "break", start: "16:00", end: "16:15", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "nov25-v1", start: "16:15", end: "16:45", soort: "toets", punte: 22,
+        title: "Nov 2025 V1 Woordverwerking (22 punte, 27 min)", detail: "",
+        werk: { tipe: "vrae", id: "dbe-2025-nov-v1", nrs: [1] } },
+      { suffix: "v7-integreer", start: "16:45", end: "17:20", soort: "toets", punte: 29,
+        title: "Nov 2025 V7 + Jun 2026 V7 (geïntegreer, 29 punte, 35 min)",
+        detail: "Doen net die dele wat jy ken (possamevoeging, eenvoudige formules). Slaan die res oor.",
+        werk: { tipe: "vrae", id: "dbe-2025-nov-v1", nrs: [7] },
+        werk_ekstra: [{ tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [7] }] },
+      { suffix: "merk-v1-v7", start: "17:20", end: "17:45", soort: "merk",
+        title: "Merk V1 + V7's + foutlog", detail: "",
+        werk: { tipe: "vrae", id: "dbe-2025-nov-v1", nrs: [1, 7] },
+        werk_ekstra: [{ tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [7] }] },
+      { suffix: "aandete", kind: "break", slug: "break", start: "17:45", end: "18:30", soort: "pouse",
+        title: "Aandete", detail: "" },
+      { suffix: "laaste-herroep", start: "18:30", end: "19:00", soort: "les",
+        title: "Laaste herroeping (net foutlog + kaarte)",
+        detail: "Lees die foutlog. Skryf elke 'Reël' een keer oor. Geen nuwe werk nie. Pak sak: ID, toelatingsbrief, pen, water." },
+      { suffix: "klaar", kind: "break", slug: "break", start: "19:00", end: "19:00", soort: "pouse",
+        title: "Klaar. Skerm af 20:30, slaap 21:30.",
+        detail: "Slaap konsolideer wat vandag geleer is. Laat-nag-leer kos meer punte as wat dit gee." }
     ]
   };
   if (VASTE_PLANNE[dateStr]) {
@@ -64,16 +194,25 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       const [bh, bm] = b.split(":").map(Number);
       return bh * 60 + bm - (ah * 60 + am);
     };
-    const blocks = VASTE_PLANNE[dateStr].map(([suffix, kind, subjectSlug, start, end, title, detail]) => ({
-      id: `${dateStr}-${suffix}`,
-      kind,
-      subjectSlug,
-      minutes: mins(start, end),
-      start,
-      end,
-      title,
-      detail
-    }));
+    /* "toets"/"merk"/"herdoen"/"opstel" is RTT-werk (rooi); "les" is ’n kort opwarm-kaart. */
+    const KIND = { pouse: "break", les: "warm" };
+    const blocks = VASTE_PLANNE[dateStr].map((b) => {
+      const blok = {
+        id: `${dateStr}-${b.suffix}`,
+        kind: b.kind || KIND[b.soort] || "rooi",
+        subjectSlug: b.slug || "rtt",
+        minutes: mins(b.start, b.end),
+        start: b.start,
+        end: b.end,
+        title: b.title,
+        detail: b.detail,
+        soort: b.soort
+      };
+      if (b.punte != null) blok.punte = b.punte;
+      if (b.werk) blok.werk = b.werk;
+      if (b.werk_ekstra) blok.werk_ekstra = b.werk_ekstra;
+      return blok;
+    });
     return {
       date: dateStr,
       blocks,

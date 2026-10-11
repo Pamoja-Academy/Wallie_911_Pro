@@ -255,7 +255,7 @@ function excursions(B, n) {
   assert(B.Pr.canStart() === true, "canStart true for RTT");
   const r = B.Pr.start();
   assert(r.ok && B.Pr.active(), "start ok");
-  assert(B.els["session-task"].value === "Praktiese blok: RTT V1", "task field marked");
+  assert(B.els["session-task"].value === "Praktiese blok: RTT V1", "task field marked (geen DBE-werk bekend → die ou merk)");
   assert(B.Pr.canStart() === false, "canStart false while active");
   assert(B.Pr.taskFor("rtt") === "Praktiese blok: RTT V1" && B.Pr.taskFor("engels") === null, "taskFor marks only RTT sessions");
   assert(changes.length === 1 && changes[0].active === true, "onChange fired on start");
@@ -360,6 +360,39 @@ function excursions(B, n) {
   excursions(B, 1);
   assert(log.warn === 1, "proctor works without praktiese.js");
   B.P.stop();
+}
+
+/* ---------- 6. Die merk noem die DBE-werk van die blok (plan v4) ---------- */
+{
+  /* Met dbe-vraestelle.js gelaai sê die merk OOK watter vraestel en watter vrae — ’n herbegin wys dus
+     nooit net die kaal "Praktiese blok: RTT V1" nie. */
+  const B = makeBrowser({ files: ["vraebank-store.js", "dbe-vraestelle.js", "praktiese.js", "proctor.js"] });
+  const WERK = { tipe: "vrae", id: "dbe-2026-jun-v1", nrs: [5] };
+  const MERK_WERK = "Praktiese blok: RTT V1 · dbe-2026-jun-v1 V5";
+  assert(B.Pr.merk() === "Praktiese blok: RTT V1", "sonder aktiewe werk bly die merk presies soos voorheen");
+  B.win.WALLIE.DBE.setAktief(WERK);
+  assert(B.Pr.merk() === MERK_WERK, "met aktiewe werk noem die merk die vraestel en die vraag");
+  assert(B.Pr.start().ok, "praktiese blok begin");
+  assert(B.els["session-task"].value === MERK_WERK, "die taak-veld kry die merk met die werk-id");
+  assert(B.Pr.taskFor("rtt") === MERK_WERK, "taskFor gee dieselfde merk vir ’n RTT-sessie");
+  assert(B.Pr.taskFor("engels") === null, "taskFor bly null vir ’n ander vak");
+
+  /* Herlaai tydens die blok: dieselfde merk, mits die werk weer bekend is */
+  const B2 = makeBrowser({ store: B.store, files: ["vraebank-store.js", "dbe-vraestelle.js", "praktiese.js", "proctor.js"], start: B.now + 60000 });
+  B2.win.WALLIE.DBE.setAktief(WERK);
+  B2.win.WALLIE.Praktiese = B2.Pr;
+  assert(B2.Pr.active(), "herlaai binne die maks-tyd → blok loop nog");
+  B2.Pr.merk();
+  assert(B2.Pr.taskFor("rtt") === MERK_WERK, "ná herlaai noem die merk steeds die werk");
+
+  /* Die katalogus self: 4 vraestelle, elkeen met vraestel-, data- en memo-skakel */
+  const K = B.win.WALLIE.DBE.KATALOGUS;
+  assert(Object.keys(K).length === 4, "4 DBE-vraestelle in die katalogus");
+  assert(
+    Object.values(K).every((v) => /^https:\/\/www\.education\.gov\.za\//.test(v.vraestel) && v.data && v.memo),
+    "elke vraestel het amptelike skakels"
+  );
+  assert(B.win.WALLIE.DBE.punte(WERK) === 35, "Jun 2026 V5 = 35 punte");
 }
 
 console.log(JSON.stringify({ passed, fails: fails.length, failList: fails }, null, 2));
