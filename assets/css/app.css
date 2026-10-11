@@ -1093,9 +1093,11 @@ body.les-open { overflow: hidden; }
 .werk-data-nota, .werk-memo-wenk { margin: 0.15rem 0 0; overflow-wrap: anywhere; }
 .werk-memo-wenk { color: var(--warn, #e2b04a); }
 .werk-ekstra-kop { margin: 0.9rem 0 0; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
-.md-ekstra { margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted); }
-.md-werk { font-size: 1rem; overflow-wrap: anywhere; }
+/* Die vraestel-reël staan ONDER die les op die kaart; die les bly die hoofsaak. */
+.md-werk { margin: 0.4rem 0 0; font-size: 0.95rem; font-weight: 700; color: #e3efe7; overflow-wrap: anywhere; }
 .next-titel { margin: 0.2rem 0 0; color: #e3efe7; font-weight: 700; overflow-wrap: anywhere; }
-.next-werk { font-size: 1.05rem; overflow-wrap: anywhere; }
-.session-les-ekstra > summary { cursor: pointer; font-weight: 800; color: var(--accent); }
-.session-les-ekstra[open] > summary { margin-bottom: 0.75rem; }
+.next-werk { margin: 0.4rem 0 0; font-size: 1rem; font-weight: 700; color: #e3efe7; overflow-wrap: anywhere; }
+.md-werk small, .next-werk small {
+  display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); font-weight: 800;
+}
