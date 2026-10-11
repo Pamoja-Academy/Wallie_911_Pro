@@ -135,8 +135,14 @@ for (const it of items) {
   assert(VERWYSING.test(it.bron.verwysing || ""), `${id}: bron.verwysing formaat (${it.bron.verwysing})`);
   assert(Number.isInteger(it.bron.bladsy) && it.bron.bladsy > 0, `${id}: bron.bladsy positiewe heelgetal`);
   assert(Number.isInteger(it.bron.memo_bladsy) && it.bron.memo_bladsy > 0, `${id}: bron.memo_bladsy positiewe heelgetal`);
-  assert(typeof it.bron.anker_vraag === "string" && it.bron.anker_vraag.length >= 20, `${id}: anker_vraag ≥ 20 karakters`);
-  assert(typeof it.bron.anker_memo === "string" && it.bron.anker_memo.length >= 20, `${id}: anker_memo ≥ 20 karakters`);
+  /* Die ankers is bronverwysings, nie iteminhoud nie: lank genoeg om die plek op die DBE-bladsy te vind,
+     maar hoogstens 8 opeenvolgende woorde DBE-teks (kopiereg; die repo is publiek). */
+  for (const veld of ["anker_vraag", "anker_memo"]) {
+    const a = it.bron[veld];
+    assert(typeof a === "string" && a.length >= 20, `${id}: ${veld} ≥ 20 karakters`);
+    const w = typeof a === "string" ? a.trim().split(/\s+/).length : Infinity;
+    assert(w <= 8, `${id}: ${veld} hoogstens 8 woorde (kry ${w})`);
+  }
   assert(typeof it.bron.vraestel_leer === "string" && it.bron.vraestel_leer.length > 0, `${id}: vraestel_leer`);
   assert(typeof it.bron.memo_leer === "string" && it.bron.memo_leer.length > 0, `${id}: memo_leer`);
   assert(it.bron.verwysing.includes(it.vak === "engels" ? "EAT" : "HT"), `${id}: bron se taal pas by die vak`);

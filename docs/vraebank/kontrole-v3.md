@@ -31,3 +31,21 @@ Afrikaans (finale stand; punte = die kontroleerder se eie nasien van die voorbee
 DeepSeek se AFWYKING by afr-v3-B1 (eerste ronde) het gegaan oor die adres "regs bo" (in gewone teks kan dit nie regs staan nie), die 2.X-nommering (die app se konvensie) en die woordtelling-merker (reggestel). By afr-v3-B3 is die bevinding (wie die gesprek begin) ná die ronde in die opdrag reggestel en daarna net deur GLM-5.3 herkontroleer (OK).
 
 Let wel: die kontroleerderpunte vir afr-v3-B5 in die tabel geld vir die vorige weergawe (groentetuin). Die nuwe B5 is net deur die vrystellingshek (0 foute) en 'n handnasien gekontroleer, nie weer deur die modelle nie. Die naamveranderings by eng-v3-A3 en eng-v3-B1 verander niks anders aan daardie items nie.
+
+## Wysiging ná die kontrole: korter ankers (11 Okt, in die Fase 2-PR)
+Cursor Bugbot het op PR #12 gewys dat van die `anker_vraag`/`anker_memo`-stringe volledige DBE-sinne is
+(tot 16 woorde) en dat hulle in 'n publieke repo lê. Op Hanno se opdrag is elke anker ingekort tot
+hoogstens **8 opeenvolgende woorde**. Elke nuwe anker is 'n egte voorvoegsel van die oue, dus staan dit
+steeds letterlik op die DBE-bladsy en bly dit bruikbaar om die plek te vind. Aangeraak: eng-v3-A3,
+eng-v3-B2, eng-v3-C1, eng-v3-C2, afr-v3-A2, afr-v3-B2, afr-v3-B3, afr-v3-B5 (14 stringe in totaal).
+
+Niks anders aan enige item het verander nie: die opdrag, beplanning, formaat-kontrolelys,
+voorbeeldantwoord, verduideliking, nasienriglyn, punte en woordtelling-merkers is greep-identies, en al
+14 woordtellings tel steeds presies dieselfde (281 / 280 / 278 / 139 / 139 / 92 / 93 · 437 / 431 / 187 /
+184 / 197 / 196 / 190). Die gegenereerde `assets/js/vraebank-v3.js` het nie verander nie, want die
+ankers word in elk geval uit die blaaierkopie gestrip. `tests/vraebank-v3.test.js` dwing die nuwe perk
+af (≤ 8 woorde per anker).
+
+Let wel: die vrystellingshek (item_gate_v3.py) se "anker letterlik op die DBE-bladsy"-kontrole is ná
+hierdie inkorting nie weer teen die korpus gehardloop nie — dit loop net op Hanno se masjien, waar die
+DBE-lêers is. Die voorvoegsel-eienskap is wel programmaties nagegaan.
