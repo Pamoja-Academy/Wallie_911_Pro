@@ -65,6 +65,7 @@ const order = [
   "assets/js/schedule.js",
   "assets/js/surveys.js",
   "assets/js/proctor.js",
+  "assets/js/dbe-vraestelle.js",
   "assets/js/live-config.js",
   "assets/js/sync.js",
   "assets/js/remote.js",
@@ -109,22 +110,52 @@ if (typeof W.buildDayPlan === "function") {
     const g = W.buildDayPlan("2026-10-10").blocks.find((b) => b.id === "2026-10-10-geel");
     assert(g && g.subjectSlug === "rtt" && g.kind === "rooi" && g.title === "RTT V1 — praktiese oefening (Oefenvrae)", "2026-10-10 geel-blok is RTT V1");
   }
-  /* Plan v3: So 11 en Ma 12 Okt is RTT V1-fokusdae (geen WG, Gasvryheid, Afrikaans of Toerisme) */
+  /* Plan v4 (11 Okt): So 11 en Ma 12 Okt is RTT V1-fokusdae met EGTE DBE-vraestelle per blok
+     (geen WG, Gasvryheid, Afrikaans of Toerisme). */
+  const SOORTE = ["toets", "merk", "herdoen", "les", "opstel", "pouse"];
   for (const d of ["2026-10-11", "2026-10-12"]) {
     const p = W.buildDayPlan(d);
-    const g = p.blocks.find((b) => b.id === `${d}-geel`);
-    assert(g && g.subjectSlug === "rtt" && g.kind === "rooi" && g.start === "09:00" && /RTT V1/.test(g.title), `${d} geel-blok is die RTT V1-blok om 09:00`);
     const verbode = p.blocks.filter((b) => ["wiskgelett", "gasvryheid", "afrikaans", "toerisme"].includes(b.subjectSlug));
     assert(verbode.length === 0, `${d} geen WG/Gasvryheid/Afrikaans/Toerisme`);
     assert(p.blocks.filter((b) => b.subjectSlug === "rtt").length >= 4, `${d} minstens 4 RTT-blokke`);
     assert(p.blocks.every((b) => b.start && b.end), `${d} elke blok het begin- en eindtyd`);
     assert(new Set(p.blocks.map((b) => b.id)).size === p.blocks.length, `${d} unieke blok-id's`);
+    assert(p.blocks.every((b) => SOORTE.includes(b.soort)), `${d} elke blok het 'n geldige soort`);
+    /* Chronologies en sonder oorvleueling */
+    let vorige = "00:00";
+    let orde = true;
+    for (const b of p.blocks) {
+      if (b.start < vorige) orde = false;
+      vorige = b.end;
+    }
+    assert(orde, `${d} blokke is chronologies, geen oorvleueling`);
+    /* Elke getimede toets wys na 'n egte DBE-vraestel met vraestel-, data- en memo-skakel */
+    const toetse = p.blocks.filter((b) => b.soort === "toets");
+    assert(toetse.length >= 4, `${d} minstens 4 getimede toets-blokke`);
+    assert(toetse.every((b) => b.werk && W.DBE.KATALOGUS[b.werk.id]), `${d} elke toets-blok wys na die DBE-katalogus`);
+    assert(
+      p.blocks.filter((b) => b.werk).every((b) => {
+        const sk = W.DBE.skakels(b.werk);
+        return sk && /^https:\/\/(www\.)?education\.gov\.za\//.test(sk.vraestel) && sk.data && sk.memo;
+      }),
+      `${d} elke werk-blok het vraestel-, data- en memo-skakel`
+    );
+    /* Geen toets-blok herhaal 'n ander toets-blok se vrae nie (merk/herdoen dóén dieselfde werk weer) */
+    const sleutels = toetse.map((b) => `${b.werk.tipe}:${b.werk.id}:${(b.werk.nrs || []).join(",")}`);
+    assert(new Set(sleutels).size === sleutels.length, `${d} geen herhaalde vrae-stel in die toets-blokke`);
   }
   {
     const s11 = W.buildDayPlan("2026-10-11").blocks;
-    assert(s11[0].minutes === 180 && /Junie 2026/.test(s11[0].title), "11 Okt: 3-uur getimede DBE Junie 2026 V1");
+    assert(s11[0].id === "2026-10-11-engels" && s11[0].start === "10:15", "11 Okt: Engels V3 skuif na 10:15 (naaste vrye venster)");
+    const diag = s11.find((b) => b.id === "2026-10-11-diagnose");
+    assert(diag && diag.start === "11:00" && diag.punte === 18 && diag.werk.id === "dbe-2025-jun-v1", "11 Okt: diagnose om 11:00 (Jun 2025 V6.1 + V5.1, 18 punte)");
+    assert(/Punte-kaart 5/.test(s11[s11.length - 1].title), "11 Okt: sluit af met die herroeping + Punte-kaart 5");
     const s12 = W.buildDayPlan("2026-10-12").blocks;
-    assert(/Pak die eksamentas/.test(s12[s12.length - 1].title), "12 Okt: aand-slot (pak die tas)");
+    const proef = s12.find((b) => b.id === "2026-10-12-proef-nov24");
+    assert(proef && proef.minutes === 180 && proef.punte === 150 && proef.werk.tipe === "vraestel" && proef.werk.id === "dbe-2024-nov-v1", "12 Okt: 3-uur volledige proef (DBE Nov 2024 V1, 150 punte)");
+    assert(s12.every((b) => b.subjectSlug !== "engels"), "12 Okt: geen Engels-blok (heeltemal RTT)");
+    assert(/Pak sak/.test(s12.find((b) => b.id === "2026-10-12-laaste-herroep").detail), "12 Okt: laaste herroeping sê pak die sak");
+    assert(/Skerm af/.test(s12[s12.length - 1].title), "12 Okt: sluit af met skerm af en slaap");
   }
   let loBlocks = 0;
   for (let t = Date.parse("2026-09-27T12:00:00Z"); t <= Date.parse("2026-11-30T12:00:00Z"); t += 86400000) {
@@ -142,6 +173,9 @@ assert(html.includes("hannovz@gmail.com"), "export names Pa email");
 assert(html.includes('id="les-viewer"'), "index has lesson viewer");
 assert(html.includes('id="view-leer"'), "index has Lesse view");
 assert(html.includes("assets/js/lesson-ui.js"), "index loads lesson-ui.js");
+assert(html.includes("assets/js/dbe-vraestelle.js"), "index loads dbe-vraestelle.js");
+assert(html.indexOf("assets/js/dbe-vraestelle.js") < html.indexOf("assets/js/praktiese.js"), "dbe-vraestelle.js laai voor praktiese.js");
+assert(html.includes('id="session-werk"'), "index has the vraestel panel on the session screen");
 assert(html.indexOf("assets/js/sync.js") > -1 && html.indexOf("assets/js/sync.js") < html.indexOf("assets/js/remote.js"), "index loads sync.js before remote.js");
 assert(html.includes('id="sync-pill"'), "index has sync indicator");
 if (W.LESSONS && Array.isArray(W.SUBJECTS)) {

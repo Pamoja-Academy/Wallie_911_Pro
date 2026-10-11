@@ -31,7 +31,17 @@
         plan.blocks.some((b) => b.subjectSlug === slug) &&
         !(state.blocks || []).some((b) => b.subjectSlug === slug)
     );
-    if (state.planDate !== today || !state.blocks?.length || missingNewBlocks) {
+    /* Plan-handtekening: ’n NUWE plan vir VANDAG moet vandag reeds deurkom — anders sit Wallie vas met
+       gister se weergawe van vandag se plan (die 11/12 Okt-blokke sou nooit gewys het nie).
+       Die handtekening kyk net na die harde feite van ’n blok (id, tyd, duur, soort, werk), NIE na titel,
+       detail of vak nie: ’n gestoorde blok wat net in vertoning verskil (bv. ’n ou, verborge vak) bly
+       onaangeraak. Voltooide blokke, opnames, sessies en foute word nooit geraak nie — net blocks/planDate. */
+    const sig = (blocks) =>
+      (blocks || [])
+        .map((b) => `${b.id}|${b.start || ""}|${b.end || ""}|${b.minutes}|${b.soort || ""}|${b.werk ? JSON.stringify(b.werk) : ""}`)
+        .join(";");
+    const planVervang = state.planDate === today && sig(state.blocks) !== sig(plan.blocks);
+    if (state.planDate !== today || !state.blocks?.length || missingNewBlocks || planVervang) {
       state.planDate = plan.date;
       state.blocks = plan.blocks;
       persist();
@@ -44,7 +54,7 @@
 
   /* Watter rooster-blok hoort by hierdie sessie? Eksplisiet (Begin-knoppie op ’n blok), anders die
      naaste onvoltooide blok van dieselfde vak vandag. */
-  function findBlock(blockId, subjectSlug) {
+  function findBlockRaw(blockId, subjectSlug) {
     const blocks = state.blocks || [];
     let b = blockId ? blocks.find((x) => x.id === blockId) : null;
     if (!b && subjectSlug) {
@@ -52,6 +62,12 @@
       const same = blocks.filter((x) => x.subjectSlug === subjectSlug && !state.completedBlocks[x.id]);
       b = same.find((x) => x.start && x.end && x.start <= nowHm && nowHm <= x.end) || same[0] || null;
     }
+    return b || null;
+  }
+
+  /* Die blok soos dit na Pa gaan — presies dieselfde velde as altyd (geen nuwe veld in die payload). */
+  function findBlock(blockId, subjectSlug) {
+    const b = findBlockRaw(blockId, subjectSlug);
     if (!b) return null;
     return { id: b.id, title: b.title, start: b.start || null, end: b.end || null, minutes: b.minutes, kind: b.kind, subjectSlug: b.subjectSlug };
   }
@@ -376,8 +392,11 @@
     }
     const subjectSlug = opts.subjectSlug || $("#session-subject").value;
     const minutes = Math.round(Number(opts.minutes || $("#session-minutes").value)) || 45;
-    const task = window.Praktiese?.taskFor?.(subjectSlug) || opts.task || $("#session-task").value;
+    const blockRaw = findBlockRaw(opts.blockId, subjectSlug);
     const block = findBlock(opts.blockId, subjectSlug);
+    /* Watter DBE-werk hoort by hierdie blok? Die praktiese blok se merk gebruik dit ook. */
+    WALLIE.DBE?.setAktief?.(WALLIE.werkVirBlok?.(blockRaw, { dag: state.planDate }) || null);
+    const task = window.Praktiese?.taskFor?.(subjectSlug) || opts.task || $("#session-task").value;
 
     $("#session-subject").value = subjectSlug;
     $("#session-minutes").value = minutes;
@@ -501,11 +520,14 @@
     updateLiveDot();
     startStills();
     showView("sessie");
-    WALLIE.lessonUI.onSessionStart(subjectSlug);
+    WALLIE.lessonUI.onSessionStart(subjectSlug, blockRaw ? blockRaw.id : null);
   }
 
   function finishSession(outcome) {
     closeMemo("sessie klaar");
+    /* Die praktiese blok eindig saam met die sessie — anders bly dit loop en oorskryf die taak
+       van die volgende sessie met die kaal merk. */
+    window.Praktiese?.end?.();
     const warnings = WALLIE.proctor.totalWarnings || 0;
     const locks = WALLIE.proctor.locks || 0;
     const memoMin = WALLIE.proctor.memoMinutes();
@@ -566,6 +588,7 @@
     sessionMeta = null;
     persist();
     setCameraStatus("Kamera af", "");
+    WALLIE.lessonUI.onSessionEnd?.(outcome);
     logEvent(`Sessie klaar (${outcome})`);
     updateLiveDot();
     renderPa();
@@ -742,7 +765,10 @@
     $(`#view-${name}`)?.classList.add("active");
     if (name === "missie") renderMissie();
     if (name === "leer") WALLIE.lessonUI.renderLeer();
-    if (name === "sessie") WALLIE.lessonUI.renderSessionLesson(sessionMeta?.subjectSlug);
+    if (name === "sessie") {
+      WALLIE.lessonUI.renderSessionWerk(sessionMeta?.block?.id || null);
+      WALLIE.lessonUI.renderSessionLesson(sessionMeta?.subjectSlug);
+    }
     if (name === "vakke") renderVakke();
     if (name === "foutbank") renderFaults();
     if (name === "oplaai") renderPapers();

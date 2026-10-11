@@ -16,6 +16,7 @@ const steps = [
   "node tests/vraebank-store.test.js",
   "node tests/vraebank.test.js",
   "node tests/preview-guard.test.js",
+  "node tests/dbe-vraestelle.test.js",
 ];
 
 for (const cmd of steps) {
