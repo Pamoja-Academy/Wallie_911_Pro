@@ -189,7 +189,8 @@
     const idx = ITEMS.findIndex((i) => i.id === id);
     if (idx < 0) return lys();
     const item = ITEMS[idx];
-    const wrap = el("div", "sw-item");
+    /* Eie klas vir die itemskerm: .sw-item is die lysknoppie se styl (rand, wyser, kompakte opvulling). */
+    const wrap = el("div", "sw-detail");
 
     const nav = el("div", "btn-row sw-nav");
     const terug = el("button", "btn ghost sw-terug", "Terug na lys");

@@ -82,6 +82,9 @@ for (const vp of VIEWPORTS) {
       for (const item of ITEMS) {
         await page.locator(`.sw-item[data-id="${item.id}"]`).click();
         await expect(page.locator(".sw-titel")).toContainText(item.teksoort);
+        /* Die itemskerm is nie 'n lysry nie: geen knoppie-omhulsel om die hele skerm */
+        await expect(page.locator(".sw-detail")).toHaveCount(1);
+        await expect(page.locator(".sw-item")).toHaveCount(0);
         await expect(page.locator(".sw-vraag")).toHaveText(item.vraag);
         await expect(page.locator(".sw-blok .sw-punte > li")).toHaveCount(item.beplanning.length);
         await expect(page.locator(".sw-bron")).toHaveText(
