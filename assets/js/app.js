@@ -1223,4 +1223,97 @@
   safe(renderPa, "pa");
 
   safe(() => WALLIE.lessonUI.openFromQuery(), "les");
+
+  /* Weergawe-kontrole: 'n oop oortjie mag nie ou JS bly loop na 'n ontplooiing nie.
+     version.json (no-store) teenoor WALLIE.APP_VERSION by laai, elke 5 min en wanneer die oortjie weer sigbaar word.
+     Verskil dit: herlaai dadelik as geen sessie loop nie; anders 'n banier en herlaai eers NA die sessie.
+     Raak nooit localStorage nie. Alle foute word ingesluk (vanlyn werk die app net soos altyd).
+     Net op die lewendige gasheer en localhost; nooit in voorskou nie. */
+  safe(() => {
+    const host = String(location.hostname || "").toLowerCase();
+    const onHost = host === "pamoja-academy.github.io" || host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host === "::1";
+    if (!onHost || window.__VOORSKOU__?.aktief || !WALLIE.APP_VERSION) return;
+    let newVersion = null;
+    let reloading = false;
+    let waitTimer = null;
+
+    const sessionRunning = () => {
+      try {
+        const st = state.live?.status;
+        if (st && st !== "off") return true;
+        if (WALLIE.proctor?.active) return true;
+        if (window.Praktiese?.active?.()) return true;
+      } catch (e) {
+        return true;
+      }
+      return false;
+    };
+    /* Ook nie terwyl 'n opname, toestemming of les oop is nie (dit sou ingetikte antwoorde verloor) */
+    const dialogOpen = () => !!document.querySelector(".modal:not(.hidden), .les-viewer:not(.hidden)");
+
+    const banner = (show) => {
+      let el = document.getElementById("weergawe-banier");
+      if (!show) {
+        el?.remove();
+        return;
+      }
+      if (el) return;
+      el = document.createElement("div");
+      el.id = "weergawe-banier";
+      el.className = "weergawe-banier";
+      el.setAttribute("role", "status");
+      el.textContent = "Nuwe weergawe - herlaai na die sessie";
+      document.body.appendChild(el);
+    };
+
+    const tryReload = () => {
+      if (!newVersion || reloading) return;
+      if (sessionRunning() || dialogOpen()) {
+        if (sessionRunning()) banner(true);
+        if (!waitTimer) waitTimer = setInterval(tryReload, 5000);
+        return;
+      }
+      /* Lus-wag (sessionStorage, nie Wallie se localStorage nie): as die CDN nog 'n ou index.html gee terwyl
+         version.json reeds nuut is, herlaai hoogstens 2 keer per weergawe per 10 min. */
+      try {
+        const g = JSON.parse(sessionStorage.getItem("wallie911_herlaai") || "null");
+        const now = Date.now();
+        const n = g && g.v === newVersion && now - g.at < 10 * 60 * 1000 ? g.n : 0;
+        if (n >= 2) return;
+        sessionStorage.setItem("wallie911_herlaai", JSON.stringify({ v: newVersion, n: n + 1, at: n ? g.at : now }));
+      } catch (e) {
+        /* geen sessionStorage: herlaai steeds */
+      }
+      reloading = true;
+      if (waitTimer) clearInterval(waitTimer);
+      try {
+        location.reload();
+      } catch (e) {
+        reloading = false;
+      }
+    };
+
+    const check = () => {
+      if (reloading) return;
+      try {
+        fetch("version.json", { cache: "no-store" })
+          .then((r) => (r && r.ok ? r.json() : null))
+          .then((j) => {
+            const v = j && typeof j.v === "string" ? j.v : null;
+            if (!v || v === WALLIE.APP_VERSION) return;
+            newVersion = v;
+            tryReload();
+          })
+          .catch(() => {});
+      } catch (e) {
+        /* vanlyn of geen fetch: ignoreer */
+      }
+    };
+
+    check();
+    setInterval(check, 5 * 60 * 1000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") check();
+    });
+  }, "weergawe");
 })();
