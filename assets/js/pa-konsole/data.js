@@ -4,7 +4,13 @@
 
   var PK = window.PK = window.PK || {};
   var TOKEN_KEY = 'wallie911_pa_token';
-  var HIST_KEY = 'wallie911_pa_hist_v1';
+  /* Pa se eie konsole-kas (NIE Wallie se data nie). v1 het {} vir lee dae gestoor en dit nooit weer gehaal nie. */
+  var HIST_KEY = 'wallie911_pa_hist_v2';
+  var HIST_KEY_V1 = 'wallie911_pa_hist_v1';
+  /* Die geskiedenis begin hier (Wallie se eerste sessie) en loop tot vandag */
+  PK.HIST_START = '2026-09-27';
+  var HIST_FRESH_MS = 6 * 3600000;   /* 'n gevulde dag is vars vir 6 h */
+  var HIST_EMPTY_MS = 30 * 60000;    /* 'n lee dag word na 30 min weer gehaal */
 
   var demoMode = false;
   try {
@@ -62,23 +68,72 @@
   }
 
   // ---------- history cache ----------
+  /* Elke SAST-dag van HIST_START tot vandag (ingesluit), as 'YYYY-MM-DD' */
+  function histDays(todayStr) {
+    var out = [];
+    var p = PK.HIST_START.split('-');
+    var t = Date.UTC(+p[0], +p[1] - 1, +p[2]);
+    for (var i = 0; i < 400; i++) {
+      var d = new Date(t + i * 86400000);
+      var ds = d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + d.getUTCDate()).slice(-2);
+      if (ds > todayStr) break;
+      out.push(ds);
+    }
+    return out;
+  }
+  function isEntry(e) {
+    return !!(e && typeof e === 'object' && e.by && typeof e.by === 'object' && typeof e.at === 'number');
+  }
+  function entryEmpty(e) {
+    if (!e) return true;
+    if (e.blocksDone > 0) return false;
+    for (var k in e.by) if (Object.prototype.hasOwnProperty.call(e.by, k) && e.by[k] > 0) return false;
+    return true;
+  }
+  /* Moet hierdie dag (weer) gehaal word? */
+  function histMissing(day, nowMs) {
+    var e = histCache[day];
+    if (!isEntry(e)) return true;
+    var todayStr = sastDay(nowMs);
+    if (day >= sastDay(nowMs - 86400000) || day === todayStr) return true; /* vandag en gister: altyd vars */
+    var age = nowMs - e.at;
+    if (age > HIST_FRESH_MS || age < 0) return true;
+    if (entryEmpty(e) && age > HIST_EMPTY_MS) return true; /* 'n lee uitslag is nooit finaal nie */
+    return false;
+  }
   function loadHistCache() {
+    try { window.localStorage.removeItem(HIST_KEY_V1); } catch (e) { /* ignore */ }
     try {
       var raw = window.localStorage.getItem(HIST_KEY);
       if (!raw) return {};
       var obj = JSON.parse(raw);
-      return (obj && typeof obj === 'object') ? obj : {};
+      if (!obj || typeof obj !== 'object') return {};
+      var out = {};
+      for (var k in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, k) && isEntry(obj[k])) out[k] = obj[k];
+      }
+      return out;
     } catch (e) { return {}; }
   }
   function saveHistCache(cache) {
     try {
-      var cutoff = sastDay(Date.now() - 21 * 86400000);
       var out = {};
       for (var k in cache) {
-        if (Object.prototype.hasOwnProperty.call(cache, k) && k >= cutoff) out[k] = cache[k];
+        if (Object.prototype.hasOwnProperty.call(cache, k) && k >= PK.HIST_START && isEntry(cache[k])) out[k] = cache[k];
       }
       window.localStorage.setItem(HIST_KEY, JSON.stringify(out));
     } catch (e) { /* ignore */ }
+  }
+  /* Een kas-inskrywing uit 'n oorsig (of wallie_pa_live) se antwoord */
+  function histEntry(res) {
+    var sessions = (res && Array.isArray(res.sessions)) ? res.sessions : [];
+    var done = 0;
+    if (res && Array.isArray(res.blocks)) {
+      for (var i = 0; i < res.blocks.length; i++) if (res.blocks[i] && res.blocks[i].status === 'done') done++;
+    }
+    var n = 0;
+    for (var j = 0; j < sessions.length; j++) if (sessionMinutes(sessions[j]) > 0) n++;
+    return { by: historyFromSessions(null, sessions), blocksDone: done, n: n, at: Date.now() };
   }
 
   function sessionMinutes(s) {
@@ -491,11 +546,12 @@
       if (useLight) {
         mergeLight(res);
       } else {
-        var model = buildModel(res, { legacy: legacy, history: buildHistoryArray(res), historyLoading: histLoading });
+        rememberDay(res, reqDay);
+        var model = buildModel(res, { legacy: legacy, history: buildHistoryArray(), historyLoading: histLoading });
         emit(model);
-        if (!histStarted) {
+        if (!histStarted || (!histLoading && Date.now() - histRunAt > HIST_EMPTY_MS)) {
           histStarted = true;
-          startHistoryBackfill(res);
+          startHistoryBackfill();
         }
       }
       schedule(pollInterval());
@@ -555,58 +611,82 @@
     } catch (e) { /* ignore */ }
   }
 
-  var lastTodayBy = {};
-  function buildHistoryArray(overviewRes) {
+  /* 'n Oorsig vir 'n spesifieke dag is die varsste bron vir daardie dag se kas-inskrywing */
+  function rememberDay(res, reqDay) {
+    try {
+      if (!res || !Array.isArray(res.sessions)) return;
+      var todayStr = sastDay(Date.now());
+      var day = String(res.day || reqDay || todayStr).slice(0, 10);
+      if (day < PK.HIST_START || day > todayStr) return;
+      if (legacy && reqDay === null && day !== todayStr) return;
+      histCache[day] = histEntry(legacy ? { sessions: res.sessions } : res);
+      saveHistCache(histCache);
+    } catch (e) { /* ignore */ }
+  }
+
+  function buildHistoryArray() {
     var out = [];
-    var todayStr = sastDay(Date.now());
-    var todayBy = {};
-    if (overviewRes && Array.isArray(overviewRes.sessions) && (overviewRes.day || todayStr) === todayStr) {
-      todayBy = historyFromSessions(todayStr, overviewRes.sessions);
-      lastTodayBy = todayBy;
-    } else {
-      todayBy = lastTodayBy;
-    }
-    for (var d = 13; d >= 0; d--) {
-      var dayStr = sastDay(Date.now() - d * 86400000);
-      var by = {};
-      if (d === 0) {
-        by = todayBy;
-      } else if (histCache[dayStr]) {
-        by = histCache[dayStr];
-      }
-      out.push({ day: dayStr, bySubject: by });
+    var days = histDays(sastDay(Date.now()));
+    for (var i = 0; i < days.length; i++) {
+      var e = histCache[days[i]];
+      out.push({
+        day: days[i],
+        bySubject: (e && e.by) || {},
+        blocksDone: (e && e.blocksDone) || 0,
+        sessions: (e && e.n) || 0
+      });
     }
     return out;
   }
 
-  function startHistoryBackfill(overviewRes) {
+  var histRunAt = 0;
+  function startHistoryBackfill() {
     if (histLoading) return;
+    histRunAt = Date.now();
+    var nowMs = Date.now();
+    var todayStr = sastDay(nowMs);
+    var days = histDays(todayStr);
     var missing = [];
-    var todayStr = sastDay(Date.now());
-    for (var d = 13; d >= 1; d--) {
-      var dayStr = sastDay(Date.now() - d * 86400000);
-      if (dayStr === todayStr) continue;
-      if (!histCache[dayStr]) missing.push(dayStr);
+    /* Nuutste eerste, sodat die mees onlangse dae eerste vul; vandag kom uit die gewone oorsig */
+    for (var d = days.length - 1; d >= 0; d--) {
+      if (days[d] === todayStr) continue;
+      if (histMissing(days[d], nowMs)) missing.push(days[d]);
     }
     if (missing.length === 0) return;
     histLoading = true;
+    if (lastModel) { lastModel.historyLoading = true; }
+
+    function refresh(loading) {
+      if (!lastModel) return;
+      lastModel.history = buildHistoryArray();
+      lastModel.historyLoading = loading;
+      emit(lastModel);
+    }
 
     function next(idx) {
       if (stopped || idx >= missing.length) {
         histLoading = false;
         saveHistCache(histCache);
-        if (lastModel) {
-          lastModel.history = buildHistoryArray(null);
-          lastModel.historyLoading = false;
-          emit(lastModel);
-        }
+        refresh(false);
         return;
       }
       var day = missing[idx];
-      rpc('wallie_pa_live', { p_token: token(), p_day: day }).then(function (res) {
+      var call = legacy
+        ? rpc('wallie_pa_live', { p_token: token(), p_day: day })
+        : rpc('wallie_pa_overview', { p_token: token(), p_day: day });
+      call.then(function (res) {
         if (handleAuth(res)) { histLoading = false; return; }
+        if (res && res.ok === false && res.missingFunction && !legacy) {
+          /* Oorsig (002) nie ontplooi nie: val terug na wallie_pa_live en probeer dieselfde dag weer */
+          legacy = true;
+          legacyCheckedAt = Date.now();
+          setTimeout(function () { next(idx); }, 400);
+          return;
+        }
         if (res && res.ok !== false) {
-          histCache[day] = historyFromSessions(day, res.sessions);
+          histCache[day] = histEntry(legacy ? { sessions: res.sessions } : res);
+          saveHistCache(histCache);
+          refresh(true); /* grafieke vul geleidelik */
         }
         setTimeout(function () { next(idx + 1); }, 400);
       }, function () {
@@ -658,7 +738,7 @@
     logout: function () {
       var t = token();
       setToken('');
-      stillCache.clear(); beats.length = 0; lastTodayBy = {}; lastModel = null;
+      stillCache.clear(); beats.length = 0; lastModel = null;
       stopTimers();
       stopped = true;
       if (!demoMode && t) {
@@ -709,7 +789,7 @@
         return;
       }
       /* Skoon begin ná (her)aanmelding: geen ou model, geskiedenis of legacy-vlag van 'n vorige sessie nie */
-      lastModel = null; histStarted = false; legacy = false; pending = false; backoffUntil = 0;
+      lastModel = null; histStarted = false; histRunAt = 0; legacy = false; pending = false; backoffUntil = 0;
       document.addEventListener('visibilitychange', onVis);
       tick();
     },

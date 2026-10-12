@@ -388,13 +388,26 @@
     });
     return keys;
   }
+  var BLK_LBL = 'Blokke klaar (geen tyd gemeet)';
+  function heatSummary(hist) {
+    var min = 0, n = 0, blk = 0;
+    hist.forEach(function (h) {
+      Object.keys(h.bySubject || {}).forEach(function (k) { min += Math.round(h.bySubject[k] || 0); });
+      n += h.sessions || 0;
+      blk += h.blocksDone || 0;
+    });
+    var start = (window.PK && PK.HIST_START) || (hist[0] && hist[0].day);
+    var since = start ? fmtDM(dayMs(start) + 12 * 3600000).replace(/\.$/, '') : '';
+    return 'Sedert ' + since + ': ' + min + ' min gemeet in ' + n + ' sessies, ' + blk + ' blokke klaar gemerk';
+  }
   function drawHeat() {
     var el = $('heatChart'); if (!el) return;
     var hist = (model && model.history) || [];
     var keys = heatRows();
     var xl = hist.map(function (h) { return fmtDM(dayMs(h.day) + 12 * 3600000); });
-    var yl = keys.map(function (k) { return subjName(k); });
-    var data = [], maxV = 0;
+    var yl = keys.map(function (k) { return subjName(k); }).concat([BLK_LBL]);
+    var blkY = keys.length;
+    var data = [], maxV = 0, blk = [];
     keys.forEach(function (k, yi) {
       hist.forEach(function (h, xi) {
         var v = Math.round((h.bySubject && h.bySubject[k]) || 0);
@@ -402,28 +415,53 @@
         data.push([xi, yi, v]);
       });
     });
-    var isNarrow = el.clientWidth < 560;
-    var vmax = Math.max(120, maxV);
+    hist.forEach(function (h, xi) {
+      var b = h.blocksDone || 0;
+      if (b > 0) blk.push([xi, blkY, b]);
+    });
+    var sub = $('heat-sub'); if (sub) sub.textContent = heatSummary(hist);
+
+    /* Een kolom per dag sedert HIST_START. Pas dit nie (foon, of later baie dae), dan wys 'n dataZoom die nuutste
+       dae en Pa sleep/rol sywaarts na vroeer dae; die vak-name links bly staan. */
+    var avail = el.clientWidth || 320;
+    var isNarrow = avail < 560;
+    var left = isNarrow ? 92 : 150;
+    var minCol = isNarrow ? 30 : 28;
+    var fit = Math.max(4, Math.floor((avail - left - 10) / minCol));
+    var zoom = hist.length > fit;
+    var vmax = Math.max(60, maxV);
     setOpt('heatChart', Object.assign(base(), {
-      grid: { left: isNarrow ? 70 : 92, right: 10, top: 6, bottom: 56 },
+      grid: { left: left, right: 10, top: 6, bottom: zoom ? (isNarrow ? 92 : 80) : 56 },
+      dataZoom: zoom ? [
+        { type: 'inside', xAxisIndex: 0, startValue: hist.length - fit, endValue: hist.length - 1, zoomLock: true, moveOnMouseWheel: true },
+        { type: 'slider', xAxisIndex: 0, startValue: hist.length - fit, endValue: hist.length - 1, zoomLock: true, brushSelect: false,
+          height: 14, bottom: 30, showDetail: false, borderColor: css('--line2'), fillerColor: css('--gold') + '33',
+          handleStyle: { color: css('--gold') }, moveHandleSize: 0, dataBackground: { lineStyle: { opacity: 0 }, areaStyle: { opacity: 0 } } }
+      ] : [],
       tooltip: Object.assign(tt(), {
         formatter: function (p) {
+          if (p.seriesIndex === 1) {
+            return esc(xl[p.value[0]]) + '<br/><b>' + p.value[2] + ' blokke klaar</b> (self gemerk of klaar; geen tyd gemeet)';
+          }
           return esc(yl[p.value[1]]) + ' · ' + esc(xl[p.value[0]]) + '<br/><b>' + p.value[2] + ' min</b>';
         }
       }),
       xAxis: {
         type: 'category', data: xl, splitArea: { show: false },
-        axisLabel: { color: css('--muted'), fontSize: 10, interval: isNarrow ? 1 : 0, rotate: isNarrow ? 45 : 0 },
+        axisLabel: { color: css('--muted'), fontSize: 10, interval: 0, rotate: isNarrow ? 45 : 0 },
         axisLine: { show: false }, axisTick: { show: false }
       },
       yAxis: {
         type: 'category', data: yl,
-        axisLabel: { color: css('--text'), fontSize: isNarrow ? 10 : 12 },
+        axisLabel: {
+          fontSize: isNarrow ? 10 : 12, width: left - 8, overflow: 'break',
+          color: function (v) { return v === BLK_LBL ? css('--gold') : css('--text'); }
+        },
         axisLine: { show: false }, axisTick: { show: false }
       },
       visualMap: {
         min: 0, max: vmax, calculable: false, orient: 'horizontal', left: 'center', bottom: 0,
-        itemHeight: isNarrow ? 120 : 180, itemWidth: 10,
+        seriesIndex: 0, itemHeight: isNarrow ? 120 : 180, itemWidth: 10,
         text: [vmax + ' min', '0'], textStyle: { color: css('--muted'), fontSize: 10 },
         inRange: { color: [css('--bg2'), '#1f6f46', '#3dcf7a', '#d4ad35'] }
       },
@@ -431,18 +469,26 @@
         type: 'heatmap', data: data,
         itemStyle: { borderColor: css('--panel-solid'), borderWidth: 3, borderRadius: 5 },
         emphasis: { itemStyle: { borderColor: css('--gold'), borderWidth: 2 } },
-        animationDelay: function (i) { return reduced ? 0 : i * 6; }
+        animationDelay: function (i) { return reduced ? 0 : i * 4; }
+      }, {
+        /* Merker, nie 'n hittesel nie: blokke klaar sonder gemete tyd (bv. 1-8 Okt) */
+        name: BLK_LBL, type: 'scatter', data: blk, symbol: 'roundRect', symbolSize: isNarrow ? [26, 20] : [30, 22],
+        itemStyle: { color: 'transparent', borderColor: css('--gold'), borderWidth: 2, borderType: 'dashed' },
+        label: { show: true, formatter: function (p) { return '✓' + p.value[2]; }, color: css('--gold'), fontSize: 11, fontWeight: 700 }
       }]
     }));
     var tbl = $('heat-table');
     if (tbl) {
       var html = '<tr><th>Vak</th>' + xl.map(function (x) { return '<th>' + esc(x) + '</th>'; }).join('') + '</tr>';
-      html += keys.map(function (k, yi) {
-        return '<tr><td>' + esc(subjName(k)) + '</td>' + hist.map(function (h, xi) {
+      html += keys.map(function (k) {
+        return '<tr><td>' + esc(subjName(k)) + '</td>' + hist.map(function (h) {
           var v = Math.round((h.bySubject && h.bySubject[k]) || 0);
           return '<td>' + v + '</td>';
         }).join('') + '</tr>';
       }).join('');
+      html += '<tr class="blk"><td>' + esc(BLK_LBL) + '</td>' + hist.map(function (h) {
+        return '<td>' + (h.blocksDone || 0) + '</td>';
+      }).join('') + '</tr>';
       tbl.innerHTML = html;
     }
   }
@@ -451,9 +497,9 @@
   function drawWeek() {
     var el = $('weekChart'); if (!el) return;
     var hist = (model && model.history) || [];
-    var byDay = {};
-    hist.forEach(function (h) { byDay[h.day] = h.bySubject || {}; });
-    // ISO-week (Ma–So) wat model.day bevat
+    var byDay = {}, blkDay = {};
+    hist.forEach(function (h) { byDay[h.day] = h.bySubject || {}; blkDay[h.day] = h.blocksDone || 0; });
+    // ISO-week (Ma-So) wat model.day bevat; die geskiedenis dek elke dag terug tot HIST_START
     var d0 = dayMs(model.day);
     var dow = (new Date(d0 + 12 * 3600000).getUTCDay() + 6) % 7; // Ma=0
     var mon = d0 - dow * 86400000;
@@ -470,7 +516,20 @@
     setOpt('weekChart', Object.assign(base(), {
       grid: { left: 40, right: 10, top: 30, bottom: 26 },
       legend: { top: 0, type: 'scroll', textStyle: { color: css('--muted'), fontSize: 11 }, itemWidth: 10, itemHeight: 8 },
-      tooltip: Object.assign(tt(), { trigger: 'axis' }),
+      tooltip: Object.assign(tt(), {
+        trigger: 'axis',
+        formatter: function (ps) {
+          if (!ps || !ps.length) return '';
+          var di = ps[0].dataIndex;
+          var tot = 0;
+          var rows = ps.filter(function (p) { return p.value > 0; }).map(function (p) {
+            tot += p.value;
+            return p.marker + esc(p.seriesName) + ': <b>' + p.value + ' min</b>';
+          });
+          return '<b>' + esc(WD[di]) + ' ' + esc(fmtDM(dayMs(days[di]) + 12 * 3600000)) + '</b> · ' + tot + ' min<br/>' +
+            (rows.length ? rows.join('<br/>') + '<br/>' : '') + 'Blokke klaar: <b>' + (blkDay[days[di]] || 0) + '</b>';
+        }
+      }),
       xAxis: {
         type: 'category', data: WD,
         axisLabel: { color: css('--muted') },
@@ -962,6 +1021,7 @@
     var today = new Date().toLocaleDateString('en-CA', { timeZone: TZ });
     dp.value = today;
     dp.max = today;
+    dp.min = (window.PK && PK.HIST_START) || '2026-09-27';
     dp.addEventListener('change', function () {
       var v = dp.value;
       PK.data.setDay(!v || v === today ? null : v);
