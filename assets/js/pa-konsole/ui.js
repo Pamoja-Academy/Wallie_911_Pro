@@ -389,16 +389,29 @@
     return keys;
   }
   var BLK_LBL = 'Blokke klaar (geen tyd gemeet)';
+  var NA = 'nie gelaai nie';
+  /* 'n Dag wie se oorsig-oproep nog nie geslaag het nie is NIE 'n nul nie: hy word oorgeslaan
+     in elke som en elke grafiek, en wys as "nie gelaai nie". */
+  function histOk(h) { return !!h && h.loaded !== false; }
+  /* Net blokke wat klaar gemerk is sonder dat enige tyd gemeet is (nie blokke wat deur gemete tyd klaar is nie) */
+  function histBlk(h) { return Math.round((h && h.blocksUntimed) || 0); }
   function heatSummary(hist) {
-    var min = 0, n = 0, blk = 0;
+    var min = 0, n = 0, blk = 0, gaps = 0;
     hist.forEach(function (h) {
+      if (!histOk(h)) { gaps++; return; }
       Object.keys(h.bySubject || {}).forEach(function (k) { min += Math.round(h.bySubject[k] || 0); });
       n += h.sessions || 0;
-      blk += h.blocksDone || 0;
+      blk += histBlk(h);
     });
     var start = (window.PK && PK.HIST_START) || (hist[0] && hist[0].day);
     var since = start ? fmtDM(dayMs(start) + 12 * 3600000).replace(/\.$/, '') : '';
-    return 'Sedert ' + since + ': ' + min + ' min gemeet in ' + n + ' sessies, ' + blk + ' blokke klaar gemerk';
+    var txt = 'Sedert ' + since + ': ' + min + ' min gemeet in ' + n + ' sessies, ' + blk + ' blokke klaar gemerk';
+    /* Die som praat net oor dae wat ons werklik gelaai het; die res word genoem, nie as nul getel nie */
+    if (gaps) {
+      txt += ' · ' + gaps + (gaps === 1 ? ' dag ' : ' dae ') + NA +
+        ((model && model.historyLoading) ? ' (nog besig om te laai)' : ' — probeer weer');
+    }
+    return txt;
   }
   function drawHeat() {
     var el = $('heatChart'); if (!el) return;
@@ -407,16 +420,19 @@
     var xl = hist.map(function (h) { return fmtDM(dayMs(h.day) + 12 * 3600000); });
     var yl = keys.map(function (k) { return subjName(k); }).concat([BLK_LBL]);
     var blkY = keys.length;
-    var data = [], maxV = 0, blk = [];
+    var data = [], maxV = 0, blk = [], gap = [];
     keys.forEach(function (k, yi) {
       hist.forEach(function (h, xi) {
+        /* '-' is ECharts se "geen data": 'n leë sel, nie 'n nul-sel nie */
+        if (!histOk(h)) { data.push([xi, yi, '-']); return; }
         var v = Math.round((h.bySubject && h.bySubject[k]) || 0);
         if (v > maxV) maxV = v;
         data.push([xi, yi, v]);
       });
     });
     hist.forEach(function (h, xi) {
-      var b = h.blocksDone || 0;
+      if (!histOk(h)) { gap.push([xi, blkY, 0]); return; }
+      var b = histBlk(h);
       if (b > 0) blk.push([xi, blkY, b]);
     });
     var sub = $('heat-sub'); if (sub) sub.textContent = heatSummary(hist);
@@ -440,8 +456,11 @@
       ] : [],
       tooltip: Object.assign(tt(), {
         formatter: function (p) {
+          if (p.seriesIndex === 2) {
+            return esc(xl[p.value[0]]) + '<br/><b>' + NA + '</b> — die oorsig vir die dag het misluk; die konsole probeer weer';
+          }
           if (p.seriesIndex === 1) {
-            return esc(xl[p.value[0]]) + '<br/><b>' + p.value[2] + ' blokke klaar</b> (self gemerk of klaar; geen tyd gemeet)';
+            return esc(xl[p.value[0]]) + '<br/><b>' + p.value[2] + ' blokke klaar</b> (self gemerk; geen tyd gemeet)';
           }
           return esc(yl[p.value[1]]) + ' · ' + esc(xl[p.value[0]]) + '<br/><b>' + p.value[2] + ' min</b>';
         }
@@ -475,19 +494,26 @@
         name: BLK_LBL, type: 'scatter', data: blk, symbol: 'roundRect', symbolSize: isNarrow ? [26, 20] : [30, 22],
         itemStyle: { color: 'transparent', borderColor: css('--gold'), borderWidth: 2, borderType: 'dashed' },
         label: { show: true, formatter: function (p) { return '✓' + p.value[2]; }, color: css('--gold'), fontSize: 11, fontWeight: 700 }
+      }, {
+        /* Dae waarvan die oorsig misluk het: 'n grys "?" in plaas van 'n nul-kolom */
+        name: NA, type: 'scatter', data: gap, symbol: 'roundRect', symbolSize: isNarrow ? [26, 20] : [30, 22],
+        itemStyle: { color: 'transparent', borderColor: css('--muted'), borderWidth: 1, borderType: 'dotted' },
+        label: { show: true, formatter: '?', color: css('--muted'), fontSize: 11, fontWeight: 700 }
       }]
     }));
     var tbl = $('heat-table');
     if (tbl) {
       var html = '<tr><th>Vak</th>' + xl.map(function (x) { return '<th>' + esc(x) + '</th>'; }).join('') + '</tr>';
+      var naCell = '<td class="na" title="' + esc(NA) + '">?</td>';
       html += keys.map(function (k) {
         return '<tr><td>' + esc(subjName(k)) + '</td>' + hist.map(function (h) {
+          if (!histOk(h)) return naCell;
           var v = Math.round((h.bySubject && h.bySubject[k]) || 0);
           return '<td>' + v + '</td>';
         }).join('') + '</tr>';
       }).join('');
       html += '<tr class="blk"><td>' + esc(BLK_LBL) + '</td>' + hist.map(function (h) {
-        return '<td>' + (h.blocksDone || 0) + '</td>';
+        return histOk(h) ? '<td>' + histBlk(h) + '</td>' : naCell;
       }).join('') + '</tr>';
       tbl.innerHTML = html;
     }
@@ -497,8 +523,12 @@
   function drawWeek() {
     var el = $('weekChart'); if (!el) return;
     var hist = (model && model.history) || [];
-    var byDay = {}, blkDay = {};
-    hist.forEach(function (h) { byDay[h.day] = h.bySubject || {}; blkDay[h.day] = h.blocksDone || 0; });
+    var byDay = {}, blkDay = {}, okDay = {};
+    hist.forEach(function (h) {
+      okDay[h.day] = histOk(h);
+      byDay[h.day] = h.bySubject || {};
+      blkDay[h.day] = histBlk(h);
+    });
     // ISO-week (Ma-So) wat model.day bevat; die geskiedenis dek elke dag terug tot HIST_START
     var d0 = dayMs(model.day);
     var dow = (new Date(d0 + 12 * 3600000).getUTCDay() + 6) % 7; // Ma=0
@@ -521,13 +551,17 @@
         formatter: function (ps) {
           if (!ps || !ps.length) return '';
           var di = ps[0].dataIndex;
+          if (okDay[days[di]] === false) {
+            return '<b>' + esc(WD[di]) + ' ' + esc(fmtDM(dayMs(days[di]) + 12 * 3600000)) + '</b> · ' + NA;
+          }
           var tot = 0;
           var rows = ps.filter(function (p) { return p.value > 0; }).map(function (p) {
             tot += p.value;
             return p.marker + esc(p.seriesName) + ': <b>' + p.value + ' min</b>';
           });
           return '<b>' + esc(WD[di]) + ' ' + esc(fmtDM(dayMs(days[di]) + 12 * 3600000)) + '</b> · ' + tot + ' min<br/>' +
-            (rows.length ? rows.join('<br/>') + '<br/>' : '') + 'Blokke klaar: <b>' + (blkDay[days[di]] || 0) + '</b>';
+            (rows.length ? rows.join('<br/>') + '<br/>' : '') +
+            'Blokke klaar sonder gemete tyd: <b>' + (blkDay[days[di]] || 0) + '</b>';
         }
       }),
       xAxis: {
@@ -543,7 +577,8 @@
       series: keys.map(function (k, i) {
         return {
           name: subjName(k), type: 'bar', stack: 't', barWidth: '52%',
-          data: days.map(function (ds) { return Math.round((byDay[ds] && byDay[ds][k]) || 0); }),
+          /* '-' en nie 0 nie: 'n dag wat nie gelaai is nie kry geen staaf nie */
+          data: days.map(function (ds) { return okDay[ds] === false ? '-' : Math.round((byDay[ds] && byDay[ds][k]) || 0); }),
           itemStyle: { color: css(subjVar(k)), borderRadius: i === keys.length - 1 ? [5, 5, 0, 0] : 0 },
           animationDelay: function (j) { return reduced ? 0 : j * 90 + i * 40; }
         };
@@ -558,7 +593,8 @@
     if (!window.echarts || !model) return;
     var c = model.current, mn = function (v) { return Math.round((v || 0) / 60000); };
     var sig = JSON.stringify([model.day, model.blocks, (model.sessions || []).map(function (x) { return [x.sessionId, x.startedAt, x.endedAt, x.minutes]; }),
-      model.history, c ? [c.startedAt, mn(c.focusedMs), mn(c.visibleMs), mn(c.hiddenMs), mn(c.idleMs)] : null,
+      /* historyLoading hoort hier: die hittekaart se onderskrif se "nog besig" / "probeer weer" hang daarvan af */
+      model.history, !!model.historyLoading, c ? [c.startedAt, mn(c.focusedMs), mn(c.visibleMs), mn(c.hiddenMs), mn(c.idleMs)] : null,
       model.isToday ? Math.floor(PK.data.serverNow() / 60000) : 0]);
     if (!force && sig === chartSig) return;
     chartSig = sig;

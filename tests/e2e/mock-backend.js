@@ -29,6 +29,9 @@ class MockBackend {
     this.nowFn = () => Date.now();
     this.plans = [];
     this.pg = null;
+    /* Opsioneel: (name, body) => "down" | "abort" | null, sodat 'n toets een RPC kan laat misluk
+       sonder om die hele bediener af te skakel. */
+    this.failRpc = null;
   }
 
   /* Net vir mode "full": skep die plaaslike databasis met die werklike skema + migrasies */
@@ -122,6 +125,12 @@ class MockBackend {
       return route.fulfill({ status: 503, headers: cors, contentType: "application/json", body: '{"message":"Service Unavailable"}' });
     }
     const json = (status, obj) => route.fulfill({ status, headers: cors, contentType: "application/json", body: JSON.stringify(obj) });
+
+    if (this.failRpc) {
+      const how = this.failRpc(name, body);
+      if (how === "abort") return route.abort("internetdisconnected");
+      if (how) return route.fulfill({ status: 503, headers: cors, contentType: "application/json", body: '{"message":"Service Unavailable"}' });
+    }
 
     if (this.pg) {
       const fn = {

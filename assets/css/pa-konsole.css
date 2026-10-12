@@ -141,6 +141,9 @@
   /* Hittekaart-tabel sedert 27 Sep: rol sywaarts binne die kaart, nooit die bladsy nie */
   .tbl-scroll{overflow-x:auto; max-width:100%}
   details.tbl tr.blk td{color:var(--gold); border-top:1px dashed var(--gold)}
+  /* 'n Dag wat nie gelaai is nie: nie 'n nul nie */
+  details.tbl td.na{color:var(--muted); font-style:italic}
+  details.tbl tr.blk td.na{color:var(--muted)}
   .legend-inline{display:flex; gap:12px; flex-wrap:wrap; font-size:.76rem; color:var(--muted); margin-bottom:6px}
   .legend-inline span{display:inline-flex; align-items:center; gap:5px}
   .legend-inline i{width:14px; height:8px; border-radius:3px; display:inline-block}
