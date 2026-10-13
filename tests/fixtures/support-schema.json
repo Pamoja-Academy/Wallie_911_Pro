@@ -1,0 +1,6 @@
+{
+  "_bron": "Lewendige wallie911.support (bic-tender-ops) ná migrasie 003, 2026-10-14. Hou in pas met migrations/003_support_hulp.sql.",
+  "table": "wallie911.support",
+  "columns": ["id", "created_at", "category", "message", "app_version", "ua", "context", "status", "vak", "gebeur", "skerm"],
+  "client_writes": ["vak", "gebeur", "skerm", "category", "message", "context", "app_version", "ua"]
+}

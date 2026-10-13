@@ -2,6 +2,7 @@
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
 const { boot } = require("./helpers");
+const GESTUUR = "Gestuur. Hulp kom binne ongeveer 10 minute per e-pos (kyk jou Gmail). Pa kry ook 'n kopie.";
 
 test("hulp-paneel: oop, navigeer, toe", async ({ page, context }) => {
   await new MockBackend({ mode: "v1" }).attach(context);
@@ -145,7 +146,7 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
   await page.locator("#hulp-gebeur").fill("Die memo-knoppie reageer nie.");
   await expect(page.locator("#hulp-skerm")).toHaveValue("Engels EAT");
   await page.locator("#hulp-stuur").click();
-  await expect(page.locator("#hulp-status")).toHaveText("Gestuur. Pa kry jou boodskap.");
+  await expect(page.locator("#hulp-status")).toHaveText(GESTUUR);
 
   const key = await page.evaluate(() => WALLIE.LIVE.key);
   expect(mock.support).toHaveLength(1);
@@ -153,7 +154,11 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
     method: "POST",
     apikey: key,
     profile: "wallie911",
-    body: { vak: "engels", gebeur: "Die memo-knoppie reageer nie.", skerm: "Engels EAT" }
+    body: {
+      vak: "engels", gebeur: "Die memo-knoppie reageer nie.", skerm: "Engels EAT",
+      category: "engels", message: "Die memo-knoppie reageer nie.",
+      context: { skerm: "Engels EAT", bron: "hulp" }
+    }
   });
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("w911_support_queue") || "[]"))).toEqual([]);
 
@@ -172,5 +177,48 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
   expect(mock.support[1].body).toMatchObject({ vak: "engels", gebeur: "Nou is ek vanlyn.", skerm: "Engels EAT" });
   expect(mock.support[1].profile).toBe("wallie911");
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("w911_support_queue") || "[]"))).toEqual([]);
-  await expect(page.locator("#hulp-status")).toHaveText("Gestuur. Pa kry jou boodskap.");
+  await expect(page.locator("#hulp-status")).toHaveText(GESTUUR);
 });
+
+const GESTUUR_TEKS = GESTUUR;
+
+test("hulp: liggaam se sleutels == skema-fiksture se kolomme (geen 0-rye meer nie)", async ({ page, context }) => {
+  const fx = require("../fixtures/support-schema.json");
+  const mock = new MockBackend({ mode: "v1" });
+  await mock.attach(context);
+  await boot(page);
+  await page.goto("/#leer");
+  await page.click("#hulp-fab");
+  await page.locator("#hulp-vak").selectOption("rtt");
+  await page.locator("#hulp-gebeur").fill("Skema-toets");
+  await page.locator("#hulp-skerm").fill("Sessie");
+  await page.locator("#hulp-stuur").click();
+  await expect(page.locator("#hulp-status")).toHaveText(GESTUUR_TEKS);
+  expect(mock.supportRejected || 0).toBe(0);
+  expect(mock.support).toHaveLength(1);
+  const keys = Object.keys(mock.support[0].body).sort();
+  expect(keys).toEqual([...fx.client_writes].sort());
+  for (const k of keys) expect(fx.columns).toContain(k);
+  expect(mock.support[0].body.app_version).toBe(await page.evaluate(() => WALLIE.APP_VERSION));
+});
+
+test("hulp: ou 'Iets werk nie'-vorm skryf ook na wallie911.support", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v1" });
+  await mock.attach(context);
+  await boot(page);
+  await page.goto("/#probleem");
+  const dialoog = new Promise((r) => page.once("dialog", async (d) => { r(d.message()); await d.accept(); }));
+  await page.locator('input[name="bugTipe"][value="proctor"]').check();
+  await page.locator("#bug-detail").fill("Skerm sluit as ek na Word gaan.");
+  await page.locator("#bug-form button[type=submit]").click();
+  expect(await dialoog).toContain("10 minute per e-pos");
+  await expect.poll(() => mock.support.length).toBe(1);
+  expect(mock.support[0].profile).toBe("wallie911");
+  expect(mock.support[0].body).toMatchObject({
+    vak: "algemeen",
+    gebeur: "Skerm sluit as ek na Word gaan.",
+    skerm: "Iets werk nie (proctor, irriterend)",
+    context: { bron: "iets-werk-nie", extra: { tipe: "proctor", severity: "irriterend" } }
+  });
+});
+

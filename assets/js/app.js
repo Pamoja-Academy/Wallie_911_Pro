@@ -1172,12 +1172,27 @@
       data: bug,
       blocking: bug.severity === "blokkeer"
     });
+    /* Dieselfde pad as die Hulp-paneel: wallie911.support (die hulp-roetine antwoord per e-pos). Push bly. */
+    const supportBelofte = WALLIE.HULP?.stuur({
+      vak: bug.subjectSlug || "algemeen",
+      gebeur: bug.detail + (bug.code ? `\nKode: ${bug.code}` : ""),
+      skerm: `Iets werk nie (${bug.tipe}, ${bug.severity})`,
+      bron: "iets-werk-nie",
+      extra: { tipe: bug.tipe, severity: bug.severity, code: bug.code, bug_id: bug.id }
+    });
     persist();
     $("#bug-detail").value = "";
     $("#bug-code").value = "";
     document.querySelectorAll('input[name="bugTipe"]').forEach((r) => (r.checked = false));
     renderBugs();
-    alert("Dankie — probleem gestoor en na Pa gestuur (push + e-pos-kopie). Pa sien dit ook onder Verbeter.");
+    const melding = (uitslag) =>
+      alert(
+        uitslag === "gestuur"
+          ? "Dankie — gestuur. Hulp kom binne ongeveer 10 minute per e-pos (kyk jou Gmail). Pa sien dit ook onder Verbeter."
+          : "Dankie — probleem gestoor. Geen verbinding nie: dit gaan deur sodra jy weer internet het, en dan kom hulp per e-pos."
+      );
+    if (supportBelofte && typeof supportBelofte.then === "function") supportBelofte.then(melding, () => melding("tou"));
+    else melding("tou");
   });
 
   $("#bug-refresh")?.addEventListener("click", () => renderBugs());

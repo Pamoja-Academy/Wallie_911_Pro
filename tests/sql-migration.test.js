@@ -116,12 +116,28 @@ async function main() {
   /* Regte: anon mag net die funksie roep */
   const g = (
     await rows(
-      "select has_function_privilege('anon', 'public.wallie_ingest_v2(jsonb)', 'execute') e, has_schema_privilege('anon', 'wallie911', 'usage') s"
+      "select has_function_privilege('anon', 'public.wallie_ingest_v2(jsonb)', 'execute') e, has_table_privilege('anon', 'wallie911.events', 'select') or has_table_privilege('anon', 'wallie911.events', 'insert') s, has_table_privilege('anon', 'wallie911.support', 'select') ss"
     )
   )[0];
-  ok(g.e === true && g.s === false, "anon: execute op v2, geen toegang tot skema nie");
+  /* Sedert 003 het anon USAGE op wallie911 (soos lewendig) — net vir INSERT in support; geen tabel-lees of events-skryf nie. */
+  ok(g.e === true && g.s === false && g.ss === false, "anon: execute op v2, geen lees/skryf op events, geen lees op support nie");
 
   await overviewTests(db, { ok, eq, v2 });
+  /* wallie911.support: kolomme == skema-fiksture, en die Hulp-paneel se presiese liggaam word aanvaar */
+  {
+    const fx = JSON.parse(fs.readFileSync(path.join(root, "tests/fixtures/support-schema.json"), "utf8"));
+    const cols = (await rows("select column_name from information_schema.columns where table_schema='wallie911' and table_name='support' order by ordinal_position")).map((r) => r.column_name);
+    eq([...cols].sort(), [...fx.columns].sort(), `support-kolomme pas by fiksture (${cols})`);
+    ok(fx.client_writes.every((c) => cols.includes(c)), "elke kliënt-sleutel bestaan as kolom");
+    const body = { vak: "rtt", gebeur: "toets", skerm: "Sessie", category: "rtt", message: "toets", context: { skerm: "Sessie", bron: "hulp" }, app_version: "x", ua: "y" };
+    eq(Object.keys(body).sort(), [...fx.client_writes].sort(), "toetsliggaam == client_writes");
+    await db.exec("set role anon");
+    await db.query("insert into wallie911.support (vak, gebeur, skerm) values ('engels','net drie','Engels EAT')");
+    await db.exec("reset role");
+    const r = (await rows("select category, message, status, context->>'skerm' s from wallie911.support where gebeur='net drie'"))[0];
+    eq(r, { category: "engels", message: "net drie", status: "new", s: "Engels EAT" }, "ou 3-veld-liggaam: sneller vul category/message, status=new");
+  }
+
   console.log(JSON.stringify({ passed, fails: 0 }));
 }
 
