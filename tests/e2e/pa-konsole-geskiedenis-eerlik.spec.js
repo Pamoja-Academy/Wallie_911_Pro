@@ -194,3 +194,81 @@ test('n dag waarvan die oorsig misluk het wys "nie gelaai nie" en word weer prob
   expect(errors).toEqual([]);
   expectNoLeaks(mock);
 });
+
+/* Terwyl Wallie in 'n sessie is, peil die konsole lig (wallie_pa_live) en slaan die swaar oorsig oor.
+   Mislukte geskiedenisdae moet TÓG na 'n minuut weer probeer word — nie eers wanneer die sessie eindig nie. */
+test("mislukte dae word ook tydens 'n sessie weer probeer", async ({ page, context }) => {
+  const mock = await new MockBackend({ mode: "full" }).init();
+  const t0 = Date.now();
+  const today = new Date(t0).toLocaleDateString("en-CA", { timeZone: "Africa/Johannesburg" });
+  expect(today > "2026-10-03", "toetsdatums moet voor vandag val").toBe(true);
+  mock.nowFn = () => t0;
+
+  const FAIL_A = "2026-10-01";
+  const FAIL_B = "2026-10-02";
+  const OK = "2026-10-03";
+  await session(mock, { day: FAIL_A, hm: "09:00", subject: GAS, slug: "gasvryheid", mins: 19 });
+  await session(mock, { day: FAIL_B, hm: "09:00", subject: WISK, slug: "wiskgelett", mins: 50 });
+  await session(mock, { day: OK, hm: "09:00", subject: WISK, slug: "wiskgelett", mins: 30 });
+  /* Oop sessie: ended_at null en last_seen = nou, sodat useLight waar bly vir die hele toets */
+  await mock.sql("select public.wallie_ingest_v2($1::jsonb) r", [
+    JSON.stringify({
+      kind: "start", event_id: "start:s_oop", session_id: "s_oop", subject: "Engels", subject_slug: "engels",
+      task: "Opstel", status: "active", started_at: t0, client_at: t0, planned_min: 50, left_ms: 50 * 60000,
+      visible: true, focused: true, idle: false, device_id: "d_eerlik", app_version: "t"
+    })
+  ]);
+
+  const STUK = new Set([FAIL_A, FAIL_B]);
+  mock.failRpc = (name, body) => (name === "wallie_pa_overview" && body && STUK.has(body.p_day) ? "down" : null);
+
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await mock.attach(context);
+  await boot(page, { time: new Date(t0), consent: false, seed: { wallie911_pa_token: "tok_test" } });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/pa-konsole.html");
+  await expect(page.locator("#console-view")).toBeVisible();
+  await expect(page.locator("#status-text")).toHaveText("IN SESSIE", { timeout: 20000 });
+
+  await runUntil(page, async () => cell(await heatTable(page), "Wisk. Gel.", "3 Okt") === "30", { label: "3 Okt gevul", max: 60000 });
+  await settled(page);
+
+  const rows = await heatTable(page);
+  expect({
+    gas1: cell(rows, "Gasvryheid", "1 Okt"), wisk1: cell(rows, "Wisk. Gel.", "1 Okt"),
+    wisk2: cell(rows, "Wisk. Gel.", "2 Okt"),
+    wisk3: cell(rows, "Wisk. Gel.", "3 Okt")
+  }).toEqual({ gas1: "?", wisk1: "?", wisk2: "?", wisk3: "30" });
+  await expect(page.locator("#heat-sub")).toContainText("2 dae nie gelaai nie — probeer weer");
+
+  /* Die ligte peiling loop: Wallie is in 'n sessie, so tick() roep wallie_pa_live, nie 'n vars oorsig vir vandag nie */
+  const inSessie = () => page.evaluate(() => !!(window.PK && PK.ui && PK.ui.lastModel && PK.ui.lastModel.current));
+  expect(await inSessie()).toBe(true);
+  expect(mock.calls.filter((c) => c.name === "wallie_pa_live").length).toBeGreaterThan(0);
+
+  const merk = mock.calls.length;
+  mock.failRpc = null;
+
+  await runUntil(page, async () => {
+    if (!(await inSessie())) throw new Error("sessie het geval — die herprobeer het nie tydens useLight gebeur nie");
+    const r = await heatTable(page);
+    return cell(r, "Gasvryheid", "1 Okt") === "19" && cell(r, "Wisk. Gel.", "2 Okt") === "50";
+  }, { label: "stukkende dae tydens sessie weer probeer", max: 180000 });
+  await settled(page);
+
+  const daarna = mock.calls.slice(merk);
+  const vandagOorsig = daarna.filter((c) => c.name === "wallie_pa_overview" && !(c.body && c.body.p_day));
+  const lig = daarna.filter((c) => c.name === "wallie_pa_live");
+  const weer = daarna.filter((c) => c.name === "wallie_pa_overview" && c.body && STUK.has(c.body.p_day));
+  expect(lig.length, "ligte peiling hou aan tydens die sessie").toBeGreaterThan(0);
+  expect(weer.length, "mislukte dae is weer gehaal").toBeGreaterThan(0);
+  expect(vandagOorsig, "herprobeer kom nie uit 'n volle oorsig-tick nie").toEqual([]);
+
+  await expect(page.locator("#heat-sub")).not.toContainText("nie gelaai nie");
+  expect(await page.evaluate(() => document.querySelectorAll("#heat-table td.na").length)).toBe(0);
+  expect(await inSessie()).toBe(true);
+  expect(errors).toEqual([]);
+  expectNoLeaks(mock);
+});

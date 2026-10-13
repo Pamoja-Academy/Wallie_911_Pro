@@ -573,11 +573,13 @@
         rememberDay(res, reqDay);
         var model = buildModel(res, { legacy: legacy, history: buildHistoryArray(), historyLoading: histLoading });
         emit(model);
-        var histGap = histAnyFailed() ? HIST_RETRY_MS : HIST_EMPTY_MS;
-        if (!histStarted || (!histLoading && Date.now() - histRunAt > histGap)) {
-          histStarted = true;
-          startHistoryBackfill();
-        }
+      }
+      /* useLight slaan die swaar oorsig oor terwyl Wallie in 'n sessie is, maar mislukte dae
+         moet steeds na HIST_RETRY_MS weer probeer word — anders bly hulle "nie gelaai nie". */
+      var histGap = histAnyFailed() ? HIST_RETRY_MS : HIST_EMPTY_MS;
+      if (!histStarted || (!histLoading && Date.now() - histRunAt > histGap)) {
+        histStarted = true;
+        startHistoryBackfill();
       }
       schedule(pollInterval());
     }, function () {
