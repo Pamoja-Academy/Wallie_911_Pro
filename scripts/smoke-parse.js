@@ -102,10 +102,11 @@ if (typeof W.buildDayPlan === "function") {
     assert(eng && eng.minutes >= 40 && eng.minutes <= 50, `${d} Engels 40–50 min`);
     assert(toe && toe.minutes >= 20 && toe.minutes <= 30, `${d} Toerisme 20–30 min`);
   }
-  const rotated = ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16"].map((d) =>
+  /* 13 en 14 Okt is vaste Engels V3-planne (nie die geel-rotasie nie). 15 en 16 roteer steeds. */
+  const rotated = ["2026-10-15", "2026-10-16"].map((d) =>
     W.buildDayPlan(d).blocks.find((b) => b.id.endsWith("-geel"))?.subjectSlug
   );
-  assert(new Set(rotated).size === 2 && !rotated.includes("rtt"), "geel rotates Engels / Toerisme after kickoff");
+  assert(rotated[0] && rotated[1] && rotated[0] !== rotated[1] && !rotated.includes("rtt"), "geel rotates Engels / Toerisme on 15 and 16 Okt");
   {
     const g = W.buildDayPlan("2026-10-10").blocks.find((b) => b.id === "2026-10-10-geel");
     assert(g && g.subjectSlug === "rtt" && g.kind === "rooi" && g.title === "RTT V1 — praktiese oefening (Oefenvrae)", "2026-10-10 geel-blok is RTT V1");
@@ -156,6 +157,38 @@ if (typeof W.buildDayPlan === "function") {
     assert(s12.every((b) => b.subjectSlug !== "engels"), "12 Okt: geen Engels-blok (heeltemal RTT)");
     assert(/Pak sak/.test(s12.find((b) => b.id === "2026-10-12-laaste-herroep").detail), "12 Okt: laaste herroeping sê pak die sak");
     assert(/Skerm af/.test(s12[s12.length - 1].title), "12 Okt: sluit af met skerm af en slaap");
+  }
+  /* Engels V3: Di 13 en Wo 14 Okt is vaste planne, nie die Gasvryheid/Afrikaans/RTT-rotasie nie. */
+  const ENG_SOORTE = ["toets", "merk", "herdoen", "les", "opstel", "pouse", "skrif"];
+  const VERBODE_VAK = ["wiskgelett", "gasvryheid", "afrikaans", "rtt", "toerisme"];
+  for (const d of ["2026-10-13", "2026-10-14"]) {
+    const p = W.buildDayPlan(d);
+    assert(p.blocks.filter((b) => VERBODE_VAK.includes(b.subjectSlug)).length === 0, `${d} geen verstek-rotasie-vakke`);
+    assert(p.blocks.some((b) => b.subjectSlug === "engels"), `${d} het Engels-werk`);
+    assert(p.blocks.every((b) => b.start && b.end && ENG_SOORTE.includes(b.soort)), `${d} tye en soort`);
+    assert(new Set(p.blocks.map((b) => b.id)).size === p.blocks.length, `${d} unieke blok-id's`);
+    let vorige = "00:00";
+    let orde = true;
+    for (const b of p.blocks) {
+      if (b.start < vorige) orde = false;
+      vorige = b.end;
+    }
+    assert(orde, `${d} blokke is chronologies, geen oorvleueling`);
+    assert(p.blocks.filter((b) => b.kind !== "break").every((b) => b.kind === "geel" && b.subjectSlug === "engels"), `${d} werkblokke is geel/engels`);
+    assert(p.blocks.filter((b) => b.kind === "break").every((b) => b.subjectSlug === "break" && b.soort === "pouse"), `${d} pouses is break/break`);
+  }
+  {
+    const s13 = W.buildDayPlan("2026-10-13").blocks;
+    const c1 = s13.find((b) => b.id === "2026-10-13-c1");
+    assert(c1 && c1.start === "14:00" && c1.end === "14:30" && c1.soort === "toets" && /Dagboekinskrywings/.test(c1.title), "13 Okt 14:00 is C1 Dagboekinskrywings");
+    assert(/Skerms af 21:30/.test(s13[s13.length - 1].title), "13 Okt: skerms af 21:30");
+    const s14 = W.buildDayPlan("2026-10-14").blocks;
+    const proef = s14.find((b) => b.id === "2026-10-14-proef");
+    assert(
+      proef && proef.start === "13:00" && proef.end === "15:30" && proef.minutes === 150 && proef.soort === "skrif" && proef.kind === "geel" && proef.subjectSlug === "engels" && !proef.werk && proef.title === "Engels V3 proefeksamen - Pa gee die vraestel",
+      "14 Okt 13:00 is die skrif-proefeksamen sonder 'n vraestel-titel uit die katalogus"
+    );
+    assert(/Skerms af 21:30/.test(s14[s14.length - 1].title), "14 Okt: skerms af 21:30");
   }
   let loBlocks = 0;
   for (let t = Date.parse("2026-09-27T12:00:00Z"); t <= Date.parse("2026-11-30T12:00:00Z"); t += 86400000) {
