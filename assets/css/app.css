@@ -97,7 +97,7 @@ body {
 
 .countdown {
   text-align: right;
-  min-width: 5.5rem;
+  min-width: 8.5rem;
 }
 .countdown-num {
   display: block;
@@ -1164,3 +1164,12 @@ body.les-open { overflow: hidden; }
 .hulp-item:hover, .hulp-item:focus-visible { border-color: var(--accent); }
 /* Hulp wyk vir dialoë en die les-kyker; geen oorvleueling nie */
 body.les-open .hulp-fab, body:has(.modal:not(.hidden)) .hulp-fab { display: none; }
+
+/* Aftelling per vak */
+.vak-aftel { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.6rem; }
+.vak-aftel-item { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.6rem 0.75rem; border: 1px solid var(--border, rgba(255,255,255,0.12)); border-radius: 8px; }
+.vak-aftel-naam { font-weight: 700; }
+.vak-aftel-paper { color: var(--muted); font-size: 0.85rem; }
+.vak-aftel-tyd { font-family: var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.vak-aftel-tyd.is-klaar { color: var(--muted); }
+.vak-aftel-kop { margin: 0.2rem 0; font-size: 0.85rem; color: var(--muted); }

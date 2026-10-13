@@ -308,6 +308,7 @@
     galEl.innerHTML = `
       <div class="leer-head zone-${zoneOf(leerSlug)}">
         <h2>${esc(subjectName(leerSlug))}</h2>
+        ${s ? WALLIE.vakAftelKop(leerSlug) : ""}
         ${s ? `<p>${esc(s.fokus)}</p>` : `<p>Sluit elke dag hiermee af.</p>`}
         <button type="button" class="btn big primary open-lesson" data-slug="${leerSlug}" data-concept="${pickConcept(leerSlug)?.id || ""}">▶ Begin by volgende konsep</button>
       </div>

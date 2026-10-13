@@ -19,20 +19,51 @@ test("Ma 12 Okt 09:00 (laaste voorbereidingsdag): nog ’n volle dag tot die CAT
   await expect(page.locator("#cd-days")).toHaveText("00");
   await expect(page.locator("#cd-hours")).toHaveText("23");
   await expect(page.locator("#cd-mins")).toHaveText("59");
-  await expect(page.locator("#cd-status")).toContainText("tot RTT/CAT-praktiese (Di 13 Okt)");
-  await expect(page.locator("#cd-status")).toContainText("Ma 12 Okt is die laaste voorbereidingsdag");
-  await expect(page.locator("#countdown-clock .stadium-eyebrow")).toContainText("Di 13 Okt · 09:00");
+  await expect(page.locator("#cd-status")).toContainText("tot RTT (CAT) V1 · Prakties (Di 13 Okt · 09:00)");
+  await expect(page.locator("#cd-eyebrow")).toContainText("Di 13 Okt · 09:00");
   await page.screenshot({ path: shot("13-aftelling-12-okt-voorbereiding.png") });
 });
 
-test("Di 13 Okt 08:59:30 en 09:00:01: aftelling eindig by die eerste vraestel", async ({ page, context }) => {
+test("Di 13 Okt 08:59:30 en 09:00:01: aftelling skuif na die volgende vraestel", async ({ page, context }) => {
   await openAt(page, context, "2026-10-13T08:59:30+02:00");
   await expect(page.locator("#cd-days")).toHaveText("00");
   await expect(page.locator("#cd-hours")).toHaveText("00");
   await expect(page.locator("#cd-mins")).toHaveText("00");
   await page.clock.runFor(31000);
-  await expect(page.locator("#cd-status")).toContainText("Kickoff — die eerste vraestel is hier");
-  await expect(page.locator("#cd-secs")).toHaveText("00");
+  await expect(page.locator("#cd-eyebrow")).toContainText("Engels EAT V3");
+  await expect(page.locator("#cd-days")).toHaveText("01");
+  await expect(page.locator("#cd-hours")).toHaveText("23");
+  await expect(page.locator('#vak-aftel [data-vak="rtt"]')).toContainText("RTT (CAT) V2");
+});
+
+test("13 Okt 20:05: lewendige aftelling per vak", async ({ page, context }) => {
+  await openAt(page, context, "2026-10-13T20:05:00+02:00");
+  await expect(page.locator("#days-left")).toHaveText("1d 12:54:58");
+  await expect(page.locator("#countdown-label")).toHaveText("tot Engels EAT V3 · Skryfwerk");
+  await page.clock.runFor(2000);
+  await expect(page.locator("#days-left")).toHaveText("1d 12:54:56");
+  await expect(page.locator("#vak-aftel .vak-aftel-item")).toHaveCount(6);
+  await expect(page.locator('#vak-aftel [data-vak="afrikaans"]')).toContainText("Di 20 Okt · 09:00");
+  await expect(page.locator('#vak-aftel [data-vak="gasvryheid"]')).toContainText("Vr 6 Nov · 14:00");
+  await page.goto("/#vakke");
+  await page.clock.runFor(1500);
+  await expect(page.locator("#view-vakke .vak-aftel-kop .vak-aftel-tyd").first()).toContainText(/\dd \d\d:\d\d:\d\d/);
+  const t1 = await page.locator('#view-vakke [data-aftel-vak="engels"]').textContent();
+  await page.clock.runFor(2000);
+  expect(await page.locator('#view-vakke [data-aftel-vak="engels"]').textContent()).not.toBe(t1);
+  await page.goto("/#leer");
+  await page.click('.leer-subject[data-leer="engels"]');
+  const l1 = await page.locator(".leer-head [data-aftel-vak]").textContent();
+  await page.clock.runFor(2000);
+  expect(await page.locator(".leer-head [data-aftel-vak]").textContent()).not.toBe(l1);
+});
+
+test("21 Nov 08:00: alle vraestelle geskryf", async ({ page, context }) => {
+  await openAt(page, context, "2026-11-21T08:00:00+02:00");
+  await expect(page.locator("#days-left")).toHaveText("Klaar");
+  await expect(page.locator("#cd-status")).toHaveText("Klaar — alle vraestelle is geskryf. Trots op jou.");
+  await expect(page.locator("#vak-aftel .vak-aftel-tyd.is-klaar")).toHaveCount(6);
+  await expect(page.locator("#vak-aftel .vak-aftel-tyd.is-klaar").first()).toHaveText("Klaar");
 });
 
 test("Vandag (9 Okt 09:00): 3 dae 23 uur 59 min tot Di 13 Okt 09:00", async ({ page, context }) => {
