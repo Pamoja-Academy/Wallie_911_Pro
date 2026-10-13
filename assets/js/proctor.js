@@ -1,6 +1,22 @@
 /* Hard-proctor sessie-logika */
 window.WALLIE = window.WALLIE || {};
 
+/* Papier-eksamen (soort "skrif"): Wallie skryf op papier wat Pa gee.
+   Tab weg / fokus-verlies mag nie ’n waarskuwing of slot word nie. */
+function skrifSessie() {
+  try {
+    const raw = localStorage.getItem("wallie911_v2_bok");
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    const id = s && s.live && s.live.block && s.live.block.id;
+    if (!id || !Array.isArray(s.blocks)) return false;
+    const blok = s.blocks.find((b) => b && b.id === id);
+    return Boolean(blok && blok.soort === "skrif");
+  } catch (e) {
+    return false;
+  }
+}
+
 WALLIE.proctor = {
   stream: null,
   tickId: null,
@@ -129,8 +145,10 @@ WALLIE.proctor = {
 
   warn(reason) {
     if (!this.active || this.locked) return;
-    /* Praktiese RTT-blok (praktiese.js): oorskakel na Word/Excel/Access tel nie as wegkyk nie */
+    /* Praktiese RTT-blok (praktiese.js): oorskakel na Word/Excel/Access tel nie as wegkyk nie.
+       Skrif-blok: papier-eksamen, dieselfde — die oortjie-slot mag nie vuur nie. */
     if (window.Praktiese?.suppressWarn?.()) return;
+    if (skrifSessie()) return;
     if (Date.now() < this.graceUntil) {
       this._cb.onIgnore?.(reason, "grasie");
       return;

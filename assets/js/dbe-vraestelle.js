@@ -284,8 +284,9 @@ window.WALLIE = window.WALLIE || {};
     return kies;
   }
 
-  /* ’n Les-, opstel-, merk- of pouse-blok kry NOOIT werk uit die rotasie nie: dit is nie ’n vraestel-blok nie. */
-  const GEEN_ROTASIE = ["les", "opstel", "merk", "pouse"];
+  /* ’n Les-, opstel-, merk-, pouse- of skrif-blok kry NOOIT werk uit die rotasie nie.
+     "skrif" is ’n papier-eksamen (Pa gee die vraestel) — geen DBE-titel uit die katalogus nie. */
+  const GEEN_ROTASIE = ["les", "opstel", "merk", "pouse", "skrif"];
 
   /* Die werk van ’n blok: vas uit die rooster, anders uit die rotasie. */
   function werkVirBlok(blok, ctx = {}) {
