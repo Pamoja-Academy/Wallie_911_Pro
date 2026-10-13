@@ -28,6 +28,7 @@ class MockBackend {
     /* Die blaaier loop op ’n nagemaakte klok; die "bediener" moet dieselfde tyd gebruik */
     this.nowFn = () => Date.now();
     this.plans = [];
+    this.support = [];
     this.pg = null;
     /* Opsioneel: (name, body) => "down" | "abort" | null, sodat 'n toets een RPC kan laat misluk
        sonder om die hele bediener af te skakel. */
@@ -100,6 +101,7 @@ class MockBackend {
       const req = route.request();
       const url = req.url();
       if (url.startsWith(`${SUPABASE}/rest/v1/rpc/`)) return this.handleRpc(route);
+      if (url.startsWith(`${SUPABASE}/rest/v1/support`)) return this.handleSupport(route);
       if (url.startsWith("https://ntfy.sh/")) {
         const u = new URL(url);
         this.ntfy.push({ title: u.searchParams.get("title"), priority: u.searchParams.get("priority"), body: req.postData() || "" });
@@ -109,6 +111,31 @@ class MockBackend {
       this.external.push(url);
       return route.abort("blockedbyclient");
     });
+  }
+
+  /* INSERT in wallie911.support (PostgREST: /rest/v1/support + Content-Profile). Net skryf, geen lees nie. */
+  async handleSupport(route) {
+    const req = route.request();
+    const cors = {
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers": "apikey, content-type, content-profile, accept, prefer, authorization",
+      "access-control-allow-methods": "POST, OPTIONS"
+    };
+    if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors, body: "" });
+    if (this.mode === "offline") return route.abort("internetdisconnected");
+    if (this.mode === "down") {
+      return route.fulfill({ status: 503, headers: cors, contentType: "application/json", body: '{"message":"Service Unavailable"}' });
+    }
+    let body = null;
+    try { body = req.postDataJSON(); } catch { /* ignore */ }
+    const headers = req.headers();
+    this.support.push({
+      body,
+      apikey: headers.apikey || "",
+      profile: headers["content-profile"] || "",
+      method: req.method()
+    });
+    return route.fulfill({ status: 201, headers: cors, contentType: "application/json", body: "" });
   }
 
   async handleRpc(route) {

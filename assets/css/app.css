@@ -1122,7 +1122,7 @@ body.les-open { overflow: hidden; }
 
 /* Hulp-paneel (v2): bly onder surveys/toestemming (.modal, 50) en die les-kyker (60) */
 .hulp-fab {
-  position: fixed; right: 1rem; bottom: 1rem; z-index: 45;
+  position: fixed; left: 1rem; bottom: 4.75rem; z-index: 45;
   min-height: var(--hit, 48px); padding: 0 1.1rem; border-radius: 999px;
   border: 1px solid var(--accent); background: var(--bok-green-deep); color: var(--text);
   font: 700 1rem var(--font); cursor: pointer; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
@@ -1138,7 +1138,21 @@ body.les-open { overflow: hidden; }
 .hulp-head { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); }
 .hulp-head h2 { margin: 0; font-family: var(--display); }
 .hulp-close { min-width: var(--hit, 48px); min-height: var(--hit, 48px); border: 0; background: transparent; color: var(--text); font-size: 1.2rem; cursor: pointer; }
-.hulp-body { overflow-y: auto; padding: 1rem; }
+.hulp-body { overflow-y: auto; padding: 1rem; min-height: 0; flex: 1 1 auto; }
+.hulp-soek, .hulp-vorm input, .hulp-vorm select, .hulp-vorm textarea {
+  width: 100%; box-sizing: border-box; font: inherit; padding: 0.55rem 0.7rem;
+  border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text);
+}
+.hulp-soek { margin: 0 0 0.8rem; }
+.hulp-groep { margin: 0 0 1rem; }
+.hulp-groep h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.hulp-qa h4 { margin: 0.55rem 0 0.2rem; font-size: 0.95rem; }
+.hulp-qa p { margin: 0; color: var(--text); }
+.hulp-vorm { display: grid; gap: 0.45rem; margin-top: 0.5rem; }
+.hulp-vorm label { display: grid; gap: 0.25rem; color: var(--muted); font-size: 0.85rem; }
+.hulp-status { min-height: 1.3rem; margin: 0.6rem 0 0; font-weight: 700; }
+.hulp-status.is-ok { color: var(--ok); }
+.hulp-groep[hidden], .hulp-qa[hidden] { display: none; }
 .hulp-intro, .hulp-voet { color: var(--muted); margin: 0 0 1rem; }
 .hulp-lys { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .hulp-item {
