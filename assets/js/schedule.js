@@ -44,7 +44,8 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
               "les" · "opstel" · "pouse".
      Engels V3 was die enigste nie-RTT-blok wat nie met die nuwe blokke oorvleuel nie: op 11 Okt skuif dit
      na die naaste vrye venster (17:00 → 10:15); op 12 Okt val dit weg (Hanno, 11 Okt) — die dag voor die
-     praktiese eksamen is heeltemal RTT. */
+     praktiese eksamen is heeltemal RTT.
+     Wo 14 herplan (13 Okt aand): Di 13 se Engels het verval; B1, V3-kaart en opstelplan na Wo 14 geskuif, A1 laat val. */
   const VASTE_PLANNE = {
     "2026-10-11": [
       { suffix: "engels", kind: "geel", slug: "engels", start: "10:15", end: "10:45", soort: "les",
@@ -235,31 +236,37 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         detail: "Werk is klaar. Skerms af om 21:30." }
     ],
     "2026-10-14": [
-      { suffix: "opstaan", kind: "break", slug: "break", start: "07:30", end: "08:15", soort: "pouse",
+      { suffix: "opstaan", kind: "break", slug: "break", start: "07:30", end: "08:00", soort: "pouse",
         title: "Opstaan, ontbyt", detail: "" },
-      { suffix: "foutlog", kind: "geel", slug: "engels", start: "08:15", end: "08:30", soort: "les",
+      { suffix: "foutlog", kind: "geel", slug: "engels", start: "08:00", end: "08:15", soort: "les",
         title: "Foutlog hardop lees", detail: "" },
-      { suffix: "a1", kind: "geel", slug: "engels", start: "08:30", end: "09:50", soort: "toets",
-        title: "Volle opstel (app A1, verhalend)",
-        detail: "80 min, 250-300 woorde." },
-      { suffix: "merk-a1", kind: "geel", slug: "engels", start: "09:50", end: "10:15", soort: "merk",
-        title: "Merk A1", detail: "" },
-      { suffix: "pouse1", kind: "break", slug: "break", start: "10:15", end: "10:30", soort: "pouse",
+      { suffix: "v3-kaart", kind: "geel", slug: "engels", start: "08:15", end: "08:30", soort: "les",
+        title: "V3 se kaart (wat elke keer kom)", detail: "3 afdelings, opstel 50 (80 min), lang teks 30 (40 min), kort teks 20 (30 min)." },
+      { suffix: "b1", kind: "geel", slug: "engels", start: "08:30", end: "09:10", soort: "toets",
+        title: "Aansoekbrief (app B1)", detail: "Formele formaat, 120-150 woorde." },
+      { suffix: "merk-b1", kind: "geel", slug: "engels", start: "09:10", end: "09:25", soort: "merk",
+        title: "Merk B1", detail: "" },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "09:25", end: "09:40", soort: "pouse",
         title: "Pouse", detail: "" },
-      { suffix: "herdoen-a1", kind: "geel", slug: "engels", start: "10:30", end: "11:00", soort: "herdoen",
-        title: "Inleiding en slot van A1", detail: "" },
-      { suffix: "a3", kind: "geel", slug: "engels", start: "11:00", end: "11:30", soort: "toets",
-        title: "App A3",
-        detail: "Net plan + inleiding + slot." },
-      { suffix: "briefing", kind: "geel", slug: "engels", start: "11:30", end: "12:00", soort: "les",
-        title: "Proefeksamen-briefing (Pa se opdragblad)",
-        detail: "Afdeling C kies 3.1." },
-      { suffix: "middag", kind: "break", slug: "break", start: "12:00", end: "13:00", soort: "pouse",
+      { suffix: "opstelplan", kind: "geel", slug: "engels", start: "09:40", end: "10:00", soort: "les",
+        title: "Opstelbeplanning", detail: "Kies 2 sterkste opsteltipes, 5 min breinkaart elk." },
+      { suffix: "inl-slot", kind: "geel", slug: "engels", start: "10:00", end: "10:30", soort: "herdoen",
+        title: "Inleiding en slot vir een opstelplan", detail: "" },
+      { suffix: "pouse2", kind: "break", slug: "break", start: "10:30", end: "10:40", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "formaat1", kind: "geel", slug: "engels", start: "10:40", end: "11:00", soort: "les",
+        title: "Formaatkaarte deel 1", detail: "Formele brief, dagboek, dialoog, instruksies." },
+      { suffix: "c1", kind: "geel", slug: "engels", start: "11:00", end: "11:30", soort: "toets",
+        title: "Dagboekinskrywings (app C1)", detail: "Twee inskrywings, verskillende datums, 80-100 woorde." },
+      { suffix: "merk-c1", kind: "geel", slug: "engels", start: "11:30", end: "11:45", soort: "merk",
+        title: "Merk C1", detail: "" },
+      { suffix: "briefing", kind: "geel", slug: "engels", start: "11:45", end: "12:10", soort: "les",
+        title: "Proefeksamen-briefing (Pa se opdragblad)", detail: "Afdeling C kies 3.1." },
+      { suffix: "middag", kind: "break", slug: "break", start: "12:10", end: "13:00", soort: "pouse",
         title: "Middagete", detail: "" },
       { suffix: "proef", kind: "geel", slug: "engels", start: "13:00", end: "15:30", soort: "skrif",
-        title: "Engels V3 proefeksamen - Pa gee die vraestel",
-        detail: "100 punte, 2,5 uur. A 13:00-14:20, B 14:20-15:00, C 15:00-15:30." },
-      { suffix: "pouse2", kind: "break", slug: "break", start: "15:30", end: "16:00", soort: "pouse",
+        title: "Engels V3 proefeksamen - Pa gee die vraestel", detail: "100 punte, 2,5 uur. A 13:00-14:20, B 14:20-15:00, C 15:00-15:30." },
+      { suffix: "pouse3", kind: "break", slug: "break", start: "15:30", end: "16:00", soort: "pouse",
         title: "Pouse", detail: "" },
       { suffix: "merk-proef", kind: "geel", slug: "engels", start: "16:00", end: "17:00", soort: "merk",
         title: "Merk die proefeksamen saam met Pa", detail: "" },
@@ -267,13 +274,14 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         title: "Top-3 foute", detail: "" },
       { suffix: "aandete", kind: "break", slug: "break", start: "17:30", end: "18:30", soort: "pouse",
         title: "Aandete", detail: "" },
-      { suffix: "formaat", kind: "geel", slug: "engels", start: "18:30", end: "19:10", soort: "les",
-        title: "Formaatkaarte per teksoort", detail: "" },
-      { suffix: "tas", kind: "geel", slug: "engels", start: "19:10", end: "19:40", soort: "les",
-        title: "Kontrolelys en tas pak", detail: "" },
-      { suffix: "klaar", kind: "break", slug: "break", start: "19:40", end: "19:40", soort: "pouse",
-        title: "Klaar. Skerms af 21:30.",
-        detail: "Werk is klaar. Skerms af om 21:30." }
+      { suffix: "formaat", kind: "geel", slug: "engels", start: "18:30", end: "19:00", soort: "les",
+        title: "Formaatkaarte deel 2", detail: "" },
+      { suffix: "oorlees", kind: "geel", slug: "engels", start: "19:00", end: "19:20", soort: "les",
+        title: "B1 en opstelplanne oorlees", detail: "" },
+      { suffix: "tas", kind: "geel", slug: "engels", start: "19:20", end: "19:50", soort: "les",
+        title: "Kontrolelys en tas pak", detail: "ID, toelatingsbrief, penne, water." },
+      { suffix: "klaar", kind: "break", slug: "break", start: "19:50", end: "19:50", soort: "pouse",
+        title: "Klaar. Skerms af 21:30, bed 22:00.", detail: "Werk is klaar. Skerms af om 21:30, bed 22:00." }
     ]
   };
   if (VASTE_PLANNE[dateStr]) {

@@ -60,3 +60,20 @@ test("14 Okt 13:05 wys die proefeksamen en die oortjie-slot vuur nie", async ({ 
   await expect(page.locator("#warn-display")).toHaveText("Waarskuwings: 0 / 3");
   expectNoLeaks(mock);
 });
+
+test("14 Okt 08:35 wys B1 Aansoekbrief 08:30-09:10, C1 11:00-11:30 en geen A1/A3", async ({ page, context }) => {
+  const mock = await openPlan(page, context, "2026-10-14T08:35:00+02:00");
+  const slugs = await page.evaluate(() => WALLIE.app.state().blocks.map((b) => b.subjectSlug));
+  for (const s of VERBODE) expect(slugs, `geen ${s}`).not.toContain(s);
+  const b1 = page.locator('#block-list .md-card[data-id="2026-10-14-b1"]');
+  await expect(b1).toBeVisible();
+  await expect(b1).toContainText("Aansoekbrief");
+  await expect(b1).toContainText("08:30");
+  await expect(b1).toContainText("09:10");
+  const c1 = page.locator('#block-list .md-card[data-id="2026-10-14-c1"]');
+  await expect(c1).toContainText("11:00");
+  await expect(c1).toContainText("11:30");
+  await expect(page.locator('#block-list .md-card[data-id="2026-10-14-a1"]')).toHaveCount(0);
+  await expect(page.locator('#block-list .md-card[data-id="2026-10-14-a3"]')).toHaveCount(0);
+  expectNoLeaks(mock);
+});
