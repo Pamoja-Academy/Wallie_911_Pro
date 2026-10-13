@@ -149,6 +149,7 @@
           return `<li><label><input type="checkbox" data-check="${key}" ${on} /><span>${item}</span></label></li>`;
         })
         .join("");
+      const faq = (WALLIE.FAQ && WALLIE.FAQ[s.slug]) || [];
       const doneCount = s.lowHanging.filter((_, i) => state.checklist[`${s.slug}:${i}`]).length;
       return `
         <article class="subject-card zone-${s.zone}">
@@ -164,6 +165,10 @@
           <details class="checklist-wrap">
             <summary>Maklike punte-lys (${doneCount}/${s.lowHanging.length})</summary>
             <ul class="checklist">${checks}</ul>
+          </details>
+          <details class="checklist-wrap faq-wrap">
+            <summary>Hulp / FAQ (${faq.length})</summary>
+            <dl class="faq-list">${faq.map(([q, a]) => `<dt>${q}</dt><dd>${a}</dd>`).join("")}</dl>
           </details>
         </article>`;
     }).join("");

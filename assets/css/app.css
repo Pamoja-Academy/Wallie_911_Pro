@@ -1119,3 +1119,7 @@ body.les-open { overflow: hidden; }
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   pointer-events: none;
 }
+
+.faq-list { margin: 0.4rem 0 0.8rem; }
+.faq-list dt { font-weight: 600; margin-top: 0.6rem; }
+.faq-list dd { margin: 0.15rem 0 0; color: var(--muted); }

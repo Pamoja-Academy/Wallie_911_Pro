@@ -115,6 +115,40 @@ WALLIE.SUBJECTS = [
   }
 ];
 
+/* Hulp / FAQ per vak — kort antwoorde op die vrae wat Wallie die meeste vra. */
+WALLIE.FAQ = {
+  gasvryheid: [
+    ["Hoe leer ek sonder om te blok-inkram?", "Verduidelik elke konsep in een sin en gee een voorbeeld. Kan jy dit nie, gaan terug na die les — dan eers die oefenvraag."],
+    ["Hoeveel moet ek skryf by ’n definisie?", "Een sin + een voorbeeld. Kyk na die merkpunte: een punt per feit, nie per paragraaf nie."],
+    ["Wat doen ek met kies-vrae wat ek nie ken nie?", "Skrap eers twee opsies wat sekerlik verkeerd is, kies dan uit die oorblywende twee. Moet nooit ’n blanko los nie."]
+  ],
+  afrikaans: [
+    ["Hoe begin ek met die opstel of transaksionele teks?", "Skryf eers ’n 5-minute plan (aanhef, 3 punte, slot). Hou die rubriek langsaan en kyk aan die einde of elke rubriek-punt gedek is."],
+    ["Wat beteken die opdragwoorde in ’n vraag?", "Onderstreep dit: ‘noem’ = kort lys, ‘verduidelik’ = rede gee, ‘bespreek’ = kante en voorbeelde. Die woord bepaal hoeveel jy skryf."],
+    ["Hoe oefen ek taalstrukture vinnig?", "15 minute spoedboor: een onderwerp (bv. indirekte rede of lydende vorm), 10 sinne, nasien teen die memo, foute in die Foutbank."]
+  ],
+  rtt: [
+    ["Wat is die slimste volgorde vir die praktiese eksamen?", "Lees die hele vraestel, doen eers die take wat jy seker ken (Word, sigblad), los die moeilike databasis-taak vir laaste, en stoor gereeld."],
+    ["Watter sigblad-formules kom altyd?", "SOM, GEMIDDELDE, ALS, SOEKOP/VLOOKUP, TELALS en absolute verwysings ($A$1). Oefen elkeen met ’n eie voorbeeld."],
+    ["Hoe verdeel ek my oefentyd?", "40 minute teorie (kortvrae uit ou vraestelle) en 40 minute praktyk, elke dag."]
+  ],
+  engels: [
+    ["Hoe verbeter ek my letterkunde-punte?", "Leer vir elke setwerk 3–4 kort aanhalings plus die tema wat dit wys. Skryf dan ’n tydgemete paragraaf van 15 minute (PEEL)."],
+    ["Hoe lees ek ’n onbekende gedig?", "Titel → wie praat → toon → 2 stylfigure → tema. Skryf die kontrolelys bo-aan jou antwoord."],
+    ["Wat as ek nie weet wat om te skryf nie?", "Neem 5 minute: kies ’n invalshoek, skryf 4 kernpunte, en begin eers dan met skryf."]
+  ],
+  toerisme: [
+    ["Hoe vermy ek dom foute?", "Lees elke vraag twee keer en onderstreep ‘nie’ en ‘behalwe’. Kyk voor jy indien na elke merkpunt-getal."],
+    ["Hoe onthou ek klein hoofstukke?", "20 minute flash-retrieval: bedek die antwoord, sê dit hardop, kyk. Wat jy mis, gaan in die Foutbank."],
+    ["Hoe werk ek buitelandse wisselkoers uit?", "Vermenigvuldig met die koers as jy van rand na vreemde geld gaan; deel as jy van vreemde geld na rand gaan. Kyk of die antwoord logies is."]
+  ],
+  wiskgelett: [
+    ["Waar begin ek met finansiële vrae?", "Skryf die gegewens uit die teks eers uit, kies dan die formule (rente, BTW, huurkoop) en wys elke stap vir deelpunte."],
+    ["Hoe gaan ek te werk met gemiddeld, mediaan en modus?", "Orden die getalle van klein na groot. Mediaan = middelste getal, modus = die meeste, gemiddeld = som ÷ aantal."],
+    ["Hoe lees ek kaarte en skale?", "Meet die afstand op die kaart, vermenigvuldig met die skaal en skakel om na die regte eenhede (cm → km)."]
+  ]
+};
+
 /* Ou rekords van ’n vak wat nie meer deel van die app is nie, word nooit uitgevee nie — net nie vertoon nie. */
 WALLIE.isVerborgeVak = function isVerborgeVak(slug) {
   return slug === "lo";
