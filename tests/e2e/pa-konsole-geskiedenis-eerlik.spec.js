@@ -243,19 +243,26 @@ test("mislukte dae word ook tydens 'n sessie weer probeer", async ({ page, conte
   }).toEqual({ gas1: "?", wisk1: "?", wisk2: "?", wisk3: "30" });
   await expect(page.locator("#heat-sub")).toContainText("2 dae nie gelaai nie — probeer weer");
 
-  /* Die ligte peiling loop: Wallie is in 'n sessie, so tick() roep wallie_pa_live, nie 'n vars oorsig vir vandag nie */
+  /* useLight peil wallie_pa_live elke 15 s, eers ná die oorsig wat die sessie sien.
+     Op vinnige CI is die terugvul klaar vóór daardie peiling; op 'n stadiger masjien het dit al geloop.
+     Dryf die klok tot minstens een ligte peiling — moenie op die wedloop staatmaak nie. */
   const inSessie = () => page.evaluate(() => !!(window.PK && PK.ui && PK.ui.lastModel && PK.ui.lastModel.current));
   expect(await inSessie()).toBe(true);
-  expect(mock.calls.filter((c) => c.name === "wallie_pa_live").length).toBeGreaterThan(0);
+  await runUntil(page, async () => {
+    if (!(await inSessie())) throw new Error("sessie het geval voordat die ligte peiling geloop het");
+    return mock.calls.some((c) => c.name === "wallie_pa_live");
+  }, { label: "ligte peiling tydens sessie", max: 20000 });
 
   const merk = mock.calls.length;
   mock.failRpc = null;
 
+  /* Herprobeer is HIST_RETRY_MS (60 s) ná histRunAt, en net wanneer 'n tick loop (elke 15 s).
+     Stap die nagemaakte klok tot die dae vul; dit is nie 'n regte minuut se wag nie. */
   await runUntil(page, async () => {
     if (!(await inSessie())) throw new Error("sessie het geval — die herprobeer het nie tydens useLight gebeur nie");
     const r = await heatTable(page);
     return cell(r, "Gasvryheid", "1 Okt") === "19" && cell(r, "Wisk. Gel.", "2 Okt") === "50";
-  }, { label: "stukkende dae tydens sessie weer probeer", max: 180000 });
+  }, { label: "stukkende dae tydens sessie weer probeer", max: 120000 });
   await settled(page);
 
   const daarna = mock.calls.slice(merk);
