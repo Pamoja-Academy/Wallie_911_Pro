@@ -4,7 +4,15 @@
 
   var PK = window.PK = window.PK || {};
   var TOKEN_KEY = 'wallie911_pa_token';
-  var HIST_KEY = 'wallie911_pa_hist_v1';
+  /* Pa se eie konsole-kas (NIE Wallie se data nie). v1 het {} vir lee dae gestoor en dit nooit weer gehaal nie. */
+  var HIST_KEY = 'wallie911_pa_hist_v2';
+  var HIST_KEY_V1 = 'wallie911_pa_hist_v1';
+  /* Die geskiedenis begin hier (Wallie se eerste sessie) en loop tot vandag */
+  PK.HIST_START = '2026-09-27';
+  var HIST_FRESH_MS = 6 * 3600000;   /* 'n gevulde dag is vars vir 6 h */
+  var HIST_EMPTY_MS = 30 * 60000;    /* 'n lee dag word na 30 min weer gehaal */
+  var HIST_RETRY_MS = 60 * 1000;     /* 'n dag wat MISLUK het word na 1 min weer probeer (nie na 30 min nie) */
+  var HIST_TRIES = 2;                /* pogings per terugvul-loop voor ons die dag as "nie gelaai nie" los */
 
   var demoMode = false;
   try {
@@ -62,23 +70,94 @@
   }
 
   // ---------- history cache ----------
+  /* Elke SAST-dag van HIST_START tot vandag (ingesluit), as 'YYYY-MM-DD' */
+  function histDays(todayStr) {
+    var out = [];
+    var p = PK.HIST_START.split('-');
+    var t = Date.UTC(+p[0], +p[1] - 1, +p[2]);
+    for (var i = 0; i < 400; i++) {
+      var d = new Date(t + i * 86400000);
+      var ds = d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + d.getUTCDate()).slice(-2);
+      if (ds > todayStr) break;
+      out.push(ds);
+    }
+    return out;
+  }
+  /* Dae waarvan die oorsig-oproep misluk het: GEEN kas-inskrywing, en dus ook geen nul nie.
+     Net vir hierdie blaaier-sessie (nooit gestoor nie) - 'n mislukking is nooit 'n uitslag. */
+  var histFailed = {};
+  function histAnyFailed() {
+    for (var d in histFailed) if (Object.prototype.hasOwnProperty.call(histFailed, d) && histFailed[d]) return true;
+    return false;
+  }
+  /* 'blocksUntimed' is deel van die inskrywing se vorm: 'n ouer kas (sonder die veld) word
+     weggegooi en weer gehaal, eerder as om die ou (verkeerde) telling te wys. */
+  function isEntry(e) {
+    return !!(e && typeof e === 'object' && e.by && typeof e.by === 'object' &&
+      typeof e.at === 'number' && typeof e.blocksUntimed === 'number');
+  }
+  function entryEmpty(e) {
+    if (!e) return true;
+    if (e.blocksDone > 0) return false;
+    for (var k in e.by) if (Object.prototype.hasOwnProperty.call(e.by, k) && e.by[k] > 0) return false;
+    return true;
+  }
+  /* Moet hierdie dag (weer) gehaal word? */
+  function histMissing(day, nowMs) {
+    var e = histCache[day];
+    if (!isEntry(e)) return true;
+    var todayStr = sastDay(nowMs);
+    if (day >= sastDay(nowMs - 86400000) || day === todayStr) return true; /* vandag en gister: altyd vars */
+    var age = nowMs - e.at;
+    if (age > HIST_FRESH_MS || age < 0) return true;
+    if (entryEmpty(e) && age > HIST_EMPTY_MS) return true; /* 'n lee uitslag is nooit finaal nie */
+    return false;
+  }
   function loadHistCache() {
+    try { window.localStorage.removeItem(HIST_KEY_V1); } catch (e) { /* ignore */ }
     try {
       var raw = window.localStorage.getItem(HIST_KEY);
       if (!raw) return {};
       var obj = JSON.parse(raw);
-      return (obj && typeof obj === 'object') ? obj : {};
+      if (!obj || typeof obj !== 'object') return {};
+      var out = {};
+      for (var k in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, k) && isEntry(obj[k])) out[k] = obj[k];
+      }
+      return out;
     } catch (e) { return {}; }
   }
   function saveHistCache(cache) {
     try {
-      var cutoff = sastDay(Date.now() - 21 * 86400000);
       var out = {};
       for (var k in cache) {
-        if (Object.prototype.hasOwnProperty.call(cache, k) && k >= cutoff) out[k] = cache[k];
+        if (Object.prototype.hasOwnProperty.call(cache, k) && k >= PK.HIST_START && isEntry(cache[k])) out[k] = cache[k];
       }
       window.localStorage.setItem(HIST_KEY, JSON.stringify(out));
     } catch (e) { /* ignore */ }
+  }
+  /* 'n Blok is "klaar sonder gemete tyd" as hy klaar is EN geen gemete minuut agter hom het.
+     Die oorsig (002) merk 'n blok klaar wanneer hy self gemerk is (manual) OF wanneer gemete tyd
+     >= 75% van die blok dek; daardie tweede soort wys al klaar as minute in sy vak se ry, en hoort
+     dus NIE in die "geen tyd gemeet"-ry nie. done_min is die gemete minute op die blok self. */
+  function blockUntimed(b) {
+    return !!b && b.status === 'done' && num(b.done_min, 0) <= 0;
+  }
+  /* Een kas-inskrywing uit 'n oorsig (of wallie_pa_live) se antwoord */
+  function histEntry(res) {
+    var sessions = (res && Array.isArray(res.sessions)) ? res.sessions : [];
+    var done = 0, untimed = 0;
+    if (res && Array.isArray(res.blocks)) {
+      for (var i = 0; i < res.blocks.length; i++) {
+        var b = res.blocks[i];
+        if (!b || b.status !== 'done') continue;
+        done++;
+        if (blockUntimed(b)) untimed++;
+      }
+    }
+    var n = 0;
+    for (var j = 0; j < sessions.length; j++) if (sessionMinutes(sessions[j]) > 0) n++;
+    return { by: historyFromSessions(null, sessions), blocksDone: done, blocksUntimed: untimed, n: n, at: Date.now() };
   }
 
   function sessionMinutes(s) {
@@ -491,12 +570,16 @@
       if (useLight) {
         mergeLight(res);
       } else {
-        var model = buildModel(res, { legacy: legacy, history: buildHistoryArray(res), historyLoading: histLoading });
+        rememberDay(res, reqDay);
+        var model = buildModel(res, { legacy: legacy, history: buildHistoryArray(), historyLoading: histLoading });
         emit(model);
-        if (!histStarted) {
-          histStarted = true;
-          startHistoryBackfill(res);
-        }
+      }
+      /* useLight slaan die swaar oorsig oor terwyl Wallie in 'n sessie is, maar mislukte dae
+         moet steeds na HIST_RETRY_MS weer probeer word — anders bly hulle "nie gelaai nie". */
+      var histGap = histAnyFailed() ? HIST_RETRY_MS : HIST_EMPTY_MS;
+      if (!histStarted || (!histLoading && Date.now() - histRunAt > histGap)) {
+        histStarted = true;
+        startHistoryBackfill();
       }
       schedule(pollInterval());
     }, function () {
@@ -555,65 +638,113 @@
     } catch (e) { /* ignore */ }
   }
 
-  var lastTodayBy = {};
-  function buildHistoryArray(overviewRes) {
+  /* 'n Oorsig vir 'n spesifieke dag is die varsste bron vir daardie dag se kas-inskrywing */
+  function rememberDay(res, reqDay) {
+    try {
+      if (!res || !Array.isArray(res.sessions)) return;
+      var todayStr = sastDay(Date.now());
+      var day = String(res.day || reqDay || todayStr).slice(0, 10);
+      if (day < PK.HIST_START || day > todayStr) return;
+      if (legacy && reqDay === null && day !== todayStr) return;
+      histCache[day] = histEntry(legacy ? { sessions: res.sessions } : res);
+      delete histFailed[day];
+      saveHistCache(histCache);
+    } catch (e) { /* ignore */ }
+  }
+
+  /* Elke dag sedert HIST_START. 'n Dag sonder kas-inskrywing is NIE nul nie: loaded = false, sodat
+     die grafieke en die "Sedert ..."-som hom oorslaan en as "nie gelaai nie" wys. */
+  function buildHistoryArray() {
     var out = [];
-    var todayStr = sastDay(Date.now());
-    var todayBy = {};
-    if (overviewRes && Array.isArray(overviewRes.sessions) && (overviewRes.day || todayStr) === todayStr) {
-      todayBy = historyFromSessions(todayStr, overviewRes.sessions);
-      lastTodayBy = todayBy;
-    } else {
-      todayBy = lastTodayBy;
-    }
-    for (var d = 13; d >= 0; d--) {
-      var dayStr = sastDay(Date.now() - d * 86400000);
-      var by = {};
-      if (d === 0) {
-        by = todayBy;
-      } else if (histCache[dayStr]) {
-        by = histCache[dayStr];
-      }
-      out.push({ day: dayStr, bySubject: by });
+    var days = histDays(sastDay(Date.now()));
+    for (var i = 0; i < days.length; i++) {
+      var e = histCache[days[i]];
+      var ok = isEntry(e);
+      out.push({
+        day: days[i],
+        loaded: ok,
+        failed: !ok && !!histFailed[days[i]],
+        bySubject: (ok && e.by) || {},
+        blocksDone: (ok && e.blocksDone) || 0,
+        blocksUntimed: (ok && num(e.blocksUntimed, 0)) || 0,
+        sessions: (ok && e.n) || 0
+      });
     }
     return out;
   }
 
-  function startHistoryBackfill(overviewRes) {
+  var histRunAt = 0;
+  function startHistoryBackfill() {
     if (histLoading) return;
+    histRunAt = Date.now();
+    var nowMs = Date.now();
+    var todayStr = sastDay(nowMs);
+    var days = histDays(todayStr);
     var missing = [];
-    var todayStr = sastDay(Date.now());
-    for (var d = 13; d >= 1; d--) {
-      var dayStr = sastDay(Date.now() - d * 86400000);
-      if (dayStr === todayStr) continue;
-      if (!histCache[dayStr]) missing.push(dayStr);
+    /* Nuutste eerste, sodat die mees onlangse dae eerste vul; vandag kom uit die gewone oorsig */
+    for (var d = days.length - 1; d >= 0; d--) {
+      if (days[d] === todayStr) continue;
+      if (histMissing(days[d], nowMs)) missing.push(days[d]);
     }
     if (missing.length === 0) return;
     histLoading = true;
+    if (lastModel) { lastModel.historyLoading = true; }
 
-    function next(idx) {
-      if (stopped || idx >= missing.length) {
-        histLoading = false;
-        saveHistCache(histCache);
-        if (lastModel) {
-          lastModel.history = buildHistoryArray(null);
-          lastModel.historyLoading = false;
-          emit(lastModel);
-        }
-        return;
-      }
-      var day = missing[idx];
-      rpc('wallie_pa_live', { p_token: token(), p_day: day }).then(function (res) {
-        if (handleAuth(res)) { histLoading = false; return; }
-        if (res && res.ok !== false) {
-          histCache[day] = historyFromSessions(day, res.sessions);
-        }
-        setTimeout(function () { next(idx + 1); }, 400);
-      }, function () {
-        setTimeout(function () { next(idx + 1); }, 400);
-      });
+    function refresh(loading) {
+      if (!lastModel) return;
+      lastModel.history = buildHistoryArray();
+      lastModel.historyLoading = loading;
+      emit(lastModel);
     }
-    next(0);
+
+    /* 'n Dag wat misluk het word onthou (histFailed) en binne dieselfde loop nog 'n keer probeer;
+       bly hy stukkend, dan wys hy "nie gelaai nie" en tick() probeer weer na HIST_RETRY_MS. */
+    function pass(queue, round) {
+      function next(idx) {
+        if (stopped) { histLoading = false; return; }
+        if (idx >= queue.length) {
+          var left = [];
+          for (var q = 0; q < queue.length; q++) if (!isEntry(histCache[queue[q]])) left.push(queue[q]);
+          if (left.length && round + 1 < HIST_TRIES) {
+            setTimeout(function () { pass(left, round + 1); }, 400);
+            return;
+          }
+          histLoading = false;
+          saveHistCache(histCache);
+          refresh(false);
+          return;
+        }
+        var day = queue[idx];
+        var call = legacy
+          ? rpc('wallie_pa_live', { p_token: token(), p_day: day })
+          : rpc('wallie_pa_overview', { p_token: token(), p_day: day });
+        call.then(function (res) {
+          if (handleAuth(res)) { histLoading = false; return; }
+          if (res && res.ok === false && res.missingFunction && !legacy) {
+            /* Oorsig (002) nie ontplooi nie: val terug na wallie_pa_live en probeer dieselfde dag weer */
+            legacy = true;
+            legacyCheckedAt = Date.now();
+            setTimeout(function () { next(idx); }, 400);
+            return;
+          }
+          if (res && res.ok !== false) {
+            histCache[day] = histEntry(legacy ? { sessions: res.sessions } : res);
+            delete histFailed[day];
+            saveHistCache(histCache);
+          } else {
+            histFailed[day] = true; /* geen inskrywing: die dag bly "nie gelaai nie", nie nul nie */
+          }
+          refresh(true); /* grafieke vul geleidelik */
+          setTimeout(function () { next(idx + 1); }, 400);
+        }, function () {
+          histFailed[day] = true;
+          refresh(true);
+          setTimeout(function () { next(idx + 1); }, 400);
+        });
+      }
+      next(0);
+    }
+    pass(missing, 0);
   }
 
   function onVis() {
@@ -658,7 +789,7 @@
     logout: function () {
       var t = token();
       setToken('');
-      stillCache.clear(); beats.length = 0; lastTodayBy = {}; lastModel = null;
+      stillCache.clear(); beats.length = 0; lastModel = null;
       stopTimers();
       stopped = true;
       if (!demoMode && t) {
@@ -709,7 +840,7 @@
         return;
       }
       /* Skoon begin ná (her)aanmelding: geen ou model, geskiedenis of legacy-vlag van 'n vorige sessie nie */
-      lastModel = null; histStarted = false; legacy = false; pending = false; backoffUntil = 0;
+      lastModel = null; histStarted = false; histRunAt = 0; legacy = false; pending = false; backoffUntil = 0;
       document.addEventListener('visibilitychange', onVis);
       tick();
     },

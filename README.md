@@ -28,3 +28,13 @@ Afrikaanse **reddingscockpit** vir Wallie se matric-finale (eindeksamen vanaf 12
 - [x] Ontwerp-spes geskryf
 - [x] Implementasieplan geskryf
 - [ ] Next.js bootstrap (wag op jou spes-goedkeuring môre, tensy jy sê “bou sommer”)
+
+## Vrystelling: weergawe bump
+
+By **elke** vrystelling bump al drie saam na dieselfde string (bv. `2026-10-12b`):
+
+1. `?v=` op elke plaaslike `<script>`/`<link>` in `index.html`
+2. `version.json` (`{"v":"..."}`)
+3. `WALLIE.APP_VERSION` in `assets/js/sync.js`
+
+`node tests/weergawe.test.js` (deel van `npm test`) faal as hulle verskil. 'n Oop oortjie sien die nuwe `version.json` binne 5 min en herlaai self (nooit tydens 'n sessie nie).

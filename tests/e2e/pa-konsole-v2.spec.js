@@ -1,5 +1,5 @@
 /* Pa-konsole v2 (pa-konsole.html): dieselfde ECHTE Postgres-nabootsing (PGlite + migrations 001/002) as pa-console.spec.js.
-   Bewys: lewendige status, rooster teenoor werklikheid, 14-dae-geskiedenis KLIËNT-KANT afgelei uit wallie_pa_live (geen migrasie),
+   Bewys: lewendige status, rooster teenoor werklikheid, geskiedenis sedert 27 Sep KLIËNT-KANT afgelei uit wallie_pa_overview per dag (geen migrasie),
    geen punte/persentasies, data.js word nooit gelaai nie, en voorskou-modus stuur NIKS na buite nie. */
 const fs = require("fs");
 const path = require("path");
@@ -94,8 +94,8 @@ test("Pa-konsole v2: status, blokke, kliënt-kant geskiedenis, geen persentasies
   expect(table).toMatch(/klaar/);
   await expect(pa.locator("#k-sess")).not.toHaveText("0");
 
-  /* Geskiedenis: Ma 5 Okt en Di 6 Okt kom uit wallie_pa_live per dag (geen nuwe RPC/migrasie nie) */
-  await runUntil(pa, async () => /70/.test(await pa.locator("#heat-table").textContent()), { label: "hittekaart gevul" });
+  /* Geskiedenis: Ma 5 Okt en Di 6 Okt kom uit wallie_pa_overview per dag (sedert PK.HIST_START, geen migrasie nie) */
+  await runUntil(pa, async () => /70/.test(await pa.locator("#heat-table").textContent()) && !(await pa.evaluate(() => PK.ui.lastModel.historyLoading)), { label: "hittekaart gevul" });
   const heat = await pa.evaluate(() => {
     const rows = [...document.querySelectorAll("#heat-table tr")].map((tr) => [...tr.children].map((c) => c.textContent.trim()));
     const head = rows[0];
@@ -103,11 +103,12 @@ test("Pa-konsole v2: status, blokke, kliënt-kant geskiedenis, geen persentasies
     return { rtt6: cell("RTT (CAT)", "6 Okt"), eng5: cell("Engels", "5 Okt"), wisk5: cell("Wisk. Gel.", "5 Okt"), wisk7: cell("Wisk. Gel.", "7 Okt") };
   });
   expect(heat).toEqual({ rtt6: "70", eng5: "45", wisk5: "40", wisk7: "30" });
-  const liveDays = mock.calls.filter((c) => c.name === "wallie_pa_live" && c.body.p_day).map((c) => c.body.p_day);
-  expect(liveDays).toContain("2026-10-05");
-  expect(liveDays).toContain("2026-10-06");
-  const cache = await pa.evaluate(() => JSON.parse(localStorage.getItem("wallie911_pa_hist_v1") || "{}"));
+  const histDays = mock.calls.filter((c) => c.name === "wallie_pa_overview" && c.body.p_day).map((c) => c.body.p_day);
+  expect(histDays).toContain("2026-10-05");
+  expect(histDays).toContain("2026-10-06");
+  const cache = await pa.evaluate(() => JSON.parse(localStorage.getItem("wallie911_pa_hist_v2") || "{}"));
   expect(Object.keys(cache)).toContain("2026-10-06");
+  expect(cache["2026-10-06"].by.rtt).toBe(70);
   /* Alleen bekende RPC's */
   const names = new Set(mock.calls.filter((c) => c.name.startsWith("wallie_pa")).map((c) => c.name));
   for (const n of names) expect(["wallie_pa_login", "wallie_pa_overview", "wallie_pa_live", "wallie_pa_still"]).toContain(n);
