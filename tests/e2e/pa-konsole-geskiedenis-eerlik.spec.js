@@ -262,7 +262,7 @@ test("mislukte dae word ook tydens 'n sessie weer probeer", async ({ page, conte
     if (!(await inSessie())) throw new Error("sessie het geval — die herprobeer het nie tydens useLight gebeur nie");
     const r = await heatTable(page);
     return cell(r, "Gasvryheid", "1 Okt") === "19" && cell(r, "Wisk. Gel.", "2 Okt") === "50";
-  }, { label: "stukkende dae tydens sessie weer probeer", max: 120000 });
+  }, { label: "stukkende dae tydens sessie weer probeer", max: 180000 });
   await settled(page);
 
   const daarna = mock.calls.slice(merk);

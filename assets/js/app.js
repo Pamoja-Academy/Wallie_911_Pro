@@ -88,34 +88,61 @@
     });
   }
 
-  function renderCountdown() {
-    const t = WALLIE.timeUntilExam();
-    const dEl = $("#days-left");
-    if (dEl) dEl.textContent = t.past ? "0" : String(t.days);
+  let vakAftelSig = null;
 
+  function renderCountdown() {
+    const now = new Date();
+    const t = WALLIE.timeUntilExam(now);
+    const ex = t.exam;
+    const when = ex ? WALLIE.examWhen(ex.kick) : "";
     const set = (id, val) => {
       const el = $(id);
       if (el) el.textContent = val;
     };
+    set("#days-left", t.past ? "Klaar" : WALLIE.fmtCountdown(t.ms));
+    set("#countdown-label", ex ? `tot ${ex.n}` : "tot volgende vraestel");
+    set("#cd-eyebrow", ex ? `Volgende vraestel · ${ex.n} · ${when}` : "Volgende vraestel");
+    set("#missie-next-name", ex ? ex.n : "—");
     set("#cd-days", t.past ? "00" : WALLIE.pad2(t.days));
     set("#cd-hours", t.past ? "00" : WALLIE.pad2(t.hours));
     set("#cd-mins", t.past ? "00" : WALLIE.pad2(t.minutes));
     set("#cd-secs", t.past ? "00" : WALLIE.pad2(t.seconds));
-
-    const status = $("#cd-status");
-    if (status) {
-      status.textContent = t.past
-        ? "Kickoff — die eerste vraestel is hier. Speel."
-        : `${t.days} dae · ${WALLIE.pad2(t.hours)}:${WALLIE.pad2(t.minutes)}:${WALLIE.pad2(t.seconds)} tot RTT/CAT-praktiese (Di 13 Okt) · ${WALLIE.EXAM_NOTE}`;
-    }
+    set(
+      "#cd-status",
+      t.past
+        ? "Klaar — alle vraestelle is geskryf. Trots op jou."
+        : `${t.days} dae · ${WALLIE.pad2(t.hours)}:${WALLIE.pad2(t.minutes)}:${WALLIE.pad2(t.seconds)} tot ${ex.n} (${when})`
+    );
 
     const missieDays = $("#missie-days-left");
-    if (missieDays) {
-      missieDays.textContent = t.past ? "0" : String(t.days);
-    }
+    if (missieDays) missieDays.textContent = t.past ? "0" : String(t.days);
 
     const clock = $("#countdown-clock");
     if (clock) clock.classList.toggle("is-live", !t.past);
+
+    const list = $("#vak-aftel");
+    if (list) {
+      const per = WALLIE.SUBJECTS.map((s) => ({ s, ex: WALLIE.nextExam(now, s.slug) }));
+      const sig = per.map((p) => `${p.s.slug}:${p.ex ? p.ex.n : ""}`).join("|");
+      if (sig !== vakAftelSig) {
+        vakAftelSig = sig;
+        list.innerHTML = per
+          .map(
+            ({ s, ex: e }) => `
+          <li class="vak-aftel-item" data-vak="${s.slug}">
+            <span class="vak-aftel-naam">${s.naam}</span>
+            <span class="vak-aftel-paper">${e ? `${e.n} · ${WALLIE.examWhen(e.kick)}` : "Alle vraestelle geskryf"}</span>
+            <span class="vak-aftel-tyd" data-aftel-vak="${s.slug}"></span>
+          </li>`
+          )
+          .join("");
+      }
+    }
+    document.querySelectorAll("[data-aftel-vak]").forEach((el) => {
+      const e = WALLIE.nextExam(now, el.dataset.aftelVak);
+      el.textContent = e ? WALLIE.fmtCountdown(e.kick - now) : "Klaar";
+      el.classList.toggle("is-klaar", !e);
+    });
   }
 
   function renderMissie() {
@@ -159,6 +186,7 @@
             <h3>${s.naam}</h3>
             <span class="badge ${crit}">Prelim ${s.prelim}% → ${s.teiken}%</span>
           </header>
+          ${WALLIE.vakAftelKop(s.slug)}
           <p class="meta">${s.fokus}</p>
           ${WALLIE.lessonUI.subjectStrip(s.slug)}
           <details class="checklist-wrap">

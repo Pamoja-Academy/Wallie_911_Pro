@@ -483,18 +483,65 @@ WALLIE.daysUntilExam = function daysUntilExam(from = new Date()) {
   return diff;
 };
 
-/** Lewendige stadium-klok tot die eerste egte vraestel (RTT/CAT praktiese, Di 13 Okt 09:00). */
+/** Alle vraestelle uit PK.EXAMS (exams.js), gesorteer; geen tyd -> 09:00 SAST. */
+WALLIE.examList = function examList() {
+  const src = (window.PK && Array.isArray(PK.EXAMS)) ? PK.EXAMS : [];
+  return src
+    .map((e) => {
+      const at = /T\d/.test(e.at) ? e.at : e.at + "T09:00:00+02:00";
+      return { ...e, kick: new Date(at) };
+    })
+    .sort((a, b) => a.kick - b.kick);
+};
+
+/** Eerste vraestel met kick > from (opsioneel net vir een vak-slug). */
+WALLIE.nextExam = function nextExam(from = new Date(), slug) {
+  return WALLIE.examList().find((e) => e.kick > from && (!slug || e.s === slug)) || null;
+};
+
+WALLIE.splitMs = function splitMs(ms) {
+  const sec = Math.floor(Math.max(0, ms) / 1000);
+  return {
+    days: Math.floor(sec / 86400),
+    hours: Math.floor((sec % 86400) / 3600),
+    minutes: Math.floor((sec % 3600) / 60),
+    seconds: sec % 60
+  };
+};
+
+WALLIE.fmtCountdown = function fmtCountdown(ms) {
+  const t = WALLIE.splitMs(ms);
+  return `${t.days}d ${WALLIE.pad2(t.hours)}:${WALLIE.pad2(t.minutes)}:${WALLIE.pad2(t.seconds)}`;
+};
+
+/** "Do 15 Okt · 09:00" in SAST, onafhanklik van die toestel se tydsone. */
+WALLIE.examWhen = function examWhen(kick) {
+  const dag = { Sun: "So", Mon: "Ma", Tue: "Di", Wed: "Wo", Thu: "Do", Fri: "Vr", Sat: "Sa" };
+  const mnd = { Jan: "Jan", Feb: "Feb", Mar: "Mrt", Apr: "Apr", May: "Mei", Jun: "Jun", Jul: "Jul", Aug: "Aug", Sep: "Sep", Oct: "Okt", Nov: "Nov", Dec: "Des" };
+  const parts = {};
+  new Intl.DateTimeFormat("en-US", {
+    timeZone: "Africa/Johannesburg", weekday: "short", day: "numeric", month: "short",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+  }).formatToParts(kick).forEach((p) => { parts[p.type] = p.value; });
+  return `${dag[parts.weekday]} ${parts.day} ${mnd[parts.month]} · ${parts.hour}:${parts.minute}`;
+};
+
+/** Reël onder 'n vak se kop: volgende vraestel + lewendige aftelling (app.js hou [data-aftel-vak] dop). */
+WALLIE.vakAftelKop = function vakAftelKop(slug) {
+  const now = new Date();
+  const e = WALLIE.nextExam(now, slug);
+  if (!e) return `<p class="vak-aftel-kop">Alle vraestelle geskryf · <strong class="vak-aftel-tyd is-klaar" data-aftel-vak="${slug}">Klaar</strong></p>`;
+  return `<p class="vak-aftel-kop">Volgende: ${e.n} · ${WALLIE.examWhen(e.kick)} · <strong class="vak-aftel-tyd" data-aftel-vak="${slug}">${WALLIE.fmtCountdown(e.kick - now)}</strong></p>`;
+};
+
+/** Lewendige stadium-klok tot die volgende vraestel; past=true net as alles verby is. */
 WALLIE.timeUntilExam = function timeUntilExam(from = new Date()) {
-  const kick = new Date(WALLIE.EXAM_KICKOFF || WALLIE.EXAM_START + "T09:00:00");
-  let ms = kick - from;
-  const past = ms <= 0;
-  if (past) ms = 0;
-  const sec = Math.floor(ms / 1000);
-  const days = Math.floor(sec / 86400);
-  const hours = Math.floor((sec % 86400) / 3600);
-  const minutes = Math.floor((sec % 3600) / 60);
-  const seconds = sec % 60;
-  return { days, hours, minutes, seconds, ms, past, kick };
+  const exam = WALLIE.nextExam(from);
+  const list = WALLIE.examList();
+  const kick = exam ? exam.kick : (list.length ? list[list.length - 1].kick : new Date(WALLIE.EXAM_KICKOFF || WALLIE.EXAM_START + "T09:00:00"));
+  const ms = exam ? kick - from : 0;
+  const past = !exam;
+  return { ...WALLIE.splitMs(ms), ms, past, kick, exam };
 };
 
 WALLIE.pad2 = function pad2(n) {

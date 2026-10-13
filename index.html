@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="assets/js/preview-guard.js?v=2026-10-12a"></script>
+  <script src="assets/js/preview-guard.js?v=2026-10-13c"></script>
   <title>Wallie_911_Pro — Springbok SOS Kamp</title>
-  <link rel="stylesheet" href="assets/css/app.css?v=2026-10-12a" />
-  <link rel="stylesheet" href="assets/css/praktiese-modus.css?v=2026-10-12a" />
-  <link rel="stylesheet" href="assets/css/vraebank.css?v=2026-10-12a" />
-  <link rel="stylesheet" href="assets/css/vraebank-v3.css?v=2026-10-12a" />
+  <link rel="stylesheet" href="assets/css/app.css?v=2026-10-13c" />
+  <link rel="stylesheet" href="assets/css/praktiese-modus.css?v=2026-10-13c" />
+  <link rel="stylesheet" href="assets/css/vraebank.css?v=2026-10-13c" />
+  <link rel="stylesheet" href="assets/css/vraebank-v3.css?v=2026-10-13c" />
   <link rel="icon" href="assets/img/lessons/ui/trui-15.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -47,9 +47,9 @@
     <button type="button" class="sync-pill sync-busy" id="sync-pill" data-level="busy" aria-live="polite" title="Sinkronisering na Pa se konsole">
       <span class="sync-dot" aria-hidden="true"></span><span id="sync-label">Sinkroniseer…</span>
     </button>
-    <div class="countdown" id="countdown" title="Tot die eerste vraestel: RTT/CAT praktiese, Di 13 Okt 2026 09:00">
+    <div class="countdown" id="countdown" title="Aftelling tot die volgende vraestel">
       <span class="countdown-num" id="days-left">—</span>
-      <span class="countdown-label">dae tot eerste vraestel</span>
+      <span class="countdown-label" id="countdown-label">tot volgende vraestel</span>
     </div>
   </header>
 
@@ -61,7 +61,7 @@
         <div class="md-hero-text">
           <p class="stadium-eyebrow">SOS · Rassie se oproep · trui #15</p>
           <h1>Wallie — jy’s die #15</h1>
-          <p class="md-hero-line"><strong><span id="missie-days-left">—</span> dae</strong> tot die eerste vraestel (RTT/CAT praktiese, Di 13 Okt). Wen die matric-Wêreldbeker: een blok, een prent, een toe-boek op ’n slag.</p>
+          <p class="md-hero-line"><strong><span id="missie-days-left">—</span> dae</strong> tot die volgende vraestel (<span id="missie-next-name">—</span>). Wen die matric-Wêreldbeker: een blok, een prent, een toe-boek op ’n slag.</p>
           <details class="md-story">
             <summary>Lees Rassie se oproep</summary>
             <p>
@@ -73,7 +73,7 @@
           </details>
         </div>
         <div class="stadium-clock" id="countdown-clock" aria-live="polite">
-          <p class="stadium-eyebrow">Eerste vraestel · RTT (CAT) praktiese · <time datetime="2026-10-13T09:00">Di 13 Okt · 09:00</time></p>
+          <p class="stadium-eyebrow" id="cd-eyebrow">Volgende vraestel</p>
           <div class="stadium-digits">
             <div class="digit-block"><span id="cd-days">—</span><small>dae</small></div>
             <div class="digit-block"><span id="cd-hours">—</span><small>uur</small></div>
@@ -84,6 +84,7 @@
         </div>
       </div>
 
+      <div class="panel vak-aftel-panel"><h2>Aftelling per vak</h2><ul class="vak-aftel" id="vak-aftel"></ul></div>
       <div id="next-up" class="next-up" aria-live="polite"></div>
       <div class="stats-row compact" id="day-stats"></div>
       <div class="panel">
@@ -446,24 +447,26 @@
     </div>
   </div>
 
-  <script src="assets/js/data.js?v=2026-10-12a"></script>
-  <script src="assets/js/storage.js?v=2026-10-12a"></script>
-  <script src="assets/js/schedule.js?v=2026-10-12a"></script>
-  <script src="assets/js/surveys.js?v=2026-10-12a"></script>
-  <script src="assets/js/proctor.js?v=2026-10-12a"></script>
-  <script src="assets/js/vraebank-store.js?v=2026-10-12a"></script>
-  <script src="assets/js/vraebank-rtt-v1.js?v=2026-10-12a"></script>
-  <script src="assets/js/dbe-vraestelle.js?v=2026-10-12a"></script>
-  <script src="assets/js/praktiese.js?v=2026-10-12a"></script>
-  <script src="assets/js/praktiese-ui.js?v=2026-10-12a"></script>
-  <script src="assets/js/vraebank-ui.js?v=2026-10-12a"></script>
-  <script src="assets/js/vraebank-v3.js?v=2026-10-12a"></script>
-  <script src="assets/js/vraebank-v3-ui.js?v=2026-10-12a"></script>
-  <script src="assets/js/live-config.js?v=2026-10-12a"></script>
-  <script src="assets/js/sync.js?v=2026-10-12a"></script>
-  <script src="assets/js/remote.js?v=2026-10-12a"></script>
-  <script src="assets/js/lessons.js?v=2026-10-12a"></script>
-  <script src="assets/js/lesson-ui.js?v=2026-10-12a"></script>
-  <script src="assets/js/app.js?v=2026-10-12a"></script>
+  <script src="assets/js/data.js?v=2026-10-13c"></script>
+  <script src="assets/js/storage.js?v=2026-10-13c"></script>
+  <script src="assets/js/pa-konsole/exams.js?v=2026-10-13c"></script>
+  <script src="assets/js/schedule.js?v=2026-10-13c"></script>
+  <script src="assets/js/surveys.js?v=2026-10-13c"></script>
+  <script src="assets/js/proctor.js?v=2026-10-13c"></script>
+  <script src="assets/js/vraebank-store.js?v=2026-10-13c"></script>
+  <script src="assets/js/vraebank-rtt-v1.js?v=2026-10-13c"></script>
+  <script src="assets/js/dbe-vraestelle.js?v=2026-10-13c"></script>
+  <script src="assets/js/praktiese.js?v=2026-10-13c"></script>
+  <script src="assets/js/praktiese-ui.js?v=2026-10-13c"></script>
+  <script src="assets/js/vraebank-ui.js?v=2026-10-13c"></script>
+  <script src="assets/js/vraebank-v3.js?v=2026-10-13c"></script>
+  <script src="assets/js/vraebank-v3-ui.js?v=2026-10-13c"></script>
+  <script src="assets/js/live-config.js?v=2026-10-13c"></script>
+  <script src="assets/js/sync.js?v=2026-10-13c"></script>
+  <script src="assets/js/remote.js?v=2026-10-13c"></script>
+  <script src="assets/js/lessons.js?v=2026-10-13c"></script>
+  <script src="assets/js/lesson-ui.js?v=2026-10-13c"></script>
+  <script src="assets/js/hulp.js?v=2026-10-13c"></script>
+  <script src="assets/js/app.js?v=2026-10-13c"></script>
 </body>
 </html>
