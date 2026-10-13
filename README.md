@@ -31,7 +31,7 @@ Afrikaanse **reddingscockpit** vir Wallie se matric-finale (eindeksamen vanaf 12
 
 ## Vrystelling: weergawe bump
 
-By **elke** vrystelling bump al drie saam na dieselfde string (bv. `2026-10-12b`):
+By **elke** vrystelling bump al drie saam na dieselfde string (bv. `2026-10-13a`):
 
 1. `?v=` op elke plaaslike `<script>`/`<link>` in `index.html`
 2. `version.json` (`{"v":"..."}`)
