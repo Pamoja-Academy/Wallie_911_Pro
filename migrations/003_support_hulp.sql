@@ -39,3 +39,5 @@ do $$ begin
     perform pg_notify('pgrst', 'reload config');
   end if;
 end $$;
+-- Nuwe kolomme (vak/gebeur/skerm) moet ook in PostgREST se skema-kas kom, anders weier dit die hele ry (PGRST204).
+notify pgrst, 'reload schema';

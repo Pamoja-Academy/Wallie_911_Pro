@@ -222,3 +222,25 @@ test("hulp: ou 'Iets werk nie'-vorm skryf ook na wallie911.support", async ({ pa
   });
 });
 
+test("hulp: 'Iets werk nie' belowe nie e-pos as die tou nie gestoor kon word nie", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "offline" });
+  await mock.attach(context);
+  await boot(page);
+  await page.goto("/#probleem");
+  /* Soos privaat modus / vol geheue: net die support-tou kan nie skryf nie */
+  await page.evaluate(() => {
+    const orig = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k, v) {
+      if (k === "w911_support_queue") throw new Error("QuotaExceededError");
+      return orig.call(this, k, v);
+    };
+  });
+  const dialoog = new Promise((r) => page.once("dialog", async (d) => { r(d.message()); await d.accept(); }));
+  await page.locator('input[name="bugTipe"][value="proctor"]').check();
+  await page.locator("#bug-detail").fill("Geen berging nie.");
+  await page.locator("#bug-form button[type=submit]").click();
+  const boodskap = await dialoog;
+  expect(boodskap).toContain("kon nie vir hulp gestuur");
+  expect(boodskap).not.toContain("kom hulp per e-pos");
+  expect(mock.support).toHaveLength(0);
+});

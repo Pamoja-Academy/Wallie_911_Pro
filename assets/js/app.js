@@ -1189,10 +1189,12 @@
       alert(
         uitslag === "gestuur"
           ? "Dankie — gestuur. Hulp kom binne ongeveer 10 minute per e-pos (kyk jou Gmail). Pa sien dit ook onder Verbeter."
-          : "Dankie — probleem gestoor. Geen verbinding nie: dit gaan deur sodra jy weer internet het, en dan kom hulp per e-pos."
+          : uitslag === "tou"
+            ? "Dankie — probleem gestoor. Geen verbinding nie: dit gaan deur sodra jy weer internet het, en dan kom hulp per e-pos."
+            : "Dankie — probleem gestoor op hierdie toestel, maar kon nie vir hulp gestuur of in die tou gesit word nie (blaaier in privaat modus of geheue vol?). Maak 'n gewone venster oop en probeer weer, of sê vir Pa."
       );
-    if (supportBelofte && typeof supportBelofte.then === "function") supportBelofte.then(melding, () => melding("tou"));
-    else melding("tou");
+    if (supportBelofte && typeof supportBelofte.then === "function") supportBelofte.then(melding, () => melding("fout"));
+    else melding("fout");
   });
 
   $("#bug-refresh")?.addEventListener("click", () => renderBugs());
