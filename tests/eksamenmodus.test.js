@@ -186,6 +186,22 @@ ok(!E.moetNuwePoging({ begin: null }, T(8, 0)), "geen begin → nie");
 ok(!E.moetNuwePoging(null, T(8, 0)), "geen rekord → nie");
 ok(!E.moetNuwePoging({ begin: new Date(2026, 9, 17, 8, 0).getTime() }, T(8, 0)), "begin in die toekoms → nie");
 
+/* O4 (AGENTS §2.3): oorskryf van begin / sedert bewaar eers die ou waarde (net as dit nog nie gestel is nie) */
+eq(E.metBewaring({ begin: T(8, 40) }, { begin: T(8, 0) }), { begin: T(8, 0), begin_eie: T(8, 40) }, "O4: vroeër sessie-begin vervang eie begin → begin_eie");
+eq(E.metBewaring({ begin: T(8, 40), begin_eie: T(9, 0) }, { begin: T(8, 0) }), { begin: T(8, 0) }, "O4: begin_eie wat reeds gestel is word nie oorskryf nie");
+eq(E.metBewaring({ begin: null }, { begin: T(8, 0) }), { begin: T(8, 0) }, "O4: geen ou begin → niks om te bewaar");
+eq(E.metBewaring({}, { begin: T(8, 0) }), { begin: T(8, 0) }, "O4: nuwe rekord (geen begin) → niks om te bewaar");
+eq(E.metBewaring({ begin: T(8, 0) }, { begin: T(8, 0) }), { begin: T(8, 0) }, "O4: dieselfde begin → niks om te bewaar");
+eq(E.metBewaring({ begin: T(8, 0) }, { begin: null }), { begin: null }, "O4: terugstelling na null (nuwePoging, reeds in vorige) → geen begin_eie");
+eq(E.metBewaring({ sedert: 111 }, { sedert: 222 }), { sedert: 222, sedert_vorige: 111 }, "O4: nuwe sedert oorskryf 'n ou een → sedert_vorige");
+eq(E.metBewaring({ sedert: 222, sedert_vorige: 111 }, { sedert: 333 }), { sedert: 333 }, "O4: sedert_vorige bly die EERSTE waarde");
+eq(E.metBewaring({ sedert: null }, { sedert: 111 }), { sedert: 111 }, "O4: eerste sedert → niks om te bewaar");
+eq(E.metBewaring({ begin: 5, sedert: 7 }, { konsep: "x" }), { konsep: "x" }, "O4: ander velde raak niks");
+eq(E.metBewaring(null, { begin: 5 }), { begin: 5 }, "O4: geen rekord, geen fout");
+const oorsk = { begin: T(8, 40) };
+E.metBewaring(oorsk, { begin: T(8, 0) });
+eq(oorsk, { begin: T(8, 40) }, "O4: verander die ingevoer-rekord nie");
+
 /* O1: vandagWerk / werkVanRekord — het Wallie VANDAG werk gedoen (voor "Stoor my punte")? */
 const NOUW = T(10, 0); /* plaaslike 16 Okt 10:00 */
 eq(E.werkVanRekord(null, NOUW, 40), { minute: 0, werk: false }, "werk: geen rekord = geen werk");

@@ -237,6 +237,77 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
+    test("O4: 'n vroeër sessie-begin vervang die eie begin; die eie begin word bewaar (begin_eie)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const sessieBegin = new Date("2026-10-16T08:00:00+02:00").getTime();
+      const eieBegin = new Date("2026-10-16T08:20:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          wallie911_v2_bok: { sessions: [{ id: "s_1", date: "2026-10-16", subjectSlug: "afrikaans", startedAt: sessieBegin, block: { id: "2026-10-16-afr-a1" } }] },
+          [DRAF]: { v: 1, items: { [item.id]: { begin: eieBegin, konsep: "my begin", bevestig: false, lêer: "", klaarMin: null } } }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator(".em-sessie-wenk")).toHaveText("Klok loop sedert jou sessie om 08:00 begin het.");
+      let rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.begin).toBe(sessieBegin);
+      expect(rec.begin_eie).toBe(eieBegin);
+      expect(rec.konsep).toBe("my begin");
+      /* Tweede keer oopmaak: niks verander nie, begin_eie bly die eerste waarde */
+      await page.reload();
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.begin).toBe(sessieBegin);
+      expect(rec.begin_eie).toBe(eieBegin);
+      expectNoLeaks(mock);
+    });
+
+    test("O4: 'n sessie sonder eie begin laat geen begin_eie na nie; nuwe poging twee keer bewaar die eerste sedert", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const sessieBegin = new Date("2026-10-16T08:00:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          wallie911_v2_bok: { sessions: [{ id: "s_1", date: "2026-10-16", subjectSlug: "afrikaans", startedAt: sessieBegin, block: { id: "2026-10-16-afr-a1" } }] }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      const lees = () => page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      let rec = await lees();
+      expect(rec.begin).toBe(sessieBegin);
+      expect(rec.begin_eie, "geen eie begin om te bewaar nie").toBeUndefined();
+      /* Eerste 'nuwe poging': geen ou sedert nie */
+      await page.locator(".em-nuut").click();
+      rec = await lees();
+      const sedert1 = rec.sedert;
+      expect(typeof sedert1).toBe("number");
+      expect(rec.sedert_vorige).toBeUndefined();
+      /* Tweede 'nuwe poging': die eerste sedert word bewaar */
+      await page.locator(".em-antwoord").fill("tweede");
+      await page.clock.fastForward(60 * 1000);
+      await page.locator(".em-nuut").click();
+      rec = await lees();
+      expect(rec.sedert).toBeGreaterThan(sedert1);
+      expect(rec.sedert_vorige).toBe(sedert1);
+      /* Derde: sedert_vorige bly die EERSTE waarde */
+      await page.locator(".em-antwoord").fill("derde");
+      await page.clock.fastForward(60 * 1000);
+      await page.locator(".em-nuut").click();
+      const rec3 = await lees();
+      expect(rec3.sedert).toBeGreaterThan(rec.sedert);
+      expect(rec3.sedert_vorige).toBe(sedert1);
+      expect(rec3.vorige.map((v) => v.konsep), "alle pogings geargiveer").toEqual(["", "tweede", "derde"]);
+      expectNoLeaks(mock);
+    });
+
     test("O3: vorige pogings sigbaar (lees-net): datum, konsep as gewone teks, lêer; die memo bly toe", async ({ page, context }) => {
       const item = V3.find((i) => i.id === "afr-v3-A1");
       const mock = new MockBackend({ mode: "v2" });

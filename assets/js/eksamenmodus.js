@@ -4,8 +4,10 @@
 
    Stoor NIKS op die bediener nie. Plaaslik:
      wallie911_eksamen_v1  { v:1, items:{ <id>:{ begin:<ms>|null, konsep:"", bevestig:bool, lêer:"", klaarMin:<n>|null,
-                                                  sedert:<ms>|null, vorige:[ { begin, konsep, bevestig, lêer, klaarMin, geargiveerOp }, … ] } } }
-       (vorige = geargiveerde vorige pogings, nuutste laaste; sedert = wanneer Wallie self 'n nuwe poging begin het)
+                                                  sedert:<ms>|null, vorige:[ { begin, konsep, bevestig, lêer, klaarMin, geargiveerOp }, … ],
+                                                  begin_eie?:<ms>, sedert_vorige?:<ms> } } }
+       (vorige = geargiveerde vorige pogings, nuutste laaste; sedert = wanneer Wallie self 'n nuwe poging begin het;
+        begin_eie / sedert_vorige = die oorskrewe waarde van begin / sedert, bewaar sodat niks verlore gaan nie, sien metBewaring)
      wallie911_vraebank_v1 (VraebankStore.saveAttempt) kry die punte-poging as ekstra velde.
    Die bediener-event (EVENT.kind) is AF tot Hanno die bediener-skema goedkeur: 'wallie_ingest_v2' aanvaar net
    'n vaste lys event-soorte (migrations/001). Sien EVENT hieronder.
@@ -209,6 +211,18 @@
     return werkVanRekord(kry(itemId), nou, kap);
   }
 
+  /* O4 (AGENTS §2.3: Wallie se plaaslike data word nooit herskryf nie): word 'n bestaande `begin` deur 'n ander (vroeër
+     sessie-) begin vervang, of 'n bestaande `sedert` deur 'n nuwe een, dan bewaar die ou waarde eers in `begin_eie` /
+     `sedert_vorige` (net as dit nog nie gestel is nie; die eerste waarde bly dus altyd). 'n Terugstelling na null
+     (nuwePoging) raak dit nie: daar is die ou begin reeds in `vorige` geargiveer. Suiwer: gee die aangevulde patch. */
+  function metBewaring(rec, patch) {
+    const r = rec || {};
+    const p = Object.assign({}, patch);
+    if (p.begin != null && r.begin != null && p.begin !== r.begin && r.begin_eie == null) p.begin_eie = r.begin;
+    if (p.sedert != null && r.sedert != null && p.sedert !== r.sedert && r.sedert_vorige == null) p.sedert_vorige = r.sedert;
+    return p;
+  }
+
   /* Dagsleutel "JJJJ-MM-DD" van 'n tydstempel: dieselfde reël as WALLIE.todayKey (toestel se plaaslike dag, SAST). */
   function dagSleutel(ms) {
     const d = new Date(ms);
@@ -261,7 +275,8 @@
   }
   function bewaar(id, patch) {
     const d = lees();
-    d.items[id] = Object.assign(kry(id), patch);
+    const nou = kry(id);
+    d.items[id] = Object.assign(nou, metBewaring(nou, patch));
     skryf(d);
     return d.items[id];
   }
@@ -643,6 +658,7 @@
     moetNuwePoging,
     werkVanRekord,
     vandagWerk,
+    metBewaring,
     dagSleutel,
     hhmm,
     eventData,
