@@ -151,8 +151,9 @@
 
   /* ---------- Hooftaak (eksamenvlak) ---------- */
 
-  /* Blokke wat self al eksamenwerk of nasienwerk is, hou hul eie titel as hooftaak. */
-  const EIE_TAAK = new Set(["merk", "herdoen", "opstel", "skrif", "toets"]);
+  /* Blokke wat self al eksamenwerk of nasienwerk is, hou hul eie titel as hooftaak.
+     "voor-eksamen" is die ligte eksamendag-opwarm (formaatkaarte lees, tas pak): geen nuwe werk, eie titel. */
+  const EIE_TAAK = new Set(["merk", "herdoen", "opstel", "skrif", "toets", "voor-eksamen"]);
 
   /* Vraagbanke met eksamenvlak-items per vak; die ander vakke het nog geen nie (sien GAPING). */
   function bankVir(slug) {
