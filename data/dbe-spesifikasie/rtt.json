@@ -1,0 +1,21 @@
+{
+  "vak": "rtt",
+  "vraestel": "RTT (CAT) V1 Prakties",
+  "geverifieer": true,
+  "verifikasie": "Punte (150) = som van vrae[] in assets/js/dbe-vraestelle.js (4 DBE-vraestelle, almal 150); tyd (3 u) uit assets/js/pa-konsole/exams.js. Vraag-groottes = reeks oor daardie 4 vraestelle.",
+  "punte": 150,
+  "tyd_min": 180,
+  "hoofwerk_bank": null,
+  "oefenbank": "data/vraebank-rtt-v1.json",
+  "oefenbank_nota": "Die 30 RTT-oefenvrae is subvrae van 1-7 punte; 'n DBE-vraag is 14-35 punte. Hulle is dus oefening (agtergrond), nie eksamenvlak-hoofwerk nie. Hoofwerk vir RTT = die volledige DBE-vraag/vraestel (werk-veld in schedule.js).",
+  "vrae": {
+    "V1": { "punte": { "min": 19, "max": 27 } },
+    "V2": { "punte": { "min": 18, "max": 26 } },
+    "V3": { "punte": { "min": 16, "max": 22 } },
+    "V4": { "punte": { "min": 18, "max": 24 } },
+    "V5": { "naam": "Databasis", "punte": { "min": 35, "max": 35 } },
+    "V6": { "naam": "HTML", "punte": { "min": 15, "max": 15 } },
+    "V7": { "naam": "Integrasie", "punte": { "min": 14, "max": 15 } }
+  },
+  "afdelings": null
+}

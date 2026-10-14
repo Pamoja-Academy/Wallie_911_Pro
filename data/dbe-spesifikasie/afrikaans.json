@@ -1,0 +1,13 @@
+{
+  "vak": "afrikaans",
+  "vraestel": "Afrikaans HT V3 (Skryfwerk)",
+  "geverifieer": false,
+  "ONGEVERIFIEER": "ONGEVERIFIEER — Hanno moet bevestig. Tyd (3 u) kom uit die eksamenrooster (assets/js/pa-konsole/exams.js). Afdeling-punte en woordgrense is die waardes in data/vraebank-v3.json (uit die DBE-vraestelle wat Fase 2 gebruik het) maar is nie teen die DBE-leers hernagaan nie; die vraestel-totaal (100 punte) en of Afdeling B meer as een 25-punt-teks bevat, moet bevestig word.",
+  "punte": 100,
+  "tyd_min": 180,
+  "hoofwerk_bank": "data/vraebank-v3.json",
+  "afdelings": {
+    "A": { "naam": "Opstel", "punte": 50, "subvrae": 1, "tyd_min": 100, "woorde": { "min": 400, "max": 450 }, "kriteria": [30, 15, 5] },
+    "B": { "naam": "Transaksionele tekste", "punte": 25, "subvrae": 1, "tyd_min": 40, "woorde": { "min": 180, "max": 200 }, "kriteria": [15, 10] }
+  }
+}

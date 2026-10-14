@@ -44,5 +44,8 @@ jobs:
       - name: Toetse (npm run test:skoon)
         run: npm run test:skoon
 
+      - name: Eksamenvlak-hek (alle vakke, DBE-spesifikasies)
+        run: node scripts/eksamenvlak-hek.js
+
       - name: Vrystellingshek (sonder korpus)
         run: python3 scripts/qa/item_gate.py data/vraebank-rtt-v1.json NONE

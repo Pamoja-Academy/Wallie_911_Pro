@@ -1,0 +1,14 @@
+{
+  "vak": "engels",
+  "vraestel": "Engels EAT V3 (Skryfwerk)",
+  "geverifieer": true,
+  "verifikasie": "Hanno, opdrag 14 Okt 2026: A 50 (250-300 w), B 30 (120-150 w), C 20 (80-100 w), 100 punte, 150 min. Tydsindeling per afdeling (80/40/30 min) uit Engels-dagplan 13 Okt.",
+  "punte": 100,
+  "tyd_min": 150,
+  "hoofwerk_bank": "data/vraebank-v3.json",
+  "afdelings": {
+    "A": { "naam": "Essay", "punte": 50, "subvrae": 1, "tyd_min": 80, "woorde": { "min": 250, "max": 300 }, "kriteria": [30, 15, 5] },
+    "B": { "naam": "Longer transactional text", "punte": 30, "subvrae": 1, "tyd_min": 40, "woorde": { "min": 120, "max": 150 }, "kriteria": [18, 12] },
+    "C": { "naam": "Shorter transactional text", "punte": 20, "subvrae": 1, "tyd_min": 30, "woorde": { "min": 80, "max": 100 }, "kriteria": [12, 8] }
+  }
+}
