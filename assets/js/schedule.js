@@ -283,8 +283,8 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       { suffix: "klaar", kind: "break", slug: "break", start: "19:50", end: "19:50", soort: "pouse",
         title: "Klaar. Skerms af 21:30, bed 22:00.", detail: "Werk is klaar. Skerms af om 21:30, bed 22:00." }
     ],
-    /* Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): Do 15 eksamendag Engels V3,
-       dan Afrikaans HT V3 (Di 20) met eksamenvlak-items; elke studieblok se hooftaak is 'n item (`item`) of DBE-werk.
+    /* Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): 15-20 Okt: Do 15 eksamendag Engels V3,
+       dan Afrikaans HT V3 (Di 20, ook 'n vaste eksamendag-plan) met eksamenvlak-items; elke studieblok se hooftaak is 'n item (`item`) of DBE-werk.
        `item` is die id van 'n eksamenvlak-item (data/vraebank-v3.json) en wen as hooftaak (lesson-ui.js hoofTaak).
        Soort "voor-eksamen" is 'n ligte eksamendag-opwarm wat sy eie titel as hooftaak hou. */
     "2026-10-15": [
@@ -412,6 +412,30 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         title: "Kontrolelys en tas pak vir môre", detail: "ID, toelatingsbrief, penne, water. Slaap vroeg." },
       { suffix: "klaar", kind: "break", slug: "break", start: "12:30", end: "12:30", soort: "pouse",
         title: "Klaar. Skerms af 21:00, bed 21:30.", detail: "Rus is deel van die voorbereiding." }
+    ],
+    "2026-10-20": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "06:45", end: "07:15", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "formaat", kind: "rooi", slug: "afrikaans", start: "07:15", end: "07:35", soort: "voor-eksamen",
+        title: "Laaste kyk: formaat van transaksionele tekste (net lees, geen nuwe werk)",
+        detail: "Brief, dagboek, verslag, toespraak, e-pos. Kies jou opsteltipe." },
+      { suffix: "tas", kind: "break", slug: "break", start: "07:35", end: "08:00", soort: "pouse",
+        title: "Tas: ID, toelatingsbrief, penne, water", detail: "" },
+      { suffix: "eksamen", kind: "break", slug: "break", start: "09:00", end: "12:00", soort: "pouse",
+        title: "AFRIKAANS HT V3-EKSAMEN (skool) 09:00-12:00", detail: "A opstel ±100 min, B twee tekste ±40 min elk. Sterkte!" },
+      { suffix: "rus", kind: "break", slug: "break", start: "12:00", end: "14:00", soort: "pouse",
+        title: "Rus en middagete", detail: "" },
+      { suffix: "terugskou", kind: "rooi", slug: "afrikaans", start: "14:00", end: "14:20", soort: "herdoen",
+        title: "Afrikaans V3: skryf neer wat gekom het + 3 lesse", detail: "" },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "14:20", end: "14:30", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "wg-v1", kind: "groen", slug: "wiskgelett", start: "14:30", end: "15:30", soort: "toets", punte: 50,
+        title: "Wisk. Gel. V1: nog 'n DBE-vraestel (Pa gee), Vraag 1 en 2 op papier, getimed (60 min)",
+        detail: "Wisk. Gel. V1 is Vr 23 Okt. Gebruik 'n amptelike DBE-vraestel en memo." },
+      { suffix: "merk-wg-v1", kind: "groen", slug: "wiskgelett", start: "15:30", end: "15:50", soort: "merk",
+        title: "Merk Wisk. Gel. Vraag 1 en 2 met die memo", detail: "" },
+      { suffix: "klaar", kind: "break", slug: "break", start: "15:50", end: "15:50", soort: "pouse",
+        title: "Klaar. Skerms af 21:30.", detail: "" }
     ]
   };
   if (VASTE_PLANNE[dateStr]) {
