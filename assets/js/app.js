@@ -896,7 +896,19 @@
     window.open(wa, "_blank", "noopener");
   }
 
+  /* "Maak item oop" (eksamenvlak-hooftaak) staan op die blokkaart (#block-list) EN op die Volgende-kaart
+     (#next-up): daarom een dokument-vlak delegasie, nie ’n hanteerder per houer nie. */
   document.body.addEventListener("click", (e) => {
+    const item = e.target.closest(".open-item");
+    if (item) {
+      /* Eksamenvlak-hooftaak: spring na die item in Skryfwerk / Oefenvrae */
+      const view = item.dataset.view;
+      const opener = { skryfwerk: window.SkryfwerkUI, oefenvrae: window.OefenvraeUI }[view];
+      showView(view);
+      /* Ná die skerm se eie "lys"-herteken (MutationObserver-mikrotaak) */
+      Promise.resolve().then(() => opener?.open(item.dataset.item));
+      return;
+    }
     if (e.target.closest(".js-export-log")) downloadLog();
     else if (e.target.closest(".js-share-log")) shareLog();
     else if (e.target.closest(".js-copy-log")) copyLog();
@@ -924,16 +936,6 @@
         task: decodeURIComponent(start.dataset.title || ""),
         blockId: start.dataset.block
       });
-    }
-    const item = e.target.closest(".open-item");
-    if (item) {
-      /* Eksamenvlak-hooftaak: spring na die item in Skryfwerk / Oefenvrae */
-      const view = item.dataset.view;
-      const opener = { skryfwerk: window.SkryfwerkUI, oefenvrae: window.OefenvraeUI }[view];
-      showView(view);
-      /* Ná die skerm se eie "lys"-herteken (MutationObserver-mikrotaak) */
-      Promise.resolve().then(() => opener?.open(item.dataset.item));
-      return;
     }
     const done = e.target.closest(".mark-done");
     if (done) {

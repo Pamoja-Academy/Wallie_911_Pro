@@ -178,6 +178,19 @@ for (const vp of VIEWPORTS) {
       });
     }
 
+    test("16 Okt 08:05: 'Maak item oop' op die Volgende-kaart open die regte item (F1)", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-16T08:05:00+02:00");
+      const knoppie = page.locator("#next-up .open-item");
+      await expect(knoppie).toHaveCount(1);
+      await expect(knoppie).toHaveAttribute("data-item", "afr-v3-A1");
+      await knoppie.scrollIntoViewIfNeeded();
+      await knoppie.click();
+      await page.clock.runFor(500);
+      await expect(page.locator("#view-skryfwerk")).toHaveClass(/active/);
+      await expect(page.locator(".sw-titel")).toContainText("A1");
+      expectNoLeaks(mock);
+    });
+
     test("15 Okt 07:20: die formaat-blok se hooftaak is sy eie titel", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-15T07:20:00+02:00");
       const kaart = page.locator('#block-list .md-card[data-id="2026-10-15-formaat"]');
