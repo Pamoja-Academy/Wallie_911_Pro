@@ -125,6 +125,49 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
+    test("sessie-gekoppelde klok: die klok loop sedert vandag se sessie op die item se blok (F3)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const sessieBegin = new Date("2026-10-16T08:00:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          wallie911_v2_bok: {
+            sessions: [
+              { id: "s_1", date: "2026-10-16", subjectSlug: "afrikaans", startedAt: sessieBegin, endedAt: sessieBegin + 1800000, block: { id: "2026-10-16-afr-a1" } },
+              /* ’n sessie op ’n ander blok tel nie */
+              { id: "s_2", date: "2026-10-16", subjectSlug: "afrikaans", startedAt: sessieBegin - 3600000, block: { id: "2026-10-16-afr-b3" } }
+            ]
+          }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator(".em-sessie-wenk")).toHaveText("Klok loop sedert jou sessie om 08:00 begin het.");
+      await expect(page.locator(".em-tyd")).toContainText(`/ ${item.tyd_min}:00`);
+      await expect(page.locator(".em-tyd")).toContainText(/^35:/);
+      await expect(page.locator(".em-begin")).toBeHidden();
+      /* Die effektiewe begin is plaaslik gestoor */
+      const draf = await page.evaluate((k) => JSON.parse(localStorage.getItem(k)), DRAF);
+      expect(draf.items[item.id].begin).toBe(sessieBegin);
+      expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
+
+    test("sessie-gekoppelde klok: geen sessie → geen wenk, klok begin by Begin (F3)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      await boot(page, { time: new Date("2026-10-16T08:35:00+02:00") });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator(".em-sessie-wenk")).toBeHidden();
+      await expect(page.locator(".em-begin")).toBeVisible();
+      await expect(page.locator(".em-tyd")).toContainText(/^00:00/);
+      expectNoLeaks(mock);
+    });
+
     test("prakties (RTT): papier-bevestiging + 60% van die tyd + klaar", async ({ page, context }) => {
       const item = RTT.find((i) => i.id === "rtt-v1-S01");
       const mock = new MockBackend({ mode: "v2" });

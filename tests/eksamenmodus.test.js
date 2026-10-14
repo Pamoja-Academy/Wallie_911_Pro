@@ -71,6 +71,99 @@ eq(E.uitslagVan(19, 50), "fout", "< 40% = fout");
 eq(E.minuteGebruik(0, 5), 0, "geen begin = 0 min");
 eq(E.minuteGebruik(1000, 1000 + 90000), 1.5, "90 sek = 1.5 min");
 
+/* sessie-gekoppelde klok (F3): vroegsteBegin(itemId, state, vandag[, eie, sedert]) */
+const T = (h, m) => new Date(2026, 9, 16, h, m).getTime(); /* plaaslike 16 Okt */
+const VANDAG = "2026-10-16";
+const toestand = (o) =>
+  Object.assign(
+    {
+      blocks: [
+        { id: "2026-10-16-afr-a1", item: "afr-v3-A1" },
+        { id: "2026-10-16-afr-b3", item: "afr-v3-B3" },
+        { id: "2026-10-16-pouse1" }
+      ],
+      sessions: [],
+      live: { status: "off", subject: null, warnings: 0, startedAt: null }
+    },
+    o
+  );
+eq(E.vroegsteBegin("afr-v3-A1", null, VANDAG, null), null, "geen toestand, geen eie begin → null");
+eq(E.vroegsteBegin("afr-v3-A1", null, VANDAG, T(9, 0)), T(9, 0), "geen toestand → net die eie begin");
+eq(E.vroegsteBegin("afr-v3-A1", toestand(), VANDAG, null), null, "geen sessies → null");
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ sessions: [{ date: VANDAG, block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 2) }] }), VANDAG, T(8, 40)),
+  T(8, 2),
+  "sessie vroeër as eie begin → sessie wen"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ sessions: [{ date: VANDAG, block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 50) }] }), VANDAG, T(8, 40)),
+  T(8, 40),
+  "eie begin vroeër as sessie → eie begin bly"
+);
+eq(
+  E.vroegsteBegin(
+    "afr-v3-A1",
+    toestand({
+      sessions: [
+        { date: VANDAG, block: { id: "2026-10-16-afr-a1" }, startedAt: T(9, 0) },
+        { date: VANDAG, block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 5) },
+        { date: VANDAG, block: { id: "2026-10-16-afr-b3" }, startedAt: T(7, 0) }
+      ]
+    }),
+    VANDAG,
+    null
+  ),
+  T(8, 5),
+  "vroegste van meer sessies; sessie van 'n ander item se blok tel nie"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ sessions: [{ date: "2026-10-15", block: { id: "2026-10-16-afr-a1" }, startedAt: T(1, 0) }] }), VANDAG, null),
+  null,
+  "sessie van 'n ander dag tel nie"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ sessions: [{ date: VANDAG, block: null, startedAt: T(1, 0) }, { date: VANDAG, startedAt: T(1, 0) }] }), VANDAG, null),
+  null,
+  "sessie sonder blok tel nie"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ live: { status: "active", block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 10) } }), VANDAG, T(8, 40)),
+  T(8, 10),
+  "aktiewe sessie tel"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ live: { status: "locked", block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 10) } }), VANDAG, null),
+  T(8, 10),
+  "gesluite (locked) sessie is ook aktief"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ live: { status: "off", block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 10) } }), VANDAG, null),
+  null,
+  "live met status off tel nie"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ live: { status: "active", block: { id: "2026-10-16-afr-b3" }, startedAt: T(8, 10) } }), VANDAG, null),
+  null,
+  "aktiewe sessie op 'n ander item se blok tel nie"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ sessions: [{ date: VANDAG, block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 5) }] }), VANDAG, null, 0),
+  T(8, 5),
+  "sedert wat nie gestel is nie, filter niks"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ sessions: [{ date: VANDAG, block: { id: "2026-10-16-afr-a1" }, startedAt: T(8, 5) }] }), VANDAG, null, T(8, 30)),
+  null,
+  "sessie voor 'sedert' (nuwe poging) tel nie"
+);
+eq(
+  E.vroegsteBegin("afr-v3-A1", toestand({ blocks: undefined, sessions: [{ date: VANDAG, block: { id: "x" }, startedAt: T(8, 5) }] }), VANDAG, T(9, 0)),
+  T(9, 0),
+  "geen blokke in die toestand → net eie begin (geen fout nie)"
+);
+eq(E.dagSleutel(T(23, 59)), VANDAG, "dagSleutel: plaaslike dag");
+eq(E.hhmm(T(8, 5)), "08:05", "hhmm: voorloopnulle");
+
 /* event-data: presies die gevraagde velde */
 eq(
   Object.keys(E.eventData(A1, "engels", { behaal: 40, totaal: 50, woorde: 270, minuteGebruik: 71, tydMin: 80, memoNaMin: 79 })).sort(),

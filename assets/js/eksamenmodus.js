@@ -113,6 +113,44 @@
     return Math.max(0, Math.round(((eindMs - beginMs) / 60000) * 10) / 10);
   }
 
+  /* Sessie-gekoppelde klok. Wallie begin gewoonlik 'n SESSIE op die blok (kamera, ■ Klaar) en maak dan eers die item
+     oop: die eksamenklok moet nie later begin as haar sessie nie. 'n Item se effektiewe begin = die vroegste van
+       · sy eie gestoorde begin (`eie`),
+       · die startedAt van VANDAG se plaaslike sessies (`date === vandag`) wie se `block.id` een van vandag se blokke
+         met `item === itemId` is, en
+       · die aktiewe sessie (`state.live`, status ≠ "off") op so 'n blok.
+     `sedert` (ms): sessies wat voor 'n "nuwe poging" begin het, tel nie meer nie. Suiwer: geen DOM, geen WALLIE.
+     Gee ms of null. */
+  function vroegsteBegin(itemId, state, vandag, eie, sedert) {
+    const st = state || {};
+    const blokIds = new Set((st.blocks || []).filter((b) => b && b.item === itemId).map((b) => b.id));
+    const kandidate = [];
+    const nuttig = (ms) => Number.isFinite(ms) && ms > 0 && !(sedert > 0 && ms < sedert);
+    if (eie != null && Number(eie) > 0) kandidate.push(Number(eie));
+    if (blokIds.size) {
+      (st.sessions || []).forEach((s) => {
+        if (s && s.date === vandag && s.block && blokIds.has(s.block.id) && nuttig(Number(s.startedAt))) kandidate.push(Number(s.startedAt));
+      });
+      const live = st.live;
+      if (live && live.status && live.status !== "off" && live.block && blokIds.has(live.block.id) && nuttig(Number(live.startedAt))) {
+        kandidate.push(Number(live.startedAt));
+      }
+    }
+    return kandidate.length ? Math.min.apply(null, kandidate) : null;
+  }
+
+  /* Dagsleutel "JJJJ-MM-DD" van 'n tydstempel: dieselfde reël as WALLIE.todayKey (toestel se plaaslike dag, SAST). */
+  function dagSleutel(ms) {
+    const d = new Date(ms);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  /* "HH:MM" van 'n tydstempel (toestel se plaaslike tyd, soos WALLIE.todayKey) */
+  function hhmm(ms) {
+    const d = new Date(ms);
+    return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+
   function eventData(item, vak, st) {
     return {
       item_id: item.id,
@@ -160,6 +198,16 @@
 
   /* ---------- DOM ---------- */
 
+  /* WALLIE.app.state() (plaaslike sessies, blokke, aktiewe sessie), of null as die toepassing nog nie daar is nie. */
+  function appState() {
+    try {
+      const a = typeof window !== "undefined" && window.WALLIE && window.WALLIE.app;
+      return a && typeof a.state === "function" ? a.state() : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function el(tag, cls, text) {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -203,6 +251,15 @@
     const tydSek = tmin ? tmin * 60 : 0;
     const wr = item.woorde || {};
     const rec0 = kry(item.id);
+    /* Klok loop sedert die vroegste van: eie begin en vandag se sessie op hierdie item se blok (vroegsteBegin). */
+    const vandag = dagSleutel(Date.now());
+    const effBegin = vroegsteBegin(item.id, appState(), vandag, rec0.begin, rec0.sedert);
+    const sessieBegin = vroegsteBegin(item.id, appState(), vandag, null, rec0.sedert);
+    const uitSessie = sessieBegin != null && sessieBegin === effBegin;
+    if (effBegin !== rec0.begin) {
+      rec0.begin = effBegin;
+      bewaar(item.id, { begin: effBegin });
+    }
     const tstate = { begin: rec0.begin, klaar: rec0.klaarMin != null, memoOpen: false, memoNaMin: null, gestoor: false };
     const parent = voor.parentNode;
 
@@ -217,6 +274,8 @@
     const beginKnop = el("button", "btn primary em-begin", "Begin (klok loop)");
     beginKnop.type = "button";
     klok.append(klokTeks, klokInfo, beginKnop);
+    const sessieWenk = el("p", "hint em-sessie-wenk", uitSessie ? "Klok loop sedert jou sessie om " + hhmm(sessieBegin) + " begin het." : "");
+    sessieWenk.hidden = !uitSessie;
 
     /* --- werkarea --- */
     const werk = el("div", "em-werk");
@@ -268,7 +327,7 @@
     memoKnop.disabled = true;
     memoKnop.setAttribute("aria-expanded", "false");
 
-    kas.append(klok, werk, klaarRij, rede, memoKnop);
+    kas.append(klok, sessieWenk, werk, klaarRij, rede, memoKnop);
     parent.insertBefore(kas, voor);
     parent.insertBefore(memoHouer, voor);
     parent.insertBefore(selfnasien, voor);
@@ -451,6 +510,9 @@
     totaal,
     uitslagVan,
     minuteGebruik,
+    vroegsteBegin,
+    dagSleutel,
+    hhmm,
     eventData,
     pasToe
   };
