@@ -207,6 +207,25 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
+    test("F8: 'n gestoorde plan van vandag sonder `item` word vervang (item is deel van die plan-handtekening)", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-16T08:05:00+02:00");
+      const voor = await page.evaluate(() => WALLIE.app.state().blocks.find((b) => b.id === "2026-10-16-afr-a1").item);
+      expect(voor).toBe("afr-v3-A1");
+      /* Ou berging: dieselfde blokke en tye, maar sonder `item` */
+      await page.evaluate(() => {
+        const st = WALLIE.app.state();
+        st.blocks.forEach((b) => delete b.item);
+        WALLIE.app.persist();
+      });
+      const stoor = await page.evaluate(() => JSON.parse(localStorage.getItem("wallie911_v2_bok")).blocks.some((b) => b.item));
+      expect(stoor).toBe(false);
+      await page.reload();
+      await page.clock.runFor(1500);
+      const na = await page.evaluate(() => WALLIE.app.state().blocks.find((b) => b.id === "2026-10-16-afr-a1").item);
+      expect(na).toBe("afr-v3-A1");
+      expectNoLeaks(mock);
+    });
+
     test("20 Okt 07:20: Afrikaans V3-eksamendag - formaat-blok is voor-eksamen, eksamen 09:00-12:00 is 'n pouse", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-20T07:20:00+02:00");
       const formaat = page.locator('#block-list .md-card[data-id="2026-10-20-formaat"]');

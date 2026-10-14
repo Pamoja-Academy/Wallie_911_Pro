@@ -33,12 +33,12 @@
     );
     /* Plan-handtekening: ’n NUWE plan vir VANDAG moet vandag reeds deurkom — anders sit Wallie vas met
        gister se weergawe van vandag se plan (die 11/12 Okt-blokke sou nooit gewys het nie).
-       Die handtekening kyk net na die harde feite van ’n blok (id, tyd, duur, soort, werk), NIE na titel,
+       Die handtekening kyk net na die harde feite van ’n blok (id, tyd, duur, soort, item, werk), NIE na titel,
        detail of vak nie: ’n gestoorde blok wat net in vertoning verskil (bv. ’n ou, verborge vak) bly
        onaangeraak. Voltooide blokke, opnames, sessies en foute word nooit geraak nie — net blocks/planDate. */
     const sig = (blocks) =>
       (blocks || [])
-        .map((b) => `${b.id}|${b.start || ""}|${b.end || ""}|${b.minutes}|${b.soort || ""}|${b.werk ? JSON.stringify(b.werk) : ""}`)
+        .map((b) => `${b.id}|${b.start || ""}|${b.end || ""}|${b.minutes}|${b.soort || ""}|${b.item || ""}|${b.werk ? JSON.stringify(b.werk) : ""}`)
         .join(";");
     const planVervang = state.planDate === today && sig(state.blocks) !== sig(plan.blocks);
     if (state.planDate !== today || !state.blocks?.length || missingNewBlocks || planVervang) {
