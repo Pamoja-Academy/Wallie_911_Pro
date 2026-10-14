@@ -63,7 +63,7 @@ test("volle sessie: elke gebeurtenis bereik Supabase met die presiese payload", 
       title: "IN SESSIE — begin",
       body: expect.stringContaining(`${subject} · ${minutes}m`),
       device_id: deviceId,
-      app_version: "2026-10-14d",
+      app_version: "2026-10-15a",
       backfill: false,
       data: { value: null, _event_id: `start:${sid}` }
     }
