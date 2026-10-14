@@ -21,7 +21,7 @@ Eksamenrooster: `assets/js/pa-konsole/exams.js`. Dagplanne: `VASTE_PLANNE` in `a
    (`blok.item`) of DBE-werk (`blok.werk`), nooit 'n les-kaart nie. Les-kaarte is `vlak: "agtergrond"` (opsioneel).
 6. **Memo kom ná die werk** (eksamenmodus): nie een klik weg nie.
 7. **Saamvoeg na `master` = live vir Wallie.** Net met groen CI én Hanno se uitdruklike "voeg saam" (of 'n staande opdrag
-   in die huidige taak). Geen force-push na `master`. Nie 'n saamvoeging in die laaste 12 uur voor 'n eksamen sonder Hanno nie.
+   in die huidige taak). Geen force-push na `master`. Saamvoeg die aand voor 'n eksamen: verifieer daarna live (foon + laptop, geen konsole-foute) dat die eksamendag-plan reg wys.
 
 ## 3. Werkwyse (projekbestuur)
 - **Eers data, dan mening.** Status = Supabase SELECT op `wallie911.live`/`events` + `git log origin/master` + live `version.json`.
