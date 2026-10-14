@@ -34,6 +34,18 @@ ok(E.memoOntsluit(sk({ woorde: 120, klaar: true })), "skryf: min woorde + klaar 
 ok(E.memoOntsluit(sk({ verlopeSek: 2400 })), "skryf: tyd verby → oop (ook sonder werk)");
 ok(!E.memoOntsluit(sk({ verlopeSek: 2399 })), "skryf: 1 sek voor die tyd → toe");
 
+/* hek: skryf, op papier geskryf (F2): bevestiging + minstens 60% van die tyd vervang die woordtelling */
+ok(!E.memoOntsluit(sk({ bevestig: true, klaar: true, verlopeSek: 1439 })), "skryf: papier bevestig + klaar maar < 60% → toe");
+ok(E.memoOntsluit(sk({ bevestig: true, klaar: true, verlopeSek: 1440 })), "skryf: papier bevestig + klaar + 60% → oop (0 woorde)");
+ok(!E.memoOntsluit(sk({ bevestig: true, verlopeSek: 2000 })), "skryf: papier bevestig maar nie klaar gedruk nie → toe");
+ok(!E.memoOntsluit(sk({ klaar: true, verlopeSek: 2000 })), "skryf: 60% verby maar nie bevestig en geen woorde nie → toe");
+ok(E.minWerkGedoen(sk({ woorde: 120 })), "skryf: genoeg woorde is werk gedoen (sonder bevestiging)");
+ok(!E.minWerkGedoen(sk({ minWoorde: 0, woorde: 0 })), "skryf: 0 woorde is nooit werk nie (ook sonder minimum)");
+ok(!E.minWerkGedoen(sk({ bevestig: true, verlopeSek: 100 })), "skryf: bevestig te vroeg is nog nie werk nie");
+ok(E.memoRede(sk({ bevestig: true, verlopeSek: 600 })).includes("Nog ±14 min"), "rede (papier): noem die minute tot 60%");
+ok(E.memoRede(sk({ woorde: 100 })).includes("op papier"), "rede: wys die papier-opsie");
+ok(E.memoRede(sk({ bevestig: true, klaar: false, verlopeSek: 1440 })).includes("Ek is klaar"), "rede (papier): 60% bereik → druk Ek is klaar");
+
 /* hek: praktiese */
 const pr = (o) => Object.assign({ tipe: "praktiese", bevestig: false, verlopeSek: 0, tydSek: 600, klaar: false, begin: true }, o);
 ok(!E.memoOntsluit(pr({ klaar: true })), "prakties: klaar sonder bevestiging → toe");

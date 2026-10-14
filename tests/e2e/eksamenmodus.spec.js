@@ -102,6 +102,29 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
+    test("skryf op papier: bevestiging + klaar + 60% van die tyd maak die memo oop (F2)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "eng-v3-B1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      await boot(page);
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator(".em-bevestig")).toContainText("Ek het dit op papier geskryf");
+      await page.locator(".em-bevestig input").check();
+      await page.locator(".em-klaar").click();
+      /* Bevestig + klaar, maar nog nie 60% van die tyd nie */
+      await expect(page.locator(".em-memo-knoppie")).toBeDisabled();
+      await expect(page.locator(".em-rede")).toContainText("Nog ±");
+      await page.clock.fastForward(Math.ceil(0.6 * item.tyd_min * 60) * 1000);
+      await page.clock.runFor(1000);
+      await expect(page.locator(".em-memo-knoppie")).toBeEnabled();
+      /* Die bevestiging is plaaslik gestoor */
+      const draf = await page.evaluate((k) => JSON.parse(localStorage.getItem(k)), DRAF);
+      expect(draf.items[item.id].bevestig).toBe(true);
+      expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
+
     test("prakties (RTT): papier-bevestiging + 60% van die tyd + klaar", async ({ page, context }) => {
       const item = RTT.find((i) => i.id === "rtt-v1-S01");
       const mock = new MockBackend({ mode: "v2" });

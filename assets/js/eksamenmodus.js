@@ -44,9 +44,12 @@
     return String(teks || "").split(/\s+/).filter(Boolean).length;
   }
 
-  /* 'skryf' = teks wat getel word; enigiets anders = papier/toepassing-bevestiging. */
+  /* 'skryf' = teks wat getel word, OF (as Wallie op papier geskryf het) die papier-bevestiging met minstens
+     60% van die tyd; enigiets anders = papier/toepassing-bevestiging. */
   function minWerkGedoen(st) {
-    if (st.tipe === "skryf") return st.woorde >= (st.minWoorde || 0) && st.woorde > 0;
+    if (st.tipe === "skryf") {
+      return (st.woorde >= (st.minWoorde || 0) && st.woorde > 0) || (Boolean(st.bevestig) && st.verlopeSek >= 0.6 * st.tydSek);
+    }
     return Boolean(st.bevestig) && st.verlopeSek >= 0.6 * st.tydSek;
   }
 
@@ -60,8 +63,18 @@
   function memoRede(st) {
     if (st.begin === false) return "Druk Begin — die klok loop dan, en die memo bly toe totdat jy klaar is.";
     if (st.tipe === "skryf") {
-      const kort = Math.max(0, (st.minWoorde || 0) - st.woorde);
-      if (kort > 0) return "Skryf nog " + kort + " woord" + (kort === 1 ? "" : "e") + " (minimum " + st.minWoorde + "), of wag vir die tyd om is.";
+      const woordeOk = st.woorde >= (st.minWoorde || 0) && st.woorde > 0;
+      if (!woordeOk) {
+        /* Op papier geskryf: dieselfde 60%-tydreël as die praktiese werk */
+        if (st.bevestig) {
+          const nog = Math.ceil(0.6 * st.tydSek - st.verlopeSek);
+          if (nog > 0) return "Nog ±" + Math.ceil(nog / 60) + " min werk voor die memo oopgaan (minstens 60% van die tyd), of wag vir die tyd om is.";
+        } else {
+          const kort = Math.max(0, (st.minWoorde || 0) - st.woorde);
+          if (kort > 0) return "Skryf nog " + kort + " woord" + (kort === 1 ? "" : "e") + " (minimum " + st.minWoorde + "), of merk dat jy dit op papier geskryf het, of wag vir die tyd om is.";
+          return "Skryf jou antwoord, of merk dat jy dit op papier geskryf het, of wag vir die tyd om is.";
+        }
+      }
     } else {
       if (!st.bevestig) return "Doen die werk en merk dit hierbo as gedoen, of wag vir die tyd om is.";
       const nog = Math.ceil(0.6 * st.tydSek - st.verlopeSek);
@@ -220,7 +233,13 @@
       area.placeholder = "Skryf jou antwoord hier (of op papier en tik dit oor)…";
       teller = el("p", "em-woorde", "");
       teller.setAttribute("aria-live", "polite");
-      werk.append(area, teller);
+      /* Wie op papier skryf, tik nie alles oor nie: dieselfde bevestiging as by die praktiese werk */
+      const papier = el("label", "em-bevestig");
+      boks = document.createElement("input");
+      boks.type = "checkbox";
+      boks.checked = Boolean(rec0.bevestig);
+      papier.append(boks, el("span", null, "Ek het dit op papier geskryf"));
+      werk.append(area, teller, papier);
     } else {
       const lab = el("label", "em-bevestig");
       boks = document.createElement("input");
