@@ -187,8 +187,9 @@ test("O1: gister se eksamenmodus-werk tel nie vir vandag se blok nie", async ({ 
   expectNoLeaks(mock);
 });
 
-/* Vaste oorsig (wallie_pa_overview) met 4 blokke: a = klaar gemerk sonder minute, b = 15/40 min, c = 30/40 min,
-   d = deur die toestel self gemeet (nie handmatig nie). Net a en b kry 'n vlag. */
+/* Vaste oorsig (wallie_pa_overview) met 5 blokke: a = klaar gemerk sonder minute, b = 15/40 min, c = 30/40 min,
+   d = deur die toestel self gemeet (nie handmatig nie), e = opwarm/voor-eksamen-blok (kind "warm") klaar gemerk sonder
+   minute. Net a en b kry 'n vlag; 'n warm-blok kry nooit een nie (O2). */
 const OORSIG = {
   ok: true, now: "2026-10-09T09:05:00+02:00", day: "2026-10-09", today: "2026-10-09", week_start: "2026-10-05", week_end: "2026-10-11",
   plan_received: true, current: null, today_by_subject: [], week_by_subject: [], week_days: [], sessions: [], surveys: [], problems: [], stills: [], device: null, events: [],
@@ -196,7 +197,8 @@ const OORSIG = {
     { id: "a", subject: "Engels", subject_slug: "engels", title: "V3 kaart", kind: "geel", start: "08:15", end: "08:30", minutes: 40, status: "done", done_min: 0, manual: true },
     { id: "b", subject: "Engels", subject_slug: "engels", title: "Aansoekbrief", kind: "geel", start: "08:30", end: "09:10", minutes: 40, status: "done", done_min: 15, manual: true },
     { id: "c", subject: "Engels", subject_slug: "engels", title: "Genoeg", kind: "geel", start: "09:10", end: "09:50", minutes: 40, status: "done", done_min: 30, manual: true },
-    { id: "d", subject: "Engels", subject_slug: "engels", title: "Gemeet", kind: "geel", start: "09:50", end: "10:30", minutes: 40, status: "done", done_min: 35, manual: false }
+    { id: "d", subject: "Engels", subject_slug: "engels", title: "Gemeet", kind: "geel", start: "09:50", end: "10:30", minutes: 40, status: "done", done_min: 35, manual: false },
+    { id: "e", subject: "Engels", subject_slug: "engels", title: "Laaste kyk", kind: "warm", start: "10:30", end: "10:50", minutes: 20, status: "done", done_min: 0, manual: true }
   ]
 };
 
@@ -208,19 +210,20 @@ test("pa-afstand.html: werklik gerendeer - GEEN POGING, VROEG KLAAR, en geen vla
   await page.locator("#login-pass").fill("toets-wagwoord");
   await page.locator("#login-form button").first().click();
   const rye = page.locator("#blocks .blk");
-  await expect(rye).toHaveCount(4);
+  await expect(rye).toHaveCount(5);
   const vlagTekste = async (i) => rye.nth(i).locator(".vlag").allTextContents();
   expect(await vlagTekste(0), "a: klaar gemerk, 0 min").toEqual(["GEEN POGING"]);
   expect(await vlagTekste(1), "b: 15 van 40 min").toEqual(["VROEG KLAAR"]);
   expect(await vlagTekste(2), "c: 30 van 40 min").toEqual([]);
   expect(await vlagTekste(3), "d: deur die toestel gemeet").toEqual([]);
+  expect(await vlagTekste(4), "e: warm-blok (opwarm/voor-eksamen), klaar gemerk sonder minute").toEqual([]);
   await expect(page.locator("#blocks .vlag")).toHaveCount(2);
   await expect(rye.nth(0).locator(".vlag")).toHaveAttribute("data-vlag", "GEEN POGING");
   await expect(rye.nth(1).locator(".vlag")).toHaveAttribute("data-vlag", "VROEG KLAAR");
   expectNoLeaks(mock);
 });
 
-test("pa-konsole.html: agenda en rooster-tabel dra dieselfde vlae (GEEN POGING, VROEG KLAAR, geen vlag by c en d)", async ({ page, context }) => {
+test("pa-konsole.html: agenda en rooster-tabel dra dieselfde vlae (GEEN POGING, VROEG KLAAR, geen vlag by c, d en die warm-blok)", async ({ page, context }) => {
   const mock = new MockBackend({ mode: "v2" });
   mock.overview = OORSIG;
   await mock.attach(context);
@@ -229,11 +232,12 @@ test("pa-konsole.html: agenda en rooster-tabel dra dieselfde vlae (GEEN POGING, 
   await page.locator("#login-form button").click();
   await expect(page.locator("#console-view")).toBeVisible();
   const agenda = page.locator("#agenda li");
-  await expect(agenda).toHaveCount(4);
+  await expect(agenda).toHaveCount(5);
   expect(await agenda.nth(0).locator(".vlag").allTextContents(), "a").toEqual(["GEEN POGING"]);
   expect(await agenda.nth(1).locator(".vlag").allTextContents(), "b").toEqual(["VROEG KLAAR"]);
   expect(await agenda.nth(2).locator(".vlag").allTextContents(), "c").toEqual([]);
   expect(await agenda.nth(3).locator(".vlag").allTextContents(), "d").toEqual([]);
+  expect(await agenda.nth(4).locator(".vlag").allTextContents(), "e: warm-blok").toEqual([]);
   await expect(page.locator("#agenda .vlag")).toHaveCount(2);
   /* Die rooster-tabel (gantt) het dieselfde vlae */
   await expect(page.locator("#gantt-table .vlag")).toHaveCount(2);

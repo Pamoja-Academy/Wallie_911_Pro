@@ -73,6 +73,11 @@ eq(F({ manual: true, status: "done", minutes: 40, doneMin: 24 }), null, "Pa: 24/
 eq(F({ manual: false, status: "done", minutes: 40, doneMin: 30 }), null, "Pa: deur gemete tyd klaar = ok");
 eq(F({ manual: true, status: "planned", minutes: 40, doneMin: 0 }), null, "Pa: nie klaar nie");
 eq(F({ manual: true, status: "done", minutes: 0, doneMin: 0 }), null, "Pa: geen minute");
+/* O2: blokke met kind "warm" (opwarm / voor-eksamen) kry nooit 'n vlag nie */
+eq(F({ kind: "warm", manual: true, status: "done", minutes: 20, doneMin: 0 }), null, "Pa: warm-blok, 0 min = geen vlag");
+eq(F({ kind: "warm", manual: true, status: "done", minutes: 20, doneMin: 5 }), null, "Pa: warm-blok, 5/20 min = geen vlag");
+eq(F({ kind: "rooi", manual: true, status: "done", minutes: 20, doneMin: 0 }), "GEEN POGING", "Pa: ander kind (rooi) bly gevlag");
+eq(F({ kind: "geel", manual: true, status: "done", minutes: 20, doneMin: 5 }), "VROEG KLAAR", "Pa: geel bly gevlag");
 
 if (fails.length) {
   console.error("vroeg-klaar: FOUT\n - " + fails.join("\n - "));

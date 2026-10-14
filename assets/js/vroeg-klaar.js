@@ -1,6 +1,11 @@
 /* Vroeg-klaar-kontrole (Wallie se kant): word 'n studieblok "klaar" gemerk sonder genoeg werk?
-   Suiwer logika; geen skerm, geen stoor. Pa se kant (pa-konsole.html / pa-afstand.html) gebruik dieselfde reëls
-   op die bestaande oorsig-data (blok.manual + done_min + minutes), sien PK.blockFlag.
+   Suiwer logika; geen skerm, geen stoor.
+   Pa se kant (pa-konsole.html / pa-afstand.html, PK.blockFlag) is 'n eenvoudiger afgeleide van dieselfde reëls en WEET
+   MINDER: sy oorsig-data ken net die blok (manual, status, kind, minutes) en done_min = GEMETE SESSIE-minute. Pa ken GEEN
+   item-pogings of eksamenmodus-werk nie (dit bly op Wallie se toestel; geen bediener-event nie, LL-04). Daarom kan Pa se
+   vlag 'n blok wat Wallie op papier/in eksamenmodus gedoen het (sonder sessie) steeds as GEEN POGING / VROEG KLAAR wys;
+   Wallie se eie waarskuwing hieronder is die ENIGE een wat dit raak. Pa se kant slaan 'n blok met kind "warm" (opwarm,
+   voor-eksamen) oor, want daar is geen eksamenwerk om na te gaan nie.
      "geen_sessie" — nog nooit 'n sessie of poging vir hierdie blok begin nie            (kode GEEN POGING)
      "geen_minute" — daar was 'n sessie/poging, maar 0 minute gedoen (bv. 'n sessie van 0 min)  (kode GEEN POGING)
      "vroeg"       — minder as 60% van die beplande minute gedoen                          (kode VROEG KLAAR)

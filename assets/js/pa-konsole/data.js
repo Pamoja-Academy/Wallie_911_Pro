@@ -192,9 +192,11 @@
   /* Vlag vir 'n blok wat Wallie self "klaar" gemerk het sonder genoeg werk (leesonly, uit die bestaande oorsig):
        GEEN POGING = klaar gemerk maar geen sessie/minute daaragter nie
        VROEG KLAAR = klaar gemerk met minder as 60% van die beplande minute gedoen
+     Blokke met kind 'warm' (opwarm / voor-eksamen: laaste kyk, tas pak) kry nooit 'n vlag nie.
      Dieselfde reël as assets/js/vroeg-klaar.js (Wallie se waarskuwing) en pa-afstand.html. */
   function blockFlag(b) {
     if (!b || !b.manual || b.status !== 'done') return null;
+    if (b.kind === 'warm') return null;
     var plan = num(b.minutes, 0), done = num(b.doneMin != null ? b.doneMin : b.done_min, 0);
     if (!(plan > 0)) return null;
     if (done <= 0) return 'GEEN POGING';
@@ -216,7 +218,8 @@
       status: (b.status === 'done' || b.status === 'partial' || b.status === 'missed' || b.status === 'planned') ? b.status : 'planned',
       doneMin: num(b.done_min, 0),
       manual: !!b.manual,
-      flag: blockFlag({ manual: !!b.manual, status: (b.status === 'done' || b.status === 'partial' || b.status === 'missed' || b.status === 'planned') ? b.status : 'planned', doneMin: b.done_min, minutes: b.minutes }),
+      kind: b.kind != null ? String(b.kind) : null,
+      flag: blockFlag({ kind: b.kind, manual: !!b.manual, status: (b.status === 'done' || b.status === 'partial' || b.status === 'missed' || b.status === 'planned') ? b.status : 'planned', doneMin: b.done_min, minutes: b.minutes }),
       _id: b.id != null ? b.id : null
     };
   }
