@@ -53,3 +53,37 @@ test("F6: 'n item wat vas in die rooster staan (blok.item) word nie deur die eks
   expect(h.itemId).toBe("afr-v3-A1");
   expectNoLeaks(mock);
 });
+
+test("F12: bank-keuse kies net items wie se tyd in die blok pas; pas geen een nie → die blok se eie titel", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page, { time: new Date("2026-10-14T08:00:00+02:00") });
+  await page.goto("/#missie");
+  /* Die 15-min-blok het nie 'n ±80-min-opstel as hooftaak nie */
+  let h = await hoof(page, { id: "t-foutlog", subjectSlug: "engels", kind: "geel", soort: "les", title: "Engels — Foutlog hardop lees", minutes: 15 });
+  expect(h.soort).toBe("blok");
+  expect(h.itemId).toBeNull();
+  expect(h.tekst).toBe("Engels — Foutlog hardop lees");
+  /* 'n Blok wat groot genoeg is, kry steeds 'n item wat pas */
+  for (const minute of [40, 60, 150]) {
+    h = await hoof(page, Object.assign({}, ENGELS, { minutes: minute }));
+    expect(h.soort, `${minute} min`).toBe("item");
+    const tyd = await page.evaluate((id) => {
+      const it = window.VRAEBANK_V3.find((i) => i.id === id);
+      return Eksamenmodus.tydMin(it, it.vak) || it.tyd_min;
+    }, h.itemId);
+    expect(tyd, `${h.itemId} pas in ${minute} min`).toBeLessThanOrEqual(minute);
+  }
+  /* RTT: ook daar pas die gekose item in die blok (3 min) */
+  h = await hoof(page, { id: "t-rtt", subjectSlug: "rtt", kind: "geel", title: "RTT — kort", minutes: 3 });
+  if (h.soort === "item") {
+    const tyd = await page.evaluate((id) => {
+      const it = window.VRAEBANK_RTT_V1.find((i) => i.id === id);
+      return Eksamenmodus.tydMin(it, "rtt");
+    }, h.itemId);
+    expect(tyd).toBeLessThanOrEqual(3);
+  } else {
+    expect(h.soort).toBe("blok");
+  }
+  expectNoLeaks(mock);
+});

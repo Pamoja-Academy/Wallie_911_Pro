@@ -209,7 +209,8 @@
 
   /* Die blok se EKSAMENVLAK-hooftaak. Nooit 'n agtergrondkaart nie.
        1. blok.item (vas in die rooster) · 2. DBE-vraestel (werk) · 3. blok wat self eksamenwerk is
-       4. volgende item uit die vak se vraagbank (die minste gedoen eerste) · 5. gaping: DBE-vraestel op papier. */
+       4. volgende item uit die vak se vraagbank (die minste gedoen eerste) wie se tyd in die blok se minute pas;
+          pas geen item nie, dan die blok se eie titel · 5. gaping: DBE-vraestel op papier. */
   function hoofTaak(b, werk, occurrence = 0) {
     const slug = b.subjectSlug;
     const bank = bankVir(slug);
@@ -220,7 +221,13 @@
     if (werk) return { soort: "werk", tekst: `${b.title} · ${DBE()?.werkLabel(werk) || ""}` };
     if (b.soort && EIE_TAAK.has(b.soort)) return { soort: "blok", tekst: b.title };
     if (bank.length) {
-      const orde = bank.map((it, n) => ({ it, n, p: pogings(it.id) })).sort((x, y) => x.p - y.p || x.n - y.n);
+      /* Net items wat in die blok pas: 'n 15-min-blok kry nie 'n ±80-min-opstel as hooftaak nie */
+      const pas = bank.filter((it) => {
+        const tyd = window.Eksamenmodus?.tydMin(it, slug) || it.tyd_min;
+        return tyd > 0 && tyd <= b.minutes;
+      });
+      if (!pas.length) return { soort: "blok", tekst: b.title };
+      const orde = pas.map((it, n) => ({ it, n, p: pogings(it.id) })).sort((x, y) => x.p - y.p || x.n - y.n);
       return itemTaak(orde[((occurrence % orde.length) + orde.length) % orde.length].it, slug);
     }
     const g = GAPING[slug];
