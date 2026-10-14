@@ -38,6 +38,8 @@
   var SKRYF = ["engels", "afrikaans"];
   var ALMAL = ["rtt", "engels", "afrikaans", "gasvryheid", "toerisme", "wiskgelett", "algemeen"];
 
+  var GESTUUR = "Gestuur. Hulp kom binne ongeveer 10 minute per e-pos (kyk jou Gmail). Pa kry ook 'n kopie.";
+
   var SUPPORT_FAQ = [
     {
       id: "rtt-maak-oop",
@@ -56,6 +58,48 @@
       vakke: ["rtt", "algemeen"],
       vraag: "Die skerm sluit wanneer ek die oortjie verlaat.",
       antwoord: "In 'n gewone sessie tel 'n oortjie wat weg is as een waarskuwing. Na 3 waarskuwings sluit die skerm en die tyd staan stil. Tydens 'n RTT-praktiese blok tel oorskakel na Word, Excel, Access of Notepad nie as wegkyk nie: geen waarskuwing en geen slot nie. Pa sien steeds hoe lank jy weg was."
+    },
+    {
+      id: "rtt-praktiese-blok",
+      vakke: ["rtt"],
+      vraag: "Ek moet Word/Excel gebruik, maar die app wil hê ek moet op die blad bly (minimiseer).",
+      antwoord: "Kies RTT (CAT) op die Sessie-skerm, druk Begin sessie en dan die groot knoppie 'Begin praktiese blok (Office)'. Van daar af mag jy die blaaier minimiseer en in Word, Excel, Access of Notepad werk: geen waarskuwing en geen slot nie (tot 3 uur 15 min). Druk 'Klaar met prakties' wanneer jy klaar is. Sonder die praktiese blok tel elke keer wat jy weggaan as 'n waarskuwing, en na 3 sluit die skerm."
+    },
+    {
+      id: "rtt-stoor",
+      vakke: ["rtt"],
+      vraag: "Hoe stoor ek my RTT-praktiese werk?",
+      antwoord: "Jou Word-, Excel- en Access-werk stoor NIE in die app nie: stoor self in die program (Ctrl+S) met die lêernaam wat die vraestel vra, in 'n vouer soos Dokumente\\RTT-eksamen. Stoor elke 10 minute. Die app hou net die tyd en jou self-nasien-punte. Maak die lêers ná die tyd toe voordat jy met die memo nasien."
+    },
+    {
+      id: "rtt-wagwoord",
+      vakke: ["rtt"],
+      vraag: "Die datalêer (.exe) vra 'n wagwoord.",
+      antwoord: "Die DBE-datalêers is wagwoordbeskermde .exe-lêers wat net op Windows werk. Die wagwoord staan in die vraestel se instruksies (gewoonlik bladsy 1-2 van die PDF), nie in die app nie. Tik dit presies soos daar (hoof- en kleinletters tel). Waarsku Windows oor die .exe, kies 'More info' en dan 'Run anyway'."
+    },
+    {
+      id: "ander-vraestel",
+      vakke: ANDER,
+      vraag: "Die vraestel of memo maak nie oop nie (Toerisme / Gasvryheid / Wiskundige Geletterdheid).",
+      antwoord: "Pa gee jou die vraestel op papier of as PDF. In 'n sessie druk jy 'Maak memo oop (PDF)' en kies die memo-lêer op jou rekenaar: dit wys binne die app en tel nie as wegkyk nie (maks 15 min, Pa kry 'n sein). Kies die knoppie maar niks gebeur nie, kyk of die lêer 'n PDF of foto is. Het jy nie die lêer nie, vra vir Pa."
+    },
+    {
+      id: "sakrekenaar",
+      vakke: ANDER,
+      vraag: "Mag ek 'n sakrekenaar gebruik?",
+      antwoord: "Ja, gebruik 'n gewone sakrekenaar op die tafel, soos in die eksamen (Wiskundige Geletterdheid het dit nodig; Toerisme vir wisselkoerse en tydsones; Gasvryheid vir koste en porsies). Moenie die Windows-sakrekenaar gebruik nie: oorskakel na 'n ander program tel in 'n sessie as 'n waarskuwing."
+    },
+    {
+      id: "ander-tyd",
+      vakke: ANDER,
+      vraag: "Hoe verdeel ek my tyd in die vraestel?",
+      antwoord: "Omtrent 1 minuut per punt. Kyk eers vinnig deur die hele vraestel (5 min), doen die vrae wat jy ken eerste, en hou 10 min aan die einde om antwoorde en eenhede (R, km, ure) na te gaan. Toerisme en Gasvryheid: 3 uur vir 200 punte. Wiskundige Geletterdheid: wys altyd jou bewerking, want dit kry punte al is die antwoord verkeerd."
+    },
+    {
+      id: "skryf-tyd-vraag",
+      vakke: SKRYF,
+      vraag: "Ek raak uit tyd by een vraag (opstel/brief).",
+      antwoord: "Sit 'n horlosie op die tafel en skryf die eindtyd vir elke vraag bo-aan die bladsy voor jy begin. Is die tyd vir 'n vraag verby, skryf 'n slotsin en gaan aan: 'n onklaar opstel met 'n slot kry meer punte as 'n kort transaksionele teks wat ontbreek."
     },
     {
       id: "skryf-stoor",
@@ -303,6 +347,23 @@
     try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); return true; } catch (e) { return false; }
   }
 
+  /* Die presiese kolomme van wallie911.support (sien tests/fixtures/support-schema.json).
+     Stuur NET bestaande kolomme: PostgREST weier die hele ry (400) as een sleutel nie bestaan nie. */
+  function supportBody(row) {
+    var ctx = { skerm: row.skerm || "", bron: row.bron || "hulp", href: String(location.href || "").slice(0, 300) };
+    if (row.extra && typeof row.extra === "object") ctx.extra = row.extra;
+    return {
+      vak: row.vak,
+      gebeur: row.gebeur,
+      skerm: row.skerm,
+      category: row.vak,
+      message: row.gebeur,
+      context: ctx,
+      app_version: String((window.WALLIE && WALLIE.APP_VERSION) || ""),
+      ua: String((typeof navigator !== "undefined" && navigator.userAgent) || "").slice(0, 200)
+    };
+  }
+
   function insertRow(row) {
     var live = window.WALLIE && WALLIE.LIVE;
     if (!live || !live.url || !live.key || typeof fetch !== "function") return Promise.resolve(false);
@@ -317,7 +378,7 @@
         Accept: "application/json",
         Prefer: "return=minimal"
       },
-      body: JSON.stringify({ vak: row.vak, gebeur: row.gebeur, skerm: row.skerm }),
+      body: JSON.stringify(supportBody(row)),
       signal: ctrl ? ctrl.signal : undefined
     }).then(function (res) {
       if (timer) clearTimeout(timer);
@@ -344,7 +405,7 @@
         if (!ok) { flushing = false; saveQueue(q); return; }
         q.shift();
         saveQueue(q);
-        if (!q.length) setStatus("Gestuur. Pa kry jou boodskap.", true);
+        if (!q.length) setStatus(GESTUUR, true);
         next();
       });
     }
@@ -379,7 +440,7 @@
       stuur.disabled = false;
       if (ok) {
         gebeur.value = "";
-        setStatus("Gestuur. Pa kry jou boodskap.", true);
+        setStatus(GESTUUR, true);
         return;
       }
       var q = loadQueue();
@@ -414,6 +475,30 @@
   new MutationObserver(function () {
     if (open && overlayOop()) close({ keepFocus: true });
   }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] });
+
+  /* Publieke ingang: die ou "Iets werk nie"-vorm (app.js) stuur ook hierdeur, sodat elke probleem
+     in wallie911.support beland (en vanlyn in dieselfde tou wag). Gee "gestuur" | "tou" | "fout". */
+  window.WALLIE = window.WALLIE || {};
+  WALLIE.HULP = {
+    GESTUUR: GESTUUR,
+    body: supportBody,
+    stuur: function (row) {
+      var r = {
+        id: "s_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        vak: String(row.vak || "algemeen"),
+        gebeur: String(row.gebeur || ""),
+        skerm: String(row.skerm || ""),
+        bron: row.bron || "hulp",
+        extra: row.extra || null
+      };
+      return insertRow(r).then(function (ok) {
+        if (ok) return "gestuur";
+        var q = loadQueue();
+        q.push(r);
+        return saveQueue(q) ? "tou" : "fout";
+      });
+    }
+  };
 
   document.body.appendChild(fab);
   document.body.appendChild(backdrop);

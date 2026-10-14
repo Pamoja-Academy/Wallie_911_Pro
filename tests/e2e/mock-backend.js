@@ -129,6 +129,14 @@ class MockBackend {
     let body = null;
     try { body = req.postDataJSON(); } catch { /* ignore */ }
     const headers = req.headers();
+    /* Soos PostgREST: een onbekende kolom = hele ry geweier (PGRST204). Kolomme uit die skema-fiksture. */
+    const kolomme = require("../fixtures/support-schema.json").columns;
+    const onbekend = body && typeof body === "object" ? Object.keys(body).filter((k) => !kolomme.includes(k)) : [];
+    if (!body || onbekend.length) {
+      this.supportRejected = (this.supportRejected || 0) + 1;
+      return route.fulfill({ status: 400, headers: cors, contentType: "application/json",
+        body: JSON.stringify({ code: "PGRST204", message: `Could not find the '${onbekend[0]}' column of 'support'` }) });
+    }
     this.support.push({
       body,
       apikey: headers.apikey || "",
