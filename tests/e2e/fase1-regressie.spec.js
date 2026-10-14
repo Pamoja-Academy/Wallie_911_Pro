@@ -16,7 +16,7 @@ const fs = require("fs");
 const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
-const { boot, hideTab, showTab, expectNoLeaks, T0 } = require("./helpers");
+const { boot, hideTab, showTab, expectNoLeaks, T0, eksamenOntsluit } = require("./helpers");
 
 const FIXTURE = path.join(__dirname, "..", "fixtures", "sync-payload-baseline.json");
 const VB_KEY = "wallie911_vraebank_v1";
@@ -164,6 +164,7 @@ async function run(page, context, { fase1 }) {
     Math.random = () => ((s = (s * 16807) % 2147483647) / 2147483647);
   });
   await boot(page, { seed: SEED });
+  await eksamenOntsluit(page);
   await page.clock.pauseAt(new Date(T0.getTime() + 1000));
   await page.goto("/#missie");
   await page.clock.runFor(30000);

@@ -3,7 +3,7 @@
    Per element: sigbaar, ná scroll binne die venster, geen horisontale oorloop (bladsy én element). Alle netwerk onderskep. */
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
-const { boot, runUntil, shot, expectNoLeaks } = require("./helpers");
+const { boot, runUntil, shot, expectNoLeaks, eksamenOntsluit } = require("./helpers");
 
 const VIEWPORTS = [
   { name: "laptop", label: "1366x768", viewport: { width: 1366, height: 768 } },
@@ -44,6 +44,7 @@ for (const vp of VIEWPORTS) {
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
       await boot(page);
+      await eksamenOntsluit(page);
       await startRtt(page, mock);
 
       const row = page.locator("#praktiese-start-row");
@@ -94,6 +95,7 @@ for (const vp of VIEWPORTS) {
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
       await boot(page);
+      await eksamenOntsluit(page);
       await page.goto("/#oefenvrae");
       await expect(page.locator(".ov-item")).toHaveCount(30);
       /* ’n Hele groep is hoër as die venster; toets die eerste groep-opskrif en lys-item */
@@ -130,6 +132,7 @@ for (const vp of VIEWPORTS) {
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
       await boot(page);
+      await eksamenOntsluit(page);
       await page.goto("/index.html?voorskou-toets=1#missie");
       const ban = page.locator("#voorskou-banier");
       await expectRendered(page, ban, "voorskou-banier");

@@ -104,29 +104,26 @@
     const pan = el("section", "panel");
     pan.append(el("h2", "oe-titel", kortId(item) + " · Vlak " + item.vlak + " " + punteTeks(item.punte)));
     pan.append(el("div", "oe-vraag", String(item.vraag)));
-    pan.append(el("p", "hint oe-opdrag", "Doen dit in Excel/Word/Access of op papier, en kyk dan na die memo."));
+    pan.append(el("p", "hint oe-opdrag", "Doen dit in Excel/Word/Access of op papier onder die DBE-tyd, en kyk eers dan na die memo."));
     const b = item.bron || {};
     pan.append(el("p", "oe-bron", "Bron: " + b.verwysing + ", bl. " + b.bladsy + " (memo bl. " + b.memo_bladsy + ")"));
 
-    const memoKnoppie = el("button", "btn primary oe-memo-knoppie", "Wys memo");
+    /* Eksamenmodus: papier/toepassing-bevestiging + klok; die memo bly toe tot die werk gedoen is. */
+    const memoKnoppie = el("button", "btn primary oe-memo-knoppie", "Memo gesluit");
     memoKnoppie.type = "button";
-    memoKnoppie.setAttribute("aria-expanded", "false");
     const memo = el("div", "oe-memo");
-    memo.hidden = true;
     const mono = item.tipe === "formule" || item.tipe === "kode";
-    memo.append(blok("Antwoord", String(item.antwoord), mono));
-    const rig = el("div", "oe-blok");
-    rig.append(el("h3", null, "Nasienriglyn"));
-    const ul = el("ul", "oe-rig");
-    (item.nasienriglyn || []).forEach((r) => ul.append(el("li", null, r.kriterium + " – " + r.punte)));
-    rig.append(ul);
-    memo.append(rig);
-    memo.append(blok("Verduideliking", String(item.verduideliking), false));
-    memoKnoppie.addEventListener("click", () => {
-      memo.hidden = !memo.hidden;
-      memoKnoppie.textContent = memo.hidden ? "Wys memo" : "Steek memo weg";
-      memoKnoppie.setAttribute("aria-expanded", String(!memo.hidden));
-    });
+    const bouMemo = () => {
+      const d = document.createDocumentFragment();
+      d.append(blok("Antwoord", String(item.antwoord), mono));
+      const rig = el("div", "oe-blok");
+      rig.append(el("h3", null, "Nasienriglyn"));
+      const ul = el("ul", "oe-rig");
+      (item.nasienriglyn || []).forEach((r) => ul.append(el("li", null, r.kriterium + " – " + r.punte)));
+      rig.append(ul);
+      d.append(rig, blok("Verduideliking", String(item.verduideliking), false));
+      return d;
+    };
     pan.append(memoKnoppie, memo);
 
     const selfnasien = el("div", "oe-nasien");
@@ -146,6 +143,9 @@
     });
     selfnasien.append(rij, bevestig);
     pan.append(selfnasien);
+    if (window.Eksamenmodus) {
+      window.Eksamenmodus.pasToe({ item, vak: item.vak || "rtt", tipe: "praktiese", voor: memoKnoppie, bouMemo, memoHouer: memo, selfnasien, store: STORE, kls: "oe" });
+    }
 
     wrap.append(nav, pan);
     root.replaceChildren(wrap);

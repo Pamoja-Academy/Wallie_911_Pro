@@ -10,7 +10,7 @@
 
    API (window.VraebankStore):
      get()                       → die hele struktuur (kopie)
-     saveAttempt(id, uitslag)    → stoor ’n self-nasien-poging; gee die poging terug (of null as ongeldig)
+     saveAttempt(id, uitslag[, ekstra]) → stoor ’n self-nasien-poging (ekstra = eksamenmodus-punte); gee die poging terug (of null as ongeldig)
      attempts(id)                → lys pogings vir een item
      practicalStart()            → begin ’n praktiese blok (of gee die aktiewe een terug)
      practicalAbsence("start"|"end") → maak ’n afwesigheid oop / toe in die aktiewe blok
@@ -92,11 +92,17 @@
       return read();
     },
 
-    saveAttempt(id, uitslag) {
+    saveAttempt(id, uitslag, ekstra) {
       if (!id || !UITSLAE.includes(uitslag)) return null;
       const d = read();
       const item = d.items[id] && Array.isArray(d.items[id].pogings) ? d.items[id] : { pogings: [] };
       const poging = { t: iso(), uitslag };
+      /* Eksamenmodus: punte, woorde en minute (net bekende, platte velde) */
+      if (ekstra && typeof ekstra === "object") {
+        ["punte_behaal", "punte_totaal", "woorde", "minute_gebruik", "tyd_min", "memo_oopgemaak_na_min"].forEach((k) => {
+          if (typeof ekstra[k] === "number" && Number.isFinite(ekstra[k])) poging[k] = ekstra[k];
+        });
+      }
       item.pogings.push(poging);
       d.items[id] = item;
       write(d);

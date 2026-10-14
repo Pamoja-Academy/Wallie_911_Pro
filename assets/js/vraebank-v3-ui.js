@@ -85,7 +85,7 @@
   function lys() {
     const wrap = el("div", "sw-lys");
     wrap.append(el("h1", null, "Skryfwerk (V3)"));
-    wrap.append(el("p", "hint", "Beplan, skryf op papier onder tyd, tel jou woorde, en kyk dan na die memo."));
+    wrap.append(el("p", "hint", "Beplan, skryf onder die DBE-tyd, tel jou woorde, en kyk eers dan na die memo. Gee jouself punte soos die rubriek."));
     GROEPE.forEach((groep) => {
       const lede = ITEMS.filter((i) => i.vak === groep.vak);
       if (!lede.length) return;
@@ -213,21 +213,19 @@
     const b = item.bron || {};
     pan.append(el("p", "sw-bron", "Bron: " + b.verwysing + ", bl. " + b.bladsy + " (memo bl. " + b.memo_bladsy + ")"));
 
-    const memoKnoppie = el("button", "btn primary sw-memo-knoppie", "Wys memo");
+    /* Eksamenmodus: die memo word eers gebou (en wys) as die tyd om is, of die werk gedoen en "Ek is klaar" gedruk is. */
+    const memoKnoppie = el("button", "btn primary sw-memo-knoppie", "Memo gesluit");
     memoKnoppie.type = "button";
-    memoKnoppie.setAttribute("aria-expanded", "false");
     const memo = el("div", "sw-memo");
-    memo.hidden = true;
-    memo.append(formaatBlok(item), antwoordBlok(item), rubriekBlok(item));
-    const verd = el("div", "sw-blok");
-    verd.append(el("h3", null, "Verduideliking"));
-    verd.append(el("div", "sw-teks", String(item.verduideliking)));
-    memo.append(verd);
-    memoKnoppie.addEventListener("click", () => {
-      memo.hidden = !memo.hidden;
-      memoKnoppie.textContent = memo.hidden ? "Wys memo" : "Steek memo weg";
-      memoKnoppie.setAttribute("aria-expanded", String(!memo.hidden));
-    });
+    const bouMemo = () => {
+      const d = document.createDocumentFragment();
+      d.append(formaatBlok(item), antwoordBlok(item), rubriekBlok(item));
+      const verd = el("div", "sw-blok");
+      verd.append(el("h3", null, "Verduideliking"));
+      verd.append(el("div", "sw-teks", String(item.verduideliking)));
+      d.append(verd);
+      return d;
+    };
     pan.append(memoKnoppie, memo);
 
     const selfnasien = el("div", "sw-nasien");
@@ -247,6 +245,9 @@
     });
     selfnasien.append(rij, bevestig);
     pan.append(selfnasien);
+    if (window.Eksamenmodus) {
+      window.Eksamenmodus.pasToe({ item, vak: item.vak, tipe: "skryf", voor: memoKnoppie, bouMemo, memoHouer: memo, selfnasien, store: STORE, kls: "sw" });
+    }
 
     wrap.append(nav, pan);
     root.replaceChildren(wrap);
