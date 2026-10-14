@@ -232,3 +232,6 @@
   @media (max-width:699px){ #ganttChart{display:none} }
   .empty{color:var(--muted); font-size:.86rem; margin:6px 0}
   footer .row{margin-top:10px}
+
+/* Vlag: blok deur Wallie klaar gemerk sonder genoeg werk */
+.vlag{display:inline-block; margin-left:4px; padding:1px 6px; border-radius:6px; border:1px solid #e5484d; color:#e5484d; font-size:.68rem; font-weight:800; letter-spacing:.04em; white-space:nowrap}

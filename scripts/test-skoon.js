@@ -21,6 +21,7 @@ const steps = [
   "node tests/weergawe.test.js",
   "node tests/eksamenmodus.test.js",
   "node tests/agtergrond.test.js",
+  "node tests/vroeg-klaar.test.js",
 ];
 
 for (const cmd of steps) {

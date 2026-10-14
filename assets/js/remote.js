@@ -545,7 +545,7 @@ WALLIE.REMOTE = {
     });
   },
 
-  blockDone(block, at) {
+  blockDone(block, at, ekstra) {
     if (!block?.id) return;
     this.enqueue(`block:${block.id}`, {
       kind: "block",
@@ -555,7 +555,7 @@ WALLIE.REMOTE = {
       client_at: at || Date.now(),
       title: "BLOK KLAAR GEMERK",
       body: `${block.title || block.id} (${block.start || "?"}–${block.end || "?"})`,
-      data: { blockId: block.id, done: true }
+      data: ekstra ? { blockId: block.id, done: true, ...ekstra } : { blockId: block.id, done: true }
     });
   },
 

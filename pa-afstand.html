@@ -105,6 +105,7 @@
     .b-done { color: var(--ok); } .b-partial { color: var(--warn); } .b-missed { color: var(--lock); } .b-planned { color: var(--muted); }
     .blk { display: flex; gap: .5rem; align-items: baseline; border-top: 1px solid var(--line); padding: .45rem 0; font-size: .88rem; }
     .blk .tag { font-weight: 700; min-width: 6.2rem; }
+    .vlag { color: #e5484d; border: 1px solid #e5484d; border-radius: 6px; padding: 0 .35rem; font-size: .74rem; letter-spacing: .04em; white-space: nowrap; }
     .banner { border: 1px solid var(--warn); color: var(--warn); border-radius: 10px; padding: .6rem .8rem; font-size: .85rem; margin-bottom: .85rem; }
     .fb { border-top: 1px solid var(--line); padding: .7rem 0; }
     .fb .when { color: var(--gold); font-size: .78rem; }
@@ -471,6 +472,13 @@
     let legacy = false;
     let legacyCheckedAt = 0;
     const stillCache = new Map();
+    /* Dieselfde reël as PK.blockFlag (pa-konsole) en assets/js/vroeg-klaar.js */
+    function blokVlag(b) {
+      if (!b || !b.manual || b.status !== "done" || !(Number(b.minutes) > 0)) return "";
+      const gedoen = Number(b.done_min) || 0;
+      if (gedoen <= 0) return "GEEN POGING";
+      return gedoen < 0.6 * Number(b.minutes) ? "VROEG KLAAR" : "";
+    }
     const BADGE = {
       done: ["b-done", "✓ klaar"],
       partial: ["b-partial", "◐ gedeeltelik"],
@@ -556,7 +564,7 @@
         .map((b) => {
           const [cls, label] = BADGE[b.status] || BADGE.planned;
           const when = b.start && b.end ? `${b.start}–${b.end} · ` : "";
-          return `<div class="blk"><span class="tag ${cls}">${label}</span><span>${when}<b>${escapeHtml(b.title && String(b.title).startsWith(b.subject) ? b.title : b.subject + (b.title ? " — " + b.title : ""))}</b> · ${b.done_min}/${b.minutes} min${b.manual ? " · deur Wallie as klaar gemerk" : ""}</span></div>`;
+          return `<div class="blk"><span class="tag ${cls}">${label}</span><span>${when}<b>${escapeHtml(b.title && String(b.title).startsWith(b.subject) ? b.title : b.subject + (b.title ? " — " + b.title : ""))}</b> · ${b.done_min}/${b.minutes} min${b.manual ? " · deur Wallie as klaar gemerk" : ""}${blokVlag(b) ? ` · <b class="vlag" data-vlag="${blokVlag(b)}">${blokVlag(b)}</b>` : ""}</span></div>`;
         })
         .join("");
       $("week-title").textContent = `Week ${dayLabel(o.week_start)} – ${dayLabel(o.week_end)}`;
