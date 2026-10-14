@@ -1,9 +1,9 @@
-/* Plan v5 (15-20 Okt): vaste dagplanne vir Do 15 (Engels V3-eksamendag) tot Di 20 Okt (Afrikaans HT V3-eksamendag).
-   Geen Gasvryheid/Toerisme/RTT-rotasie nie. Elke studieblok se hooftaak is 'n eksamenvlak-item (`item`)
+/* Plan v5 (15-22 Okt): vaste dagplanne vir Do 15 (Engels V3-eksamendag) tot Di 20 Okt (Afrikaans HT V3-eksamendag),
+   en die vervolg Wo 21 / Do 22 Okt (Wisk. Gel. V1 is Vr 23 Okt). Geen Gasvryheid/Toerisme/RTT-rotasie nie. Elke studieblok se hooftaak is 'n eksamenvlak-item (`item`)
    of eie eksamenwerk, nooit sy agtergrond-les-kaart nie. Klok vals; alle netwerk onderskep (mock-backend). */
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
-const { boot, expectNoLeaks } = require("./helpers");
+const { boot, runUntil, hideTab, showTab, expectNoLeaks } = require("./helpers");
 
 const VERBODE = ["gasvryheid", "toerisme", "rtt"];
 
@@ -108,6 +108,32 @@ const DAE = [
       ["wg-v1", "14:30", "15:30"],
       ["merk-wg-v1", "15:30", "15:50"],
       ["klaar", "15:50", "15:50"]
+    ]
+  },
+  {
+    dag: "2026-10-21",
+    tyd: "2026-10-21T07:50:00+02:00",
+    blokke: [
+      ["opstaan", "07:30", "08:00"],
+      ["wg-v1-proef", "08:00", "11:00"],
+      ["middag", "11:00", "12:00"],
+      ["merk-wg-v1-proef", "12:00", "13:00"],
+      ["pouse1", "13:00", "13:15"],
+      ["foutlog", "13:15", "13:45"],
+      ["klaar", "13:45", "13:45"]
+    ]
+  },
+  {
+    dag: "2026-10-22",
+    tyd: "2026-10-22T07:50:00+02:00",
+    blokke: [
+      ["opstaan", "07:30", "08:00"],
+      ["wg-v1", "08:00", "09:00"],
+      ["merk-wg-v1", "09:00", "09:20"],
+      ["pouse1", "09:20", "09:40"],
+      ["formules", "09:40", "10:10"],
+      ["tas", "10:10", "10:30"],
+      ["klaar", "10:30", "10:30"]
     ]
   }
 ];
@@ -237,6 +263,76 @@ for (const vp of VIEWPORTS) {
       await expect(eksamen).toContainText("AFRIKAANS HT V3-EKSAMEN (skool) 09:00-12:00");
       await expect(page.locator("#next-up .next-hoof")).toContainText("Laaste kyk: formaat van transaksionele tekste");
       expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
+
+    test("21 Okt: Wisk. Gel. V1 proefeksamen (150 punte, 3 uur) is 'n skrif-blok met sy eie hooftaak en sonder 'n item", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-21T07:50:00+02:00");
+      const proef = page.locator('#block-list .md-card[data-id="2026-10-21-wg-v1-proef"]');
+      await expect(proef).toContainText("Wisk. Gel. V1 proefeksamen");
+      await expect(proef).toContainText("150 punte, 3 uur");
+      await expect(proef.locator(".md-hoof")).toHaveAttribute("data-soort", "blok");
+      await expect(proef.locator(".open-item")).toHaveCount(0);
+      const b = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-21-wg-v1-proef"));
+      expect(b).toMatchObject({ soort: "skrif", kind: "groen", subjectSlug: "wiskgelett", minutes: 180 });
+      expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
+
+    test("21 Okt 08:05: die proefeksamen is 'n skrif-blok en die oortjie-slot vuur nie (soos 14 Okt)", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-21T08:05:00+02:00");
+      const blok = page.locator('#block-list .md-card[data-id="2026-10-21-wg-v1-proef"]');
+      await expect(blok).toBeVisible();
+      await blok.locator(".start-block").click();
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "proef begin" });
+      await expect(page.locator("#session-subject")).toHaveValue("wiskgelett");
+      /* Verby die 8 s begin-grasie, dan drie tab-weg — 'n gewone toets sou nou sluit */
+      await page.clock.runFor(10000);
+      for (let i = 0; i < 3; i++) {
+        await hideTab(page);
+        await page.clock.runFor(20000);
+        await showTab(page);
+        await page.clock.runFor(5000);
+      }
+      expect(mock.byKind("warn")).toHaveLength(0);
+      expect(mock.byKind("lock")).toHaveLength(0);
+      await expect(page.locator("#lock-box")).toBeHidden();
+      await expect(page.locator("#warn-display")).toHaveText("Waarskuwings: 0 / 3");
+      expectNoLeaks(mock);
+    });
+
+    test("22 Okt 08:05: die gewone Wisk. Gel.-toets (soort toets) is wel onder oortjie-slot (kontras met die skrif-proef)", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-22T08:05:00+02:00");
+      const blok = page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"]');
+      await expect(blok).toBeVisible();
+      const soort = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-22-wg-v1").soort);
+      expect(soort).toBe("toets");
+      await blok.locator(".start-block").click();
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "toets begin" });
+      await page.clock.runFor(10000);
+      for (let i = 0; i < 3; i++) {
+        await hideTab(page);
+        await page.clock.runFor(20000);
+        await showTab(page);
+        await page.clock.runFor(5000);
+      }
+      expect(mock.byKind("warn").length, "die gewone toets waarsku wel").toBeGreaterThan(0);
+      expectNoLeaks(mock);
+    });
+
+    test("22 Okt 10:15: tas pak is 'n voor-eksamen-blok en kry nooit 'n waarskuwing nie", async ({ page, context }) => {
+      /* blok-gebeure word net in modus v2 afgelewer */
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      await boot(page, { time: new Date("2026-10-22T10:15:00+02:00") });
+      await page.goto("/#missie");
+      await page.clock.runFor(1500);
+      const tas = page.locator('#block-list .md-card[data-id="2026-10-22-tas"]');
+      await expect(tas).toContainText("Kontrolelys en tas pak vir môre");
+      await tas.locator(".mark-done").click();
+      await expect(page.locator('#block-list .md-card[data-id="2026-10-22-tas"] .vroeg-wenk')).toHaveCount(0);
+      await runUntil(page, async () => mock.byKind("block").length === 1, { label: "blok afgelewer" });
+      expect(mock.byKind("block")[0].body.p.data).toEqual({ blockId: "2026-10-22-tas", done: true });
       expectNoLeaks(mock);
     });
 

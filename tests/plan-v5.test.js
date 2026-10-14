@@ -1,4 +1,4 @@
-/* Plan v5 (15-20 Okt): die vaste dagplanne is heel (geen oorvleueling nie, minute klop, elke `item` is 'n
+/* Plan v5 (15-22 Okt): die vaste dagplanne is heel (geen oorvleueling nie, minute klop, elke `item` is 'n
    Afrikaans-item in die V3-vraagbank met dieselfde duur). `node tests/plan-v5.test.js` */
 const fs = require("fs");
 const path = require("path");
@@ -15,7 +15,7 @@ for (const lêer of ["assets/js/data.js", "assets/js/pa-konsole/exams.js", "asse
 const bank = JSON.parse(fs.readFileSync(path.join(root, "data", "vraebank-v3.json"), "utf8"));
 const items = new Map(bank.map((i) => [i.id, i]));
 
-const DAE = ["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"];
+const DAE = ["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22"];
 const min = (t) => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
@@ -72,7 +72,7 @@ for (const dag of DAE) {
 }
 
 /* Afrikaans-minute per dag (A1/A2 = 100 min, B = 40 min, merk/herdoen/voor-eksamen soos in die plan) */
-const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30, "2026-10-19": 100 + 30 + 30 + 30, "2026-10-20": 20 + 20 };
+const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30, "2026-10-19": 100 + 30 + 30 + 30, "2026-10-20": 20 + 20, "2026-10-21": 0, "2026-10-22": 0 };
 for (const dag of DAE) {
   const som = ctx.WALLIE.buildDayPlan(dag)
     .blocks.filter((b) => b.kind !== "break" && b.subjectSlug === "afrikaans")
@@ -110,8 +110,52 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   if (!tr || tr.subjectSlug !== "afrikaans" || tr.kind !== "rooi" || tr.soort !== "herdoen") fails.push("20 Okt: terugskou moet 'n rooi Afrikaans herdoen-blok wees");
 }
 
+/* Plan v5 (vervolg): Wisk. Gel. V1 is Vr 23 Okt. Wo 21 = volle proefeksamen (soort "skrif": papier, geen oortjie-slot),
+   Do 22 = Vraag 1 en 2, formuleblad en tas pak. Alles groen/wiskgelett; pouses break/break. */
+{
+  const verwag21 = [
+    ["opstaan", "07:30", "08:00", "break"], ["wg-v1-proef", "08:00", "11:00", "groen"], ["middag", "11:00", "12:00", "break"],
+    ["merk-wg-v1-proef", "12:00", "13:00", "groen"], ["pouse1", "13:00", "13:15", "break"], ["foutlog", "13:15", "13:45", "groen"], ["klaar", "13:45", "13:45", "break"]
+  ];
+  const verwag22 = [
+    ["opstaan", "07:30", "08:00", "break"], ["wg-v1", "08:00", "09:00", "groen"], ["merk-wg-v1", "09:00", "09:20", "groen"],
+    ["pouse1", "09:20", "09:40", "break"], ["formules", "09:40", "10:10", "groen"], ["tas", "10:10", "10:30", "groen"], ["klaar", "10:30", "10:30", "break"]
+  ];
+  for (const [dag, verwag] of [["2026-10-21", verwag21], ["2026-10-22", verwag22]]) {
+    const lys = ctx.WALLIE.buildDayPlan(dag).blocks;
+    if (lys.map((b) => b.id).join() !== verwag.map(([s]) => `${dag}-${s}`).join()) fails.push(`${dag}: blokke of volgorde verskil van die plan`);
+    verwag.forEach(([s, a, e, kind]) => {
+      const b = lys.find((x) => x.id === `${dag}-${s}`);
+      if (!b || b.start !== a || b.end !== e) fails.push(`${dag} ${s}: tye ${b && b.start}-${b && b.end}, verwag ${a}-${e}`);
+      if (b && b.kind !== kind) fails.push(`${dag} ${s}: kind ${b.kind}, verwag ${kind}`);
+      if (b && kind === "groen" && b.subjectSlug !== "wiskgelett") fails.push(`${dag} ${s}: groen blok moet wiskgelett wees`);
+      if (b && kind === "break" && (b.subjectSlug !== "break" || b.soort !== "pouse")) fails.push(`${dag} ${s}: pouse moet break/break/pouse wees`);
+    });
+  }
+  const p21 = ctx.WALLIE.buildDayPlan("2026-10-21");
+  const proef = p21.blocks.find((b) => b.id === "2026-10-21-wg-v1-proef");
+  if (!proef || proef.soort !== "skrif" || proef.minutes !== 180 || proef.item || proef.werk) fails.push("21 Okt: wg-v1-proef moet soort skrif, 180 min, sonder item/werk wees (papier-eksamen, geen oortjie-slot)");
+  if (proef && !/150 punte, 3 uur/.test(proef.title)) fails.push("21 Okt: proef-titel noem nie 150 punte, 3 uur nie");
+  if (p21.totalMinutes !== 180 + 60 + 30) fails.push(`21 Okt: totalMinutes ${p21.totalMinutes}, verwag 270`);
+  const merk21 = p21.blocks.find((b) => b.id === "2026-10-21-merk-wg-v1-proef");
+  if (!merk21 || merk21.soort !== "merk") fails.push("21 Okt: merk-blok moet soort merk wees");
+  const foutlog = p21.blocks.find((b) => b.id === "2026-10-21-foutlog");
+  if (!foutlog || foutlog.soort !== "herdoen") fails.push("21 Okt: foutlog moet soort herdoen wees");
+  const p22 = ctx.WALLIE.buildDayPlan("2026-10-22");
+  const wg22 = p22.blocks.find((b) => b.id === "2026-10-22-wg-v1");
+  if (!wg22 || wg22.soort !== "toets" || wg22.punte !== 50 || wg22.minutes !== 60) fails.push("22 Okt: wg-v1 moet 'n toets van 50 punte / 60 min wees");
+  const tas22 = p22.blocks.find((b) => b.id === "2026-10-22-tas");
+  if (!tas22 || tas22.soort !== "voor-eksamen" || !/sakrekenaar/.test(tas22.detail)) fails.push("22 Okt: tas moet voor-eksamen wees en die sakrekenaar noem");
+  if (p22.totalMinutes !== 60 + 20 + 30 + 20) fails.push(`22 Okt: totalMinutes ${p22.totalMinutes}, verwag 130`);
+  /* Net 'n "skrif"-blok (papier-eksamen) het geen oortjie-slot nie: die ander Wisk. Gel.-toetse is "toets" */
+  for (const dag of ["2026-10-16", "2026-10-17", "2026-10-18", "2026-10-20", "2026-10-22"]) {
+    const wgb = ctx.WALLIE.buildDayPlan(dag).blocks.find((b) => b.id === `${dag}-wg-v1`);
+    if (!wgb || wgb.soort !== "toets") fails.push(`${dag}: wg-v1 is nie soort toets nie`);
+  }
+}
+
 /* "voor-eksamen" is 'n studieblok (nie 'n pouse nie) met die vak se eie kind */
-for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "geel"], ["2026-10-19", "2026-10-19-tas", "rooi"], ["2026-10-20", "2026-10-20-formaat", "rooi"]]) {
+for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "geel"], ["2026-10-19", "2026-10-19-tas", "rooi"], ["2026-10-20", "2026-10-20-formaat", "rooi"], ["2026-10-22", "2026-10-22-tas", "groen"]]) {
   const b = ctx.WALLIE.buildDayPlan(dag).blocks.find((x) => x.id === id);
   if (!b || b.soort !== "voor-eksamen") fails.push(`${id}: soort moet voor-eksamen wees`);
   if (b && b.kind !== kind) fails.push(`${id}: kind is ${b.kind}, verwag ${kind}`);
