@@ -952,12 +952,20 @@
       } catch (err) {
         pogings = [];
       }
+      /* O1: eksamenmodus-werk van vandag (begin, papier-boks/konsep, "Ek is klaar") tel ook, al is "Stoor my punte" nog nie gedruk nie */
+      let eksamen = null;
+      try {
+        if (blok.item && window.Eksamenmodus?.vandagWerk) eksamen = window.Eksamenmodus.vandagWerk(blok.item, at);
+      } catch (err) {
+        eksamen = null;
+      }
       const vroeg = window.VroegKlaar?.kontroleer(
         blok,
         vis(state.sessions),
         sessionMeta ? { blockId: sessionMeta.block?.id, startedAt: sessionMeta.startedAt } : null,
         at,
-        pogings
+        pogings,
+        eksamen
       );
       if (vroeg && !done.dataset.bevestig) {
         done.dataset.bevestig = "1";

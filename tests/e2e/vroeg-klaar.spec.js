@@ -114,6 +114,79 @@ test("F5: voor-eksamen-blok (formaat) kry nooit 'n waarskuwing nie", async ({ pa
   expectNoLeaks(mock);
 });
 
+/* O1: eksamenmodus-werk van vandag tel as werk, ook as "Stoor my punte" nog nie gedruk is nie (geen VraebankStore-poging).
+   Blok 2026-10-16-afr-b3 = 40 min, item afr-v3-B3 (40 min). Geen sessie op die blok nie. */
+const B3 = "2026-10-16-afr-b3";
+async function werkOpB3(page, { papier, minute, klaar }) {
+  await page.goto("/#skryfwerk");
+  await page.locator('.sw-item[data-id="afr-v3-B3"]').click();
+  await page.locator(".em-begin").click();
+  if (papier) await page.locator(".em-bevestig input").check();
+  await page.clock.fastForward(minute * 60 * 1000);
+  await page.clock.runFor(1000);
+  if (klaar) await page.locator(".em-klaar").click();
+}
+
+test("O1: item sonder sessie, papier-boks, 40 min, Ek is klaar, dan blok klaar: geen waarskuwing, geen vroeg_klaar", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page, { time: new Date("2026-10-16T10:30:00+02:00") });
+  await werkOpB3(page, { papier: true, minute: 40, klaar: true });
+  /* Geen sessie en geen gestoorde poging nie: net die eksamenmodus-rekord */
+  const toestand = await page.evaluate(() => ({
+    sessies: WALLIE.app.state().sessions.length,
+    pogings: (JSON.parse(localStorage.getItem("wallie911_vraebank_v1") || "{}").items || {})["afr-v3-B3"] || null,
+    rek: JSON.parse(localStorage.getItem("wallie911_eksamen_v1")).items["afr-v3-B3"]
+  }));
+  expect(toestand.sessies).toBe(0);
+  expect(toestand.pogings).toBeNull();
+  expect(toestand.rek.bevestig).toBe(true);
+  expect(toestand.rek.klaarMin).toBeGreaterThanOrEqual(40);
+  await page.goto("/#missie");
+  await page.locator(`#block-list .md-card[data-id="${B3}"] .mark-done`).click();
+  await expect(page.locator(`#block-list .md-card[data-id="${B3}"] .vroeg-wenk`)).toHaveCount(0);
+  await runUntil(page, async () => mock.byKind("block").length === 1, { label: "blok afgelewer" });
+  expect(mock.byKind("block")[0].body.p.data).toEqual({ blockId: B3, done: true });
+  expectNoLeaks(mock);
+});
+
+test("O1: papier-boks maar net 15 van 40 min (en nog nie klaar nie): steeds VROEG KLAAR (60%-reël bly)", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page, { time: new Date("2026-10-16T10:30:00+02:00") });
+  await werkOpB3(page, { papier: true, minute: 15, klaar: false });
+  await page.goto("/#missie");
+  await page.locator(`#block-list .md-card[data-id="${B3}"] .mark-done`).click();
+  await expect(page.locator(`#block-list .md-card[data-id="${B3}"] .vroeg-wenk`)).toContainText("15 van 40 min");
+  expect(mock.byKind("block")).toHaveLength(0);
+  expectNoLeaks(mock);
+});
+
+test("O1: klok het geloop maar niks gedoen nie (geen boks, geen teks): steeds waarskuwing", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page, { time: new Date("2026-10-16T10:30:00+02:00") });
+  await werkOpB3(page, { papier: false, minute: 40, klaar: true });
+  await page.goto("/#missie");
+  await page.locator(`#block-list .md-card[data-id="${B3}"] .mark-done`).click();
+  await expect(page.locator(`#block-list .md-card[data-id="${B3}"] .vroeg-wenk`)).toContainText("Seker?");
+  expectNoLeaks(mock);
+});
+
+test("O1: gister se eksamenmodus-werk tel nie vir vandag se blok nie", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  const gister = new Date("2026-10-15T09:00:00+02:00").getTime();
+  await boot(page, {
+    time: new Date("2026-10-16T10:30:00+02:00"),
+    seed: { wallie911_eksamen_v1: { v: 1, items: { "afr-v3-B3": { begin: gister, konsep: "gister", bevestig: true, lêer: "", klaarMin: 40 } } } }
+  });
+  await page.goto("/#missie");
+  await page.locator(`#block-list .md-card[data-id="${B3}"] .mark-done`).click();
+  await expect(page.locator(`#block-list .md-card[data-id="${B3}"] .vroeg-wenk`)).toContainText("Seker?");
+  expectNoLeaks(mock);
+});
+
 /* Vaste oorsig (wallie_pa_overview) met 4 blokke: a = klaar gemerk sonder minute, b = 15/40 min, c = 30/40 min,
    d = deur die toestel self gemeet (nie handmatig nie). Net a en b kry 'n vlag. */
 const OORSIG = {

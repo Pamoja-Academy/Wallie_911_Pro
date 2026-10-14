@@ -186,6 +186,45 @@ ok(!E.moetNuwePoging({ begin: null }, T(8, 0)), "geen begin → nie");
 ok(!E.moetNuwePoging(null, T(8, 0)), "geen rekord → nie");
 ok(!E.moetNuwePoging({ begin: new Date(2026, 9, 17, 8, 0).getTime() }, T(8, 0)), "begin in die toekoms → nie");
 
+/* O1: vandagWerk / werkVanRekord — het Wallie VANDAG werk gedoen (voor "Stoor my punte")? */
+const NOUW = T(10, 0); /* plaaslike 16 Okt 10:00 */
+eq(E.werkVanRekord(null, NOUW, 40), { minute: 0, werk: false }, "werk: geen rekord = geen werk");
+eq(E.werkVanRekord({ begin: null, konsep: "", bevestig: false, klaarMin: null }, NOUW, 40), { minute: 0, werk: false }, "werk: leë rekord");
+eq(E.werkVanRekord({ begin: T(9, 20), bevestig: true, klaarMin: 40 }, NOUW, 40), { minute: 40, werk: true }, "werk: papier-boks, 40 min, Ek is klaar");
+eq(E.werkVanRekord({ begin: T(9, 50), bevestig: true, klaarMin: null }, NOUW, 40), { minute: 10, werk: true }, "werk: nog nie klaar nie → verlope tyd tot nou");
+eq(E.werkVanRekord({ begin: T(7, 0), bevestig: true, klaarMin: null }, NOUW, 40), { minute: 40, werk: true }, "werk: verlope tyd word by die item se tyd begrens");
+eq(E.werkVanRekord({ begin: T(7, 0), bevestig: true, klaarMin: 95 }, NOUW, 40), { minute: 40, werk: true }, "werk: klaarMin word ook begrens");
+eq(E.werkVanRekord({ begin: T(7, 0), bevestig: true, klaarMin: 95 }, NOUW, null), { minute: 95, werk: true }, "werk: onbekende item-tyd, geen begrensing");
+eq(E.werkVanRekord({ begin: T(9, 0), konsep: "  een twee  ", klaarMin: 30 }, NOUW, 40), { minute: 30, werk: true }, "werk: konsep met teks is werk (sonder papier-boks)");
+eq(E.werkVanRekord({ begin: T(9, 0), konsep: " \t  ", bevestig: false, klaarMin: 30 }, NOUW, 40).werk, false, "werk: leë/spasie-konsep sonder boks is geen werk");
+eq(E.werkVanRekord({ begin: T(9, 0), bevestig: false, klaarMin: 30 }, NOUW, 40).werk, false, "werk: klok het geloop maar niks gedoen nie");
+eq(E.werkVanRekord({ begin: new Date(2026, 9, 15, 9, 0).getTime(), bevestig: true, klaarMin: 40 }, NOUW, 40), { minute: 0, werk: false }, "werk: gister se begin tel nie");
+eq(E.werkVanRekord({ begin: T(9, 55), bevestig: true, klaarMin: 0 }, NOUW, 40), { minute: 0, werk: true }, "werk: klaarMin 0 → 0 minute (maar daar was iets)");
+eq(E.werkVanRekord({ begin: T(11, 0), bevestig: true }, NOUW, 40), { minute: 0, werk: true }, "werk: begin in die toekoms → nooit negatief nie");
+const vorigeVandag = { begin: null, bevestig: false, klaarMin: null, vorige: [{ begin: T(8, 0), konsep: "x", bevestig: true, lêer: "", klaarMin: 25, geargiveerOp: T(8, 30) }] };
+eq(E.werkVanRekord(vorigeVandag, NOUW, 40), { minute: 25, werk: true }, "werk: vandag se geargiveerde poging tel (nuwe poging nog leeg)");
+eq(E.werkVanRekord(Object.assign({}, vorigeVandag, { begin: T(9, 0), bevestig: true, klaarMin: 10 }), NOUW, 40), { minute: 25, werk: true }, "werk: die meeste minute wen, nie die som nie");
+eq(E.werkVanRekord({ vorige: [{ begin: new Date(2026, 9, 15, 8, 0).getTime(), bevestig: true, klaarMin: 40 }] }, NOUW, 40).werk, false, "werk: gister se geargiveerde poging tel nie");
+eq(E.werkVanRekord({ vorige: [{ begin: T(8, 0), bevestig: true, geargiveerOp: T(8, 12) }] }, NOUW, 40), { minute: 12, werk: true }, "werk: geargiveerde poging sonder klaarMin → begin tot geargiveerOp");
+/* vandagWerk lees die plaaslike stoor (wallie911_eksamen_v1); skryf niks */
+(function () {
+  const stoor = { [E.KEY]: JSON.stringify({ v: 1, items: { "afr-v3-B3": { begin: T(9, 20), konsep: "", bevestig: true, lêer: "", klaarMin: 40 }, "x-leeg": { begin: T(9, 20) } } }) };
+  let skrywe = 0;
+  global.localStorage = { getItem: (k) => (k in stoor ? stoor[k] : null), setItem() { skrywe++; }, removeItem() { skrywe++; } };
+  eq(E.vandagWerk("afr-v3-B3", NOUW, 40), { minute: 40, werk: true }, "vandagWerk: lees die rekord uit die stoor");
+  eq(E.vandagWerk("x-leeg", NOUW, 40), { minute: 0, werk: false }, "vandagWerk: begin sonder werk");
+  eq(E.vandagWerk("bestaan-nie", NOUW, 40), { minute: 0, werk: false }, "vandagWerk: onbekende item");
+  eq(E.vandagWerk("", NOUW, 40), { minute: 0, werk: false }, "vandagWerk: geen item-id");
+  eq(E.vandagWerk(null, NOUW), { minute: 0, werk: false }, "vandagWerk: null item-id");
+  global.window = { VRAEBANK_V3: V3, VRAEBANK_RTT_V1: RTT };
+  const b3 = V3.find((i) => i.id === "afr-v3-B3");
+  stoor[E.KEY] = JSON.stringify({ v: 1, items: { "afr-v3-B3": { begin: T(6, 0), bevestig: true, klaarMin: null } } });
+  eq(E.vandagWerk("afr-v3-B3", NOUW).minute, b3.tyd_min, "vandagWerk: tmin weggelaat → item se tyd uit die vraagbank (begrens)");
+  delete global.window;
+  eq(skrywe, 0, "vandagWerk: lees-net, skryf niks");
+  delete global.localStorage;
+})();
+
 /* event-data: presies die gevraagde velde */
 eq(
   Object.keys(E.eventData(A1, "engels", { behaal: 40, totaal: 50, woorde: 270, minuteGebruik: 71, tydMin: 80, memoNaMin: 79 })).sort(),

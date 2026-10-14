@@ -167,6 +167,48 @@
     return Boolean(rec && Number(rec.begin) > 0 && dagSleutel(Number(rec.begin)) < dagSleutel(nou == null ? Date.now() : nou));
   }
 
+  /* O1: Het Wallie VANDAG werk aan hierdie item gedoen, ook al het sy nog nie "Stoor my punte" gedruk nie (dan is daar
+     nog geen VraebankStore-poging nie)? Suiwer: neem die item-rekord (soos kry() dit gee).
+       minute = klaarMin (as "Ek is klaar" gedruk is), anders die verlope tyd sedert begin tot `nou`; begrens by `tmin` (die
+                item se tyd), nooit negatief nie. Net pogings waarvan die begin VANDAG is (plaaslike dag) tel, dus nie
+                gister se poging nie; die geargiveerde `vorige` pogings van vandag ook (die meeste minute wen, nie die som nie).
+       werk   = daar is iets gedoen: papier/toepassing-bevestiging of 'n konsep met teks. */
+  function werkVanRekord(rec, nou, tmin) {
+    const n = nou == null ? Date.now() : nou;
+    const vandag = dagSleutel(n);
+    const kap = Number(tmin) > 0 ? Number(tmin) : Infinity;
+    const poging = (begin, klaarMin, einde, bevestig, konsep) => {
+      if (!(Number(begin) > 0) || dagSleutel(Number(begin)) !== vandag) return null;
+      const rou = klaarMin != null && Number.isFinite(Number(klaarMin)) ? Number(klaarMin) : (Number(einde) - Number(begin)) / 60000;
+      return { minute: Math.round(Math.min(Math.max(0, rou), kap) * 10) / 10, werk: Boolean(bevestig) || Boolean(String(konsep || "").trim()) };
+    };
+    const r = rec || {};
+    const lys = [poging(r.begin, r.klaarMin, n, r.bevestig, r.konsep)];
+    (Array.isArray(r.vorige) ? r.vorige : []).forEach((v) => {
+      if (v) lys.push(poging(v.begin, v.klaarMin, v.geargiveerOp == null ? n : v.geargiveerOp, v.bevestig, v.konsep));
+    });
+    const werk = lys.filter((x) => x && x.werk);
+    if (!werk.length) return { minute: 0, werk: false };
+    return { minute: Math.max.apply(null, werk.map((x) => x.minute)), werk: true };
+  }
+
+  /* Plaaslike stoor-weergawe van werkVanRekord (wallie911_eksamen_v1). `tmin` weggelaat → die item se tyd uit die
+     vraagbank (VRAEBANK_V3 / VRAEBANK_RTT_V1); onbekende item → geen begrensing. Lees-net: skryf niks. */
+  function vandagWerk(itemId, nou, tmin) {
+    if (!itemId) return { minute: 0, werk: false };
+    let kap = tmin;
+    if (kap === undefined) {
+      try {
+        const g = typeof window !== "undefined" ? window : globalThis;
+        const item = (g.VRAEBANK_V3 || []).concat(g.VRAEBANK_RTT_V1 || []).find((i) => i && i.id === itemId);
+        kap = item ? tydMin(item, item.vak || "rtt") : null;
+      } catch (e) {
+        kap = null;
+      }
+    }
+    return werkVanRekord(kry(itemId), nou, kap);
+  }
+
   /* Dagsleutel "JJJJ-MM-DD" van 'n tydstempel: dieselfde reël as WALLIE.todayKey (toestel se plaaslike dag, SAST). */
   function dagSleutel(ms) {
     const d = new Date(ms);
@@ -576,6 +618,8 @@
     vroegsteBegin,
     nuwePoging,
     moetNuwePoging,
+    werkVanRekord,
+    vandagWerk,
     dagSleutel,
     hhmm,
     eventData,
