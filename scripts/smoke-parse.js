@@ -102,9 +102,9 @@ if (typeof W.buildDayPlan === "function") {
     assert(eng && eng.minutes >= 40 && eng.minutes <= 50, `${d} Engels 40–50 min`);
     assert(toe && toe.minutes >= 20 && toe.minutes <= 30, `${d} Toerisme 20–30 min`);
   }
-  /* 13-19 Okt is vaste planne (Engels V3, dan plan v5: Afrikaans V3) — geen geel-rotasie nie.
+  /* 13-20 Okt is vaste planne (Engels V3, dan plan v5: Afrikaans V3 tot en met die eksamendag) — geen geel-rotasie nie.
      Die eerste dae daarna sonder vaste plan (21 en 22 Okt) roteer steeds Engels / Toerisme. */
-  for (const d of ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19"]) {
+  for (const d of ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"]) {
     assert(!W.buildDayPlan(d).blocks.some((b) => b.id.endsWith("-geel")), `${d} is 'n vaste plan (geen geel-rotasie)`);
   }
   const rotated = ["2026-10-21", "2026-10-22"].map((d) =>

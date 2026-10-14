@@ -2,8 +2,8 @@
   "vak": "wiskgelett",
   "vraestel": "Wiskundige Geletterdheid V1 en V2",
   "geverifieer": false,
-  "ONGEVERIFIEER": "ONGEVERIFIEER — Hanno moet bevestig. Tyd (3 u) kom uit die eksamenrooster (assets/js/pa-konsole/exams.js). Die totale punte (100), afdelings, vraag-groottes en subvraag-telling is nie teen 'n DBE-vraestel/memo in hierdie repo nagegaan nie (dbe-vraestelle.js verwys net na RTT).",
-  "punte": 100,
+  "ONGEVERIFIEER": "ONGEVERIFIEER — Hanno moet bevestig. Tyd (3 u) kom uit die eksamenrooster (assets/js/pa-konsole/exams.js). Die totale punte is 150 punte (CAPS; Hanno moet bevestig). Afdelings, vraag-groottes en subvraag-telling is nie teen 'n DBE-vraestel/memo in hierdie repo nagegaan nie (dbe-vraestelle.js verwys net na RTT).",
+  "punte": 150,
   "tyd_min": 180,
   "hoofwerk_bank": null,
   "afdelings": null

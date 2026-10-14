@@ -1,4 +1,4 @@
-/* Plan v5 (15-19 Okt): die vaste dagplanne is heel (geen oorvleueling nie, minute klop, elke `item` is 'n
+/* Plan v5 (15-20 Okt): die vaste dagplanne is heel (geen oorvleueling nie, minute klop, elke `item` is 'n
    Afrikaans-item in die V3-vraagbank met dieselfde duur). `node tests/plan-v5.test.js` */
 const fs = require("fs");
 const path = require("path");
@@ -15,7 +15,7 @@ for (const lêer of ["assets/js/data.js", "assets/js/pa-konsole/exams.js", "asse
 const bank = JSON.parse(fs.readFileSync(path.join(root, "data", "vraebank-v3.json"), "utf8"));
 const items = new Map(bank.map((i) => [i.id, i]));
 
-const DAE = ["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19"];
+const DAE = ["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"];
 const min = (t) => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
@@ -72,7 +72,7 @@ for (const dag of DAE) {
 }
 
 /* Afrikaans-minute per dag (A1/A2 = 100 min, B = 40 min, merk/herdoen/voor-eksamen soos in die plan) */
-const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30, "2026-10-19": 100 + 30 + 30 + 30 };
+const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30, "2026-10-19": 100 + 30 + 30 + 30, "2026-10-20": 20 + 20 };
 for (const dag of DAE) {
   const som = ctx.WALLIE.buildDayPlan(dag)
     .blocks.filter((b) => b.kind !== "break" && b.subjectSlug === "afrikaans")
@@ -89,11 +89,32 @@ const eksamenBlok = ctx.WALLIE.buildDayPlan("2026-10-15").blocks.find((b) => b.i
 if (!eksamenBlok || eksamenBlok.start !== "09:00" || eksamenBlok.end !== "11:30") fails.push("15 Okt: eksamen-blok moet 09:00-11:30 wees");
 if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blok (by die skool) moet kind break wees");
 
+/* Afrikaans V3-eksamendag (Di 20 Okt): eksamen 09:00-12:00 by die skool (pouse), voor-eksamen-formaat, terugskou, Wisk. Gel. V1 */
+{
+  const lys = ctx.WALLIE.buildDayPlan("2026-10-20").blocks;
+  const eks20 = lys.find((b) => b.id === "2026-10-20-eksamen");
+  if (!eks20 || eks20.start !== "09:00" || eks20.end !== "12:00" || eks20.kind !== "break") fails.push("20 Okt: eksamen-blok moet 09:00-12:00 en kind break wees");
+  const verwag = [
+    ["opstaan", "06:45", "07:15"], ["formaat", "07:15", "07:35"], ["tas", "07:35", "08:00"], ["eksamen", "09:00", "12:00"],
+    ["rus", "12:00", "14:00"], ["terugskou", "14:00", "14:20"], ["pouse1", "14:20", "14:30"], ["wg-v1", "14:30", "15:30"],
+    ["merk-wg-v1", "15:30", "15:50"], ["klaar", "15:50", "15:50"]
+  ];
+  if (lys.map((b) => b.id).join() !== verwag.map(([s]) => `2026-10-20-${s}`).join()) fails.push("20 Okt: blokke of volgorde verskil van die plan");
+  verwag.forEach(([s, a, e]) => {
+    const b = lys.find((x) => x.id === `2026-10-20-${s}`);
+    if (!b || b.start !== a || b.end !== e) fails.push(`20 Okt ${s}: tye ${b && b.start}-${b && b.end}, verwag ${a}-${e}`);
+  });
+  const wg = lys.find((b) => b.id === "2026-10-20-wg-v1");
+  if (!wg || wg.subjectSlug !== "wiskgelett" || wg.kind !== "groen" || wg.soort !== "toets" || wg.punte !== 50 || wg.minutes !== 60) fails.push("20 Okt: wg-v1 is nie 'n groen Wisk. Gel. toets van 50 punte / 60 min nie");
+  const tr = lys.find((b) => b.id === "2026-10-20-terugskou");
+  if (!tr || tr.subjectSlug !== "afrikaans" || tr.kind !== "rooi" || tr.soort !== "herdoen") fails.push("20 Okt: terugskou moet 'n rooi Afrikaans herdoen-blok wees");
+}
+
 /* "voor-eksamen" is 'n studieblok (nie 'n pouse nie) met die vak se eie kind */
-for (const [dag, id] of [["2026-10-15", "2026-10-15-formaat"], ["2026-10-19", "2026-10-19-tas"]]) {
+for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "geel"], ["2026-10-19", "2026-10-19-tas", "rooi"], ["2026-10-20", "2026-10-20-formaat", "rooi"]]) {
   const b = ctx.WALLIE.buildDayPlan(dag).blocks.find((x) => x.id === id);
   if (!b || b.soort !== "voor-eksamen") fails.push(`${id}: soort moet voor-eksamen wees`);
-  if (b && b.kind !== (id.endsWith("formaat") ? "geel" : "rooi")) fails.push(`${id}: kind is ${b.kind}`);
+  if (b && b.kind !== kind) fails.push(`${id}: kind is ${b.kind}, verwag ${kind}`);
 }
 
 if (fails.length) {

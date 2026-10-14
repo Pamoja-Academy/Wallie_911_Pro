@@ -72,7 +72,7 @@ function expectNoLeaks(mock) {
   expect(other, "geen onverwagte eksterne versoeke").toEqual([]);
 }
 
-/* Eksamenmodus: laat die memo van elke item oop wees (die klok se begin is lank gelede), sodat ouer toetse
+/* Eksamenmodus: laat die memo van elke item oop wees (die klok se begin is middernag vandag), sodat ouer toetse
    die memo/selfnasien-skerm kan bereik. Die eie eksamenmodus-toetse gebruik dit NIE. */
 async function eksamenOntsluit(page) {
   const ids = [
@@ -82,8 +82,12 @@ async function eksamenOntsluit(page) {
   await page.addInitScript((lys) => {
     try {
       if (localStorage.getItem("wallie911_eksamen_v1")) return;
+      /* Begin = middernag van (die gevalste) vandag: die klok loop lank, maar dit is nie 'n vroeër dag nie
+         (anders begin eksamenmodus outomaties 'n nuwe poging en sluit die memo weer). */
+      const middernag = new Date();
+      middernag.setHours(0, 0, 0, 0);
       const items = {};
-      lys.forEach((id) => (items[id] = { begin: 1000, konsep: "", bevestig: false, lêer: "", klaarMin: null }));
+      lys.forEach((id) => (items[id] = { begin: middernag.getTime(), konsep: "", bevestig: false, lêer: "", klaarMin: null }));
       localStorage.setItem("wallie911_eksamen_v1", JSON.stringify({ v: 1, items }));
     } catch (e) {}
   }, ids);

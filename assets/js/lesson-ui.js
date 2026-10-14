@@ -162,14 +162,26 @@
     let bank = [];
     if (slug === "engels" || slug === "afrikaans") bank = (window.VRAEBANK_V3 || []).filter((i) => i.vak === slug);
     else if (slug === "rtt") bank = window.VRAEBANK_RTT_V1 || [];
-    return bank.filter((i) => !af.has(i.id));
+    return bank.filter((i) => !af.has(i.id) && !eksamenKlaar(i));
+  }
+
+  /* Die vraestel waaruit die item kom is al geskryf (PK.EXAMS-inskrywing van die vak met "V<n>" in sy naam,
+     begintyd + 4 uur verby): daardie item is nie meer hooftaak nie (bv. Engels V3-items ná 15 Okt 13:00).
+     Geen PK nie → geen filter. Items wat vas in die rooster staan (blok.item) word hier nie geraak nie. */
+  function eksamenKlaar(item) {
+    const lys = window.PK && window.PK.EXAMS;
+    if (!lys || !item || (item.vak !== "engels" && item.vak !== "afrikaans") || item.vraestel == null) return false;
+    const woord = new RegExp("\\bV" + String(item.vraestel) + "\\b");
+    const eks = lys.find((x) => x.s === item.vak && woord.test(x.n));
+    const begin = eks ? Date.parse(eks.at) : NaN;
+    return Number.isFinite(begin) && begin + 4 * 3600000 < Date.now();
   }
 
   /* Geen vraagbank nie: Wallie werk uit 'n amptelike DBE-vraestel, op papier, getimed. (Gaping — Hanno moet die vraestel kies.) */
   const GAPING = {
     gasvryheid: "Nov 2025 Gasvryheidstudie, kies 'n vraag van ±20 punte (±18 min)",
     toerisme: "Nov 2025 Toerisme, kies 'n vraag van ±20 punte (±24 min)",
-    wiskgelett: "Nov 2025 V1 Wisk. Geletterdheid, kies 'n vraag van ±20 punte (±36 min)"
+    wiskgelett: "Nov 2025 V1 Wisk. Geletterdheid, kies 'n vraag van ±20 punte (±24 min)"
   };
 
   function itemKort(item) {
@@ -197,7 +209,8 @@
 
   /* Die blok se EKSAMENVLAK-hooftaak. Nooit 'n agtergrondkaart nie.
        1. blok.item (vas in die rooster) · 2. DBE-vraestel (werk) · 3. blok wat self eksamenwerk is
-       4. volgende item uit die vak se vraagbank (die minste gedoen eerste) · 5. gaping: DBE-vraestel op papier. */
+       4. volgende item uit die vak se vraagbank (die minste gedoen eerste) wie se tyd in die blok se minute pas;
+          pas geen item nie, dan die blok se eie titel · 5. gaping: DBE-vraestel op papier. */
   function hoofTaak(b, werk, occurrence = 0) {
     const slug = b.subjectSlug;
     const bank = bankVir(slug);
@@ -208,7 +221,13 @@
     if (werk) return { soort: "werk", tekst: `${b.title} · ${DBE()?.werkLabel(werk) || ""}` };
     if (b.soort && EIE_TAAK.has(b.soort)) return { soort: "blok", tekst: b.title };
     if (bank.length) {
-      const orde = bank.map((it, n) => ({ it, n, p: pogings(it.id) })).sort((x, y) => x.p - y.p || x.n - y.n);
+      /* Net items wat in die blok pas: 'n 15-min-blok kry nie 'n ±80-min-opstel as hooftaak nie */
+      const pas = bank.filter((it) => {
+        const tyd = window.Eksamenmodus?.tydMin(it, slug) || it.tyd_min;
+        return tyd > 0 && tyd <= b.minutes;
+      });
+      if (!pas.length) return { soort: "blok", tekst: b.title };
+      const orde = pas.map((it, n) => ({ it, n, p: pogings(it.id) })).sort((x, y) => x.p - y.p || x.n - y.n);
       return itemTaak(orde[((occurrence % orde.length) + orde.length) % orde.length].it, slug);
     }
     const g = GAPING[slug];

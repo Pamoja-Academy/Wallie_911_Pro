@@ -33,12 +33,12 @@
     );
     /* Plan-handtekening: ’n NUWE plan vir VANDAG moet vandag reeds deurkom — anders sit Wallie vas met
        gister se weergawe van vandag se plan (die 11/12 Okt-blokke sou nooit gewys het nie).
-       Die handtekening kyk net na die harde feite van ’n blok (id, tyd, duur, soort, werk), NIE na titel,
+       Die handtekening kyk net na die harde feite van ’n blok (id, tyd, duur, soort, item, werk), NIE na titel,
        detail of vak nie: ’n gestoorde blok wat net in vertoning verskil (bv. ’n ou, verborge vak) bly
        onaangeraak. Voltooide blokke, opnames, sessies en foute word nooit geraak nie — net blocks/planDate. */
     const sig = (blocks) =>
       (blocks || [])
-        .map((b) => `${b.id}|${b.start || ""}|${b.end || ""}|${b.minutes}|${b.soort || ""}|${b.werk ? JSON.stringify(b.werk) : ""}`)
+        .map((b) => `${b.id}|${b.start || ""}|${b.end || ""}|${b.minutes}|${b.soort || ""}|${b.item || ""}|${b.werk ? JSON.stringify(b.werk) : ""}`)
         .join(";");
     const planVervang = state.planDate === today && sig(state.blocks) !== sig(plan.blocks);
     if (state.planDate !== today || !state.blocks?.length || missingNewBlocks || planVervang) {
@@ -896,7 +896,19 @@
     window.open(wa, "_blank", "noopener");
   }
 
+  /* "Maak item oop" (eksamenvlak-hooftaak) staan op die blokkaart (#block-list) EN op die Volgende-kaart
+     (#next-up): daarom een dokument-vlak delegasie, nie ’n hanteerder per houer nie. */
   document.body.addEventListener("click", (e) => {
+    const item = e.target.closest(".open-item");
+    if (item) {
+      /* Eksamenvlak-hooftaak: spring na die item in Skryfwerk / Oefenvrae */
+      const view = item.dataset.view;
+      const opener = { skryfwerk: window.SkryfwerkUI, oefenvrae: window.OefenvraeUI }[view];
+      showView(view);
+      /* Ná die skerm se eie "lys"-herteken (MutationObserver-mikrotaak) */
+      Promise.resolve().then(() => opener?.open(item.dataset.item));
+      return;
+    }
     if (e.target.closest(".js-export-log")) downloadLog();
     else if (e.target.closest(".js-share-log")) shareLog();
     else if (e.target.closest(".js-copy-log")) copyLog();
@@ -925,26 +937,27 @@
         blockId: start.dataset.block
       });
     }
-    const item = e.target.closest(".open-item");
-    if (item) {
-      /* Eksamenvlak-hooftaak: spring na die item in Skryfwerk / Oefenvrae */
-      const view = item.dataset.view;
-      const opener = { skryfwerk: window.SkryfwerkUI, oefenvrae: window.OefenvraeUI }[view];
-      showView(view);
-      /* Ná die skerm se eie "lys"-herteken (MutationObserver-mikrotaak) */
-      Promise.resolve().then(() => opener?.open(item.dataset.item));
-      return;
-    }
     const done = e.target.closest(".mark-done");
     if (done) {
       const at = Date.now();
       const blok = state.blocks.find((b) => b.id === done.dataset.id) || { id: done.dataset.id };
       /* Studieblok "klaar" sonder genoeg werk: eers 'n waarskuwing ("Seker? Dit is eksamenwerk"). Die tweede klik bevestig. */
+      /* Pogings op die blok se eksamenvlak-item tel ook as werk (net vandag se, met hul minute_gebruik) */
+      let pogings = [];
+      try {
+        const vandag = WALLIE.todayKey();
+        if (blok.item && window.VraebankStore) {
+          pogings = window.VraebankStore.attempts(blok.item).filter((p) => p && WALLIE.todayKey(new Date(p.t)) === vandag);
+        }
+      } catch (err) {
+        pogings = [];
+      }
       const vroeg = window.VroegKlaar?.kontroleer(
         blok,
         vis(state.sessions),
         sessionMeta ? { blockId: sessionMeta.block?.id, startedAt: sessionMeta.startedAt } : null,
-        at
+        at,
+        pogings
       );
       if (vroeg && !done.dataset.bevestig) {
         done.dataset.bevestig = "1";

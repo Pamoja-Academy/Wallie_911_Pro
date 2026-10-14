@@ -1,4 +1,4 @@
-/* Plan v5 (15-19 Okt): vaste dagplanne vir Do 15 (Engels V3-eksamendag) tot Ma 19 Okt (dag voor Afrikaans V3).
+/* Plan v5 (15-20 Okt): vaste dagplanne vir Do 15 (Engels V3-eksamendag) tot Di 20 Okt (Afrikaans HT V3-eksamendag).
    Geen Gasvryheid/Toerisme/RTT-rotasie nie. Elke studieblok se hooftaak is 'n eksamenvlak-item (`item`)
    of eie eksamenwerk, nooit sy agtergrond-les-kaart nie. Klok vals; alle netwerk onderskep (mock-backend). */
 const { test, expect } = require("@playwright/test");
@@ -93,6 +93,22 @@ const DAE = [
       ["tas", "12:00", "12:30"],
       ["klaar", "12:30", "12:30"]
     ]
+  },
+  {
+    dag: "2026-10-20",
+    tyd: "2026-10-20T07:20:00+02:00",
+    blokke: [
+      ["opstaan", "06:45", "07:15"],
+      ["formaat", "07:15", "07:35"],
+      ["tas", "07:35", "08:00"],
+      ["eksamen", "09:00", "12:00"],
+      ["rus", "12:00", "14:00"],
+      ["terugskou", "14:00", "14:20"],
+      ["pouse1", "14:20", "14:30"],
+      ["wg-v1", "14:30", "15:30"],
+      ["merk-wg-v1", "15:30", "15:50"],
+      ["klaar", "15:50", "15:50"]
+    ]
   }
 ];
 
@@ -177,6 +193,52 @@ for (const vp of VIEWPORTS) {
         expectNoLeaks(mock);
       });
     }
+
+    test("16 Okt 08:05: 'Maak item oop' op die Volgende-kaart open die regte item (F1)", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-16T08:05:00+02:00");
+      const knoppie = page.locator("#next-up .open-item");
+      await expect(knoppie).toHaveCount(1);
+      await expect(knoppie).toHaveAttribute("data-item", "afr-v3-A1");
+      await knoppie.scrollIntoViewIfNeeded();
+      await knoppie.click();
+      await page.clock.runFor(500);
+      await expect(page.locator("#view-skryfwerk")).toHaveClass(/active/);
+      await expect(page.locator(".sw-titel")).toContainText("A1");
+      expectNoLeaks(mock);
+    });
+
+    test("F8: 'n gestoorde plan van vandag sonder `item` word vervang (item is deel van die plan-handtekening)", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-16T08:05:00+02:00");
+      const voor = await page.evaluate(() => WALLIE.app.state().blocks.find((b) => b.id === "2026-10-16-afr-a1").item);
+      expect(voor).toBe("afr-v3-A1");
+      /* Ou berging: dieselfde blokke en tye, maar sonder `item` */
+      await page.evaluate(() => {
+        const st = WALLIE.app.state();
+        st.blocks.forEach((b) => delete b.item);
+        WALLIE.app.persist();
+      });
+      const stoor = await page.evaluate(() => JSON.parse(localStorage.getItem("wallie911_v2_bok")).blocks.some((b) => b.item));
+      expect(stoor).toBe(false);
+      await page.reload();
+      await page.clock.runFor(1500);
+      const na = await page.evaluate(() => WALLIE.app.state().blocks.find((b) => b.id === "2026-10-16-afr-a1").item);
+      expect(na).toBe("afr-v3-A1");
+      expectNoLeaks(mock);
+    });
+
+    test("20 Okt 07:20: Afrikaans V3-eksamendag - formaat-blok is voor-eksamen, eksamen 09:00-12:00 is 'n pouse", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-20T07:20:00+02:00");
+      const formaat = page.locator('#block-list .md-card[data-id="2026-10-20-formaat"]');
+      await expect(formaat.locator(".md-hoof")).toHaveAttribute("data-soort", "blok");
+      await expect(formaat.locator(".md-hoof")).toContainText("Laaste kyk: formaat van transaksionele tekste");
+      await expect(formaat.locator(".open-item")).toHaveCount(0);
+      const eksamen = page.locator('#block-list .md-card[data-id="2026-10-20-eksamen"]');
+      await expect(eksamen).toHaveClass(/kind-break/);
+      await expect(eksamen).toContainText("AFRIKAANS HT V3-EKSAMEN (skool) 09:00-12:00");
+      await expect(page.locator("#next-up .next-hoof")).toContainText("Laaste kyk: formaat van transaksionele tekste");
+      expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
 
     test("15 Okt 07:20: die formaat-blok se hooftaak is sy eie titel", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-15T07:20:00+02:00");
