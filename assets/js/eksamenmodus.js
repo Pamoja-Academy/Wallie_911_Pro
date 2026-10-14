@@ -3,7 +3,9 @@
    DAN selfnasien in punte volgens die rubriek/riglyn.
 
    Stoor NIKS op die bediener nie. Plaaslik:
-     wallie911_eksamen_v1  { v:1, items:{ <id>:{ begin:<ms>|null, konsep:"", bevestig:bool, lêer:"", klaarMin:<n>|null } } }
+     wallie911_eksamen_v1  { v:1, items:{ <id>:{ begin:<ms>|null, konsep:"", bevestig:bool, lêer:"", klaarMin:<n>|null,
+                                                  sedert:<ms>|null, vorige:[ { begin, konsep, bevestig, lêer, klaarMin, geargiveerOp }, … ] } } }
+       (vorige = geargiveerde vorige pogings, nuutste laaste; sedert = wanneer Wallie self 'n nuwe poging begin het)
      wallie911_vraebank_v1 (VraebankStore.saveAttempt) kry die punte-poging as ekstra velde.
    Die bediener-event (EVENT.kind) is AF tot Hanno die bediener-skema goedkeur: 'wallie_ingest_v2' aanvaar net
    'n vaste lys event-soorte (migrations/001). Sien EVENT hieronder.
@@ -139,6 +141,32 @@
     return kandidate.length ? Math.min.apply(null, kandidate) : null;
   }
 
+  /* Nuwe poging (dieselfde item word weer gebruik, bv. afr-v3-A1 op 16 én 19 Okt): die item-staat is anders
+     permanent, dus sou die klok van die vorige poging bly loop en die memo oop wees. nuwePoging argiveer die
+     huidige waardes in `vorige` (nuutste laaste, nooit weggegooi nie) en stel die vyf velde terug. Suiwer: gee 'n
+     nuwe rekord, verander `rec` nie. 'n Leë poging (niks gedoen nie) word nie geargiveer nie. */
+  function nuwePoging(rec, nou) {
+    const r = rec || {};
+    const vorige = Array.isArray(r.vorige) ? r.vorige.slice() : [];
+    const iets = r.begin != null || Boolean(r.konsep) || Boolean(r.bevestig) || Boolean(r.lêer) || r.klaarMin != null;
+    if (iets) {
+      vorige.push({
+        begin: r.begin == null ? null : r.begin,
+        konsep: r.konsep || "",
+        bevestig: Boolean(r.bevestig),
+        lêer: r.lêer || "",
+        klaarMin: r.klaarMin == null ? null : r.klaarMin,
+        geargiveerOp: nou == null ? Date.now() : nou
+      });
+    }
+    return Object.assign({}, r, { begin: null, konsep: "", bevestig: false, lêer: "", klaarMin: null, vorige });
+  }
+
+  /* Outomaties: die gestoorde begin is van 'n vroeër dag as vandag (WALLIE.todayKey-reël, plaaslike dag). */
+  function moetNuwePoging(rec, nou) {
+    return Boolean(rec && Number(rec.begin) > 0 && dagSleutel(Number(rec.begin)) < dagSleutel(nou == null ? Date.now() : nou));
+  }
+
   /* Dagsleutel "JJJJ-MM-DD" van 'n tydstempel: dieselfde reël as WALLIE.todayKey (toestel se plaaslike dag, SAST). */
   function dagSleutel(ms) {
     const d = new Date(ms);
@@ -187,7 +215,7 @@
     }
   }
   function kry(id) {
-    return Object.assign({ begin: null, konsep: "", bevestig: false, lêer: "", klaarMin: null }, lees().items[id] || {});
+    return Object.assign({ begin: null, konsep: "", bevestig: false, lêer: "", klaarMin: null, sedert: null, vorige: [] }, lees().items[id] || {});
   }
   function bewaar(id, patch) {
     const d = lees();
@@ -250,7 +278,11 @@
     const tmin = tydMin(item, vak);
     const tydSek = tmin ? tmin * 60 : 0;
     const wr = item.woorde || {};
-    const rec0 = kry(item.id);
+    let rec0 = kry(item.id);
+    /* Nuwe dag, nuwe poging: die vorige dag se poging word geargiveer (nooit uitgevee nie) en die item begin skoon. */
+    const nou0 = Date.now();
+    const outoNuut = moetNuwePoging(rec0, nou0);
+    if (outoNuut) rec0 = bewaar(item.id, nuwePoging(rec0, nou0));
     /* Klok loop sedert die vroegste van: eie begin en vandag se sessie op hierdie item se blok (vroegsteBegin). */
     const vandag = dagSleutel(Date.now());
     const effBegin = vroegsteBegin(item.id, appState(), vandag, rec0.begin, rec0.sedert);
@@ -273,7 +305,12 @@
     const klokInfo = el("span", "em-tyd-info", tmin ? "DBE-tyd: " + tmin + " min" : "");
     const beginKnop = el("button", "btn primary em-begin", "Begin (klok loop)");
     beginKnop.type = "button";
-    klok.append(klokTeks, klokInfo, beginKnop);
+    const nuutKnop = el("button", "btn ghost em-nuut", "Begin nuwe poging");
+    nuutKnop.type = "button";
+    nuutKnop.hidden = true;
+    klok.append(klokTeks, klokInfo, beginKnop, nuutKnop);
+    const nuutMeld = el("p", "hint em-nuut-meld", outoNuut ? "Nuwe dag, nuwe poging. Jou vorige poging is veilig bewaar." : "");
+    nuutMeld.hidden = !outoNuut;
     const sessieWenk = el("p", "hint em-sessie-wenk", uitSessie ? "Klok loop sedert jou sessie om " + hhmm(sessieBegin) + " begin het." : "");
     sessieWenk.hidden = !uitSessie;
 
@@ -327,7 +364,7 @@
     memoKnop.disabled = true;
     memoKnop.setAttribute("aria-expanded", "false");
 
-    kas.append(klok, sessieWenk, werk, klaarRij, rede, memoKnop);
+    kas.append(klok, nuutMeld, sessieWenk, werk, klaarRij, rede, memoKnop);
     parent.insertBefore(kas, voor);
     parent.insertBefore(memoHouer, voor);
     parent.insertBefore(selfnasien, voor);
@@ -368,6 +405,7 @@
         klokTeks.classList.remove("em-oor");
       }
       beginKnop.hidden = Boolean(tstate.begin);
+      nuutKnop.hidden = !tstate.begin;
       if (teller) {
         const lim = wr.min ? " (doel " + wr.min + "–" + wr.max + ")" : "";
         teller.textContent = st.woorde + " woorde" + lim;
@@ -391,10 +429,35 @@
       if (tstate.begin) return;
       tstate.begin = Date.now();
       bewaar(item.id, { begin: tstate.begin });
+      nuutMeld.hidden = true;
       teken();
     }
 
     beginKnop.addEventListener("click", begin);
+
+    /* Op aanvraag: argiveer die huidige poging en begin skoon. `sedert` keer dat vandag se (vroeër) sessie die
+       nuwe klok terugsleep (sien vroegsteBegin). */
+    nuutKnop.addEventListener("click", () => {
+      const nou = Date.now();
+      bewaar(item.id, Object.assign(nuwePoging(kry(item.id), nou), { sedert: nou }));
+      tstate.begin = null;
+      tstate.klaar = false;
+      tstate.memoOpen = false;
+      tstate.memoNaMin = null;
+      if (area) area.value = "";
+      if (boks) boks.checked = false;
+      if (lêerVeld) lêerVeld.value = "";
+      memoHouer.hidden = true;
+      selfnasien.hidden = true;
+      memoKnop.setAttribute("aria-expanded", "false");
+      velde.forEach((v) => (v.inp.value = ""));
+      somTeken();
+      stoorMeld.textContent = "";
+      sessieWenk.hidden = true;
+      nuutMeld.textContent = "Nuwe poging. Die vorige poging is veilig bewaar.";
+      nuutMeld.hidden = false;
+      teken();
+    });
     if (area) {
       area.addEventListener("input", () => {
         if (!tstate.begin) begin();
@@ -511,6 +574,8 @@
     uitslagVan,
     minuteGebruik,
     vroegsteBegin,
+    nuwePoging,
+    moetNuwePoging,
     dagSleutel,
     hhmm,
     eventData,

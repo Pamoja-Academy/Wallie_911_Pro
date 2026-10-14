@@ -168,6 +168,75 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
+    test("nuwe poging: begin van 'n vroeër dag word geargiveer en die item begin skoon (F4)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const gister = new Date("2026-10-15T09:00:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          [DRAF]: { v: 1, items: { [item.id]: { begin: gister, konsep: "gister se opstel", bevestig: true, lêer: "gister.jpg", klaarMin: 90 } } }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator(".em-antwoord")).toHaveValue("");
+      await expect(page.locator(".em-tyd")).toContainText(/^00:00/);
+      await expect(page.locator(".em-memo-knoppie")).toBeDisabled();
+      await expect(page.locator(".em-nuut-meld")).toContainText("veilig bewaar");
+      const rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.begin).toBeNull();
+      expect(rec.konsep).toBe("");
+      expect(rec.vorige).toHaveLength(1);
+      expect(rec.vorige[0]).toMatchObject({ begin: gister, konsep: "gister se opstel", bevestig: true, lêer: "gister.jpg", klaarMin: 90 });
+      expectNoLeaks(mock);
+    });
+
+    test("nuwe poging op aanvraag: knoppie sigbaar sodra die klok loop; argiveer en sit alles terug (F4)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const sessieBegin = new Date("2026-10-16T08:00:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          wallie911_v2_bok: { sessions: [{ id: "s_1", date: "2026-10-16", subjectSlug: "afrikaans", startedAt: sessieBegin, block: { id: "2026-10-16-afr-a1" } }] }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      /* Klok loop reeds (sessie) → knoppie sigbaar */
+      await expect(page.locator(".em-nuut")).toBeVisible();
+      await page.locator(".em-antwoord").fill("eerste poging");
+      await page.locator(".em-klaar").click();
+      await page.locator(".em-nuut").click();
+      await expect(page.locator(".em-antwoord")).toHaveValue("");
+      await expect(page.locator(".em-tyd")).toContainText(/^00:00/);
+      await expect(page.locator(".em-begin")).toBeVisible();
+      await expect(page.locator(".em-nuut")).toBeHidden();
+      await expect(page.locator(".em-memo-knoppie")).toBeDisabled();
+      await expect(page.locator(".em-sessie-wenk")).toBeHidden();
+      let rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.begin).toBeNull();
+      expect(rec.vorige).toHaveLength(1);
+      expect(rec.vorige[0]).toMatchObject({ begin: sessieBegin, konsep: "eerste poging" });
+      expect(typeof rec.sedert).toBe("number");
+      /* Weer oopmaak: vandag se (ou) sessie sleep die nuwe klok nie terug nie */
+      await page.reload();
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator(".em-tyd")).toContainText(/^00:00/);
+      await expect(page.locator(".em-sessie-wenk")).toBeHidden();
+      /* Nuwe poging begin: klok loop en die knoppie kom terug */
+      await page.locator(".em-antwoord").fill("tweede poging");
+      await expect(page.locator(".em-nuut")).toBeVisible();
+      rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.konsep).toBe("tweede poging");
+      expect(rec.vorige).toHaveLength(1);
+      expectNoLeaks(mock);
+    });
+
     test("prakties (RTT): papier-bevestiging + 60% van die tyd + klaar", async ({ page, context }) => {
       const item = RTT.find((i) => i.id === "rtt-v1-S01");
       const mock = new MockBackend({ mode: "v2" });

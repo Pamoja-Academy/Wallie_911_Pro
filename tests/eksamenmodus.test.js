@@ -164,6 +164,25 @@ eq(
 eq(E.dagSleutel(T(23, 59)), VANDAG, "dagSleutel: plaaslike dag");
 eq(E.hhmm(T(8, 5)), "08:05", "hhmm: voorloopnulle");
 
+/* nuwe poging (F4): argiveer in `vorige` (nuutste laaste) en stel terug; suiwer */
+const ou = { begin: T(8, 0), konsep: "my antwoord", bevestig: true, lêer: "foto.jpg", klaarMin: 71.5 };
+const n1 = E.nuwePoging(ou, 111);
+eq({ begin: n1.begin, konsep: n1.konsep, bevestig: n1.bevestig, lêer: n1.lêer, klaarMin: n1.klaarMin }, { begin: null, konsep: "", bevestig: false, lêer: "", klaarMin: null }, "nuwePoging: vyf velde teruggestel");
+eq(n1.vorige, [{ begin: T(8, 0), konsep: "my antwoord", bevestig: true, lêer: "foto.jpg", klaarMin: 71.5, geargiveerOp: 111 }], "nuwePoging: huidige waardes geargiveer");
+eq(ou.konsep, "my antwoord", "nuwePoging verander die ingevoer-rekord nie");
+const n2 = E.nuwePoging(Object.assign({}, n1, { begin: T(9, 0), konsep: "tweede" }), 222);
+eq(n2.vorige.map((v) => v.konsep), ["my antwoord", "tweede"], "nuutste laaste, niks weggegooi");
+eq(n2.vorige.length, 2, "twee pogings geargiveer");
+eq(E.nuwePoging(n1, 333).vorige.length, 1, "leë poging word nie geargiveer nie");
+eq(E.nuwePoging(null, 1).vorige, [], "geen rekord → leë argief, geen fout");
+eq(E.nuwePoging({ begin: T(8, 0), sedert: 5 }, 1).sedert, 5, "ander velde (sedert) bly");
+ok(E.nuwePoging({ konsep: "x" }, 1).vorige[0].begin === null, "konsep sonder begin word ook bewaar");
+ok(E.moetNuwePoging({ begin: new Date(2026, 9, 15, 23, 59).getTime() }, T(0, 1)), "vroeër dag (gister 23:59) → nuwe poging");
+ok(!E.moetNuwePoging({ begin: T(0, 0) }, T(23, 59)), "dieselfde dag → nie");
+ok(!E.moetNuwePoging({ begin: null }, T(8, 0)), "geen begin → nie");
+ok(!E.moetNuwePoging(null, T(8, 0)), "geen rekord → nie");
+ok(!E.moetNuwePoging({ begin: new Date(2026, 9, 17, 8, 0).getTime() }, T(8, 0)), "begin in die toekoms → nie");
+
 /* event-data: presies die gevraagde velde */
 eq(
   Object.keys(E.eventData(A1, "engels", { behaal: 40, totaal: 50, woorde: 270, minuteGebruik: 71, tydMin: 80, memoNaMin: 79 })).sort(),
