@@ -233,6 +233,11 @@ class MockBackend {
         still: null
       });
     }
+    /* Vaste oorsig vir Pa-skerm-toetse sonder PGlite: mock.overview = { ...wallie_pa_overview-antwoord } */
+    if (name === "wallie_pa_overview" && this.overview) {
+      if (body.p_token !== "tok_test") return json(200, { ok: false, error: "auth" });
+      return json(200, this.overview);
+    }
     return json(404, { code: "PGRST202", message: `unknown ${name}` });
   }
 
