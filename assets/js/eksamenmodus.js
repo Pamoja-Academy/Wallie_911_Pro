@@ -406,7 +406,29 @@
     memoKnop.disabled = true;
     memoKnop.setAttribute("aria-expanded", "false");
 
-    kas.append(klok, nuutMeld, sessieWenk, werk, klaarRij, rede, memoKnop);
+    /* O3: vorige pogings (geargiveerde nuwePoging-rekords), lees-net. Raak die memo-hek NIE aan nie: die hek volg net
+       die huidige poging. Teks altyd via textContent. */
+    const vorigeKas = document.createElement("details");
+    vorigeKas.className = "em-vorige";
+    vorigeKas.hidden = true;
+    function tekenVorige() {
+      const lys = kry(item.id).vorige || [];
+      vorigeKas.textContent = "";
+      vorigeKas.hidden = !lys.length;
+      if (!lys.length) return;
+      vorigeKas.append(el("summary", "em-vorige-opsom", "Vorige pogings (" + lys.length + ")"));
+      lys.forEach((v, i) => {
+        const ms = Number(v.begin) > 0 ? Number(v.begin) : Number(v.geargiveerOp) > 0 ? Number(v.geargiveerOp) : 0;
+        const rij = el("div", "em-vorige-poging");
+        rij.append(el("p", "em-vorige-datum", "Poging " + (i + 1) + (ms ? " · " + dagSleutel(ms) + " " + hhmm(ms) : "")));
+        rij.append(el("p", "em-vorige-konsep", v.konsep ? String(v.konsep) : "(geen teks bewaar nie)"));
+        if (v.lêer) rij.append(el("p", "em-vorige-lêer", "Lêer: " + v.lêer));
+        vorigeKas.append(rij);
+      });
+    }
+    tekenVorige();
+
+    kas.append(klok, nuutMeld, sessieWenk, werk, klaarRij, rede, memoKnop, vorigeKas);
     parent.insertBefore(kas, voor);
     parent.insertBefore(memoHouer, voor);
     parent.insertBefore(selfnasien, voor);
@@ -498,6 +520,7 @@
       sessieWenk.hidden = true;
       nuutMeld.textContent = "Nuwe poging. Die vorige poging is veilig bewaar.";
       nuutMeld.hidden = false;
+      tekenVorige();
       teken();
     });
     if (area) {

@@ -237,6 +237,81 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
+    test("O3: vorige pogings sigbaar (lees-net): datum, konsep as gewone teks, lêer; die memo bly toe", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const g1 = new Date("2026-10-15T09:00:00+02:00").getTime();
+      const g2 = new Date("2026-10-15T14:30:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          [DRAF]: {
+            v: 1,
+            items: {
+              [item.id]: {
+                begin: null, konsep: "", bevestig: false, lêer: "", klaarMin: null,
+                vorige: [
+                  { begin: g1, konsep: "Eerste reël\n<b>nie vet nie</b>\nTweede reël", bevestig: false, lêer: "", klaarMin: 50, geargiveerOp: g1 + 3000000 },
+                  { begin: g2, konsep: "", bevestig: true, lêer: "opstel-foto.jpg", klaarMin: 90, geargiveerOp: g2 + 5400000 }
+                ]
+              }
+            }
+          }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      const vorige = page.locator("details.em-vorige");
+      await expect(vorige).toBeVisible();
+      await expect(vorige.locator("summary")).toHaveText("Vorige pogings (2)");
+      /* Toe tot Wallie dit oopmaak; dan die inhoud */
+      expect(await vorige.evaluate((d) => d.open)).toBe(false);
+      await vorige.locator("summary").click();
+      const pogings = vorige.locator(".em-vorige-poging");
+      await expect(pogings).toHaveCount(2);
+      await expect(pogings.nth(0).locator(".em-vorige-datum")).toHaveText("Poging 1 · 2026-10-15 09:00");
+      await expect(pogings.nth(1).locator(".em-vorige-datum")).toHaveText("Poging 2 · 2026-10-15 14:30");
+      const konsep = pogings.nth(0).locator(".em-vorige-konsep");
+      await expect(konsep).toHaveText("Eerste reël\n<b>nie vet nie</b>\nTweede reël");
+      expect(await konsep.evaluate((e) => getComputedStyle(e).whiteSpace)).toBe("pre-wrap");
+      expect(await konsep.evaluate((e) => e.children.length), "teks, nie opmaak nie (textContent)").toBe(0);
+      await expect(pogings.nth(0).locator(".em-vorige-lêer")).toHaveCount(0);
+      await expect(pogings.nth(1).locator(".em-vorige-konsep")).toHaveText("(geen teks bewaar nie)");
+      await expect(pogings.nth(1).locator(".em-vorige-lêer")).toHaveText("Lêer: opstel-foto.jpg");
+      /* Lees-net: die huidige poging is steeds skoon en die memo bly gesluit */
+      await expect(page.locator(".em-antwoord")).toHaveValue("");
+      await expect(page.locator(".em-memo-knoppie")).toBeDisabled();
+      await expect(page.locator(".em-memo-knoppie")).toHaveText("Memo gesluit");
+      await expect(page.locator(".sw-memo")).toBeHidden();
+      const rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.vorige).toHaveLength(2);
+      expect(rec.vorige[1]).toMatchObject({ konsep: "", lêer: "opstel-foto.jpg", klaarMin: 90 });
+      expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
+
+    test("O3: geen vorige pogings → geen blok; 'Begin nuwe poging' laat dit verskyn (1) en dit groei", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      await boot(page, { time: new Date("2026-10-16T08:35:00+02:00") });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator("details.em-vorige")).toBeHidden();
+      await page.locator(".em-antwoord").fill("eerste poging");
+      await page.locator(".em-nuut").click();
+      await expect(page.locator("details.em-vorige summary")).toHaveText("Vorige pogings (1)");
+      await page.locator("details.em-vorige summary").click();
+      await expect(page.locator(".em-vorige-konsep")).toHaveText("eerste poging");
+      await page.locator(".em-antwoord").fill("tweede poging");
+      await page.locator(".em-nuut").click();
+      await expect(page.locator("details.em-vorige summary")).toHaveText("Vorige pogings (2)");
+      await expect(page.locator(".em-vorige-konsep")).toHaveText(["eerste poging", "tweede poging"]);
+      await expect(page.locator(".em-memo-knoppie")).toBeDisabled();
+      expectNoLeaks(mock);
+    });
+
     test("prakties (RTT): papier-bevestiging + 60% van die tyd + klaar", async ({ page, context }) => {
       const item = RTT.find((i) => i.id === "rtt-v1-S01");
       const mock = new MockBackend({ mode: "v2" });

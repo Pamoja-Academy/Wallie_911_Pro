@@ -56,3 +56,9 @@
 .em-punt-naam { flex: 1 1 12rem; overflow-wrap: anywhere; }
 .em-punt-inp { width: 5rem; min-height: 44px; box-sizing: border-box; font: inherit; padding: 0.3rem 0.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--text); }
 .em-som { font-weight: 700; margin: 0.5rem 0; }
+.em-vorige { margin-top: 0.75rem; border-top: 1px solid var(--line); padding-top: 0.5rem; }
+.em-vorige-opsom { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.em-vorige-poging { margin: 0.5rem 0; padding: 0.5rem 0.75rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+.em-vorige-datum { margin: 0 0 0.3rem; color: var(--muted); font-size: 0.9rem; }
+.em-vorige-konsep { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.em-vorige-lêer { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.9rem; overflow-wrap: anywhere; }
