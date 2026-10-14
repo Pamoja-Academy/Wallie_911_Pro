@@ -156,9 +156,12 @@
 
   /* Vraagbanke met eksamenvlak-items per vak; die ander vakke het nog geen nie (sien GAPING). */
   function bankVir(slug) {
-    if (slug === "engels" || slug === "afrikaans") return (window.VRAEBANK_V3 || []).filter((i) => i.vak === slug);
-    if (slug === "rtt") return window.VRAEBANK_RTT_V1 || [];
-    return [];
+    /* Items wat scripts/eksamenvlak-hek.js as onder die DBE-vraag gelys het, is agtergrond en nooit hooftaak nie. */
+    const af = new Set(window.EKSAMENVLAK_AGTERGROND || []);
+    let bank = [];
+    if (slug === "engels" || slug === "afrikaans") bank = (window.VRAEBANK_V3 || []).filter((i) => i.vak === slug);
+    else if (slug === "rtt") bank = window.VRAEBANK_RTT_V1 || [];
+    return bank.filter((i) => !af.has(i.id));
   }
 
   /* Geen vraagbank nie: Wallie werk uit 'n amptelike DBE-vraestel, op papier, getimed. (Gaping — Hanno moet die vraestel kies.) */
