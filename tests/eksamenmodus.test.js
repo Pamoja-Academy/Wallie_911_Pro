@@ -17,6 +17,9 @@ eq(E.tydMin({ vak: "engels", punte: 50 }), 75, "engels 50 punte = 75 min (150/10
 eq(E.tydMin({ vak: "rtt", punte: 5 }, "rtt"), 6, "rtt 5 punte = 6 min (180/150)");
 eq(E.tydMin({ vak: "gasvryheid", punte: 20 }), 18, "gasvryheid 20 punte = 18 min (180/200)");
 eq(E.tydMin({ vak: "rtt", punte: 1 }), 1, "minstens 1 min");
+eq(E.tydMin({ vak: "wiskgelett", punte: 20 }), 24, "wiskgelett 20 punte = 24 min (180/150, F9)");
+eq(E.VRAESTEL.wiskgelett, { min: 180, punte: 150 }, "wiskgelett: 150 punte per 180 min");
+eq(JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "dbe-spesifikasie", "wiskgelett.json"), "utf8")).punte, 150, "dbe-spesifikasie wiskgelett: 150 punte");
 eq(E.tydMin({ vak: "onbekend", punte: 5 }), null, "onbekende vak, geen tyd");
 V3.forEach((i) => ok(E.tydMin(i) === i.tyd_min, `${i.id} gebruik eie tyd_min`));
 RTT.forEach((i) => ok(E.tydMin(i, "rtt") >= 1, `${i.id} kry 'n tyd`));

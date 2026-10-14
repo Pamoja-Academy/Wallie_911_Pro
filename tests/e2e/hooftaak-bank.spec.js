@@ -87,3 +87,15 @@ test("F12: bank-keuse kies net items wie se tyd in die blok pas; pas geen een ni
   }
   expectNoLeaks(mock);
 });
+
+test("F9: Wisk. Gel. sonder bank wys 'n gaping-vraag van ±20 punte (±24 min), 150 punte per 180 min", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page, { time: new Date("2026-10-21T08:00:00+02:00") });
+  await page.goto("/#missie");
+  const h = await hoof(page, { id: "t-wg", subjectSlug: "wiskgelett", kind: "groen", title: "Wisk. Gel. — oefen", minutes: 60 });
+  expect(h.soort).toBe("gaping");
+  expect(h.tekst).toContain("±20 punte (±24 min)");
+  expect(await page.evaluate(() => Eksamenmodus.tydMin({ vak: "wiskgelett", punte: 20 }))).toBe(24);
+  expectNoLeaks(mock);
+});

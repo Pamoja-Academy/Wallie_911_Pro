@@ -23,7 +23,7 @@
     engels: { min: 150, punte: 100 },
     afrikaans: { min: 180, punte: 100 },
     rtt: { min: 180, punte: 150 },
-    wiskgelett: { min: 180, punte: 100 }, /* ONGEVERIFIEER (Hanno) */
+    wiskgelett: { min: 180, punte: 150 }, /* CAPS: 150 punte per 180 min; ONGEVERIFIEER (Hanno moet bevestig) */
     toerisme: { min: 180, punte: 200 }, /* ONGEVERIFIEER (Hanno) — sien data/dbe-spesifikasie */
     gasvryheid: { min: 180, punte: 200 } /* ONGEVERIFIEER (Hanno) */
   };

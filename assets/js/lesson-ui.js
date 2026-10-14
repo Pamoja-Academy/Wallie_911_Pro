@@ -181,7 +181,7 @@
   const GAPING = {
     gasvryheid: "Nov 2025 Gasvryheidstudie, kies 'n vraag van ±20 punte (±18 min)",
     toerisme: "Nov 2025 Toerisme, kies 'n vraag van ±20 punte (±24 min)",
-    wiskgelett: "Nov 2025 V1 Wisk. Geletterdheid, kies 'n vraag van ±20 punte (±36 min)"
+    wiskgelett: "Nov 2025 V1 Wisk. Geletterdheid, kies 'n vraag van ±20 punte (±24 min)"
   };
 
   function itemKort(item) {
