@@ -72,6 +72,8 @@ test("Pa-konsole: lewendige status, rooster teenoor werklikheid, surveys woordel
 
   /* Vandag: Toerisme-blok handmatig as klaar merk, dan ’n lewendige Engels-sessie op sy blok */
   await page.locator('.mark-done[data-id="2026-10-07-toerisme"]').click();
+  /* PR 3: geen sessie vir die blok nie → "Seker?"; die tweede klik bevestig */
+  await page.locator('.mark-done[data-id="2026-10-07-toerisme"]').click();
   await page.evaluate(() =>
     WALLIE.app.startSession({ subjectSlug: "engels", minutes: 50, task: "Opstel — PEEL-paragrawe", blockId: "2026-10-07-engels-lit" })
   );

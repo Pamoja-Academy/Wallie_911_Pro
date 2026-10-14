@@ -209,6 +209,9 @@ test("blok klaar gemerk: gaan via v2 sodra dit bestaan", async ({ page, context 
   const done = page.locator(".mark-done").first();
   const blockId = await done.getAttribute("data-id");
   await done.click();
+  /* PR 3: 'n studieblok sonder sessie vra eers "Seker?" — die tweede klik bevestig */
+  await expect(page.locator(".vroeg-wenk").first()).toContainText("Seker? Dit is eksamenwerk");
+  await done.click();
   await runUntil(page, async () => mock.byKind("block").length === 1, { label: "blok afgelewer" });
   const b = mock.byKind("block")[0];
   expect(b.name).toBe("wallie_ingest_v2");

@@ -1180,3 +1180,6 @@ body.les-open .hulp-fab, body:has(.modal:not(.hidden)) .hulp-fab { display: none
 .next-agtergrond { margin: 0.6rem 0 0; }
 .next-agtergrond small { color: var(--muted); }
 .md-concept { opacity: 0.85; font-weight: 600; font-size: 0.95rem; }
+/* Vroeg-klaar-waarskuwing op die blok-kaart */
+.mark-done.is-waarsku { border-color: var(--danger, #e5484d); color: var(--danger, #e5484d); }
+.vroeg-wenk { margin: 0.5rem 0 0; font-size: 0.95rem; font-weight: 700; color: var(--danger, #e5484d); overflow-wrap: anywhere; }

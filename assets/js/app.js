@@ -938,7 +938,26 @@
     const done = e.target.closest(".mark-done");
     if (done) {
       const at = Date.now();
-      WALLIE.REMOTE?.blockDone(state.blocks.find((b) => b.id === done.dataset.id) || { id: done.dataset.id }, at);
+      const blok = state.blocks.find((b) => b.id === done.dataset.id) || { id: done.dataset.id };
+      /* Studieblok "klaar" sonder genoeg werk: eers 'n waarskuwing ("Seker? Dit is eksamenwerk"). Die tweede klik bevestig. */
+      const vroeg = window.VroegKlaar?.kontroleer(
+        blok,
+        vis(state.sessions),
+        sessionMeta ? { blockId: sessionMeta.block?.id, startedAt: sessionMeta.startedAt } : null,
+        at
+      );
+      if (vroeg && !done.dataset.bevestig) {
+        done.dataset.bevestig = "1";
+        done.classList.add("is-waarsku");
+        done.textContent = "Seker? Klaar";
+        const wenk = document.createElement("p");
+        wenk.className = "vroeg-wenk";
+        wenk.setAttribute("role", "alert");
+        wenk.textContent = window.VroegKlaar.teks(vroeg) + " Druk weer om te bevestig.";
+        done.closest(".md-body")?.append(wenk);
+        return;
+      }
+      WALLIE.REMOTE?.blockDone(blok, at, vroeg ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan } : null);
       /* Tydstempel i.p.v. true (steeds "truthy" vir ou kode) sodat Pa weet wanneer */
       state.completedBlocks[done.dataset.id] = at;
       persist();

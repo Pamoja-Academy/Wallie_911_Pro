@@ -351,7 +351,7 @@
           '<time>' + esc(b.start || '—') + '–' + esc(b.end || '—') + '</time>' +
           '<div>' + esc(b.title || subjName(b.subjectKey, b.subject)) +
           '<small>' + esc(subjName(b.subjectKey, b.subject)) + ' · ' + (b.doneMin || 0) + '/' + (b.minutes || 0) + ' min' + esc(man) + '</small></div>' +
-          '<b>' + esc(st) + '</b></li>';
+          '<b>' + esc(st) + (b.flag ? ' <span class="vlag" data-vlag="' + esc(b.flag) + '">' + esc(b.flag) + '</span>' : '') + '</b></li>';
       }).join('');
     }
     var tbl = $('gantt-table');
@@ -366,7 +366,7 @@
           }).join(', ') || '—';
           return '<tr><td>' + esc(subjName(b.subjectKey, b.subject)) + ' — ' + esc(b.title || '') + '</td>' +
             '<td>' + esc(b.start || '—') + '–' + esc(b.end || '—') + '</td>' +
-            '<td>' + esc(acts) + '</td><td>' + esc(stLbl[b.status] || b.status) + '</td></tr>';
+            '<td>' + esc(acts) + '</td><td>' + esc(stLbl[b.status] || b.status) + (b.flag ? ' <span class="vlag" data-vlag="' + esc(b.flag) + '">' + esc(b.flag) + '</span>' : '') + '</td></tr>';
         }).join('');
       }
     }
