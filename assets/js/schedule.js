@@ -282,6 +282,136 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         title: "Kontrolelys en tas pak", detail: "ID, toelatingsbrief, penne, water." },
       { suffix: "klaar", kind: "break", slug: "break", start: "19:50", end: "19:50", soort: "pouse",
         title: "Klaar. Skerms af 21:30, bed 22:00.", detail: "Werk is klaar. Skerms af om 21:30, bed 22:00." }
+    ],
+    /* Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): Do 15 eksamendag Engels V3,
+       dan Afrikaans HT V3 (Di 20) met eksamenvlak-items; elke studieblok se hooftaak is 'n item (`item`) of DBE-werk.
+       `item` is die id van 'n eksamenvlak-item (data/vraebank-v3.json) en wen as hooftaak (lesson-ui.js hoofTaak).
+       Soort "voor-eksamen" is 'n ligte eksamendag-opwarm wat sy eie titel as hooftaak hou. */
+    "2026-10-15": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "06:45", end: "07:15", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "formaat", kind: "geel", slug: "engels", start: "07:15", end: "07:35", soort: "voor-eksamen",
+        title: "Laaste kyk: formaatkaarte (net lees, geen nuwe werk)",
+        detail: "Aansoekbrief, dagboek, dialoog, instruksies. Kies jou opsteltipe. Geen nuwe werk nie." },
+      { suffix: "tas", kind: "break", slug: "break", start: "07:35", end: "08:00", soort: "pouse",
+        title: "Tas: ID, toelatingsbrief, penne, water", detail: "" },
+      { suffix: "eksamen", kind: "break", slug: "break", start: "09:00", end: "11:30", soort: "pouse",
+        title: "ENGELS EAT V3-EKSAMEN (skool) 09:00-11:30", detail: "A 80 min, B 40 min, C 30 min. Sterkte!" },
+      { suffix: "rus", kind: "break", slug: "break", start: "11:30", end: "13:30", soort: "pouse",
+        title: "Rus en middagete", detail: "" },
+      { suffix: "terugskou", kind: "geel", slug: "engels", start: "13:30", end: "13:50", soort: "herdoen",
+        title: "Engels V3: skryf neer wat gekom het + 3 lesse",
+        detail: "Watter onderwerpe, watter teksoorte, wat het jy anders gedoen. Vir Afrikaans V3 (Di 20)." },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "13:50", end: "14:00", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "afr-b1", kind: "rooi", slug: "afrikaans", start: "14:00", end: "14:40", soort: "toets",
+        item: "afr-v3-B1", punte: 25,
+        title: "Afrikaans V3 B1 (25 punte, 40 min)",
+        detail: "Getimed, op papier of in die app. Memo eers ná die tyd." },
+      { suffix: "merk-afr-b1", kind: "rooi", slug: "afrikaans", start: "14:40", end: "15:00", soort: "merk",
+        title: "Merk B1 met die rubriek", detail: "" },
+      { suffix: "pouse2", kind: "break", slug: "break", start: "15:00", end: "15:15", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "afr-b2", kind: "rooi", slug: "afrikaans", start: "15:15", end: "15:55", soort: "toets",
+        item: "afr-v3-B2", punte: 25,
+        title: "Afrikaans V3 B2 (25 punte, 40 min)", detail: "Getimed." },
+      { suffix: "merk-afr-b2", kind: "rooi", slug: "afrikaans", start: "15:55", end: "16:15", soort: "merk",
+        title: "Merk B2 met die rubriek", detail: "" },
+      { suffix: "klaar", kind: "break", slug: "break", start: "16:15", end: "16:15", soort: "pouse",
+        title: "Klaar. Skerms af 21:30.", detail: "Eksamendag: genoeg vir vandag." }
+    ],
+    "2026-10-16": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "07:30", end: "08:00", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "afr-a1", kind: "rooi", slug: "afrikaans", start: "08:00", end: "09:40", soort: "toets",
+        item: "afr-v3-A1", punte: 50,
+        title: "Afrikaans V3 A1 opstel (50 punte, 100 min)",
+        detail: "Beplan 10 min, skryf 80, lees oor 10. 400-450 woorde." },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "09:40", end: "10:00", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "merk-afr-a1", kind: "rooi", slug: "afrikaans", start: "10:00", end: "10:30", soort: "merk",
+        title: "Merk A1 met die rubriek (30/15/5)", detail: "" },
+      { suffix: "afr-b3", kind: "rooi", slug: "afrikaans", start: "10:30", end: "11:10", soort: "toets",
+        item: "afr-v3-B3", punte: 25,
+        title: "Afrikaans V3 B3 (25 punte, 40 min)", detail: "Getimed." },
+      { suffix: "merk-afr-b3", kind: "rooi", slug: "afrikaans", start: "11:10", end: "11:30", soort: "merk",
+        title: "Merk B3 met die rubriek", detail: "" },
+      { suffix: "middag", kind: "break", slug: "break", start: "11:30", end: "12:30", soort: "pouse",
+        title: "Middagete", detail: "" },
+      { suffix: "wg-v1", kind: "groen", slug: "wiskgelett", start: "12:30", end: "13:30", soort: "toets", punte: 50,
+        title: "Wisk. Gel. V1: een DBE-vraestel (Pa gee), Vraag 1 en 2 op papier, getimed (60 min)",
+        detail: "Wisk. Gel. V1 is Vr 23 Okt. Gebruik 'n amptelike DBE-vraestel en memo." },
+      { suffix: "merk-wg-v1", kind: "groen", slug: "wiskgelett", start: "13:30", end: "13:50", soort: "merk",
+        title: "Merk Wisk. Gel. Vraag 1 en 2 met die memo", detail: "" },
+      { suffix: "klaar", kind: "break", slug: "break", start: "13:50", end: "13:50", soort: "pouse",
+        title: "Klaar. Skerms af 21:30.", detail: "" }
+    ],
+    "2026-10-17": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "08:00", end: "08:30", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "afr-a2", kind: "rooi", slug: "afrikaans", start: "08:30", end: "10:10", soort: "toets",
+        item: "afr-v3-A2", punte: 50,
+        title: "Afrikaans V3 A2 opstel (50 punte, 100 min)", detail: "Ander opsteltipe as gister." },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "10:10", end: "10:30", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "merk-afr-a2", kind: "rooi", slug: "afrikaans", start: "10:30", end: "11:00", soort: "merk",
+        title: "Merk A2 met die rubriek (30/15/5)", detail: "" },
+      { suffix: "afr-b4", kind: "rooi", slug: "afrikaans", start: "11:00", end: "11:40", soort: "toets",
+        item: "afr-v3-B4", punte: 25,
+        title: "Afrikaans V3 B4 (25 punte, 40 min)", detail: "Getimed." },
+      { suffix: "merk-afr-b4", kind: "rooi", slug: "afrikaans", start: "11:40", end: "12:00", soort: "merk",
+        title: "Merk B4 met die rubriek", detail: "" },
+      { suffix: "middag", kind: "break", slug: "break", start: "12:00", end: "13:00", soort: "pouse",
+        title: "Middagete", detail: "" },
+      { suffix: "wg-v1", kind: "groen", slug: "wiskgelett", start: "13:00", end: "14:00", soort: "toets", punte: 50,
+        title: "Wisk. Gel. V1: Vraag 3 en 4 uit dieselfde DBE-vraestel, op papier, getimed (60 min)", detail: "" },
+      { suffix: "merk-wg-v1", kind: "groen", slug: "wiskgelett", start: "14:00", end: "14:20", soort: "merk",
+        title: "Merk Wisk. Gel. Vraag 3 en 4 met die memo", detail: "" },
+      { suffix: "klaar", kind: "break", slug: "break", start: "14:20", end: "14:20", soort: "pouse",
+        title: "Klaar. Skerms af 21:30.", detail: "" }
+    ],
+    "2026-10-18": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "08:00", end: "08:45", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "afr-b5", kind: "rooi", slug: "afrikaans", start: "08:45", end: "09:25", soort: "toets",
+        item: "afr-v3-B5", punte: 25,
+        title: "Afrikaans V3 B5 (25 punte, 40 min)", detail: "Getimed." },
+      { suffix: "merk-afr-b5", kind: "rooi", slug: "afrikaans", start: "09:25", end: "09:45", soort: "merk",
+        title: "Merk B5 met die rubriek", detail: "" },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "09:45", end: "10:00", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "foutlog", kind: "rooi", slug: "afrikaans", start: "10:00", end: "10:30", soort: "herdoen",
+        title: "Afrikaans: top-3 foute uit A1, A2 en B1-B5 herskryf",
+        detail: "Net die paragrawe/dele wat punte gekos het." },
+      { suffix: "middag", kind: "break", slug: "break", start: "10:30", end: "13:00", soort: "pouse",
+        title: "Familie / middagete", detail: "" },
+      { suffix: "wg-v1", kind: "groen", slug: "wiskgelett", start: "13:00", end: "14:00", soort: "toets", punte: 50,
+        title: "Wisk. Gel. V1: res van die DBE-vraestel, op papier, getimed (60 min)", detail: "" },
+      { suffix: "merk-wg-v1", kind: "groen", slug: "wiskgelett", start: "14:00", end: "14:20", soort: "merk",
+        title: "Merk Wisk. Gel. met die memo", detail: "" },
+      { suffix: "klaar", kind: "break", slug: "break", start: "14:20", end: "14:20", soort: "pouse",
+        title: "Klaar. Skerms af 21:30.", detail: "" }
+    ],
+    "2026-10-19": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "07:30", end: "08:00", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "afr-a1-weer", kind: "rooi", slug: "afrikaans", start: "08:00", end: "09:40", soort: "toets",
+        item: "afr-v3-A1", punte: 50,
+        title: "Afrikaans V3 opstel weer (50 punte, 100 min): ander onderwerp uit A1 se vraag",
+        detail: "Volle eksamentyd. Kies 'n ander onderwerp as Vrydag." },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "09:40", end: "10:00", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "merk-afr-a1-weer", kind: "rooi", slug: "afrikaans", start: "10:00", end: "10:30", soort: "merk",
+        title: "Merk die opstel met die rubriek", detail: "" },
+      { suffix: "formaat", kind: "rooi", slug: "afrikaans", start: "10:30", end: "11:00", soort: "herdoen",
+        title: "Afrikaans: formaat van elke transaksionele teks (een bladsy)",
+        detail: "Brief, dagboek, verslag, toespraak, e-pos: net die formaat." },
+      { suffix: "middag", kind: "break", slug: "break", start: "11:00", end: "12:00", soort: "pouse",
+        title: "Middagete", detail: "" },
+      { suffix: "tas", kind: "rooi", slug: "afrikaans", start: "12:00", end: "12:30", soort: "voor-eksamen",
+        title: "Kontrolelys en tas pak vir môre", detail: "ID, toelatingsbrief, penne, water. Slaap vroeg." },
+      { suffix: "klaar", kind: "break", slug: "break", start: "12:30", end: "12:30", soort: "pouse",
+        title: "Klaar. Skerms af 21:00, bed 21:30.", detail: "Rus is deel van die voorbereiding." }
     ]
   };
   if (VASTE_PLANNE[dateStr]) {
@@ -291,7 +421,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       return bh * 60 + bm - (ah * 60 + am);
     };
     /* "toets"/"merk"/"herdoen"/"opstel" is RTT-werk (rooi); "les" is ’n kort opwarm-kaart. */
-    const KIND = { pouse: "break", les: "warm" };
+    const KIND = { pouse: "break", les: "warm", "voor-eksamen": "warm" };
     const blocks = VASTE_PLANNE[dateStr].map((b) => {
       const blok = {
         id: `${dateStr}-${b.suffix}`,
@@ -305,6 +435,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         soort: b.soort
       };
       if (b.punte != null) blok.punte = b.punte;
+      if (b.item) blok.item = b.item;
       if (b.werk) blok.werk = b.werk;
       if (b.werk_ekstra) blok.werk_ekstra = b.werk_ekstra;
       return blok;
