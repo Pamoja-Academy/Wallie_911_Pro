@@ -1173,3 +1173,10 @@ body.les-open .hulp-fab, body:has(.modal:not(.hidden)) .hulp-fab { display: none
 .vak-aftel-tyd { font-family: var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
 .vak-aftel-tyd.is-klaar { color: var(--muted); }
 .vak-aftel-kop { margin: 0.2rem 0; font-size: 0.85rem; color: var(--muted); }
+
+/* Hooftaak (eksamenvlak) bo, agtergrond (opsioneel) onder */
+.md-hoof, .next-hoof { margin: 0 0 0.35rem; font-size: 1.1rem; font-weight: 800; color: var(--text, #fff); overflow-wrap: anywhere; }
+.md-hoof small, .next-hoof small, .next-agtergrond small { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+.next-agtergrond { margin: 0.6rem 0 0; }
+.next-agtergrond small { color: var(--muted); }
+.md-concept { opacity: 0.85; font-weight: 600; font-size: 0.95rem; }

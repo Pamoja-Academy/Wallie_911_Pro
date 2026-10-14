@@ -262,4 +262,6 @@
     was = nou;
   }).observe(section, { attributes: true, attributeFilter: ["class"] });
   lys();
+  /* Vir die hooftaak-knoppie op die Missie-skerm (app.js) */
+  window.SkryfwerkUI = { open: itemSkerm };
 })();
