@@ -1,0 +1,15 @@
+# Lessons learned — Wallie_911_Pro
+
+Elke les: wat gebeur het (met bewys), die oorsaak, en die KONTROLE wat dit nou keer.
+Kruiskontrole: voor elke saamvoeging gaan die QC-agent hierdie lys deur en merk elke kontrole as ✓ of n.v.t. in die PR.
+
+| # | Wat gebeur het (bewys) | Oorsaak | Kontrole (wat dit nou keer) |
+|---|---|---|---|
+| LL-01 | 14 Okt: 3 Engels-sessies "te_maklik" (fokus 5/5) maar 6/15, 7/40 en 11/15 min; om 11:00 is 8 blokke in 30 s klaar gemerk (`wallie911.events` 208–215). | Sessie-taak was 'n les-kaart (PEEL, Figures of speech); memo een klik weg; klaar merk sonder werk was gratis. | PR #21 eksamenmodus (klok, memo-hek, punte); PR #22 hooftaak = eksamenitem; PR #23 "Seker? Dit is eksamenwerk" + Pa-vlag VROEG KLAAR / GEEN POGING. |
+| LL-02 | 15–19 Okt (insluitend die Engels V3-eksamendag en die aanloop na Afrikaans V3) het die generiese rotasie gewys: 405 min, geen tye, RTT ná die RTT-eksamen. | Net 11, 13 en 14 Okt het 'n vaste plan gehad; niemand het vooruit beplan nie. | Plan v5 (15–19 Okt) met eksamenvlak-items; reël in AGENTS.md §3: altyd 5 dae vooruit + elke eksamendag. |
+| LL-03 | Net RTT het op 11 Okt 'n eksamenvlak-kontrole gekry; Engels-items was nooit outomaties nagegaan nie. | Geen gedeelde hek per vak nie. | PR #24 `scripts/eksamenvlak-hek.js` in CI + `data/dbe-spesifikasie/<vak>.json`. |
+| LL-04 | Nuwe event-soort `v3_poging` sou deur die bediener afgekeur word ("bad kind"). | `wallie_ingest_v2` het 'n vaste lys soorte. | Eksamenmodus stuur niks tot Hanno die skema goedkeur (`Eksamenmodus.EVENT.kind = null`). |
+| LL-05 | Plaaslike toetse het 6 Pa-konsole-mislukkings en 2 LF-mislukkings gewys wat op CI groen is. | Windows `core.autocrlf=true` maak vendor-lêers CRLF → SHA-384 verskil. | AGENTS.md §4: werkkopie-omskakeling; nooit commit nie; CI is die waarheid. |
+| LL-06 | `fase1-regressie` het een keer op CI misluk ("probleem:b_1 presies een keer afgelewer", 2 ontvang) en ná 'n herhaling geslaag. | Waarskynlik 'n tydsberoepende herprobeer-wedloop in die toets/sinkronisering — nog nie bewys nie. | Herhaal hoogstens een keer; tweede mislukking = ondersoek, nie weer herhaal nie. Oop taak. |
+| LL-07 | Vorige projekbestuur (Grokbot): eksponensiële vertragings, lae gehalte, herhalende regressie. | Geen gedeelde reëls, geen toetshek per vak, geen vooruitbeplanning, status uit geheue i.p.v. data. | AGENTS.md as een bron van waarheid vir Claude Code, Cursor en Grokbot; status altyd uit data. |
+| LL-08 | 'n Vorige besluit ("les is weer die hoofsaak", PR #14) is op 14 Okt deur PR #22 omgekeer. | Besluite was nie op een plek nie. | Elke rigting-besluit kom as 'n reël in AGENTS.md §2, met datum. |

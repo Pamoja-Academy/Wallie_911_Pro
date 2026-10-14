@@ -1,0 +1,8 @@
+---
+description: Wallie_911_Pro projekreëls (een bron van waarheid)
+alwaysApply: true
+---
+
+Lees en volg AGENTS.md en docs/LESSONS-LEARNED.md in die wortel van hierdie repo voor enige verandering.
+Harde reëls: geen proef-blokke aanraak; niks in Supabase skryf nie; Wallie se localStorage nooit uitvee nie;
+geen uitgedinkte DBE-inligting nie; hooftaak is altyd eksamenwerk; saamvoeg na master net met groen CI en Hanno se ja.
