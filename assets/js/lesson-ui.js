@@ -162,7 +162,19 @@
     let bank = [];
     if (slug === "engels" || slug === "afrikaans") bank = (window.VRAEBANK_V3 || []).filter((i) => i.vak === slug);
     else if (slug === "rtt") bank = window.VRAEBANK_RTT_V1 || [];
-    return bank.filter((i) => !af.has(i.id));
+    return bank.filter((i) => !af.has(i.id) && !eksamenKlaar(i));
+  }
+
+  /* Die vraestel waaruit die item kom is al geskryf (PK.EXAMS-inskrywing van die vak met "V<n>" in sy naam,
+     begintyd + 4 uur verby): daardie item is nie meer hooftaak nie (bv. Engels V3-items ná 15 Okt 13:00).
+     Geen PK nie → geen filter. Items wat vas in die rooster staan (blok.item) word hier nie geraak nie. */
+  function eksamenKlaar(item) {
+    const lys = window.PK && window.PK.EXAMS;
+    if (!lys || !item || (item.vak !== "engels" && item.vak !== "afrikaans") || item.vraestel == null) return false;
+    const woord = new RegExp("\\bV" + String(item.vraestel) + "\\b");
+    const eks = lys.find((x) => x.s === item.vak && woord.test(x.n));
+    const begin = eks ? Date.parse(eks.at) : NaN;
+    return Number.isFinite(begin) && begin + 4 * 3600000 < Date.now();
   }
 
   /* Geen vraagbank nie: Wallie werk uit 'n amptelike DBE-vraestel, op papier, getimed. (Gaping — Hanno moet die vraestel kies.) */
