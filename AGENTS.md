@@ -35,7 +35,7 @@ Eksamenrooster: `assets/js/pa-konsole/exams.js`. Dagplanne: `VASTE_PLANNE` in `a
   - Wye soektogte/lees: 'n goedkoop verken-agent (Haiku/Explore).
   - Onafhanklike kwaliteitsbeheer: 'n tweede agent wat NIE die kode geskryf het nie, met hierdie lêer as kontrolelys.
   - Beplanmodus net as Hanno wakker is om die plan goed te keur; anders: skryf die plan in die PR-beskrywing.
-- **Kwaliteitshek voor saamvoeg**: `npm run test:skoon` groen · CI `qa` groen · onafhanklike QC-oorsig · lessons-learned nagegaan.
+- **Kwaliteitshek voor saamvoeg** (ook vir elke sub-agent se opdrag: die VOLLE suite, nooit net geteikende toetse — LL-11): `npm run test:skoon` groen · CI `qa` groen · onafhanklike QC-oorsig · lessons-learned nagegaan.
 
 ## 4. Toetse en omgewing
 - `npm run test:skoon` (alles) · `node scripts/eksamenvlak-hek.js` · Playwright op poort 9123 (een lopie op 'n slag).
