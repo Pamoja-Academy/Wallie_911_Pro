@@ -942,11 +942,22 @@
       const at = Date.now();
       const blok = state.blocks.find((b) => b.id === done.dataset.id) || { id: done.dataset.id };
       /* Studieblok "klaar" sonder genoeg werk: eers 'n waarskuwing ("Seker? Dit is eksamenwerk"). Die tweede klik bevestig. */
+      /* Pogings op die blok se eksamenvlak-item tel ook as werk (net vandag se, met hul minute_gebruik) */
+      let pogings = [];
+      try {
+        const vandag = WALLIE.todayKey();
+        if (blok.item && window.VraebankStore) {
+          pogings = window.VraebankStore.attempts(blok.item).filter((p) => p && WALLIE.todayKey(new Date(p.t)) === vandag);
+        }
+      } catch (err) {
+        pogings = [];
+      }
       const vroeg = window.VroegKlaar?.kontroleer(
         blok,
         vis(state.sessions),
         sessionMeta ? { blockId: sessionMeta.block?.id, startedAt: sessionMeta.startedAt } : null,
-        at
+        at,
+        pogings
       );
       if (vroeg && !done.dataset.bevestig) {
         done.dataset.bevestig = "1";

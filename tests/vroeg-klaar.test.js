@@ -26,6 +26,26 @@ eq(VK.kontroleer(null, [], null, NOU), null, "geen blok");
 ok(VK.teks({ soort: "vroeg", gedoen: 10, plan: 40 }).includes("Seker? Dit is eksamenwerk"), "waarskuwingsteks");
 ok(VK.teks({ soort: "geen_sessie" }).includes("Seker? Dit is eksamenwerk"), "waarskuwingsteks (geen sessie)");
 
+/* F5: pogings (VANDAG se VraebankStore-pogings op blok.item), voor-eksamen, 0 minute */
+const pog = (min) => ({ t: "2026-10-16T08:30:00.000Z", minute_gebruik: min });
+eq(VK.kontroleer(blok, [], null, NOU, [pog(30)]), null, "poging van 30/40 min tel as werk (sonder sessie)");
+eq(VK.kontroleer(blok, [], null, NOU, [pog(10), pog(15)]), null, "twee pogings tel saam (25 ≥ 24)");
+eq(VK.kontroleer(blok, [], null, NOU, [pog(10)]).kode, "VROEG KLAAR", "poging van 10/40 = VROEG KLAAR (nie geen_sessie nie)");
+eq(VK.kontroleer(blok, [], null, NOU, [pog(10)]).soort, "vroeg", "poging = daar was werk, dus nie geen_sessie nie");
+eq(VK.kontroleer(blok, [sess("d-b1", 10)], null, NOU, [pog(30)]), null, "gedoen = maks(sessie 10, poging 30), nie die som nie");
+eq(VK.kontroleer(blok, [sess("d-b1", 30)], null, NOU, [pog(5)]), null, "gedoen = maks(sessie 30, poging 5)");
+eq(VK.kontroleer(blok, [sess("d-b1", 20)], null, NOU, [pog(15)]).kode, "VROEG KLAAR", "maks (20) en nie som (35) nie: 20/40 = VROEG KLAAR");
+eq(VK.kontroleer(blok, [], null, NOU, [{ t: "x" }]).kode, "GEEN POGING", "poging sonder minute_gebruik: gedoen 0 = GEEN POGING");
+eq(VK.kontroleer(blok, [], null, NOU, [{ t: "x" }]).soort, "geen_minute", "poging sonder minute: soort geen_minute");
+eq(VK.kontroleer(blok, [sess("d-b1", 0)], null, NOU).kode, "GEEN POGING", "sessie van 0 min = GEEN POGING (net soos Pa)");
+eq(VK.kontroleer(blok, [sess("d-b1", 0)], null, NOU).soort, "geen_minute", "sessie van 0 min: soort geen_minute");
+eq(VK.kontroleer(blok, [], { blockId: "d-b1", startedAt: NOU }, NOU).kode, "GEEN POGING", "sessie wat nou begin het (0 min) = GEEN POGING");
+eq(VK.kontroleer(blok, [], null, NOU, []).soort, "geen_sessie", "leë pogings en geen sessie = geen_sessie");
+eq(VK.kontroleer(blok, [], null, NOU, undefined).soort, "geen_sessie", "pogings weggelaat = geen_sessie (ou aanroepers)");
+eq(VK.kontroleer({ id: "v", kind: "rooi", minutes: 20, soort: "voor-eksamen" }, [], null, NOU, []), null, "voor-eksamen: nooit 'n waarskuwing nie");
+eq(VK.kontroleer({ id: "v", kind: "rooi", minutes: 20, soort: "voor-eksamen" }, [sess("v", 0)], null, NOU), null, "voor-eksamen met 0-min sessie: ook nie");
+ok(VK.teks({ soort: "geen_minute" }).includes("geen minute"), "waarskuwingsteks (0 minute)");
+
 /* Pa-konsole: PK.blockFlag uit die bestaande oorsig-velde */
 const ctx = { console, setTimeout, clearTimeout, setInterval, clearInterval, Date };
 ctx.window = ctx;

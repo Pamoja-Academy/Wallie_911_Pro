@@ -59,6 +59,61 @@ test("blok met genoeg werk is sonder waarskuwing klaar; te min werk waarsku", as
   expectNoLeaks(mock);
 });
 
+test("F5: vandag se poging op die blok se item tel as werk (70 van 100 min), gister s'n nie", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  const poging = (t, min) => ({ t, uitslag: "reg", minute_gebruik: min });
+  await boot(page, {
+    time: new Date("2026-10-16T08:05:00+02:00"),
+    seed: {
+      wallie911_vraebank_v1: {
+        v: 1,
+        prakties: [],
+        items: { "afr-v3-A1": { pogings: [poging("2026-10-15T09:00:00.000Z", 95), poging("2026-10-16T05:00:00.000Z", 70)] } }
+      }
+    }
+  });
+  await page.goto("/#missie");
+  const knoppie = page.locator('#block-list .md-card[data-id="2026-10-16-afr-a1"] .mark-done');
+  await knoppie.click();
+  await expect(page.locator('#block-list .md-card[data-id="2026-10-16-afr-a1"] .vroeg-wenk')).toHaveCount(0);
+  await runUntil(page, async () => mock.byKind("block").length === 1, { label: "blok afgelewer" });
+  expect(mock.byKind("block")[0].body.p.data).toEqual({ blockId: "2026-10-16-afr-a1", done: true });
+  /* Die ander blok se item (afr-v3-B3) het niks → waarsku */
+  const b3 = page.locator('#block-list .md-card[data-id="2026-10-16-afr-b3"] .mark-done');
+  await b3.click();
+  await expect(page.locator('#block-list .md-card[data-id="2026-10-16-afr-b3"] .vroeg-wenk')).toContainText("Seker?");
+  expectNoLeaks(mock);
+});
+
+test("F5: gister se poging alleen tel nie (GEEN POGING)", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page, {
+    time: new Date("2026-10-16T08:05:00+02:00"),
+    seed: {
+      wallie911_vraebank_v1: { v: 1, prakties: [], items: { "afr-v3-A1": { pogings: [{ t: "2026-10-15T09:00:00.000Z", uitslag: "reg", minute_gebruik: 95 }] } } }
+    }
+  });
+  await page.goto("/#missie");
+  await page.locator('#block-list .md-card[data-id="2026-10-16-afr-a1"] .mark-done').click();
+  await expect(page.locator('#block-list .md-card[data-id="2026-10-16-afr-a1"] .vroeg-wenk')).toContainText("Seker?");
+  expectNoLeaks(mock);
+});
+
+test("F5: voor-eksamen-blok (formaat) kry nooit 'n waarskuwing nie", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page, { time: new Date("2026-10-15T07:20:00+02:00") });
+  await page.goto("/#missie");
+  const knoppie = page.locator('#block-list .md-card[data-id="2026-10-15-formaat"] .mark-done');
+  await knoppie.click();
+  await expect(page.locator('#block-list .md-card[data-id="2026-10-15-formaat"] .vroeg-wenk')).toHaveCount(0);
+  await runUntil(page, async () => mock.byKind("block").length === 1, { label: "blok afgelewer" });
+  expect(mock.byKind("block")[0].body.p.data).toEqual({ blockId: "2026-10-15-formaat", done: true });
+  expectNoLeaks(mock);
+});
+
 test("pa-afstand.html: VROEG KLAAR en GEEN POGING-vlag uit die bestaande oorsig", async ({ page }) => {
   const oorsig = {
     ok: true, now: "2026-10-09T09:05:00+02:00", day: "2026-10-09", today: "2026-10-09", week_start: "2026-10-05", week_end: "2026-10-11",
