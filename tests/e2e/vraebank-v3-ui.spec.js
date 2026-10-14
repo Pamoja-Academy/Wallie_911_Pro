@@ -4,7 +4,7 @@ const { test, expect } = require("@playwright/test");
 const fs = require("fs");
 const path = require("path");
 const { MockBackend } = require("./mock-backend");
-const { boot, shot, expectNoLeaks } = require("./helpers");
+const { boot, shot, expectNoLeaks, eksamenOntsluit } = require("./helpers");
 
 const ITEMS = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "data", "vraebank-v3.json"), "utf8"));
 const RUBRIEKE = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "data", "vraebank-v3-rubrieke.json"), "utf8"));
@@ -54,12 +54,13 @@ for (const vp of VIEWPORTS) {
         if (!/^(http:\/\/localhost|data:|blob:)/.test(u) && !/fonts\.(googleapis|gstatic)\.com|supabase\.co|ntfy\.sh/.test(u)) buite.push(u);
       });
       await boot(page);
+      await eksamenOntsluit(page);
       await page.goto("/#skryfwerk");
 
       await expect(page.locator("#view-skryfwerk")).toHaveClass(/active/);
       await expect(page.locator("#skryfwerk-root h1")).toHaveText("Skryfwerk (V3)");
       await expect(page.locator("#skryfwerk-root .hint").first()).toHaveText(
-        "Beplan, skryf op papier onder tyd, tel jou woorde, en kyk dan na die memo."
+        "Beplan, skryf onder die DBE-tyd, tel jou woorde, en kyk eers dan na die memo. Gee jouself punte soos die rubriek."
       );
       await expect(page.locator(".sw-item")).toHaveCount(14);
       expect(await page.locator(".sw-groep h2").allTextContents()).toEqual(GROEPE);
@@ -130,6 +131,7 @@ for (const vp of VIEWPORTS) {
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
       await boot(page);
+      await eksamenOntsluit(page);
       await page.goto("/#skryfwerk");
       await expect(page.locator(".sw-item")).toHaveCount(14);
 
@@ -150,6 +152,7 @@ for (const vp of VIEWPORTS) {
       /* Self-nasien stoor net in die bestaande vraebank-sleutel */
       const voor = await otherKeys(page);
       await page.locator(`.sw-item[data-id="${ITEMS[0].id}"]`).click();
+      await page.locator(".sw-memo-knoppie").click();
       await page.locator(".sw-reg").click();
       await expect(page.locator(".sw-gestoor")).toHaveText("Gestoor.");
       const store = await page.evaluate((k) => JSON.parse(localStorage.getItem(k)), KEY);
@@ -165,10 +168,12 @@ for (const vp of VIEWPORTS) {
 
       /* "Gedeeltelik" en "Moet oordoen" stoor die ander twee uitslae */
       await page.locator(`.sw-item[data-id="${ITEMS[1].id}"]`).click();
+      await page.locator(".sw-memo-knoppie").click();
       await page.locator(".sw-gedeeltelik").click();
       await expect(page.locator(".sw-gestoor")).toHaveText("Gestoor.");
       await page.locator(".sw-terug").click();
       await page.locator(`.sw-item[data-id="${ITEMS[2].id}"]`).click();
+      await page.locator(".sw-memo-knoppie").click();
       await page.locator(".sw-fout").click();
       await expect(page.locator(".sw-gestoor")).toHaveText("Gestoor.");
       await page.locator(".sw-terug").click();
@@ -191,6 +196,7 @@ for (const vp of VIEWPORTS) {
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
       await boot(page);
+      await eksamenOntsluit(page);
       await page.goto("/#missie");
       await page.locator(".nav-more summary").click();
       await page.locator('.nav-btn[data-view="skryfwerk"]').click();

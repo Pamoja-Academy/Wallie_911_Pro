@@ -72,4 +72,21 @@ function expectNoLeaks(mock) {
   expect(other, "geen onverwagte eksterne versoeke").toEqual([]);
 }
 
-module.exports = { boot, syncLabel, runUntil, hideTab, showTab, queue, shot, expectNoLeaks, T0, ARTIFACTS };
+/* Eksamenmodus: laat die memo van elke item oop wees (die klok se begin is lank gelede), sodat ouer toetse
+   die memo/selfnasien-skerm kan bereik. Die eie eksamenmodus-toetse gebruik dit NIE. */
+async function eksamenOntsluit(page) {
+  const ids = [
+    ...JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "data", "vraebank-v3.json"), "utf8")),
+    ...JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "data", "vraebank-rtt-v1.json"), "utf8"))
+  ].map((i) => i.id);
+  await page.addInitScript((lys) => {
+    try {
+      if (localStorage.getItem("wallie911_eksamen_v1")) return;
+      const items = {};
+      lys.forEach((id) => (items[id] = { begin: 1000, konsep: "", bevestig: false, lêer: "", klaarMin: null }));
+      localStorage.setItem("wallie911_eksamen_v1", JSON.stringify({ v: 1, items }));
+    } catch (e) {}
+  }, ids);
+}
+
+module.exports = { eksamenOntsluit, boot, syncLabel, runUntil, hideTab, showTab, queue, shot, expectNoLeaks, T0, ARTIFACTS };

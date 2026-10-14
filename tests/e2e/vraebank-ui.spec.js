@@ -3,7 +3,7 @@ const { test, expect } = require("@playwright/test");
 const fs = require("fs");
 const path = require("path");
 const { MockBackend } = require("./mock-backend");
-const { boot, shot, expectNoLeaks } = require("./helpers");
+const { boot, shot, expectNoLeaks, eksamenOntsluit } = require("./helpers");
 
 const DATA = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "data", "vraebank-rtt-v1.json"), "utf8"));
 const LIST = Array.isArray(DATA) ? DATA : DATA.items;
@@ -34,6 +34,7 @@ for (const vp of VIEWPORTS) {
         if (!/^(http:\/\/localhost|data:|blob:)/.test(u) && !/fonts\.(googleapis|gstatic)\.com|supabase\.co|ntfy\.sh/.test(u)) buite.push(u);
       });
       await boot(page);
+      await eksamenOntsluit(page);
       await page.goto("/#oefenvrae");
       await expect(page.locator("#view-oefenvrae")).toHaveClass(/active/);
       await expect(page.locator("#oefenvrae-root h1")).toHaveText("Oefenvrae (RTT V1)");
@@ -55,7 +56,7 @@ for (const vp of VIEWPORTS) {
         const bron = page.locator(".oe-bron");
         await expect(bron).toBeVisible();
         await expect(bron).toHaveText(`Bron: ${it.bron.verwysing}, bl. ${it.bron.bladsy} (memo bl. ${it.bron.memo_bladsy})`);
-        await expect(page.locator(".oe-opdrag")).toHaveText("Doen dit in Excel/Word/Access of op papier, en kyk dan na die memo.");
+        await expect(page.locator(".oe-opdrag")).toHaveText("Doen dit in Excel/Word/Access of op papier onder die DBE-tyd, en kyk eers dan na die memo.");
         const wys = page.locator(".oe-memo-knoppie");
         await expect(page.locator(".oe-memo")).toBeHidden();
         await wys.click();
@@ -63,12 +64,12 @@ for (const vp of VIEWPORTS) {
         await expect(wys).toHaveText("Steek memo weg");
         if (i === eersteHtml) await page.screenshot({ path: shot(`fase1/vraebank-item-memo-${vp.name}.png`) });
         expect(await noOverflow(page), `oorloop by ${it.id}`).toBe(true);
-        await wys.click();
-        await expect(page.locator(".oe-memo")).toBeHidden();
-        await expect(wys).toHaveText("Wys memo");
         for (const t of ["Reg", "Gedeeltelik", "Fout"]) {
           expect((await page.getByRole("button", { name: t, exact: true }).boundingBox()).height).toBeGreaterThanOrEqual(44);
         }
+        await wys.click();
+        await expect(page.locator(".oe-memo")).toBeHidden();
+        await expect(wys).toHaveText("Wys memo");
         if (i < LIST.length - 1) await page.locator(".oe-volgende").click();
       }
       await expect(page.locator(".oe-volgende")).toBeDisabled();
@@ -78,6 +79,7 @@ for (const vp of VIEWPORTS) {
       await page.locator(".ov-item").first().click();
       const voor = await otherKeys(page);
       expect(await page.evaluate((k) => localStorage.getItem(k), KEY)).toBeNull();
+      await page.locator(".oe-memo-knoppie").click();
       await page.getByRole("button", { name: "Reg", exact: true }).click();
       await expect(page.locator(".oe-gestoor")).toHaveText("Gestoor.");
       const store = await page.evaluate((k) => JSON.parse(localStorage.getItem(k)), KEY);
@@ -99,6 +101,7 @@ for (const vp of VIEWPORTS) {
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
       await boot(page);
+      await eksamenOntsluit(page);
       await page.goto("/#missie");
       await page.locator(".nav-more summary").click();
       await page.locator('.nav-btn[data-view="oefenvrae"]').click();
