@@ -110,6 +110,9 @@ for (const vp of VIEWPORTS) {
       await page.goto("/#skryfwerk");
       await page.locator(`.sw-item[data-id="${item.id}"]`).click();
       await expect(page.locator(".em-bevestig")).toContainText("Ek het dit op papier geskryf");
+      /* O5: die plekhouer verwys na die blokkie en sê nie meer "tik dit oor" nie */
+      await expect(page.locator(".em-antwoord")).toHaveAttribute("placeholder", "Skryf jou antwoord hier — of skryf op papier en merk die blokkie hieronder.");
+      expect(await page.locator(".em-antwoord").evaluate((e) => e.compareDocumentPosition(document.querySelector(".em-bevestig")) & Node.DOCUMENT_POSITION_FOLLOWING), "die blokkie is ONDER die antwoordarea").toBeTruthy();
       await page.locator(".em-bevestig input").check();
       await page.locator(".em-klaar").click();
       /* Bevestig + klaar, maar nog nie 60% van die tyd nie */

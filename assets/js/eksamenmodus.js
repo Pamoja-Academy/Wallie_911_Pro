@@ -383,7 +383,7 @@
       area.rows = 12;
       area.value = rec0.konsep || "";
       area.setAttribute("aria-label", "Jou antwoord");
-      area.placeholder = "Skryf jou antwoord hier (of op papier en tik dit oor)…";
+      area.placeholder = "Skryf jou antwoord hier — of skryf op papier en merk die blokkie hieronder.";
       teller = el("p", "em-woorde", "");
       teller.setAttribute("aria-live", "polite");
       /* Wie op papier skryf, tik nie alles oor nie: dieselfde bevestiging as by die praktiese werk */
