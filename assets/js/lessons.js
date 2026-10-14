@@ -491,6 +491,18 @@ WALLIE.LESSONS = {
   }
 };
 
+/* Elke les-kaart is AGTERGROND: verduideliking om die eksamenwerk te verstaan, nie self eksamenwerk nie.
+   Net 'n kaart wat self 'n DBE-eksamenvlak-item is, sou vlak: "eksamen" kry (nog geen een nie).
+   Die sessie-taak en blok-hooftaak is nooit 'n agtergrondkaart nie (sien WALLIE.lessonUI hoofTaak). */
+Object.values(WALLIE.LESSONS).forEach((L) =>
+  L.concepts.forEach((c) => {
+    if (!c.vlak) c.vlak = "agtergrond";
+  })
+);
+WALLIE.isAgtergrond = function isAgtergrond(c) {
+  return !c || c.vlak !== "eksamen";
+};
+
 WALLIE.lessonImg = function lessonImg(slug, id) {
   return `${WALLIE.LESSON_IMG}${slug}/${id}.svg`;
 };

@@ -1,7 +1,7 @@
-/* Die LES is weer die hoofsaak op elke kaart, vir ELKE vak (klok vals, datums uit die skedule).
-   Wat dit vasvat (en wat op master faal): sedert die DBE-vraestelle bygekom het, het die matchday-kaart
-   en die Volgende-kaart by werk-blokke die vraestel in die plek van die les gewys, en die sessieskerm
-   het die les onder ’n toe <details> "Ekstra: kort les" weggesteek.
+/* Hooftaak = eksamenwerk; die les is AGTERGROND (opsioneel) en bly op elke kaart, vir ELKE vak
+   (klok vals, datums uit die skedule). PR 2 (14 Okt): die les was voorheen die hoofsaak — nou is dit die
+   eksamenvlak-item/vraestel, en die les-kaart staan daaronder as "Agtergrond (opsioneel)".
+   Steeds vasgevat: die les is sigbaar (nie in 'n toe <details> weggesteek nie).
    Alle netwerk word onderskep (mock-backend). */
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
@@ -29,6 +29,8 @@ async function kaarte(page) {
         slug: knop ? knop.dataset.slug : "",
         konsep: knop ? knop.dataset.concept || "" : "",
         vak: el.querySelector("h3") ? el.querySelector("h3").textContent : "",
+        hoof: el.querySelector(".md-hoof") ? el.querySelector(".md-hoof").textContent : "",
+        hoofSoort: el.querySelector(".md-hoof") ? el.querySelector(".md-hoof").dataset.soort : "",
         les: el.querySelector(".md-concept") ? el.querySelector(".md-concept").textContent : "",
         werk: el.querySelector(".md-werk") ? el.querySelector(".md-werk").textContent : "",
         prentGelaai: !!img && img.complete && img.naturalWidth > 0,
@@ -39,11 +41,11 @@ async function kaarte(page) {
 }
 
 for (const vp of VIEWPORTS) {
-  test.describe(`les weer hoofsaak @ ${vp.label}`, () => {
+  test.describe(`hooftaak + agtergrond-les @ ${vp.label}`, () => {
     test.use({ viewport: vp.viewport });
 
     for (const { dag, naam, tyd } of DAE) {
-      test(`${dag} (${naam}): elke kaart wys prent, "Wat leer ek?" en die konseptitel`, async ({ page, context }) => {
+      test(`${dag} (${naam}): elke kaart wys 'n hooftaak (eksamenvlak), en die les as agtergrond`, async ({ page, context }) => {
         const mock = new MockBackend({ mode: "v1" });
         await mock.attach(context);
         await boot(page, { time: new Date(tyd) });
@@ -69,10 +71,15 @@ for (const vp of VIEWPORTS) {
         for (const k of lys) {
           expect(k.prentGelaai, `${k.id} (${k.vak}): prent gelaai (${k.prentBron})`).toBe(true);
           expect(k.prentBron, `${k.id}: prent kom uit die vak se les-gids`).toMatch(/^assets\/img\/lessons\/[a-z]+\/[a-z0-9-]+\.svg$/);
-          expect(k.les, `${k.id} (${k.vak}): "Wat leer ek?" bo-aan`).toContain("Wat leer ek?");
+          expect(k.les, `${k.id} (${k.vak}): les is gemerk as agtergrond`).toContain("Agtergrond (opsioneel)");
           expect(k.konsep, `${k.id}: 'n konsep is gekies`).toBeTruthy();
-          /* Die konseptitel staan in dieselfde reël as "Wat leer ek?" */
-          expect(k.les.replace("Wat leer ek?", "").trim().length, `${k.id}: konseptitel sigbaar`).toBeGreaterThan(3);
+          const titel = k.les.replace("Agtergrond (opsioneel)", "").trim();
+          expect(titel.length, `${k.id}: konseptitel sigbaar`).toBeGreaterThan(3);
+          /* Die hooftaak is eksamenwerk, nooit die agtergrondkaart nie */
+          expect(k.hoof, `${k.id}: hooftaak is gewys`).toContain("Hooftaak");
+          expect(k.hoofSoort, `${k.id}: hooftaak-soort`).toMatch(/^(item|werk|blok|gaping)$/);
+          expect(k.hoof.replace("Hooftaak", "").trim().length, `${k.id}: hooftaak het teks`).toBeGreaterThan(3);
+          expect(k.hoof, `${k.id}: hooftaak is nie die agtergrondkaart nie`).not.toContain(titel);
           expect(k.les, `${k.id}: geen "Ekstra: kort les" meer nie`).not.toContain("Ekstra");
         }
         /* Al die vakke van die dag kom voor, en nooit LO nie */
@@ -83,6 +90,8 @@ for (const vp of VIEWPORTS) {
 
         /* Volgende-kaart: prent, konseptitel EN die 3 wenke */
         await expect(page.locator("#next-up .next-img img")).toBeVisible();
+        await expect(page.locator("#next-up .next-hoof")).toContainText("Hooftaak");
+        await expect(page.locator("#next-up .next-agtergrond")).toContainText("Agtergrond (opsioneel)");
         await expect(page.locator("#next-up .next-concept")).toBeVisible();
         await expect(page.locator("#next-up .next-cues > li")).toHaveCount(3);
 
@@ -119,10 +128,13 @@ for (const vp of VIEWPORTS) {
         /* Die les is dadelik sigbaar: prent, titel en wenke, sonder om iets oop te klik */
         const les = page.locator("#session-lesson");
         await expect(les.locator(".session-lesson-img img")).toBeVisible();
-        await expect(les.locator("h3")).toHaveText(k.les.replace("Wat leer ek?", "").trim());
+        await expect(les.locator("h3")).toHaveText(k.les.replace("Agtergrond (opsioneel)", "").trim());
+        /* Die sessie-taak is die hooftaak (eksamenvlak), nie die agtergrondkaart nie */
+        const taak = await page.locator("#session-task").inputValue();
+        expect(taak, `${k.id}: sessie-taak`).not.toContain(k.les.replace("Agtergrond (opsioneel)", "").trim());
         await expect(les.locator(".next-cues > li").first()).toBeVisible();
         await expect(les.locator("details")).toHaveCount(0);
-        await expect(les.locator(".panel-head h2")).toHaveText("Les vir hierdie sessie");
+        await expect(les.locator(".panel-head h2")).toHaveText("Agtergrond (opsioneel)");
         await page.locator("#end-session").click();
         await runUntil(page, async () => mock.byKind("end").length === begin, { label: `sessie klaar ${k.slug}` });
         await page.evaluate(() => {
@@ -143,14 +155,16 @@ for (const vp of VIEWPORTS) {
 
       /* Die werk-blok se kaart: les bo, vraestel daaronder */
       const kaart = page.locator('#block-list .md-card[data-id="2026-10-11-diagnose"]');
-      await expect(kaart.locator(".md-concept")).toContainText("Wat leer ek?");
+      await expect(kaart.locator(".md-concept")).toContainText("Agtergrond (opsioneel)");
+      await expect(kaart.locator(".md-hoof")).toContainText("Hooftaak");
       await expect(kaart.locator(".md-werk")).toContainText("Vraestel");
       await expect(kaart.locator(".md-werk")).toContainText("punte");
       const volgorde = await kaart.evaluate((el) => {
         const kids = [...el.querySelectorAll(".md-body > p")];
         return kids.map((p) => p.className);
       });
-      expect(volgorde.indexOf("md-concept"), "die les staan bo die vraestel").toBeLessThan(volgorde.indexOf("md-werk"));
+      expect(volgorde.indexOf("md-hoof"), "hooftaak staan bo die vraestel").toBeLessThan(volgorde.indexOf("md-werk"));
+      expect(volgorde.indexOf("md-werk"), "die agtergrond-les staan onder die vraestel").toBeLessThan(volgorde.indexOf("md-concept"));
 
       await kaart.locator(".start-block").click();
       await runUntil(page, async () => mock.byKind("start").length === 1, { label: "sessie begin" });

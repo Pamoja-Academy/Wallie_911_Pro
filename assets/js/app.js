@@ -925,6 +925,16 @@
         blockId: start.dataset.block
       });
     }
+    const item = e.target.closest(".open-item");
+    if (item) {
+      /* Eksamenvlak-hooftaak: spring na die item in Skryfwerk / Oefenvrae */
+      const view = item.dataset.view;
+      const opener = { skryfwerk: window.SkryfwerkUI, oefenvrae: window.OefenvraeUI }[view];
+      showView(view);
+      /* Ná die skerm se eie "lys"-herteken (MutationObserver-mikrotaak) */
+      Promise.resolve().then(() => opener?.open(item.dataset.item));
+      return;
+    }
     const done = e.target.closest(".mark-done");
     if (done) {
       const at = Date.now();

@@ -149,6 +149,77 @@
     return { reg, total };
   }
 
+  /* ---------- Hooftaak (eksamenvlak) ---------- */
+
+  /* Blokke wat self al eksamenwerk of nasienwerk is, hou hul eie titel as hooftaak. */
+  const EIE_TAAK = new Set(["merk", "herdoen", "opstel", "skrif", "toets"]);
+
+  /* Vraagbanke met eksamenvlak-items per vak; die ander vakke het nog geen nie (sien GAPING). */
+  function bankVir(slug) {
+    if (slug === "engels" || slug === "afrikaans") return (window.VRAEBANK_V3 || []).filter((i) => i.vak === slug);
+    if (slug === "rtt") return window.VRAEBANK_RTT_V1 || [];
+    return [];
+  }
+
+  /* Geen vraagbank nie: Wallie werk uit 'n amptelike DBE-vraestel, op papier, getimed. (Gaping — Hanno moet die vraestel kies.) */
+  const GAPING = {
+    gasvryheid: "Nov 2025 Gasvryheidstudie, kies 'n vraag van ±20 punte (±18 min)",
+    toerisme: "Nov 2025 Toerisme, kies 'n vraag van ±20 punte (±24 min)",
+    wiskgelett: "Nov 2025 V1 Wisk. Geletterdheid, kies 'n vraag van ±20 punte (±36 min)"
+  };
+
+  function itemKort(item) {
+    return String(item.id).replace(/^(eng|afr|rtt)-v3-|^rtt-v1-/, "");
+  }
+
+  function itemTaak(item, slug) {
+    const tyd = window.Eksamenmodus?.tydMin(item, slug) || item.tyd_min;
+    const naam = item.teksoort ? `${itemKort(item)} ${item.teksoort}` : itemKort(item);
+    return {
+      soort: "item",
+      itemId: item.id,
+      view: slug === "rtt" ? "oefenvrae" : "skryfwerk",
+      tekst: `${naam} · ${item.punte} punte${tyd ? ` · ±${tyd} min` : ""} (${item.bron?.verwysing || "DBE"})`
+    };
+  }
+
+  function pogings(id) {
+    try {
+      return window.VraebankStore ? window.VraebankStore.attempts(id).length : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  /* Die blok se EKSAMENVLAK-hooftaak. Nooit 'n agtergrondkaart nie.
+       1. blok.item (vas in die rooster) · 2. DBE-vraestel (werk) · 3. blok wat self eksamenwerk is
+       4. volgende item uit die vak se vraagbank (die minste gedoen eerste) · 5. gaping: DBE-vraestel op papier. */
+  function hoofTaak(b, werk, occurrence = 0) {
+    const slug = b.subjectSlug;
+    const bank = bankVir(slug);
+    if (b.item) {
+      const vas = (window.VRAEBANK_V3 || []).concat(window.VRAEBANK_RTT_V1 || []).find((i) => i.id === b.item);
+      if (vas) return itemTaak(vas, vas.vak || "rtt");
+    }
+    if (werk) return { soort: "werk", tekst: `${b.title} · ${DBE()?.werkLabel(werk) || ""}` };
+    if (b.soort && EIE_TAAK.has(b.soort)) return { soort: "blok", tekst: b.title };
+    if (bank.length) {
+      const orde = bank.map((it, n) => ({ it, n, p: pogings(it.id) })).sort((x, y) => x.p - y.p || x.n - y.n);
+      return itemTaak(orde[((occurrence % orde.length) + orde.length) % orde.length].it, slug);
+    }
+    const g = GAPING[slug];
+    return {
+      soort: "gaping",
+      tekst: g ? `Gebruik DBE-vraestel ${g} op papier, getimed` : b.title
+    };
+  }
+
+  function hoofKnoppie(h) {
+    return h && h.soort === "item"
+      ? `<button type="button" class="btn ghost open-item" data-view="${h.view}" data-item="${esc(h.itemId)}">Maak item oop</button>`
+      : "";
+  }
+
   /* ---------- Missie ---------- */
 
   /* Die blok se eie naam op die kaart: "Vak — naam" wys net die naam (die vak staan al in die opskrif),
@@ -179,13 +250,18 @@
     const opsomming = werkOpsomming(b, werk);
     /* Die LES is die hoofsaak op elke kaart, vir elke vak. ’n Vraestel kom as ’n ekstra reël daaronder
        by — dit vervang nooit die les nie. */
-    const task = werk ? `${b.title} · ${DBE()?.werkLabel(werk) || ""}` : c ? `${b.title} · ${c.titel}` : b.title;
+    const hoof = hoofTaak(b, werk, occurrence);
+    const task = hoof.tekst;
     const label = blockLabel(b);
+    /* Hooftaak = eksamenwerk. Die les-kaart is agtergrond (opsioneel) en kom onderaan. */
     const hoofReel =
+      `<p class="md-hoof" data-soort="${hoof.soort}"><small>Hooftaak</small>${esc(hoof.tekst)}</p>` +
+      (opsomming ? `<p class="md-werk"><small>${werk ? "Vraestel" : "Lêers"}</small>${esc(opsomming)}</p>` : "") +
       (c
-        ? `<p class="md-concept"><small>Wat leer ek?</small>${esc(c.titel)}</p>`
-        : `<p class="md-concept">${esc(b.detail)}</p>`) +
-      (opsomming ? `<p class="md-werk"><small>${werk ? "Vraestel" : "Lêers"}</small>${esc(opsomming)}</p>` : "");
+        ? `<p class="md-concept"><small>Agtergrond (opsioneel)</small>${esc(c.titel)}</p>`
+        : b.detail
+          ? `<p class="md-concept">${esc(b.detail)}</p>`
+          : "");
     return `
       <li class="md-card kind-${b.kind} ${done ? "done" : ""}" data-id="${b.id}">
         <button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c?.id || ""}" aria-label="Kyk les: ${esc(c?.titel || subjectName(slug))}">
@@ -202,7 +278,8 @@
           ${hoofReel}
           <div class="md-actions">
             <button type="button" class="btn big primary start-block" data-block="${b.id}" data-slug="${slug}" data-concept="${c?.id || ""}" data-min="${b.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin ${b.minutes} min</button>
-            ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${slug}" data-concept="${c.id}">Kyk les</button>` : ""}
+            ${hoofKnoppie(hoof)}
+            ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${slug}" data-concept="${c.id}">Agtergrond: kyk les</button>` : ""}
             <button type="button" class="btn big ghost mark-done" data-id="${b.id}" aria-label="Merk klaar">✓</button>
           </div>
         </div>
@@ -245,7 +322,8 @@
     const werk = werkKaart(state)[next.id] || null;
     const opsomming = werkOpsomming(next, werk);
     const time = next.start && next.end ? `${next.start}–${next.end} · ` : "";
-    const task = werk ? `${next.title} · ${DBE()?.werkLabel(werk) || ""}` : c ? `${next.title} · ${c.titel}` : next.title;
+    const hoof = hoofTaak(next, werk, Math.max(0, seen));
+    const task = hoof.tekst;
     el.innerHTML = `
       <div class="next-card kind-${next.kind}">
         <button type="button" class="next-img open-lesson" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" aria-label="Kyk les">
@@ -255,11 +333,13 @@
           <p class="next-kicker"><span class="zone-tag ${next.kind}">${KIND_LABEL[next.kind] || next.kind}</span> Volgende blok · ${time}${next.minutes} min</p>
           <h2>${esc(subjectName(next.subjectSlug))}</h2>
           <p class="next-titel">${esc(next.title)}</p>
-          ${c ? `<p class="next-concept">${esc(c.titel)}</p><ul class="next-cues">${c.cues.slice(0, 3).map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
+          <p class="next-hoof" data-soort="${hoof.soort}"><small>Hooftaak</small>${esc(hoof.tekst)}</p>
           ${opsomming ? `<p class="next-werk"><small>${werk ? "Vraestel" : "Lêers"}</small>${esc(opsomming)}</p>` : ""}
+          ${c ? `<p class="next-agtergrond"><small>Agtergrond (opsioneel)</small></p><p class="next-concept">${esc(c.titel)}</p><ul class="next-cues">${c.cues.slice(0, 3).map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
           <div class="md-actions">
             <button type="button" class="btn big primary js-start" data-block="${next.id}" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" data-min="${next.minutes}" data-title="${encodeURIComponent(task)}">▶ Begin nou</button>
-            ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${next.subjectSlug}" data-concept="${c.id}">Kyk les eers</button>` : ""}
+            ${hoofKnoppie(hoof)}
+            ${c ? `<button type="button" class="btn big ghost open-lesson" data-slug="${next.subjectSlug}" data-concept="${c.id}">Agtergrond: kyk les</button>` : ""}
           </div>
         </div>
       </div>`;
@@ -437,7 +517,7 @@
     const c = (conceptId && lesson(slug).concepts.find((x) => x.id === conceptId)) || pickConcept(slug, 0, sessieBlokId);
     /* Die les staan altyd oop op die sessieskerm — ook by ’n blok met ’n DBE-vraestel. */
     el.innerHTML = `
-      <div class="panel-head"><h2>Les vir hierdie sessie</h2><span class="hint">Oop hier binne — dit tel nie as wegkyk nie.</span></div>
+      <div class="panel-head"><h2>Agtergrond (opsioneel)</h2><span class="hint">Les by hierdie sessie — oop hier binne, dit tel nie as wegkyk nie. Die hooftaak is die eksamenwerk hierbo.</span></div>
       <div class="session-lesson-main">
         <button type="button" class="session-lesson-img open-lesson" data-slug="${slug}" data-concept="${c.id}" aria-label="Maak les groot oop">
           <img src="${WALLIE.lessonImg(slug, c.id)}" alt="${esc(c.titel)}" />
@@ -660,6 +740,7 @@
 
   WALLIE.lessonUI = {
     pickConcept,
+    hoofTaak,
     matchdayCard,
     renderBlocks,
     renderNextUp,
