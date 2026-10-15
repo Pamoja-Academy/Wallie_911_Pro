@@ -283,8 +283,8 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       { suffix: "klaar", kind: "break", slug: "break", start: "19:50", end: "19:50", soort: "pouse",
         title: "Klaar. Skerms af 21:30, bed 22:00.", detail: "Werk is klaar. Skerms af om 21:30, bed 22:00." }
     ],
-    /* Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): 15-20 Okt: Do 15 eksamendag Engels V3,
-       dan Afrikaans HT V3 (Di 20, ook 'n vaste eksamendag-plan) met eksamenvlak-items; elke studieblok se hooftaak is 'n item (`item`) of DBE-werk.
+    /* Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): 15-26 Okt: Do 15 eksamendag Engels V3,
+       dan Afrikaans HT V3 (Di 20), Wisk. Gel. V1 (Vr 23) en V2 (Ma 26) (ook vaste eksamendag-planne) met eksamenvlak-items; elke studieblok se hooftaak is 'n item (`item`) of DBE-werk.
        `item` is die id van 'n eksamenvlak-item (data/vraebank-v3.json) en wen as hooftaak (lesson-ui.js hoofTaak).
        Soort "voor-eksamen" is 'n ligte eksamendag-opwarm wat sy eie titel as hooftaak hou. */
     "2026-10-15": [
@@ -474,6 +474,82 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         title: "Kontrolelys en tas pak vir môre", detail: "ID, toelatingsbrief, sakrekenaar, penne, liniaal. Slaap vroeg." },
       { suffix: "klaar", kind: "break", slug: "break", start: "10:45", end: "10:45", soort: "pouse",
         title: "Klaar. Skerms af 21:00, bed 21:30.", detail: "" }
+    ],
+    /* Vr 23 Okt: Wisk. Gel. V1-eksamen 09:00-12:00; middag begin Wisk. Gel. V2 (Ma 26 Okt 09:00). */
+    "2026-10-23": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "06:45", end: "07:15", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "formules", kind: "groen", slug: "wiskgelett", start: "07:15", end: "07:35", soort: "voor-eksamen",
+        title: "Laaste kyk: formuleblad en eenhede (net lees, geen nuwe werk)", detail: "Rente, BTW, persentasie, skaal, oppervlakte en volume. Geen nuwe werk nie." },
+      { suffix: "tas", kind: "break", slug: "break", start: "07:35", end: "08:00", soort: "pouse",
+        title: "Tas: ID, toelatingsbrief, sakrekenaar, penne, liniaal", detail: "" },
+      { suffix: "eksamen", kind: "break", slug: "break", start: "09:00", end: "12:00", soort: "pouse",
+        title: "WISK. GEL. V1-EKSAMEN (skool) 09:00-12:00", detail: "150 punte, 3 uur. Sterkte!" },
+      { suffix: "rus", kind: "break", slug: "break", start: "12:00", end: "14:00", soort: "pouse",
+        title: "Rus en middagete", detail: "" },
+      { suffix: "terugskou", kind: "groen", slug: "wiskgelett", start: "14:00", end: "14:20", soort: "herdoen",
+        title: "Wisk. Gel. V1: skryf neer wat gekom het + 3 lesse vir V2", detail: "" },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "14:20", end: "14:30", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "wg-v2", kind: "groen", slug: "wiskgelett", start: "14:30", end: "15:45", soort: "toets", punte: 62,
+        title: "Wisk. Gel. V2: Vraag 1 en 2 uit 'n DBE-vraestel (Pa gee), op papier, getimed (62 punte, 75 min)", detail: "Wisk. Gel. V2 is Ma 26 Okt. Gebruik 'n amptelike DBE-vraestel en memo." },
+      { suffix: "merk-wg-v2", kind: "groen", slug: "wiskgelett", start: "15:45", end: "16:05", soort: "merk",
+        title: "Merk Wisk. Gel. Vraag 1 en 2 met die memo", detail: "" },
+      { suffix: "klaar", kind: "break", slug: "break", start: "16:05", end: "16:05", soort: "pouse",
+        title: "Klaar. Skerms af 21:30.", detail: "" }
+    ],
+    "2026-10-24": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "08:00", end: "08:30", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "wg-v2", kind: "groen", slug: "wiskgelett", start: "08:30", end: "09:45", soort: "toets", punte: 62,
+        title: "Wisk. Gel. V2: Vraag 3 en 4 uit dieselfde DBE-vraestel, op papier, getimed (62 punte, 75 min)", detail: "" },
+      { suffix: "merk-wg-v2", kind: "groen", slug: "wiskgelett", start: "09:45", end: "10:05", soort: "merk",
+        title: "Merk Wisk. Gel. Vraag 3 en 4 met die memo", detail: "" },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "10:05", end: "10:25", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "wg-v2-5", kind: "groen", slug: "wiskgelett", start: "10:25", end: "11:05", soort: "toets", punte: 26,
+        title: "Wisk. Gel. V2: Vraag 5 (die res van die DBE-vraestel), op papier, getimed (26 punte, 40 min)", detail: "" },
+      { suffix: "merk-wg-v2-5", kind: "groen", slug: "wiskgelett", start: "11:05", end: "11:25", soort: "merk",
+        title: "Merk Wisk. Gel. Vraag 5 met die memo", detail: "" },
+      { suffix: "middag", kind: "break", slug: "break", start: "11:25", end: "12:30", soort: "pouse",
+        title: "Middagete", detail: "" },
+      { suffix: "foutlog", kind: "groen", slug: "wiskgelett", start: "12:30", end: "13:00", soort: "herdoen",
+        title: "Wisk. Gel.: top-3 foute uit V1 en V2 herdoen", detail: "Net die vrae wat die meeste punte gekos het." },
+      { suffix: "klaar", kind: "break", slug: "break", start: "13:00", end: "13:00", soort: "pouse",
+        title: "Klaar. Skerms af 21:30.", detail: "" }
+    ],
+    "2026-10-25": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "08:30", end: "09:00", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "formules", kind: "groen", slug: "wiskgelett", start: "09:00", end: "09:40", soort: "herdoen",
+        title: "Wisk. Gel.: formuleblad en eenhede-omskakelings (een bladsy, uit jou kop)", detail: "" },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "09:40", end: "10:00", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "foutlog", kind: "groen", slug: "wiskgelett", start: "10:00", end: "10:40", soort: "herdoen",
+        title: "Wisk. Gel. V2: top-3 foute herdoen", detail: "" },
+      { suffix: "middag", kind: "break", slug: "break", start: "10:40", end: "13:00", soort: "pouse",
+        title: "Familie / middagete", detail: "" },
+      { suffix: "tas", kind: "groen", slug: "wiskgelett", start: "13:00", end: "13:20", soort: "voor-eksamen",
+        title: "Kontrolelys en tas pak vir môre", detail: "ID, toelatingsbrief, sakrekenaar, penne, liniaal. Slaap vroeg." },
+      { suffix: "klaar", kind: "break", slug: "break", start: "13:20", end: "13:20", soort: "pouse",
+        title: "Klaar. Skerms af 21:00, bed 21:30.", detail: "" }
+    ],
+    /* Ma 26 Okt: Wisk. Gel. V2-eksamen 09:00-12:00. Di 27 Okt het nog geen vaste plan nie (oop taak): Engels V1 is Wo 28 Okt 09:00. */
+    "2026-10-26": [
+      { suffix: "opstaan", kind: "break", slug: "break", start: "06:45", end: "07:15", soort: "pouse",
+        title: "Opstaan, ontbyt", detail: "" },
+      { suffix: "formules", kind: "groen", slug: "wiskgelett", start: "07:15", end: "07:35", soort: "voor-eksamen",
+        title: "Laaste kyk: formuleblad en eenhede (net lees, geen nuwe werk)", detail: "Geen nuwe werk nie." },
+      { suffix: "tas", kind: "break", slug: "break", start: "07:35", end: "08:00", soort: "pouse",
+        title: "Tas: ID, toelatingsbrief, sakrekenaar, penne, liniaal", detail: "" },
+      { suffix: "eksamen", kind: "break", slug: "break", start: "09:00", end: "12:00", soort: "pouse",
+        title: "WISK. GEL. V2-EKSAMEN (skool) 09:00-12:00", detail: "150 punte, 3 uur. Sterkte!" },
+      { suffix: "rus", kind: "break", slug: "break", start: "12:00", end: "14:00", soort: "pouse",
+        title: "Rus en middagete", detail: "" },
+      { suffix: "terugskou", kind: "groen", slug: "wiskgelett", start: "14:00", end: "14:20", soort: "herdoen",
+        title: "Wisk. Gel. V2: skryf neer wat gekom het", detail: "" },
+      { suffix: "klaar", kind: "break", slug: "break", start: "14:20", end: "14:20", soort: "pouse",
+        title: "Klaar. Rus: Engels V1 is Wo 28 Okt. Skerms af 21:30.", detail: "Die res van die dag is vry." }
     ]
   };
   if (VASTE_PLANNE[dateStr]) {

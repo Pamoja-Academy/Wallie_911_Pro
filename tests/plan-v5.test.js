@@ -1,4 +1,4 @@
-/* Plan v5 (15-22 Okt): die vaste dagplanne is heel (geen oorvleueling nie, minute klop, elke `item` is 'n
+/* Plan v5 (15-26 Okt): die vaste dagplanne is heel (geen oorvleueling nie, minute klop, elke `item` is 'n
    Afrikaans-item in die V3-vraagbank met dieselfde duur). `node tests/plan-v5.test.js` */
 const fs = require("fs");
 const path = require("path");
@@ -15,7 +15,7 @@ for (const lêer of ["assets/js/data.js", "assets/js/pa-konsole/exams.js", "asse
 const bank = JSON.parse(fs.readFileSync(path.join(root, "data", "vraebank-v3.json"), "utf8"));
 const items = new Map(bank.map((i) => [i.id, i]));
 
-const DAE = ["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22"];
+const DAE = ["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26"];
 const min = (t) => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
@@ -72,7 +72,7 @@ for (const dag of DAE) {
 }
 
 /* Afrikaans-minute per dag (A1/A2 = 100 min, B = 40 min, merk/herdoen/voor-eksamen soos in die plan) */
-const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30, "2026-10-19": 100 + 30 + 30 + 30, "2026-10-20": 20 + 20, "2026-10-21": 0, "2026-10-22": 0 };
+const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30, "2026-10-19": 100 + 30 + 30 + 30, "2026-10-20": 20 + 20, "2026-10-21": 0, "2026-10-22": 0, "2026-10-23": 0, "2026-10-24": 0, "2026-10-25": 0, "2026-10-26": 0 };
 for (const dag of DAE) {
   const som = ctx.WALLIE.buildDayPlan(dag)
     .blocks.filter((b) => b.kind !== "break" && b.subjectSlug === "afrikaans")
@@ -154,8 +154,69 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   }
 }
 
+/* Plan v5 (vervolg 2): Wisk. Gel. V1-eksamen Vr 23 Okt 09:00, V2 Ma 26 Okt 09:00 (150 punte, 3 uur; 1,2 min per punt).
+   Eksamen-blokke is break/pouse (by die skool, geen oortjie-slot); wg-v2-blokke is soort toets met punte, sonder item/werk. */
+{
+  const verwag = {
+    "2026-10-23": [
+      ["opstaan", "06:45", "07:15", "break"], ["formules", "07:15", "07:35", "warm"], ["tas", "07:35", "08:00", "break"], ["eksamen", "09:00", "12:00", "break"],
+      ["rus", "12:00", "14:00", "break"], ["terugskou", "14:00", "14:20", "groen"], ["pouse1", "14:20", "14:30", "break"], ["wg-v2", "14:30", "15:45", "groen"],
+      ["merk-wg-v2", "15:45", "16:05", "groen"], ["klaar", "16:05", "16:05", "break"]
+    ],
+    "2026-10-24": [
+      ["opstaan", "08:00", "08:30", "break"], ["wg-v2", "08:30", "09:45", "groen"], ["merk-wg-v2", "09:45", "10:05", "groen"], ["pouse1", "10:05", "10:25", "break"],
+      ["wg-v2-5", "10:25", "11:05", "groen"], ["merk-wg-v2-5", "11:05", "11:25", "groen"], ["middag", "11:25", "12:30", "break"], ["foutlog", "12:30", "13:00", "groen"], ["klaar", "13:00", "13:00", "break"]
+    ],
+    "2026-10-25": [
+      ["opstaan", "08:30", "09:00", "break"], ["formules", "09:00", "09:40", "groen"], ["pouse1", "09:40", "10:00", "break"], ["foutlog", "10:00", "10:40", "groen"],
+      ["middag", "10:40", "13:00", "break"], ["tas", "13:00", "13:20", "warm"], ["klaar", "13:20", "13:20", "break"]
+    ],
+    "2026-10-26": [
+      ["opstaan", "06:45", "07:15", "break"], ["formules", "07:15", "07:35", "warm"], ["tas", "07:35", "08:00", "break"], ["eksamen", "09:00", "12:00", "break"],
+      ["rus", "12:00", "14:00", "break"], ["terugskou", "14:00", "14:20", "groen"], ["klaar", "14:20", "14:20", "break"]
+    ]
+  };
+  for (const [dag, lysVerwag] of Object.entries(verwag)) {
+    const plan = ctx.WALLIE.buildDayPlan(dag);
+    const lys = plan.blocks;
+    if (lys.map((b) => b.id).join() !== lysVerwag.map(([s]) => `${dag}-${s}`).join()) fails.push(`${dag}: blokke of volgorde verskil van die plan`);
+    lysVerwag.forEach(([s, a, e, kind]) => {
+      const b = lys.find((x) => x.id === `${dag}-${s}`);
+      if (!b || b.start !== a || b.end !== e) fails.push(`${dag} ${s}: tye ${b && b.start}-${b && b.end}, verwag ${a}-${e}`);
+      if (b && b.kind !== kind) fails.push(`${dag} ${s}: kind ${b.kind}, verwag ${kind}`);
+      if (b && kind === "groen" && b.subjectSlug !== "wiskgelett") fails.push(`${dag} ${s}: groen blok moet wiskgelett wees`);
+      if (b && kind === "break" && (b.subjectSlug !== "break" || b.soort !== "pouse")) fails.push(`${dag} ${s}: pouse moet break/break/pouse wees`);
+      if (b && b.minutes !== min(e) - min(a)) fails.push(`${dag} ${s}: minute ${b.minutes} ≠ ${min(e) - min(a)}`);
+      if (b && (b.item || b.werk)) fails.push(`${dag} ${s}: Wisk. Gel. het geen item/werk nie`);
+    });
+    const studie = lys.filter((b) => b.kind !== "break").reduce((x, b) => x + b.minutes, 0);
+    if (plan.totalMinutes !== studie) fails.push(`${dag}: totalMinutes ${plan.totalMinutes} ≠ ${studie}`);
+  }
+  /* Eksamen-blokke: break, 09:00-12:00 by die skool */
+  for (const [dag, naam] of [["2026-10-23", "V1"], ["2026-10-26", "V2"]]) {
+    const b = ctx.WALLIE.buildDayPlan(dag).blocks.find((x) => x.id === `${dag}-eksamen`);
+    if (!b || b.kind !== "break" || b.start !== "09:00" || b.end !== "12:00") fails.push(`${dag}: eksamen-blok moet break 09:00-12:00 wees`);
+    if (b && !new RegExp(`WISK. GEL. ${naam}-EKSAMEN`).test(b.title)) fails.push(`${dag}: eksamen-titel noem nie ${naam} nie`);
+  }
+  /* wg-v2-blokke: soort toets, gegewe punte; 1,2 min per punt moet binne die blok pas */
+  for (const [dag, id, punte, minute] of [["2026-10-23", "wg-v2", 62, 75], ["2026-10-24", "wg-v2", 62, 75], ["2026-10-24", "wg-v2-5", 26, 40]]) {
+    const b = ctx.WALLIE.buildDayPlan(dag).blocks.find((x) => x.id === `${dag}-${id}`);
+    if (!b || b.soort !== "toets" || b.punte !== punte || b.minutes !== minute) fails.push(`${dag}-${id}: moet soort toets, ${punte} punte, ${minute} min wees`);
+    if (b && b.minutes < Math.round(punte * 1.2)) fails.push(`${dag}-${id}: ${b.minutes} min is te min vir ${punte} punte (1,2 min per punt)`);
+  }
+  if (ctx.WALLIE.buildDayPlan("2026-10-23").totalMinutes !== 20 + 20 + 75 + 20) fails.push("23 Okt: totalMinutes verwag 135");
+  if (ctx.WALLIE.buildDayPlan("2026-10-24").totalMinutes !== 75 + 20 + 40 + 20 + 30) fails.push("24 Okt: totalMinutes verwag 185");
+  if (ctx.WALLIE.buildDayPlan("2026-10-25").totalMinutes !== 40 + 40 + 20) fails.push("25 Okt: totalMinutes verwag 100");
+  if (ctx.WALLIE.buildDayPlan("2026-10-26").totalMinutes !== 20 + 20) fails.push("26 Okt: totalMinutes verwag 40");
+  /* Eksamenrooster: Wisk. Gel. V1 Vr 23 Okt 09:00, V2 Ma 26 Okt 09:00 */
+  for (const [re, at] of [[/V1/, "2026-10-23T09:00"], [/V2/, "2026-10-26T09:00"]]) {
+    const ex = ctx.PK.EXAMS.find((x) => x.s === "wiskgelett" && re.test(x.n));
+    if (!ex || !ex.at.startsWith(at)) fails.push(`Wisk. Gel. ${re} se eksamen is nie ${at} nie (${ex && ex.at})`);
+  }
+}
+
 /* "voor-eksamen" is 'n studieblok (nie 'n pouse nie) met kind "warm" (opwarm), sodat Pa se oorsig dit nooit vlag nie */
-for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2026-10-19", "2026-10-19-tas", "warm"], ["2026-10-20", "2026-10-20-formaat", "warm"], ["2026-10-22", "2026-10-22-tas", "warm"]]) {
+for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2026-10-19", "2026-10-19-tas", "warm"], ["2026-10-20", "2026-10-20-formaat", "warm"], ["2026-10-22", "2026-10-22-tas", "warm"], ["2026-10-23", "2026-10-23-formules", "warm"], ["2026-10-25", "2026-10-25-tas", "warm"], ["2026-10-26", "2026-10-26-formules", "warm"]]) {
   const b = ctx.WALLIE.buildDayPlan(dag).blocks.find((x) => x.id === id);
   if (!b || b.soort !== "voor-eksamen") fails.push(`${id}: soort moet voor-eksamen wees`);
   if (b && b.kind !== kind) fails.push(`${id}: kind is ${b.kind}, verwag ${kind}`);
