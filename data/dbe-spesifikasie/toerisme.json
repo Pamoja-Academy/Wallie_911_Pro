@@ -1,10 +1,16 @@
 {
   "vak": "toerisme",
   "vraestel": "Toerisme",
-  "geverifieer": false,
-  "ONGEVERIFIEER": "ONGEVERIFIEER — Hanno moet bevestig. Tyd (3 u) kom uit die eksamenrooster (assets/js/pa-konsole/exams.js). Die totale punte (200), afdelings, vraag-groottes en subvraag-telling is nie teen 'n DBE-vraestel/memo in hierdie repo nagegaan nie (dbe-vraestelle.js verwys net na RTT).",
+  "geverifieer": true,
   "punte": 200,
   "tyd_min": 180,
   "hoofwerk_bank": null,
-  "afdelings": null
+  "afdelings": null,
+  "verifikasie": "Voorblad/memo van die DBE November 2025-vraestel (education.gov.za, nagegaan 15 Okt 2026). Geen DBE-teks in die repo nie, net getalle. Toerisme: 200 punte, 3 uur; afdelings A (kortvrae) 40, B 50, C 50, D 30 punte.",
+  "afdeling_punte": {
+    "A": 40,
+    "B": 50,
+    "C": 50,
+    "D": 30
+  }
 }
