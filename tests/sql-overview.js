@@ -102,6 +102,29 @@ async function overviewTests(db, { ok, eq, v2 }) {
   ]);
   const o2 = await ov("2026-09-28", "2026-10-05T11:05:00Z");
   ok(o2.sessions.find((s) => s.session_id === "s_v1")?.minutes === 30, "v1-ry: minute uit end-gebeurtenis, nie uit sinktyd nie");
+
+  /* S2: 'n v3_poging (migrasie 004) verander die oorsig se blokke, sessies, surveys, probleme of tellings NIE;
+     dit verskyn net as een gewone gebeurtenis in die dag-stroom (events). */
+  {
+    const dag = "2026-10-05";
+    const nou = "2026-10-05T11:05:00Z";
+    const voor = await ov(dag, nou);
+    const pog = (id, extra) => ({
+      kind: "v3_poging", event_id: id, client_at: T("2026-10-05T10:30:00Z"), title: "EKSAMENPOGING eng-v3-B1", body: "eng-v3-B1 · 40/50 punte",
+      data: { item_id: "eng-v3-B1", vak: "engels", punte_behaal: 40, punte_totaal: 50, woorde: 270, minute_gebruik: 71, tyd_min: 80, memo_oopgemaak_na_min: 79 }, ...extra
+    });
+    ok((await v2(pog("v3_poging:eng-v3-B1:1791455400000"))).ok, "oorsig: v3_poging sonder sessie aanvaar");
+    ok((await v2(pog("v3_poging:eng-v3-B1:1791455500000", { session_id: "s_ove1", subject: "Engels EAT", block_id: "2026-10-05-eng1" }))).ok, "oorsig: v3_poging met sessie en blok aanvaar");
+    const na = await ov(dag, nou);
+    for (const sleutel of ["blocks", "sessions", "surveys", "problems", "stills", "current", "today_by_subject", "week_by_subject"]) {
+      eq(na[sleutel], voor[sleutel], `oorsig: ${sleutel} onveranderd deur v3_poging`);
+    }
+    ok(na.sessions.length === voor.sessions.length && na.blocks.length === voor.blocks.length, "oorsig: v3_poging tel nie as blok of sessie nie");
+    ok(!na.surveys.some((x) => x.kind === "v3_poging") && !na.problems.some((x) => /EKSAMENPOGING/.test(x.title || "")), "oorsig: v3_poging is nie 'n survey of probleem nie");
+    eq(na.events.length, voor.events.length + 2, "oorsig: net die dag-stroom (events) kry die twee v3_poging-gebeure");
+    eq(na.events.filter((e) => e.kind === "v3_poging").length, 2, "oorsig: events het presies twee v3_poging");
+    eq(na.events.filter((e) => e.kind !== "v3_poging"), voor.events, "oorsig: die ander gebeure onveranderd");
+  }
 }
 
 module.exports = { overviewTests };

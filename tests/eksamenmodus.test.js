@@ -251,7 +251,18 @@ eq(
   ["item_id", "memo_oopgemaak_na_min", "minute_gebruik", "punte_behaal", "punte_totaal", "tyd_min", "vak", "woorde"],
   "event-velde"
 );
-ok(E.EVENT.kind === null, "event staan AF totdat die bediener die soort aanvaar");
+eq(E.EVENT.kind, "v3_poging", "event-soort is v3_poging (Hanno het dit op 15 Okt goedgekeur; migrasie 004)");
+/* data: waardes en tipes, nul-velde vir praktiese items (woorde/memo kan null wees) */
+eq(
+  E.eventData(A1, "engels", { behaal: 40, totaal: 50, woorde: 270, minuteGebruik: 71, tydMin: 80, memoNaMin: 79 }),
+  { item_id: A1.id, vak: "engels", punte_behaal: 40, punte_totaal: 50, woorde: 270, minute_gebruik: 71, tyd_min: 80, memo_oopgemaak_na_min: 79 },
+  "event-waardes"
+);
+eq(
+  E.eventData(A1, "rtt", { behaal: 3, totaal: 6, woorde: null, minuteGebruik: 5, tydMin: 8, memoNaMin: null }).woorde,
+  null,
+  "woorde = null vir 'n praktiese item"
+);
 
 if (fails.length) {
   console.error("eksamenmodus: FOUT\n - " + fails.join("\n - "));

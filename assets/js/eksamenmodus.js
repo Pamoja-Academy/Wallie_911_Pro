@@ -9,8 +9,10 @@
        (vorige = geargiveerde vorige pogings, nuutste laaste; sedert = wanneer Wallie self 'n nuwe poging begin het;
         begin_eie / sedert_vorige = die oorskrewe waarde van begin / sedert, bewaar sodat niks verlore gaan nie, sien metBewaring)
      wallie911_vraebank_v1 (VraebankStore.saveAttempt) kry die punte-poging as ekstra velde.
-   Die bediener-event (EVENT.kind) is AF tot Hanno die bediener-skema goedkeur: 'wallie_ingest_v2' aanvaar net
-   'n vaste lys event-soorte (migrations/001). Sien EVENT hieronder.
+   Bediener-event: elke gestoorde punte-poging stuur EEN event van soort "v3_poging" (EVENT.kind) via WALLIE.SYNC.enqueue,
+   met NET die agt velde van eventData (geen konsep-teks, geen persoonlike data). Hanno het die soort op 15 Okt 2026
+   goedgekeur; 'wallie_ingest_v2' ken dit eers ná migrations/004_v3_poging.sql (deur Hanno toegepas). Tot dan wag die
+   event "geparkeer" in die sync-tou (sync.js, parkOnBadKind) en lewer vanself af. Sien EVENT hieronder.
 
    Alle teks via textContent (nooit innerHTML met item-teks nie). */
 (function (root, factory) {
@@ -30,9 +32,9 @@
     gasvryheid: { min: 180, punte: 200 } /* ONGEVERIFIEER (Hanno) */
   };
 
-  /* Bediener-event. kind = null → NIKS word gestuur nie (die poging bly plaaslik).
-     Sit dit op "v3_poging" (of "eksamen_poging") SODRA wallie_ingest_v2 daardie soort aanvaar. */
-  const EVENT = { kind: null };
+  /* Bediener-event: een konstante soort. event_id = "v3_poging:<item_id>:<poging-tyd>" (poging-tyd = ms van die
+     "Stoor my punte"-klik), dus uniek en deterministies per poging; 'n herstuur ontdubbel op event_id. */
+  const EVENT = { kind: "v3_poging" };
 
   /* ---------- suiwer logika (getoets in tests/eksamenmodus.test.js) ---------- */
 
@@ -307,12 +309,13 @@
     return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
   }
 
-  function stuurEvent(item, vak, st) {
+  /* at = tyd (ms) van die poging; 'n fout hier mag nooit die UI breek nie (alles in try/catch) */
+  function stuurEvent(item, vak, st, at) {
     if (!EVENT.kind) return false;
     try {
       const S = window.WALLIE && window.WALLIE.SYNC;
       if (!S || !S.enqueue) return false;
-      const at = Date.now();
+      at = Number.isFinite(at) ? at : Date.now();
       S.enqueue(EVENT.kind + ":" + item.id + ":" + at, {
         kind: EVENT.kind,
         client_at: at,
@@ -669,7 +672,7 @@
       };
       const uitslag = uitslagVan(t.behaal, t.totaal);
       const poging = store && store.saveAttempt(item.id, uitslag, eventData(item, vak, st));
-      if (poging) stuurEvent(item, vak, st);
+      if (poging) stuurEvent(item, vak, st, eind);
       stoorMeld.textContent = poging ? "Gestoor: " + t.behaal + " / " + t.totaal + " punte." : "Kon nie stoor nie.";
     });
 

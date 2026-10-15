@@ -4,7 +4,7 @@ const { test, expect } = require("@playwright/test");
 const fs = require("fs");
 const path = require("path");
 const { MockBackend } = require("./mock-backend");
-const { boot, expectNoLeaks } = require("./helpers");
+const { boot, expectNoLeaks, queue } = require("./helpers");
 
 const V3 = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "data", "vraebank-v3.json"), "utf8"));
 const RTT = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "data", "vraebank-rtt-v1.json"), "utf8"));
@@ -20,6 +20,22 @@ const nuwePoging = async (page) => {
   await page.locator(".em-nuut").click();
   await page.locator(".em-nuut-ja").click();
 };
+const ACHT_VELDE = ["item_id", "memo_oopgemaak_na_min", "minute_gebruik", "punte_behaal", "punte_totaal", "tyd_min", "vak", "woorde"];
+/* Doen een volledige skryf-poging (min. woorde → klaar → memo → punte) en druk "Stoor my punte"; gee die verwagte punte terug */
+async function doenSkryfPoging(page, item) {
+  await page.goto("/#skryfwerk");
+  await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+  await page.locator(".em-antwoord").fill(woorde(item.woorde.min));
+  await page.locator(".em-klaar").click();
+  await expect(page.locator(".em-memo-knoppie")).toBeEnabled();
+  await page.locator(".em-memo-knoppie").click();
+  const inps = page.locator(".em-punt-inp");
+  await inps.nth(0).fill(String(item.nasienriglyn[0].punte));
+  await inps.nth(1).fill("5");
+  await page.locator(".em-stoor-punte").click();
+  await expect(page.locator(".em-gestoor")).toContainText("Gestoor");
+  return item.nasienriglyn[0].punte + 5;
+}
 const woorde = (n) => Array.from({ length: n }, (_, i) => "woord" + i).join(" ");
 
 for (const vp of VIEWPORTS) {
@@ -83,7 +99,84 @@ for (const vp of VIEWPORTS) {
       /* Die ou drie knoppies bly as ekstra */
       await expect(page.locator(".sw-reg")).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
-      /* Geen bediener-event solank die soort nie goedgekeur is nie */
+      /* Die bediener-event (v3_poging) word in die volgende toets nagegaan; hier net: niks lek na buite nie */
+      expectNoLeaks(mock);
+    });
+
+    test("v3_poging: ná 'Stoor my punte' presies EEN event met die 8 velde (sync-tou/mock v2)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "eng-v3-B1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      await boot(page);
+      const behaal = await doenSkryfPoging(page, item);
+      await expect.poll(() => mock.byKind("v3_poging").length, { timeout: 10000 }).toBe(1);
+      /* 'n bykomende wag: geen tweede stuur nie */
+      await page.clock.runFor(2000);
+      expect(mock.ingests().filter((c) => c.body.p.kind === "v3_poging")).toHaveLength(1);
+      const e = mock.byKind("v3_poging")[0].body.p;
+      expect(e.kind).toBe("v3_poging");
+      expect(e.event_id).toMatch(/^v3_poging:eng-v3-B1:\d+$/);
+      expect(Object.keys(e.data).sort()).toEqual(ACHT_VELDE);
+      expect(e.data.item_id).toBe(item.id);
+      expect(e.data.vak).toBe("engels");
+      expect(e.data.punte_behaal).toBe(behaal);
+      expect(e.data.punte_totaal).toBe(item.punte);
+      expect(e.data.woorde).toBe(item.woorde.min);
+      expect(e.data.minute_gebruik).toBeGreaterThanOrEqual(0);
+      expect(e.data.tyd_min).toBe(item.tyd_min);
+      expect(typeof e.data.memo_oopgemaak_na_min).toBe("number");
+      /* Geen konsep-teks of ander persoonlike data in die payload nie */
+      expect(JSON.stringify(e)).not.toContain("woord10");
+      /* Aflewering klaar: tou leeg, en die mock het presies een v3_poging-ry */
+      expect(await queue(page)).toEqual([]);
+      expect(mock.events.filter((x) => x.kind === "v3_poging")).toHaveLength(1);
+      expectNoLeaks(mock);
+      expect(mock.external.filter((u) => !/fonts\.(googleapis|gstatic)\.com/.test(u))).toEqual([]);
+    });
+
+    test("v3_poging: bediener ken die soort nog nie ('bad kind') → geparkeer, aanwyser normaal, res lewer af, later vanself", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "eng-v3-B1");
+      /* "visibility" is 'n ou soort wat hier ook onbekend is: bad kind bly "dead" vir ander soorte (ongewysigde gedrag) */
+      const mock = new MockBackend({ mode: "v2", unknownKinds: ["v3_poging", "visibility"] });
+      await mock.attach(context);
+      await boot(page);
+      await doenSkryfPoging(page, item);
+      await expect.poll(() => mock.calls.filter((c) => c.body?.p?.kind === "v3_poging").length, { timeout: 10000 }).toBe(1);
+      await expect.poll(async () => (await queue(page)).find((q) => q.kind === "v3_poging")?.state, { timeout: 10000 }).toBe("parked");
+      expect(mock.byKind("v3_poging")).toHaveLength(0);
+      const parked = (await queue(page)).find((q) => q.kind === "v3_poging");
+      expect(parked.lastError).toContain("004");
+
+      /* Wallie se aanwyser: groen/normaal, geen rooi, geen "wag vir Pa se bediener-opgradering" nie */
+      const pil = page.locator("#sync-pill");
+      await expect(pil).toHaveAttribute("data-level", "ok");
+      await expect(page.locator("#sync-label")).toHaveText("Gesinkroniseer");
+      expect(await pil.getAttribute("title")).not.toContain("bediener-opgradering");
+      const st = await page.evaluate(() => WALLIE.SYNC.status());
+      expect(st).toMatchObject({ level: "ok", pending: 0, parked: 0, dead: 0 });
+
+      /* Die res van die tou lewer steeds af; 'n ander soort met 'bad kind' bly "dead" */
+      await page.evaluate(() => {
+        WALLIE.SYNC.enqueue("probleem:v3p-1", { kind: "probleem", title: "PROBLEEM", body: "toets" });
+        WALLIE.SYNC.enqueue("visibility:v3p-1", { kind: "visibility", title: "sigbaarheid", body: "toets" });
+      });
+      await expect.poll(() => mock.byKind("probleem").length, { timeout: 10000 }).toBe(1);
+      await expect.poll(async () => (await queue(page)).find((q) => q.kind === "visibility")?.state, { timeout: 10000 }).toBe("dead");
+      expect((await queue(page)).find((q) => q.kind === "v3_poging").state).toBe("parked");
+
+      /* Herlaai: die geparkeerde item oorleef en bly 'n stil, normale aanwyser */
+      await page.reload();
+      await expect.poll(async () => (await queue(page)).find((q) => q.kind === "v3_poging")?.state).toBe("parked");
+      await expect(page.locator("#sync-pill")).toHaveAttribute("data-level", "ok");
+      expect(await page.evaluate(() => WALLIE.SYNC.status().parked)).toBe(0);
+
+      /* Hanno pas 004 toe: die volgende herpoging-venster (v2RecheckMs = 30 min) lewer dit vanself af */
+      mock.unknownKinds = ["visibility"];
+      await page.clock.fastForward(31 * 60 * 1000);
+      await page.clock.runFor(25000);
+      await expect.poll(() => mock.byKind("v3_poging").length, { timeout: 10000 }).toBe(1);
+      await expect.poll(async () => (await queue(page)).some((q) => q.kind === "v3_poging"), { timeout: 10000 }).toBe(false);
+      expect(mock.byKind("v3_poging")[0].body.p.data.item_id).toBe(item.id);
       expectNoLeaks(mock);
     });
 
@@ -418,6 +511,11 @@ for (const vp of VIEWPORTS) {
       expect(p.punte_behaal).toBe(item.punte);
       expect(p.uitslag).toBe("reg");
       expect(p.woorde).toBeUndefined();
+      /* Een v3_poging-event: woorde = null vir 'n praktiese item, punte volgens die rubriek */
+      await expect.poll(() => mock.byKind("v3_poging").length, { timeout: 10000 }).toBe(1);
+      const ev = mock.byKind("v3_poging")[0].body.p;
+      expect(Object.keys(ev.data).sort()).toEqual(ACHT_VELDE);
+      expect(ev.data).toMatchObject({ item_id: item.id, vak: "rtt", punte_behaal: item.punte, punte_totaal: item.punte, woorde: null });
       expect(await noOverflow(page)).toBe(true);
       expectNoLeaks(mock);
     });
