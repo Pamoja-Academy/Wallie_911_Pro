@@ -123,6 +123,83 @@ async function main() {
   ok(g.e === true && g.s === false && g.ss === false, "anon: execute op v2, geen lees/skryf op events, geen lees op support nie");
 
   await overviewTests(db, { ok, eq, v2 });
+
+  /* ---------- 004: v3_poging (S3) ---------- */
+  {
+    const { newDb: nuweDb } = require("./sql-helpers");
+    const lees = (f) => fs.readFileSync(path.join(root, "migrations", f), "utf8");
+    const alle = migrationFiles();
+    ok(alle.includes("004_v3_poging.sql"), "004_v3_poging.sql bestaan");
+    const tot003 = alle.filter((f) => f < "004");
+    eq(tot003, ["001_wallie_ingest_v2.sql", "002_pa_overview.sql", "003_support_hulp.sql"], "001..003 is die toestand voor 004");
+    const funksieBron = async (d, naam) => (await d.query("select pg_get_functiondef(p.oid) d from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = $1", [naam])).rows[0].d;
+
+    const poging = {
+      item_id: "eng-v3-B1", vak: "engels", punte_behaal: 40, punte_totaal: 50, woorde: 270,
+      minute_gebruik: 71, tyd_min: 80, memo_oopgemaak_na_min: 79
+    };
+    const ev = (id, extra) => ({
+      kind: "v3_poging", event_id: id, client_at: 1791455400000, device_id: "d_v3",
+      title: "EKSAMENPOGING eng-v3-B1", body: "eng-v3-B1 · 40/50 punte", data: poging, ...extra
+    });
+
+    /* (a) net 001..003: weier met 'bad kind' */
+    const oud = await nuweDb({ migrations: false });
+    for (const f of tot003) await oud.exec(lees(f));
+    const oudV2 = async (p) => (await oud.query("select public.wallie_ingest_v2($1::jsonb) r", [JSON.stringify(p)])).rows[0].r;
+    const oudV1 = async (p) => (await oud.query("select public.wallie_ingest($1::jsonb) r", [JSON.stringify(p)])).rows[0].r;
+    eq(await oudV2(ev("v3_poging:eng-v3-B1:1791455400000")), { ok: false, error: "bad kind" }, "voor 004: v2 weier v3_poging met 'bad kind'");
+    ok((await oud.query("select count(*)::int n from wallie911.events where kind = 'v3_poging'")).rows[0].n === 0, "voor 004: niks gestoor nie");
+    const v1Bron = await funksieBron(oud, "wallie_ingest");
+    const v2BronVoor = await funksieBron(oud, "wallie_ingest_v2");
+    const oudEvents = (await oud.query("select count(*)::int n from wallie911.events")).rows[0].n;
+
+    /* (b) ná 004: aanvaar, data met presies die 8 velde */
+    const sql004 = lees("004_v3_poging.sql");
+    await oud.exec(sql004);
+    await oud.exec(sql004); /* idempotent */
+    const r1 = await oudV2(ev("v3_poging:eng-v3-B1:1791455400000"));
+    eq(r1, { ok: true, duplicate: false }, "ná 004: v2 aanvaar v3_poging");
+    const ry = (await oud.query("select kind, title, body, data, client_event_id, device_id, session_id from wallie911.events where kind = 'v3_poging'")).rows;
+    eq(ry.length, 1, "ná 004: een v3_poging-ry");
+    eq(Object.keys(ry[0].data).sort(), ["item_id", "memo_oopgemaak_na_min", "minute_gebruik", "punte_behaal", "punte_totaal", "tyd_min", "vak", "woorde"], "data het presies die 8 velde");
+    eq(ry[0].data, poging, "data-waardes onveranderd (jsonb)");
+    eq([ry[0].title, ry[0].body, ry[0].client_event_id, ry[0].device_id, ry[0].session_id], ["EKSAMENPOGING eng-v3-B1", "eng-v3-B1 · 40/50 punte", "v3_poging:eng-v3-B1:1791455400000", "d_v3", null], "title, body en client_event_id behou");
+    /* geen sessie-/lewendig-/presence-effek nie */
+    eq((await oud.query("select count(*)::int n from wallie911.live")).rows[0].n, 0, "v3_poging maak geen lewendige sessie nie");
+    eq((await oud.query("select count(*)::int n from wallie911.presence")).rows[0].n, 0, "v3_poging skryf geen presence nie");
+
+    /* (c) herhaling met dieselfde event_id */
+    eq(await oudV2(ev("v3_poging:eng-v3-B1:1791455400000")), { ok: true, duplicate: true }, "herhaling gee duplicate: true");
+    eq((await oud.query("select count(*)::int n from wallie911.events where kind = 'v3_poging'")).rows[0].n, 1, "herhaling gee nie 'n tweede ry nie");
+    eq(await oudV2(ev("v3_poging:eng-v3-B1:1791455500000")), { ok: true, duplicate: false }, "'n ander poging (ander tyd) is 'n nuwe ry");
+
+    /* (d) alle ou soorte werk steeds */
+    for (const k of ["start", "heartbeat", "warn", "lock", "unlock", "memo", "end", "survey", "pa-survey", "probleem", "offline", "idle", "active", "visibility", "block"]) {
+      const r = await oudV2({ kind: k, event_id: `${k}:s_004:1`, session_id: "s_004", client_at: 1791455400000, subject: "Engels EAT", block_id: "b_004" });
+      ok(r.ok === true, `ná 004: ou soort ${k} werk steeds`);
+    }
+    eq((await oudV2({ kind: "nope", event_id: "x:1" })).error, "bad kind", "ná 004: onbekende soort word steeds geweier");
+    eq((await oudV2({ kind: "v3_poging" })).error, "no event_id", "ná 004: v3_poging sonder event_id word geweier");
+
+    /* (e) die ou v1-funksie is onveranderd en ken v3_poging steeds nie */
+    eq(await funksieBron(oud, "wallie_ingest"), v1Bron, "wallie_ingest (v1) se bron onveranderd deur 004");
+    eq((await oudV1({ kind: "v3_poging" })).error, "bad kind", "v1 weier v3_poging steeds");
+    ok(v2BronVoor !== (await funksieBron(oud, "wallie_ingest_v2")), "net v2 se bron het verander");
+    ok(!v2BronVoor.includes("v3_poging") && (await funksieBron(oud, "wallie_ingest_v2")).includes("v3_poging"), "v2-bron: v3_poging net ná 004");
+
+    /* 004 raak geen bestaande rye nie: net die twee v3_poging-rye + ou-soort-rye van hierdie toets bygekom */
+    ok(oudEvents === 0, "voor 004 was die gebeure-tabel leeg (niks om te raak nie)");
+    /* regte bly: anon mag die funksie roep */
+    ok((await oud.query("select has_function_privilege('anon', 'public.wallie_ingest_v2(jsonb)', 'execute') e")).rows[0].e === true, "anon kan v2 steeds roep");
+
+    /* 004 sit net die funksie vervang: geen DDL op tabelle, geen DML op wallie911 nie (bron-kontrole) */
+    const kaal = sql004.split("\n").filter((l) => !l.trim().startsWith("--")).join("\n");
+    const fnEind = kaal.indexOf("end " + "$$;") + 7;
+    const buite = kaal.slice(0, kaal.indexOf("create or replace function")) + kaal.slice(fnEind);
+    ok(!/\b(create|alter|drop)\s+table\b/i.test(kaal), "004: geen tabel-DDL");
+    ok(!/^\s*(insert\s+into|update|delete\s+from)\b/im.test(buite), "004: geen insert/update/delete buite die funksie nie");
+  }
   /* wallie911.support: kolomme == skema-fiksture, en die Hulp-paneel se presiese liggaam word aanvaar */
   {
     const fx = JSON.parse(fs.readFileSync(path.join(root, "tests/fixtures/support-schema.json"), "utf8"));

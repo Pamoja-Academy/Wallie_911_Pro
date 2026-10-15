@@ -4,13 +4,15 @@
    - Stuur eers via wallie_ingest_v2 (migrations/001). Bestaan dit nog nie op die bediener nie (PGRST202 / 404),
      val terug na die bestaande wallie_ingest. Soorte wat die ou funksie nie ken nie, wag in die tou ("geparkeer")
      tot die migrasie toegepas is — hulle gaan nie verlore nie en hou nie ander gebeure terug nie.
+   - v3_poging (migrations/004): ken die bediener die soort nog nie ('bad kind'), dan "geparkeer" i.p.v. "dead",
+     met dieselfde herpoging-venster (v2RecheckMs); dit tel nie in Wallie se aanwyser nie (parkOnBadKind / quietParkedKinds).
    - Een slegte gebeurtenis blokkeer nooit die res nie (geen "head-of-line" meer nie); elke versoek het ’n tydlimiet.
    - Terugvul: alle historiese sessies, surveys en probleme in wallie911_v2_bok (ou en nuwe weergawes deel die sleutel)
      word by elke laai nagegaan en wat nog nie gestuur is nie, word in die tou gesit.
    - As sinkronisering langer as 10 min misluk, kry Pa ’n ntfy-waarskuwing. */
 window.WALLIE = window.WALLIE || {};
 
-WALLIE.APP_VERSION = "2026-10-15d";
+WALLIE.APP_VERSION = "2026-10-15e";
 
 WALLIE.SYNC = {
   key: "wallie911_sync_v2",
@@ -27,6 +29,12 @@ WALLIE.SYNC = {
   tickMs: 20000,
   requestTimeoutMs: 15000,
   v2RecheckMs: 30 * 60 * 1000,
+  /* Soorte wat Hanno goedgekeur het maar waarvan die bediener-migrasie dalk nog nie toegepas is nie:
+     'bad kind' van wallie_ingest_v2 = "geparkeer" (nie "dead" nie). Alle ander soorte: 'bad kind' bly "dead". */
+  parkOnBadKind: ["v3_poging"],
+  /* Geparkeerde soorte wat nie in Wallie se aanwyser of "wag vir Pa se bediener-opgradering"-boodskap tel nie:
+     rooster (002) en v3_poging (004) is agtergrond-inligting vir Pa. */
+  quietParkedKinds: ["plan", "v3_poging"],
   heartbeatStaleForV1Ms: 2 * 60 * 1000,
   maxHeartbeats: 1500,
   maxQueue: 6000,
@@ -227,6 +235,10 @@ WALLIE.SYNC = {
         box.v2CheckedAt = now;
       } else if (res.transient) {
         return { result: "retry", error: res.error };
+      } else if (res.error === "bad kind" && this.parkOnBadKind.includes(item.kind)) {
+        /* Soort goedgekeur maar migrasie nog nie toegepas nie (v3_poging → migrations/004): wag, nie dood nie.
+           Die gewone herpoging (nextTryAt = v2RecheckMs) lewer dit self af sodra die bediener die soort ken. */
+        return { result: "parked", error: "wag vir bediener-opgradering (004)" };
       } else {
         return { result: "dead", error: res.error };
       }
@@ -463,8 +475,8 @@ WALLIE.SYNC = {
   status() {
     const box = this.load();
     const pending = this.sendable(box).length;
-    /* Rooster-items (kind "plan") tel nie vir Wallie se aanwyser nie: dis agtergrond-inligting vir Pa */
-    const parked = box.queue.filter((q) => q.state === "parked" && q.kind !== "plan").length;
+    /* Rooster-items (kind "plan") en v3_poging tel nie vir Wallie se aanwyser nie: agtergrond-inligting vir Pa */
+    const parked = box.queue.filter((q) => q.state === "parked" && !this.quietParkedKinds.includes(q.kind)).length;
     const dead = box.queue.filter((q) => q.state === "dead" && q.kind !== "plan").length;
     const failingFor = box.failingSince ? Date.now() - box.failingSince : 0;
     let level = "ok";

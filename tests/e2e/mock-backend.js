@@ -6,6 +6,8 @@
      mode "v2": ná migrations/001. mode "offline": netwerk af (ook ntfy).
      mode "full": soos "v2", maar die ECHTE migrasies (001 + 002) loop in ’n plaaslike Postgres (PGlite): ingest, rooster,
        Pa se oorsig en foto's gaan deur die werklike SQL. "Nou" op die bediener = nowFn() (die blaaier se nagemaakte klok).
+     opsie unknownKinds (bv. ["v3_poging"]): in mode "v2" antwoord wallie_ingest_v2 'bad kind' op daardie soorte, soos die lewendige
+       funksie voor migrations/004 (die ander soorte word aanvaar). In mode "full" gebruik die ECHTE SQL (001..004) en is v3_poging bekend.
      mode "down": Supabase gee 503, maar ntfy werk (Pa kan gewaarsku word). */
 const { newDb, addPaToken } = require("../sql-helpers");
 
@@ -15,8 +17,9 @@ const isV2 = (mode) => mode === "v2" || mode === "full";
 const V1_KINDS = ["start", "heartbeat", "warn", "lock", "unlock", "memo", "end", "survey", "pa-survey", "probleem", "offline"];
 
 class MockBackend {
-  constructor({ mode = "v1" } = {}) {
+  constructor({ mode = "v1", unknownKinds = [] } = {}) {
     this.mode = mode;
+    this.unknownKinds = unknownKinds;
     this.calls = [];
     this.ntfy = [];
     this.external = [];
@@ -56,6 +59,7 @@ class MockBackend {
     const k = p.kind;
     if (name === "wallie_ingest" && !V1_KINDS.includes(k)) return { ok: false, error: "bad kind" };
     if (name === "wallie_ingest_v2") {
+      if (this.unknownKinds.includes(k)) return { ok: false, error: "bad kind" };
       if (!p.event_id) return { ok: false, error: "no event_id" };
       if (this.seen.has(p.event_id)) return { ok: true, duplicate: true };
       this.seen.add(p.event_id);
@@ -153,7 +157,8 @@ class MockBackend {
     try {
       body = req.postDataJSON();
     } catch {}
-    this.calls.push({ name, body, at: Date.now(), mode: this.mode });
+    const call = { name, body, at: Date.now(), mode: this.mode };
+    this.calls.push(call);
     const cors = { "access-control-allow-origin": "*" };
     if (this.mode === "offline") return route.abort("internetdisconnected");
     if (this.mode === "down") {
@@ -213,7 +218,11 @@ class MockBackend {
         message: "Could not find the function public.wallie_ingest_v2(p) in the schema cache"
       });
     }
-    if (name === "wallie_ingest" || name === "wallie_ingest_v2") return json(200, this.ingest(name, body.p));
+    if (name === "wallie_ingest" || name === "wallie_ingest_v2") {
+      const r = this.ingest(name, body.p);
+      if (r.error === "bad kind") call.rejected = true; /* ten tye van die versoek (unknownKinds kan later verander) */
+      return json(200, r);
+    }
     if (name === "wallie_still") {
       this.stills.push(body);
       return json(200, { ok: true });
@@ -248,7 +257,7 @@ class MockBackend {
 
   delivered() {
     /* Net versoeke wat die bediener werklik aanvaar het (nie vanlyn / 404 / bad kind nie) */
-    return this.ingests().filter((c) => !["offline", "down"].includes(c.mode) && !(c.name === "wallie_ingest_v2" && !isV2(c.mode)) && (c.name !== "wallie_ingest" || V1_KINDS.includes(c.body.p.kind)));
+    return this.ingests().filter((c) => !["offline", "down"].includes(c.mode) && !(c.name === "wallie_ingest_v2" && (!isV2(c.mode) || c.rejected)) && (c.name !== "wallie_ingest" || V1_KINDS.includes(c.body.p.kind)));
   }
 
   deliveredIds() {
