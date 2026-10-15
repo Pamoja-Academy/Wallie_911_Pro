@@ -174,15 +174,17 @@
        minute = klaarMin (as "Ek is klaar" gedruk is), anders die verlope tyd sedert begin tot `nou`; begrens by `tmin` (die
                 item se tyd), nooit negatief nie. Net pogings waarvan die begin VANDAG is (plaaslike dag) tel, dus nie
                 gister se poging nie; die geargiveerde `vorige` pogings van vandag ook (die meeste minute wen, nie die som nie).
-       werk   = daar is iets gedoen: papier/toepassing-bevestiging of 'n konsep met teks. */
-  function werkVanRekord(rec, nou, tmin) {
+       werk   = daar is iets gedoen: papier/toepassing-bevestiging, of 'n konsep met minstens `minWoorde` woorde
+                (dieselfde drempel as die memo-hek; LL-01: een letter tik mag nie die "Seker?"-waarskuwing omseil nie). */
+  function werkVanRekord(rec, nou, tmin, minWoorde) {
+    const drempel = Math.max(1, Number(minWoorde) || 1);
     const n = nou == null ? Date.now() : nou;
     const vandag = dagSleutel(n);
     const kap = Number(tmin) > 0 ? Number(tmin) : Infinity;
     const poging = (begin, klaarMin, einde, bevestig, konsep) => {
       if (!(Number(begin) > 0) || dagSleutel(Number(begin)) !== vandag) return null;
       const rou = klaarMin != null && Number.isFinite(Number(klaarMin)) ? Number(klaarMin) : (Number(einde) - Number(begin)) / 60000;
-      return { minute: Math.round(Math.min(Math.max(0, rou), kap) * 10) / 10, werk: Boolean(bevestig) || Boolean(String(konsep || "").trim()) };
+      return { minute: Math.round(Math.min(Math.max(0, rou), kap) * 10) / 10, werk: Boolean(bevestig) || tel(konsep) >= drempel };
     };
     const r = rec || {};
     const lys = [poging(r.begin, r.klaarMin, n, r.bevestig, r.konsep)];
@@ -199,16 +201,16 @@
   function vandagWerk(itemId, nou, tmin) {
     if (!itemId) return { minute: 0, werk: false };
     let kap = tmin;
-    if (kap === undefined) {
-      try {
-        const g = typeof window !== "undefined" ? window : globalThis;
-        const item = (g.VRAEBANK_V3 || []).concat(g.VRAEBANK_RTT_V1 || []).find((i) => i && i.id === itemId);
-        kap = item ? tydMin(item, item.vak || "rtt") : null;
-      } catch (e) {
-        kap = null;
-      }
+    let minW = null;
+    try {
+      const g = typeof window !== "undefined" ? window : globalThis;
+      const item = (g.VRAEBANK_V3 || []).concat(g.VRAEBANK_RTT_V1 || []).find((i) => i && i.id === itemId);
+      if (kap === undefined) kap = item ? tydMin(item, item.vak || "rtt") : null;
+      minW = item && item.woorde ? item.woorde.min : null;
+    } catch (e) {
+      if (kap === undefined) kap = null;
     }
-    return werkVanRekord(kry(itemId), nou, kap);
+    return werkVanRekord(kry(itemId), nou, kap, minW);
   }
 
   /* O4 (AGENTS §2.3: Wallie se plaaslike data word nooit herskryf nie): word 'n bestaande `begin` deur 'n ander (vroeër

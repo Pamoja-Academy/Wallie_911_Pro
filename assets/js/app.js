@@ -978,7 +978,13 @@
         done.closest(".md-body")?.append(wenk);
         return;
       }
-      WALLIE.REMOTE?.blockDone(blok, at, vroeg ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan } : null);
+      /* Spoor vir Pa (LL-01): het die eksamenmodus-werk die waarskuwing onderdruk, stuur die minute saam (bestaande soort "block"). */
+      const spoor = vroeg
+        ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan }
+        : eksamen && eksamen.werk
+          ? { eksamen_min: eksamen.minute }
+          : null;
+      WALLIE.REMOTE?.blockDone(blok, at, spoor);
       /* Tydstempel i.p.v. true (steeds "truthy" vir ou kode) sodat Pa weet wanneer */
       state.completedBlocks[done.dataset.id] = at;
       persist();

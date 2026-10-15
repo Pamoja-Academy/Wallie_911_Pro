@@ -222,6 +222,10 @@ eq(E.werkVanRekord(vorigeVandag, NOUW, 40), { minute: 25, werk: true }, "werk: v
 eq(E.werkVanRekord(Object.assign({}, vorigeVandag, { begin: T(9, 0), bevestig: true, klaarMin: 10 }), NOUW, 40), { minute: 25, werk: true }, "werk: die meeste minute wen, nie die som nie");
 eq(E.werkVanRekord({ vorige: [{ begin: new Date(2026, 9, 15, 8, 0).getTime(), bevestig: true, klaarMin: 40 }] }, NOUW, 40).werk, false, "werk: gister se geargiveerde poging tel nie");
 eq(E.werkVanRekord({ vorige: [{ begin: T(8, 0), bevestig: true, geargiveerOp: T(8, 12) }] }, NOUW, 40), { minute: 12, werk: true }, "werk: geargiveerde poging sonder klaarMin → begin tot geargiveerOp");
+/* LL-01: 'n konsep tel net as werk by die memo-hek se woord-drempel */
+eq(E.werkVanRekord({ begin: T(9, 0), konsep: "x", klaarMin: 40 }, NOUW, 40, 180).werk, false, "werk: een letter konsep onder die drempel = geen werk");
+eq(E.werkVanRekord({ begin: T(9, 0), konsep: Array(180).fill("w").join(" "), klaarMin: 40 }, NOUW, 40, 180).werk, true, "werk: 180 woorde = werk");
+eq(E.werkVanRekord({ begin: T(9, 0), konsep: "x", bevestig: true, klaarMin: 40 }, NOUW, 40, 180).werk, true, "werk: papier-blokkie tel steeds");
 /* vandagWerk lees die plaaslike stoor (wallie911_eksamen_v1); skryf niks */
 (function () {
   const stoor = { [E.KEY]: JSON.stringify({ v: 1, items: { "afr-v3-B3": { begin: T(9, 20), konsep: "", bevestig: true, lêer: "", klaarMin: 40 }, "x-leeg": { begin: T(9, 20) } } }) };

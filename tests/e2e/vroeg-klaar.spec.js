@@ -146,7 +146,11 @@ test("O1: item sonder sessie, papier-boks, 40 min, Ek is klaar, dan blok klaar: 
   await page.locator(`#block-list .md-card[data-id="${B3}"] .mark-done`).click();
   await expect(page.locator(`#block-list .md-card[data-id="${B3}"] .vroeg-wenk`)).toHaveCount(0);
   await runUntil(page, async () => mock.byKind("block").length === 1, { label: "blok afgelewer" });
-  expect(mock.byKind("block")[0].body.p.data).toEqual({ blockId: B3, done: true });
+  /* Geen vroeg_klaar nie, maar die eksamenmodus-minute gaan as spoor na Pa (LL-01) */
+  const data = mock.byKind("block")[0].body.p.data;
+  expect(Object.keys(data).sort()).toEqual(["blockId", "done", "eksamen_min"]);
+  expect(data).toMatchObject({ blockId: B3, done: true });
+  expect(data.eksamen_min).toBeGreaterThanOrEqual(40);
   expectNoLeaks(mock);
 });
 

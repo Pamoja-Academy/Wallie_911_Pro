@@ -119,7 +119,7 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   ];
   const verwag22 = [
     ["opstaan", "07:30", "08:00", "break"], ["wg-v1", "08:00", "09:00", "groen"], ["merk-wg-v1", "09:00", "09:20", "groen"],
-    ["pouse1", "09:20", "09:40", "break"], ["formules", "09:40", "10:10", "groen"], ["tas", "10:10", "10:30", "groen"], ["klaar", "10:30", "10:30", "break"]
+    ["pouse1", "09:20", "09:40", "break"], ["formules", "09:40", "10:10", "groen"], ["tas", "10:10", "10:30", "warm"], ["klaar", "10:30", "10:30", "break"]
   ];
   for (const [dag, verwag] of [["2026-10-21", verwag21], ["2026-10-22", verwag22]]) {
     const lys = ctx.WALLIE.buildDayPlan(dag).blocks;
@@ -154,8 +154,8 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   }
 }
 
-/* "voor-eksamen" is 'n studieblok (nie 'n pouse nie) met die vak se eie kind */
-for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "geel"], ["2026-10-19", "2026-10-19-tas", "rooi"], ["2026-10-20", "2026-10-20-formaat", "rooi"], ["2026-10-22", "2026-10-22-tas", "groen"]]) {
+/* "voor-eksamen" is 'n studieblok (nie 'n pouse nie) met kind "warm" (opwarm), sodat Pa se oorsig dit nooit vlag nie */
+for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2026-10-19", "2026-10-19-tas", "warm"], ["2026-10-20", "2026-10-20-formaat", "warm"], ["2026-10-22", "2026-10-22-tas", "warm"]]) {
   const b = ctx.WALLIE.buildDayPlan(dag).blocks.find((x) => x.id === id);
   if (!b || b.soort !== "voor-eksamen") fails.push(`${id}: soort moet voor-eksamen wees`);
   if (b && b.kind !== kind) fails.push(`${id}: kind is ${b.kind}, verwag ${kind}`);

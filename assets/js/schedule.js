@@ -485,7 +485,8 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
     const blocks = VASTE_PLANNE[dateStr].map((b) => {
       const blok = {
         id: `${dateStr}-${b.suffix}`,
-        kind: b.kind || KIND[b.soort] || "rooi",
+        /* "voor-eksamen" is altyd opwarm (kind "warm"): Pa se oorsig ken net `kind`, nie `soort` nie, en vlag dit dan nie as GEEN POGING nie */
+        kind: b.soort === "voor-eksamen" ? "warm" : b.kind || KIND[b.soort] || "rooi",
         subjectSlug: b.slug || "rtt",
         minutes: mins(b.start, b.end),
         start: b.start,
