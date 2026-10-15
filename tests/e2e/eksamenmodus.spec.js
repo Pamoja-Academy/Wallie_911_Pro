@@ -175,7 +175,12 @@ for (const vp of VIEWPORTS) {
       await page.clock.fastForward(31 * 60 * 1000);
       await page.clock.runFor(25000);
       await expect.poll(() => mock.byKind("v3_poging").length, { timeout: 10000 }).toBe(1);
-      await expect.poll(async () => (await queue(page)).some((q) => q.kind === "v3_poging"), { timeout: 10000 }).toBe(false);
+      /* Die app se klok is vals: laat dit saam met die peiling loop sodat die "afgelewer → uit die tou"-stap kan klaarmaak */
+      for (let i = 0; i < 20 && (await queue(page)).some((q) => q.kind === "v3_poging"); i++) {
+        await page.clock.runFor(1000);
+        await page.waitForTimeout(25);
+      }
+      expect((await queue(page)).some((q) => q.kind === "v3_poging")).toBe(false);
       expect(mock.byKind("v3_poging")[0].body.p.data.item_id).toBe(item.id);
       expectNoLeaks(mock);
     });
