@@ -44,9 +44,9 @@ const DAE = [
       ["afr-b3", "10:30", "11:10", "afr-v3-B3"],
       ["merk-afr-b3", "11:10", "11:30"],
       ["middag", "11:30", "12:30"],
-      ["wg-v1", "12:30", "13:30"],
-      ["merk-wg-v1", "13:30", "13:50"],
-      ["klaar", "13:50", "13:50"]
+      ["wg-v1", "12:30", "13:45"],
+      ["merk-wg-v1", "13:45", "14:05"],
+      ["klaar", "14:05", "14:05"]
     ]
   },
   {
@@ -60,9 +60,9 @@ const DAE = [
       ["afr-b4", "11:00", "11:40", "afr-v3-B4"],
       ["merk-afr-b4", "11:40", "12:00"],
       ["middag", "12:00", "13:00"],
-      ["wg-v1", "13:00", "14:00"],
-      ["merk-wg-v1", "14:00", "14:20"],
-      ["klaar", "14:20", "14:20"]
+      ["wg-v1", "13:00", "14:10"],
+      ["merk-wg-v1", "14:10", "14:30"],
+      ["klaar", "14:30", "14:30"]
     ]
   },
   {
@@ -75,9 +75,9 @@ const DAE = [
       ["pouse1", "09:45", "10:00"],
       ["foutlog", "10:00", "10:30"],
       ["middag", "10:30", "13:00"],
-      ["wg-v1", "13:00", "14:00"],
-      ["merk-wg-v1", "14:00", "14:20"],
-      ["klaar", "14:20", "14:20"]
+      ["wg-v1", "13:00", "13:40"],
+      ["merk-wg-v1", "13:40", "14:00"],
+      ["klaar", "14:00", "14:00"]
     ]
   },
   {
@@ -105,9 +105,9 @@ const DAE = [
       ["rus", "12:00", "14:00"],
       ["terugskou", "14:00", "14:20"],
       ["pouse1", "14:20", "14:30"],
-      ["wg-v1", "14:30", "15:30"],
-      ["merk-wg-v1", "15:30", "15:50"],
-      ["klaar", "15:50", "15:50"]
+      ["wg-v1", "14:30", "15:45"],
+      ["merk-wg-v1", "15:45", "16:05"],
+      ["klaar", "16:05", "16:05"]
     ]
   },
   {
@@ -128,12 +128,12 @@ const DAE = [
     tyd: "2026-10-22T07:50:00+02:00",
     blokke: [
       ["opstaan", "07:30", "08:00"],
-      ["wg-v1", "08:00", "09:00"],
-      ["merk-wg-v1", "09:00", "09:20"],
-      ["pouse1", "09:20", "09:40"],
-      ["formules", "09:40", "10:10"],
-      ["tas", "10:10", "10:30"],
-      ["klaar", "10:30", "10:30"]
+      ["wg-v1", "08:00", "09:15"],
+      ["merk-wg-v1", "09:15", "09:35"],
+      ["pouse1", "09:35", "09:55"],
+      ["formules", "09:55", "10:25"],
+      ["tas", "10:25", "10:45"],
+      ["klaar", "10:45", "10:45"]
     ]
   }
 ];
@@ -320,11 +320,11 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
-    test("22 Okt 10:15: tas pak is 'n voor-eksamen-blok en kry nooit 'n waarskuwing nie", async ({ page, context }) => {
+    test("22 Okt 10:30: tas pak is 'n voor-eksamen-blok en kry nooit 'n waarskuwing nie", async ({ page, context }) => {
       /* blok-gebeure word net in modus v2 afgelewer */
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
-      await boot(page, { time: new Date("2026-10-22T10:15:00+02:00") });
+      await boot(page, { time: new Date("2026-10-22T10:30:00+02:00") });
       await page.goto("/#missie");
       await page.clock.runFor(1500);
       const tas = page.locator('#block-list .md-card[data-id="2026-10-22-tas"]');

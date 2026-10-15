@@ -96,8 +96,8 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   if (!eks20 || eks20.start !== "09:00" || eks20.end !== "12:00" || eks20.kind !== "break") fails.push("20 Okt: eksamen-blok moet 09:00-12:00 en kind break wees");
   const verwag = [
     ["opstaan", "06:45", "07:15"], ["formaat", "07:15", "07:35"], ["tas", "07:35", "08:00"], ["eksamen", "09:00", "12:00"],
-    ["rus", "12:00", "14:00"], ["terugskou", "14:00", "14:20"], ["pouse1", "14:20", "14:30"], ["wg-v1", "14:30", "15:30"],
-    ["merk-wg-v1", "15:30", "15:50"], ["klaar", "15:50", "15:50"]
+    ["rus", "12:00", "14:00"], ["terugskou", "14:00", "14:20"], ["pouse1", "14:20", "14:30"], ["wg-v1", "14:30", "15:45"],
+    ["merk-wg-v1", "15:45", "16:05"], ["klaar", "16:05", "16:05"]
   ];
   if (lys.map((b) => b.id).join() !== verwag.map(([s]) => `2026-10-20-${s}`).join()) fails.push("20 Okt: blokke of volgorde verskil van die plan");
   verwag.forEach(([s, a, e]) => {
@@ -105,7 +105,7 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
     if (!b || b.start !== a || b.end !== e) fails.push(`20 Okt ${s}: tye ${b && b.start}-${b && b.end}, verwag ${a}-${e}`);
   });
   const wg = lys.find((b) => b.id === "2026-10-20-wg-v1");
-  if (!wg || wg.subjectSlug !== "wiskgelett" || wg.kind !== "groen" || wg.soort !== "toets" || wg.punte !== 50 || wg.minutes !== 60) fails.push("20 Okt: wg-v1 is nie 'n groen Wisk. Gel. toets van 50 punte / 60 min nie");
+  if (!wg || wg.subjectSlug !== "wiskgelett" || wg.kind !== "groen" || wg.soort !== "toets" || wg.punte !== 62 || wg.minutes !== 75) fails.push("20 Okt: wg-v1 is nie 'n groen Wisk. Gel. toets van 62 punte / 75 min nie (V1 Vraag 1+2 = 30+32 punte, 1,2 min per punt)");
   const tr = lys.find((b) => b.id === "2026-10-20-terugskou");
   if (!tr || tr.subjectSlug !== "afrikaans" || tr.kind !== "rooi" || tr.soort !== "herdoen") fails.push("20 Okt: terugskou moet 'n rooi Afrikaans herdoen-blok wees");
 }
@@ -118,8 +118,8 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
     ["merk-wg-v1-proef", "12:00", "13:00", "groen"], ["pouse1", "13:00", "13:15", "break"], ["foutlog", "13:15", "13:45", "groen"], ["klaar", "13:45", "13:45", "break"]
   ];
   const verwag22 = [
-    ["opstaan", "07:30", "08:00", "break"], ["wg-v1", "08:00", "09:00", "groen"], ["merk-wg-v1", "09:00", "09:20", "groen"],
-    ["pouse1", "09:20", "09:40", "break"], ["formules", "09:40", "10:10", "groen"], ["tas", "10:10", "10:30", "warm"], ["klaar", "10:30", "10:30", "break"]
+    ["opstaan", "07:30", "08:00", "break"], ["wg-v1", "08:00", "09:15", "groen"], ["merk-wg-v1", "09:15", "09:35", "groen"],
+    ["pouse1", "09:35", "09:55", "break"], ["formules", "09:55", "10:25", "groen"], ["tas", "10:25", "10:45", "warm"], ["klaar", "10:45", "10:45", "break"]
   ];
   for (const [dag, verwag] of [["2026-10-21", verwag21], ["2026-10-22", verwag22]]) {
     const lys = ctx.WALLIE.buildDayPlan(dag).blocks;
@@ -143,10 +143,10 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   if (!foutlog || foutlog.soort !== "herdoen") fails.push("21 Okt: foutlog moet soort herdoen wees");
   const p22 = ctx.WALLIE.buildDayPlan("2026-10-22");
   const wg22 = p22.blocks.find((b) => b.id === "2026-10-22-wg-v1");
-  if (!wg22 || wg22.soort !== "toets" || wg22.punte !== 50 || wg22.minutes !== 60) fails.push("22 Okt: wg-v1 moet 'n toets van 50 punte / 60 min wees");
+  if (!wg22 || wg22.soort !== "toets" || wg22.punte !== 62 || wg22.minutes !== 75) fails.push("22 Okt: wg-v1 moet 'n toets van 62 punte / 75 min wees");
   const tas22 = p22.blocks.find((b) => b.id === "2026-10-22-tas");
   if (!tas22 || tas22.soort !== "voor-eksamen" || !/sakrekenaar/.test(tas22.detail)) fails.push("22 Okt: tas moet voor-eksamen wees en die sakrekenaar noem");
-  if (p22.totalMinutes !== 60 + 20 + 30 + 20) fails.push(`22 Okt: totalMinutes ${p22.totalMinutes}, verwag 130`);
+  if (p22.totalMinutes !== 75 + 20 + 30 + 20) fails.push(`22 Okt: totalMinutes ${p22.totalMinutes}, verwag 145`);
   /* Net 'n "skrif"-blok (papier-eksamen) het geen oortjie-slot nie: die ander Wisk. Gel.-toetse is "toets" */
   for (const dag of ["2026-10-16", "2026-10-17", "2026-10-18", "2026-10-20", "2026-10-22"]) {
     const wgb = ctx.WALLIE.buildDayPlan(dag).blocks.find((b) => b.id === `${dag}-wg-v1`);
