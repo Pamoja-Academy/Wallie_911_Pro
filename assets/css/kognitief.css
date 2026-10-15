@@ -1,0 +1,236 @@
+/* Kognitiewe ontwerp (Okt 2026) — docs/ontwerp/kognitief/SPESIFIKASIE.md, K1–K12.
+   Laai LAASTE (ná vraebank-v3.css) sodat dit by gelyke spesifisiteit wen. Net bykomende reëls en klasse:
+   geen bestaande klas of teks is hernoem nie. */
+
+/* ---------- Tokens (K4, K6, K7, K10) ---------- */
+:root {
+  --line-ui: #4f8a66;      /* rand van knoppies en velde: 4.4 / 4.0 / 3.5 : 1 teen --bg / --bg-2 / --panel (WCAG 1.4.11 ≥ 3:1) */
+  --danger-teks: #ff8a7a;  /* gevaar as TEKS op donker: 7.2 : 1 op --bg-2, 6.2 : 1 op --panel */
+  --let-op: var(--geel);   /* versigtig / let op (nie gevaar nie) */
+  --topbar-h: 0px;         /* hoogte van die taai .topbar; app.js stel dit (K4) */
+  --leesmaat: 30em;        /* ±65–72 karakters per reël vir lang teks (K6) */
+}
+
+/* ---------- K1 Fokusmodus tydens 'n sessie ---------- */
+body.fokus-sessie .brand,
+body.fokus-sessie .countdown,
+body.fokus-sessie .nav-more,
+body.fokus-sessie #main-nav > .nav-btn:not([data-view="missie"]):not([data-view="sessie"]),
+body.fokus-sessie .sw-vorige,
+body.fokus-sessie .sw-volgende,
+body.fokus-sessie .oe-vorige,
+body.fokus-sessie .oe-volgende { display: none; }
+
+/* ---------- K2 Sessieskerm: hooftaak bo, klok eerste, kamera klein ---------- */
+.sessie-hooftaak[hidden] { display: none; }
+.sessie-hooftaak { display: grid; gap: 0.6rem; border: 2px solid var(--accent); }
+.sessie-hoof-kop { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text); overflow-wrap: anywhere; }
+.sessie-hoof-kop small { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+.sessie-hoof-knop { justify-self: start; }
+body.fokus-sessie #view-sessie .hero-strip { margin-bottom: 0.75rem; }
+body.fokus-sessie #view-sessie .hero-strip .lede { display: none; }
+body.fokus-sessie .session-grid { grid-template-columns: minmax(0, 1fr) 240px; align-items: start; }
+body.fokus-sessie .session-controls { order: -1; display: flex; flex-direction: column; }
+body.fokus-sessie #lock-box { order: -3; }
+body.fokus-sessie #timer-display { order: -2; margin-top: 0; }
+body.fokus-sessie #warn-display { order: -1; }
+body.fokus-sessie .camera-panel { min-height: 0; }
+body.fokus-sessie #camera { min-height: 0; height: 180px; }
+body.fokus-sessie #start-session { display: none; }
+body.fokus-sessie #end-session { background: transparent; color: var(--danger-teks); border-color: var(--danger); }
+body.fokus-sessie #session-lesson .concept-strip { display: none; }
+body.fokus-sessie #session-lesson .btn.primary { background: transparent; color: var(--text); border-color: var(--line-ui); }
+
+/* ---------- K3 Missie: Volgende-kaart eerste, hooftaak voor die prent ---------- */
+.next-card { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
+.next-card:not(.all-done) > .next-img { order: 2; }
+.next-card:not(.all-done) > .next-body { display: flex; flex-direction: column; }
+.next-card:not(.all-done) > .next-body > .md-actions { order: 5; margin-top: 0.75rem; }
+.next-card:not(.all-done) > .next-body > .next-agtergrond,
+.next-card:not(.all-done) > .next-body > .next-concept,
+.next-card:not(.all-done) > .next-body > .next-cues { order: 6; }
+.next-body:has(.next-hoof[data-soort="item"]) > .next-titel { display: none; }
+.next-hoof { font-size: 1.25rem; }
+.next-concept { font-size: 1rem; color: var(--muted); margin: 0.15rem 0 0.25rem; }
+.next-cues { font-size: 0.95rem; color: var(--muted); margin-bottom: 0; }
+.md-card .md-actions .open-lesson,
+.next-card:not(.all-done) .md-actions .open-lesson { display: none; } /* die prent self is die knoppie na die les */
+
+/* ---------- K4 Eksamenmodus: taai klok-balk met vorderingstrook ---------- */
+.em-klok-balk {
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 15;
+  margin: 0 0 0.9rem;
+  padding: 0.5rem 0.8rem 0.8rem;
+  background: var(--bg-2);
+  border: 1px solid var(--line-ui);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+.em-klok-balk::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: linear-gradient(90deg, var(--groen) calc(var(--em-vordering, 0) * 100%), var(--line) 0);
+}
+.em-klok-balk.em-laaste::after { background: linear-gradient(90deg, var(--geel) calc(var(--em-vordering, 0) * 100%), var(--line) 0); }
+.em-klok-balk.em-verby::after { background: var(--geel); }
+.em-klok-balk .em-klok { gap: 0.3rem 0.9rem; }
+.em-nog { font-weight: 700; color: var(--text); }
+.em-nog[hidden] { display: none; }
+.em-tyd.em-oor { color: var(--geel); }
+/* K13 "Begin nuwe poging": onderaan die kas (weg van die klok), klein en sekondêr, met 'n tweede bevestigingsklik.
+   Een verkeerde tik middel-in 'n getimede opstel mag nie die poging terugstel nie. */
+.em-nuut-rij { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+.em-nuut-rij[hidden] { display: none; }
+.em-nuut-rij .em-nuut { font-size: 0.85rem; padding: 0.35rem 0.7rem; color: var(--muted); background: transparent; border-color: transparent; text-decoration: underline; }
+.em-nuut-seker { display: grid; gap: 0.5rem; width: 100%; max-width: var(--leesmaat); }
+.em-nuut-seker[hidden] { display: none; }
+.em-nuut-seker-teks { margin: 0; color: var(--text); }
+.em-nuut-seker-knoppies { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+.em-nuut-seker .btn { font-size: 0.9rem; }
+.em-nuut-seker .em-nuut-ja { border-color: var(--let-op); color: var(--let-op); }
+@media (max-width: 640px) {
+  .topbar { position: static; }
+}
+
+/* ---------- K5 Eksamenmodus: een primêre knoppie op 'n slag ---------- */
+.em-memo-knoppie:disabled { background: transparent; color: var(--muted); border: 1px dashed var(--line-ui); opacity: 1; }
+.panel:has(.em-klok-balk .em-begin[hidden]) .em-kas:has(.em-memo-knoppie:disabled) .em-klaar {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent-dim);
+}
+.em-memo-knoppie[aria-expanded="true"] { background: transparent; color: var(--text); border-color: var(--line-ui); }
+
+/* ---------- K6 Leesbaarheid ---------- */
+body { line-height: 1.5; }
+.sw-vraag, .oe-vraag, .sw-teks, .oe-teks { font-size: max(17px, 1em); line-height: 1.6; max-width: var(--leesmaat); }
+.sw-punte, .sw-kontrolelys, .sw-bande, .oe-rig, .sw-bron, .oe-bron, .oe-opdrag,
+.em-rede, .em-sessie-wenk, .em-nuut-meld, .em-vorige-konsep { max-width: var(--leesmaat); }
+.em-antwoord { max-width: 32em; font-size: max(17px, 1em); line-height: 1.6; }
+.em-rede, .em-sessie-wenk { font-size: 1rem; color: #d5e6db; }
+
+/* ---------- K7 Kontras en teikengroottes ---------- */
+.zone-tag.rooi, .zone-tag.groen, .kind.rooi, .kind.groen, .btn.danger { color: var(--ink); }
+.btn, .nav-btn, .nav-more > summary,
+.field input, .field select, #unlock-pin, #new-pin,
+.fault-form input, .fault-form select, .upload-form input, .upload-form select,
+.em-antwoord, .em-punt-inp, .em-lêer, .survey-q textarea { border-color: var(--line-ui); }
+.btn, .field input, .field select, #unlock-pin, #new-pin, .sync-pill, .md-story > summary { min-height: 44px; }
+a.btn { display: inline-flex; align-items: center; }
+.survey-q .scale-row button { min-width: 44px; min-height: 44px; }
+.em-bevestig, .sw-kontrole { min-height: 44px; align-items: center; }
+.em-bevestig input, .sw-kontrole input, .checklist input { width: 24px; height: 24px; margin: 0; flex: 0 0 auto; accent-color: var(--accent); }
+.digit-block small { font-size: 0.75rem; }
+.md-card.done { opacity: 1; border-style: dashed; }
+.md-card.done h3, .md-card.done .md-hoof { color: var(--muted); }
+.md-card.done .md-thumb img { opacity: 0.5; }
+
+/* ---------- K8 Beweging ---------- */
+.stadium-clock.is-live .digit-block span { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- K9 Bloklys as tydlyn ---------- */
+.md-list { grid-template-columns: 1fr; gap: 0.6rem; }
+.md-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(88px, 22%, 200px);
+  grid-template-areas: "body thumb";
+  align-items: start;
+  border-top: 1px solid var(--line);
+  border-left: 6px solid var(--muted);
+}
+.md-card.kind-rooi, .md-card.kind-geel, .md-card.kind-warm, .md-card.kind-groen, .md-card.kind-slot, .md-card.kind-break { border-top-color: var(--line); }
+.md-card.kind-rooi { border-left-color: var(--rooi); }
+.md-card.kind-geel, .md-card.kind-warm { border-left-color: var(--geel); }
+.md-card.kind-groen { border-left-color: var(--groen); }
+.md-card.kind-slot { border-left-color: var(--slot); }
+.md-card.kind-break { grid-template-columns: 1fr; grid-template-areas: "body"; border-left-color: var(--line); background: var(--bg-2); }
+.md-thumb { grid-area: thumb; margin: 0.75rem 0.75rem 0.75rem 0; border-radius: 10px; overflow: hidden; }
+.md-body { grid-area: body; }
+.md-card.kind-break .md-body { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; padding: 0.45rem 0.9rem; }
+.md-card.kind-break h3 { font-size: 1rem; font-weight: 700; color: var(--muted); }
+.md-card.kind-break .md-concept:empty { display: none; }
+.md-card.kind-break .md-concept { flex-basis: 100%; font-size: 0.9rem; }
+.md-card.kind-break .md-actions { margin: 0 0 0 auto; padding: 0; }
+.md-card.done { order: 1; }
+.md-card:not(.is-volgende) .start-block { background: transparent; color: var(--text); border-color: var(--line-ui); }
+.md-card.is-nou { outline: 3px solid var(--accent); outline-offset: 2px; }
+.md-card:has(.md-hoof[data-soort="item"]) .md-label { display: none; }
+
+/* ---------- K10 Kleursemantiek: let op = geel, gevaar = rooi; "Seker?" wys die alternatief ---------- */
+.vroeg-wenk {
+  color: var(--text);
+  background: rgba(242, 201, 76, 0.12);
+  border: 2px solid var(--let-op);
+  border-left-width: 6px;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+}
+.mark-done.is-waarsku { color: var(--let-op); border-color: var(--let-op); }
+.md-card:has(.vroeg-wenk) .start-block {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent-dim);
+  outline: 3px solid var(--let-op);
+  outline-offset: 3px;
+}
+.warn-display.hot, .camera-overlay.lock, .sw-fout, .ov-fout, .badge.crit, .praktiese-fout { color: var(--danger-teks); }
+.em-woorde.em-onder { color: var(--muted); }
+.em-woorde.em-bo { color: var(--let-op); }
+.next-card.kind-rooi { border-color: var(--accent); }
+
+/* ---------- K11 Selfnasien: punte langs hul kriterium ---------- */
+.em-punte { display: grid; grid-template-columns: minmax(0, max-content) 5rem auto; justify-content: start; gap: 0.5rem 0.75rem; align-items: center; }
+.em-punte > :not(.em-punt-rij) { grid-column: 1 / -1; }
+.em-punt-rij { display: contents; }
+.sw-nasien > h3, .oe-nasien > h3 { font-size: 0.85rem; color: var(--muted); }
+
+/* ---------- K12 Missie: sekondêre panele progressief ---------- */
+.vak-aftel-summary { cursor: pointer; font-weight: 800; font-size: 1.05rem; min-height: 44px; display: flex; align-items: center; }
+.vak-aftel-panel[open] > .vak-aftel-summary { margin-bottom: 0.6rem; }
+#view-missie .js-export-log { background: transparent; color: var(--text); border-color: var(--line-ui); }
+.md-hero-line { display: none; }
+@media (max-width: 640px) {
+  .md-hero { grid-template-columns: 1fr; }
+  .md-trui { display: none; }
+}
+
+/* ---------- Smal skerms (moet LAASTE bly: oorskryf die basisreëls hierbo) ---------- */
+/* K2 */
+@media (max-width: 800px) {
+  body.fokus-sessie .session-grid { grid-template-columns: 1fr; }
+  body.fokus-sessie #camera { height: 140px; }
+}
+/* K3 */
+@media (max-width: 900px) {
+  .next-card { grid-template-columns: 1fr; }
+  .next-card:not(.all-done) > .next-img { max-width: 220px; }
+}
+/* K1 + K2 */
+@media (max-width: 640px) {
+  body.fokus-sessie .nav { order: 0; flex: 1 1 auto; }
+  .sessie-hoof-knop { justify-self: stretch; }
+}
+/* K11 */
+.em-punte > .btn { justify-self: start; }
+/* K9: op die foon is die prent 88 px regs bo; die liggaam gebruik die volle breedte */
+@media (max-width: 640px) {
+  .md-card { display: block; position: relative; }
+  .md-card .md-thumb { position: absolute; top: 0.75rem; right: 0.75rem; width: 88px; margin: 0; }
+  .md-card:not(.kind-break) .md-meta, .md-card:not(.kind-break) .md-body > h3 { padding-right: 96px; }
+}

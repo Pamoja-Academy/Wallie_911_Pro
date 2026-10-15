@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="assets/css/praktiese-modus.css?v=2026-10-15a" />
   <link rel="stylesheet" href="assets/css/vraebank.css?v=2026-10-15a" />
   <link rel="stylesheet" href="assets/css/vraebank-v3.css?v=2026-10-15a" />
+  <link rel="stylesheet" href="assets/css/kognitief.css?v=2026-10-15a" />
   <link rel="icon" href="assets/img/lessons/ui/trui-15.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -56,6 +57,16 @@
   <main>
     <!-- MISSIE -->
     <section class="view active" id="view-missie">
+      <div id="next-up" class="next-up" aria-live="polite"></div>
+      <div class="stats-row compact" id="day-stats"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Vandag se matchday-kaarte</h2>
+          <button type="button" class="btn ghost" id="regen-plan">Herbou plan</button>
+        </div>
+        <p class="hint"><strong>Begin</strong> sit die kamera aan. Maak dan die hooftaak oop. Die prent is agtergrond (opsioneel): tik dit om die les te sien.</p>
+        <ol class="block-list md-list" id="block-list"></ol>
+      </div>
       <div class="md-hero">
         <img class="md-trui" src="assets/img/lessons/ui/trui-15.svg" alt="Springbok-trui nommer 15" width="240" height="220" />
         <div class="md-hero-text">
@@ -84,17 +95,7 @@
         </div>
       </div>
 
-      <div class="panel vak-aftel-panel"><h2>Aftelling per vak</h2><ul class="vak-aftel" id="vak-aftel"></ul></div>
-      <div id="next-up" class="next-up" aria-live="polite"></div>
-      <div class="stats-row compact" id="day-stats"></div>
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Vandag se matchday-kaarte</h2>
-          <button type="button" class="btn ghost" id="regen-plan">Herbou plan</button>
-        </div>
-        <p class="hint">Tik die prent om die les te sien. <strong>Begin</strong> sit die kamera aan en wys die les langs jou.</p>
-        <ol class="block-list md-list" id="block-list"></ol>
-      </div>
+      <details class="panel vak-aftel-panel"><summary class="vak-aftel-summary">Aftelling per vak</summary><ul class="vak-aftel" id="vak-aftel"></ul></details>
       <div class="panel">
         <div class="panel-head">
           <h2>Stuur my log na Pa</h2>
@@ -128,6 +129,7 @@
         <h1>Afrigter-sessie (hard observeerder)</h1>
         <p class="lede">Kamera aan. Bly op hierdie oortjie: wegkyk = waarskuwing, 3× = slot tot Pa-PIN. Die les hieronder oop maak is veilig.</p>
       </div>
+      <div class="panel sessie-hooftaak" id="sessie-hooftaak" hidden></div>
       <div id="praktiese-banner" class="praktiese-banner-wrap" aria-live="polite"></div>
       <div class="panel session-werk" id="session-werk" hidden></div>
       <div class="session-grid">
