@@ -15,6 +15,11 @@ const VIEWPORTS = [
   { name: "foon", viewport: { width: 390, height: 844 } }
 ];
 const noOverflow = (page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+/* K13: "Begin nuwe poging" vra 'n tweede klik; hierdie helper doen albei (die eerste klik alleen stel niks terug nie) */
+const nuwePoging = async (page) => {
+  await page.locator(".em-nuut").click();
+  await page.locator(".em-nuut-ja").click();
+};
 const woorde = (n) => Array.from({ length: n }, (_, i) => "woord" + i).join(" ");
 
 for (const vp of VIEWPORTS) {
@@ -213,7 +218,7 @@ for (const vp of VIEWPORTS) {
       await expect(page.locator(".em-nuut")).toBeVisible();
       await page.locator(".em-antwoord").fill("eerste poging");
       await page.locator(".em-klaar").click();
-      await page.locator(".em-nuut").click();
+      await nuwePoging(page);
       await expect(page.locator(".em-antwoord")).toHaveValue("");
       await expect(page.locator(".em-tyd")).toContainText(/^00:00/);
       await expect(page.locator(".em-begin")).toBeVisible();
@@ -288,7 +293,7 @@ for (const vp of VIEWPORTS) {
       expect(rec.begin).toBe(sessieBegin);
       expect(rec.begin_eie, "geen eie begin om te bewaar nie").toBeUndefined();
       /* Eerste 'nuwe poging': geen ou sedert nie */
-      await page.locator(".em-nuut").click();
+      await nuwePoging(page);
       rec = await lees();
       const sedert1 = rec.sedert;
       expect(typeof sedert1).toBe("number");
@@ -296,14 +301,14 @@ for (const vp of VIEWPORTS) {
       /* Tweede 'nuwe poging': die eerste sedert word bewaar */
       await page.locator(".em-antwoord").fill("tweede");
       await page.clock.fastForward(60 * 1000);
-      await page.locator(".em-nuut").click();
+      await nuwePoging(page);
       rec = await lees();
       expect(rec.sedert).toBeGreaterThan(sedert1);
       expect(rec.sedert_vorige).toBe(sedert1);
       /* Derde: sedert_vorige bly die EERSTE waarde */
       await page.locator(".em-antwoord").fill("derde");
       await page.clock.fastForward(60 * 1000);
-      await page.locator(".em-nuut").click();
+      await nuwePoging(page);
       const rec3 = await lees();
       expect(rec3.sedert).toBeGreaterThan(rec.sedert);
       expect(rec3.sedert_vorige).toBe(sedert1);
@@ -374,12 +379,12 @@ for (const vp of VIEWPORTS) {
       await page.locator(`.sw-item[data-id="${item.id}"]`).click();
       await expect(page.locator("details.em-vorige")).toBeHidden();
       await page.locator(".em-antwoord").fill("eerste poging");
-      await page.locator(".em-nuut").click();
+      await nuwePoging(page);
       await expect(page.locator("details.em-vorige summary")).toHaveText("Vorige pogings (1)");
       await page.locator("details.em-vorige summary").click();
       await expect(page.locator(".em-vorige-konsep")).toHaveText("eerste poging");
       await page.locator(".em-antwoord").fill("tweede poging");
-      await page.locator(".em-nuut").click();
+      await nuwePoging(page);
       await expect(page.locator("details.em-vorige summary")).toHaveText("Vorige pogings (2)");
       await expect(page.locator(".em-vorige-konsep")).toHaveText(["eerste poging", "tweede poging"]);
       await expect(page.locator(".em-memo-knoppie")).toBeDisabled();

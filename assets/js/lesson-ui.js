@@ -257,7 +257,7 @@
     const time = b.start && b.end ? `${b.start}–${b.end}` : `${b.minutes} min`;
     if (b.kind === "break") {
       return `
-      <li class="md-card kind-break ${done ? "done" : ""}" data-id="${b.id}">
+      <li class="md-card kind-break ${done ? "done" : ""}${ctx.nou ? " is-nou" : ""}" data-id="${b.id}">
         <div class="md-body">
           <div class="md-meta"><span class="zone-tag break">${kindLabel}</span><span class="md-time">${time}</span></div>
           <h3>${esc(b.title)}</h3>
@@ -286,7 +286,7 @@
           ? `<p class="md-concept">${esc(b.detail)}</p>`
           : "");
     return `
-      <li class="md-card kind-${b.kind} ${done ? "done" : ""}" data-id="${b.id}">
+      <li class="md-card kind-${b.kind} ${done ? "done" : ""}${ctx.volgende ? " is-volgende" : ""}${ctx.nou ? " is-nou" : ""}" data-id="${b.id}">
         <button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c?.id || ""}" aria-label="Kyk les: ${esc(c?.titel || subjectName(slug))}">
           <img src="${img}" alt="${esc(c?.titel || subjectName(slug))}" loading="lazy" />
           ${done ? `<span class="md-done-badge">KLAAR ✓</span>` : ""}
@@ -312,12 +312,22 @@
   function renderBlocks(state) {
     const seen = {};
     const kaart = werkKaart(state);
+    /* K9: dieselfde reël as renderNextUp (eerste oop studieblok), en die blok van "nou" as die plan vandag s'n is */
+    const volgende = state.blocks.find(
+      (b) => b.kind !== "break" && !WALLIE.isVerborgeVak(b.subjectSlug) && !state.completedBlocks[b.id]
+    );
+    const nou = new Date().toTimeString().slice(0, 5);
+    const vandag = state.planDate === WALLIE.todayKey();
     return state.blocks
       .filter((b) => !WALLIE.isVerborgeVak(b.subjectSlug))
       .map((b) => {
         const occ = seen[b.subjectSlug] || 0;
         seen[b.subjectSlug] = occ + 1;
-        return matchdayCard(b, !!state.completedBlocks[b.id], occ, { werk: kaart[b.id] || null });
+        return matchdayCard(b, !!state.completedBlocks[b.id], occ, {
+          werk: kaart[b.id] || null,
+          volgende: Boolean(volgende && volgende.id === b.id),
+          nou: Boolean(vandag && b.start && b.end && b.start <= nou && nou < b.end)
+        });
       })
       .join("");
   }
@@ -473,6 +483,23 @@
       </div>`;
   }
 
+  /* K2: tydens 'n sessie op 'n blok met 'n vaste eksamenvlak-item (blok.item): die hooftaak bo-aan, met een
+     primêre knoppie na die item. Gebruik dieselfde .open-item-delegasie as die Missie-kaarte (app.js). */
+  function renderSessieHooftaak(blok) {
+    const el = $("#sessie-hooftaak");
+    if (!el) return;
+    const h = blok && blok.item && WALLIE.proctor?.active ? hoofTaak(blok, null, 0) : null;
+    if (!h || h.soort !== "item") {
+      el.hidden = true;
+      el.innerHTML = "";
+      return;
+    }
+    el.hidden = false;
+    el.innerHTML = `
+      <p class="sessie-hoof-kop"><small>Hooftaak</small>${esc(h.tekst)}</p>
+      <button type="button" class="btn big primary open-item sessie-hoof-knop" data-view="${h.view}" data-item="${esc(h.itemId)}">Maak hooftaak oop</button>`;
+  }
+
   /* Die vraestel-paneel: drie knoppies (vraestel, datalêers, memo) vir die blok se eie werk. */
   function renderSessionWerk(blockId) {
     const el = $("#session-werk");
@@ -480,6 +507,7 @@
     if (blockId) sessieBlokId = blockId;
     const blok = blokById(sessieBlokId) || huidigeBlok();
     if (blok) sessieBlokId = blok.id;
+    renderSessieHooftaak(blok);
     const werk = blok ? werkVan(blok.id) : null;
     const ekstra = (blok?.werk_ekstra || []).filter((w) => DBE()?.skakels(w));
     const hoof = DBE()?.skakels(werk) ? werk : null;

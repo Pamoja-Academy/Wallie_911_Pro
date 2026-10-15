@@ -367,7 +367,27 @@
     const nuutKnop = el("button", "btn ghost em-nuut", "Begin nuwe poging");
     nuutKnop.type = "button";
     nuutKnop.hidden = true;
-    klok.append(klokTeks, klokInfo, beginKnop, nuutKnop);
+    /* K4: "nog N min" + die klok sit in 'n taai balk bo-aan die paneel. K13: "Begin nuwe poging" staan onderaan die kas,
+       klein en sekondêr, en vra 'n tweede klik (een verkeerde tik middel-in 'n getimede opstel mag nie die poging terugstel nie). */
+    const nog = el("span", "em-nog", "");
+    nog.hidden = true;
+    klok.append(klokTeks, nog, klokInfo, beginKnop);
+    const klokBalk = el("div", "em-klok-balk");
+    klokBalk.append(klok);
+    const nuutRij = el("div", "em-nuut-rij");
+    nuutRij.hidden = true;
+    const nuutSeker = el("div", "em-nuut-seker");
+    nuutSeker.hidden = true;
+    const nuutSekerTeks = el("p", "em-nuut-seker-teks", "Seker? Jou huidige poging word bewaar onder Vorige pogings");
+    nuutSekerTeks.setAttribute("role", "status");
+    const nuutJa = el("button", "btn ghost small em-nuut-ja", "Ja, begin nuwe poging");
+    nuutJa.type = "button";
+    const nuutNee = el("button", "btn ghost small em-nuut-nee", "Nee, gaan voort");
+    nuutNee.type = "button";
+    const nuutKnoppies = el("div", "em-nuut-seker-knoppies");
+    nuutKnoppies.append(nuutNee, nuutJa);
+    nuutSeker.append(nuutSekerTeks, nuutKnoppies);
+    nuutRij.append(nuutKnop, nuutSeker);
     const nuutMeld = el("p", "hint em-nuut-meld", outoNuut ? "Nuwe dag, nuwe poging. Jou vorige poging is veilig bewaar." : "");
     nuutMeld.hidden = !outoNuut;
     const sessieWenk = el("p", "hint em-sessie-wenk", uitSessie ? "Klok loop sedert jou sessie om " + hhmm(sessieBegin) + " begin het." : "");
@@ -445,8 +465,9 @@
     }
     tekenVorige();
 
-    kas.append(klok, nuutMeld, sessieWenk, werk, klaarRij, rede, memoKnop, vorigeKas);
+    kas.append(nuutMeld, sessieWenk, werk, klaarRij, rede, memoKnop, vorigeKas, nuutRij);
     parent.insertBefore(kas, voor);
+    parent.insertBefore(klokBalk, parent.firstChild);
     parent.insertBefore(memoHouer, voor);
     parent.insertBefore(selfnasien, voor);
     memoHouer.hidden = true;
@@ -485,8 +506,17 @@
         klokTeks.textContent = mmss(v) + (tydSek ? " / " + mmss(tydSek) : "");
         klokTeks.classList.remove("em-oor");
       }
+      /* K4: vorderingstrook en "nog N min" (net vertoning; die memo-hek bly onveranderd) */
+      const deel = tstate.begin && tydSek ? Math.min(1, v / tydSek) : 0;
+      klokBalk.style.setProperty("--em-vordering", deel.toFixed(4));
+      klokBalk.classList.toggle("em-laaste", Boolean(tstate.begin && tydSek && v >= 0.75 * tydSek && v <= tydSek));
+      klokBalk.classList.toggle("em-verby", Boolean(tstate.begin && tydSek && v > tydSek));
+      nog.textContent = tstate.begin && tydSek && v <= tydSek ? "nog " + Math.max(1, Math.ceil((tydSek - v) / 60)) + " min" : "";
+      nog.hidden = !nog.textContent;
       beginKnop.hidden = Boolean(tstate.begin);
-      nuutKnop.hidden = !tstate.begin;
+      nuutKnop.hidden = !tstate.begin || !nuutSeker.hidden;
+      nuutRij.hidden = !tstate.begin;
+      if (!tstate.begin) nuutSeker.hidden = true;
       if (teller) {
         const lim = wr.min ? " (doel " + wr.min + "–" + wr.max + ")" : "";
         teller.textContent = st.woorde + " woorde" + lim;
@@ -518,7 +548,7 @@
 
     /* Op aanvraag: argiveer die huidige poging en begin skoon. `sedert` keer dat vandag se (vroeër) sessie die
        nuwe klok terugsleep (sien vroegsteBegin). */
-    nuutKnop.addEventListener("click", () => {
+    function doeNuwePoging() {
       const nou = Date.now();
       bewaar(item.id, Object.assign(nuwePoging(kry(item.id), nou), { sedert: nou }));
       tstate.begin = null;
@@ -537,9 +567,22 @@
       sessieWenk.hidden = true;
       nuutMeld.textContent = "Nuwe poging. Die vorige poging is veilig bewaar.";
       nuutMeld.hidden = false;
+      nuutSeker.hidden = true;
       tekenVorige();
       teken();
+    }
+    /* K13: die eerste klik vra net "Seker?"; eers "Ja, begin nuwe poging" stel terug */
+    nuutKnop.addEventListener("click", () => {
+      nuutSeker.hidden = false;
+      nuutKnop.hidden = true;
+      nuutJa.focus();
     });
+    nuutNee.addEventListener("click", () => {
+      nuutSeker.hidden = true;
+      teken();
+      nuutKnop.focus();
+    });
+    nuutJa.addEventListener("click", doeNuwePoging);
     if (area) {
       area.addEventListener("input", () => {
         if (!tstate.begin) begin();

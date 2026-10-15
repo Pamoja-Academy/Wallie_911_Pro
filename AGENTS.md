@@ -22,6 +22,8 @@ Eksamenrooster: `assets/js/pa-konsole/exams.js`. Dagplanne: `VASTE_PLANNE` in `a
 6. **Memo kom ná die werk** (eksamenmodus): nie een klik weg nie.
 7. **Saamvoeg na `master` = live vir Wallie.** Net met groen CI én Hanno se uitdruklike "voeg saam" (of 'n staande opdrag
    in die huidige taak). Geen force-push na `master`. Saamvoeg die aand voor 'n eksamen: verifieer daarna live (foon + laptop, geen konsole-foute) dat die eksamendag-plan reg wys.
+8. **Kognitiewe ontwerp (15 Okt, PR #31)**: een primêre aksie per skerm; tydens 'n sessie is fokusmodus aan (net Missie en Sessie in die nav);
+   die eksamenklok is taai bo-aan; die hooftaak staan voor die agtergrond-prent; geen herhaalde teks nie. Spesifikasie: `docs/ontwerp/kognitief/SPESIFIKASIE.md`.
 
 ## 3. Werkwyse (projekbestuur)
 - **Eers data, dan mening.** Status = Supabase SELECT op `wallie911.live`/`events` + `git log origin/master` + live `version.json`.
