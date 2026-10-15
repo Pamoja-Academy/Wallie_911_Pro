@@ -10,7 +10,7 @@
    - As sinkronisering langer as 10 min misluk, kry Pa ’n ntfy-waarskuwing. */
 window.WALLIE = window.WALLIE || {};
 
-WALLIE.APP_VERSION = "2026-10-15b";
+WALLIE.APP_VERSION = "2026-10-15c";
 
 WALLIE.SYNC = {
   key: "wallie911_sync_v2",
