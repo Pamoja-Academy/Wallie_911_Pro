@@ -547,6 +547,8 @@
     logEvent(`Sessie begin: ${subjectBySlug(subjectSlug)?.naam || subjectSlug} (${minutes}m)`);
     updateLiveDot();
     startStills();
+    /* K1 fokusmodus: minder keuses en geen tweede klok tydens die sessie */
+    document.body.classList.add("fokus-sessie");
     showView("sessie");
     WALLIE.lessonUI.onSessionStart(subjectSlug, blockRaw ? blockRaw.id : null);
   }
@@ -609,6 +611,7 @@
 
     stopStills();
     WALLIE.proctor.stop();
+    document.body.classList.remove("fokus-sessie");
     $("#camera").srcObject = null;
     $("#start-session").disabled = false;
     $("#end-session").disabled = true;
@@ -1417,4 +1420,15 @@
       if (document.visibilityState === "visible") check();
     });
   }, "weergawe");
+
+  /* K4: hoogte van die taai topbalk, sodat die eksamenklok-balk net daaronder vassit (0 as die topbalk nie taai is nie) */
+  safe(() => {
+    const tb = document.querySelector(".topbar");
+    if (!tb) return;
+    const stel = () =>
+      document.documentElement.style.setProperty("--topbar-h", (getComputedStyle(tb).position === "sticky" ? tb.offsetHeight : 0) + "px");
+    if (window.ResizeObserver) new ResizeObserver(stel).observe(tb);
+    window.addEventListener("resize", stel);
+    stel();
+  }, "topbalk-hoogte");
 })();
