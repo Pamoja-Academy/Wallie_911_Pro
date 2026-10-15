@@ -952,12 +952,20 @@
       } catch (err) {
         pogings = [];
       }
+      /* O1: eksamenmodus-werk van vandag (begin, papier-boks/konsep, "Ek is klaar") tel ook, al is "Stoor my punte" nog nie gedruk nie */
+      let eksamen = null;
+      try {
+        if (blok.item && window.Eksamenmodus?.vandagWerk) eksamen = window.Eksamenmodus.vandagWerk(blok.item, at);
+      } catch (err) {
+        eksamen = null;
+      }
       const vroeg = window.VroegKlaar?.kontroleer(
         blok,
         vis(state.sessions),
         sessionMeta ? { blockId: sessionMeta.block?.id, startedAt: sessionMeta.startedAt } : null,
         at,
-        pogings
+        pogings,
+        eksamen
       );
       if (vroeg && !done.dataset.bevestig) {
         done.dataset.bevestig = "1";
@@ -970,7 +978,13 @@
         done.closest(".md-body")?.append(wenk);
         return;
       }
-      WALLIE.REMOTE?.blockDone(blok, at, vroeg ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan } : null);
+      /* Spoor vir Pa (LL-01): het die eksamenmodus-werk die waarskuwing onderdruk, stuur die minute saam (bestaande soort "block"). */
+      const spoor = vroeg
+        ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan }
+        : eksamen && eksamen.werk
+          ? { eksamen_min: eksamen.minute }
+          : null;
+      WALLIE.REMOTE?.blockDone(blok, at, spoor);
       /* Tydstempel i.p.v. true (steeds "truthy" vir ou kode) sodat Pa weet wanneer */
       state.completedBlocks[done.dataset.id] = at;
       persist();

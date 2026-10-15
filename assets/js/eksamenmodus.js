@@ -4,8 +4,10 @@
 
    Stoor NIKS op die bediener nie. Plaaslik:
      wallie911_eksamen_v1  { v:1, items:{ <id>:{ begin:<ms>|null, konsep:"", bevestig:bool, lêer:"", klaarMin:<n>|null,
-                                                  sedert:<ms>|null, vorige:[ { begin, konsep, bevestig, lêer, klaarMin, geargiveerOp }, … ] } } }
-       (vorige = geargiveerde vorige pogings, nuutste laaste; sedert = wanneer Wallie self 'n nuwe poging begin het)
+                                                  sedert:<ms>|null, vorige:[ { begin, konsep, bevestig, lêer, klaarMin, geargiveerOp }, … ],
+                                                  begin_eie?:<ms>, sedert_vorige?:<ms> } } }
+       (vorige = geargiveerde vorige pogings, nuutste laaste; sedert = wanneer Wallie self 'n nuwe poging begin het;
+        begin_eie / sedert_vorige = die oorskrewe waarde van begin / sedert, bewaar sodat niks verlore gaan nie, sien metBewaring)
      wallie911_vraebank_v1 (VraebankStore.saveAttempt) kry die punte-poging as ekstra velde.
    Die bediener-event (EVENT.kind) is AF tot Hanno die bediener-skema goedkeur: 'wallie_ingest_v2' aanvaar net
    'n vaste lys event-soorte (migrations/001). Sien EVENT hieronder.
@@ -167,6 +169,62 @@
     return Boolean(rec && Number(rec.begin) > 0 && dagSleutel(Number(rec.begin)) < dagSleutel(nou == null ? Date.now() : nou));
   }
 
+  /* O1: Het Wallie VANDAG werk aan hierdie item gedoen, ook al het sy nog nie "Stoor my punte" gedruk nie (dan is daar
+     nog geen VraebankStore-poging nie)? Suiwer: neem die item-rekord (soos kry() dit gee).
+       minute = klaarMin (as "Ek is klaar" gedruk is), anders die verlope tyd sedert begin tot `nou`; begrens by `tmin` (die
+                item se tyd), nooit negatief nie. Net pogings waarvan die begin VANDAG is (plaaslike dag) tel, dus nie
+                gister se poging nie; die geargiveerde `vorige` pogings van vandag ook (die meeste minute wen, nie die som nie).
+       werk   = daar is iets gedoen: papier/toepassing-bevestiging, of 'n konsep met minstens `minWoorde` woorde
+                (dieselfde drempel as die memo-hek; LL-01: een letter tik mag nie die "Seker?"-waarskuwing omseil nie). */
+  function werkVanRekord(rec, nou, tmin, minWoorde) {
+    const drempel = Math.max(1, Number(minWoorde) || 1);
+    const n = nou == null ? Date.now() : nou;
+    const vandag = dagSleutel(n);
+    const kap = Number(tmin) > 0 ? Number(tmin) : Infinity;
+    const poging = (begin, klaarMin, einde, bevestig, konsep) => {
+      if (!(Number(begin) > 0) || dagSleutel(Number(begin)) !== vandag) return null;
+      const rou = klaarMin != null && Number.isFinite(Number(klaarMin)) ? Number(klaarMin) : (Number(einde) - Number(begin)) / 60000;
+      return { minute: Math.round(Math.min(Math.max(0, rou), kap) * 10) / 10, werk: Boolean(bevestig) || tel(konsep) >= drempel };
+    };
+    const r = rec || {};
+    const lys = [poging(r.begin, r.klaarMin, n, r.bevestig, r.konsep)];
+    (Array.isArray(r.vorige) ? r.vorige : []).forEach((v) => {
+      if (v) lys.push(poging(v.begin, v.klaarMin, v.geargiveerOp == null ? n : v.geargiveerOp, v.bevestig, v.konsep));
+    });
+    const werk = lys.filter((x) => x && x.werk);
+    if (!werk.length) return { minute: 0, werk: false };
+    return { minute: Math.max.apply(null, werk.map((x) => x.minute)), werk: true };
+  }
+
+  /* Plaaslike stoor-weergawe van werkVanRekord (wallie911_eksamen_v1). `tmin` weggelaat → die item se tyd uit die
+     vraagbank (VRAEBANK_V3 / VRAEBANK_RTT_V1); onbekende item → geen begrensing. Lees-net: skryf niks. */
+  function vandagWerk(itemId, nou, tmin) {
+    if (!itemId) return { minute: 0, werk: false };
+    let kap = tmin;
+    let minW = null;
+    try {
+      const g = typeof window !== "undefined" ? window : globalThis;
+      const item = (g.VRAEBANK_V3 || []).concat(g.VRAEBANK_RTT_V1 || []).find((i) => i && i.id === itemId);
+      if (kap === undefined) kap = item ? tydMin(item, item.vak || "rtt") : null;
+      minW = item && item.woorde ? item.woorde.min : null;
+    } catch (e) {
+      if (kap === undefined) kap = null;
+    }
+    return werkVanRekord(kry(itemId), nou, kap, minW);
+  }
+
+  /* O4 (AGENTS §2.3: Wallie se plaaslike data word nooit herskryf nie): word 'n bestaande `begin` deur 'n ander (vroeër
+     sessie-) begin vervang, of 'n bestaande `sedert` deur 'n nuwe een, dan bewaar die ou waarde eers in `begin_eie` /
+     `sedert_vorige` (net as dit nog nie gestel is nie; die eerste waarde bly dus altyd). 'n Terugstelling na null
+     (nuwePoging) raak dit nie: daar is die ou begin reeds in `vorige` geargiveer. Suiwer: gee die aangevulde patch. */
+  function metBewaring(rec, patch) {
+    const r = rec || {};
+    const p = Object.assign({}, patch);
+    if (p.begin != null && r.begin != null && p.begin !== r.begin && r.begin_eie == null) p.begin_eie = r.begin;
+    if (p.sedert != null && r.sedert != null && p.sedert !== r.sedert && r.sedert_vorige == null) p.sedert_vorige = r.sedert;
+    return p;
+  }
+
   /* Dagsleutel "JJJJ-MM-DD" van 'n tydstempel: dieselfde reël as WALLIE.todayKey (toestel se plaaslike dag, SAST). */
   function dagSleutel(ms) {
     const d = new Date(ms);
@@ -219,7 +277,8 @@
   }
   function bewaar(id, patch) {
     const d = lees();
-    d.items[id] = Object.assign(kry(id), patch);
+    const nou = kry(id);
+    d.items[id] = Object.assign(nou, metBewaring(nou, patch));
     skryf(d);
     return d.items[id];
   }
@@ -326,7 +385,7 @@
       area.rows = 12;
       area.value = rec0.konsep || "";
       area.setAttribute("aria-label", "Jou antwoord");
-      area.placeholder = "Skryf jou antwoord hier (of op papier en tik dit oor)…";
+      area.placeholder = "Skryf jou antwoord hier — of skryf op papier en merk die blokkie hieronder.";
       teller = el("p", "em-woorde", "");
       teller.setAttribute("aria-live", "polite");
       /* Wie op papier skryf, tik nie alles oor nie: dieselfde bevestiging as by die praktiese werk */
@@ -364,7 +423,29 @@
     memoKnop.disabled = true;
     memoKnop.setAttribute("aria-expanded", "false");
 
-    kas.append(klok, nuutMeld, sessieWenk, werk, klaarRij, rede, memoKnop);
+    /* O3: vorige pogings (geargiveerde nuwePoging-rekords), lees-net. Raak die memo-hek NIE aan nie: die hek volg net
+       die huidige poging. Teks altyd via textContent. */
+    const vorigeKas = document.createElement("details");
+    vorigeKas.className = "em-vorige";
+    vorigeKas.hidden = true;
+    function tekenVorige() {
+      const lys = kry(item.id).vorige || [];
+      vorigeKas.textContent = "";
+      vorigeKas.hidden = !lys.length;
+      if (!lys.length) return;
+      vorigeKas.append(el("summary", "em-vorige-opsom", "Vorige pogings (" + lys.length + ")"));
+      lys.forEach((v, i) => {
+        const ms = Number(v.begin) > 0 ? Number(v.begin) : Number(v.geargiveerOp) > 0 ? Number(v.geargiveerOp) : 0;
+        const rij = el("div", "em-vorige-poging");
+        rij.append(el("p", "em-vorige-datum", "Poging " + (i + 1) + (ms ? " · " + dagSleutel(ms) + " " + hhmm(ms) : "")));
+        rij.append(el("p", "em-vorige-konsep", v.konsep ? String(v.konsep) : "(geen teks bewaar nie)"));
+        if (v.lêer) rij.append(el("p", "em-vorige-lêer", "Lêer: " + v.lêer));
+        vorigeKas.append(rij);
+      });
+    }
+    tekenVorige();
+
+    kas.append(klok, nuutMeld, sessieWenk, werk, klaarRij, rede, memoKnop, vorigeKas);
     parent.insertBefore(kas, voor);
     parent.insertBefore(memoHouer, voor);
     parent.insertBefore(selfnasien, voor);
@@ -456,6 +537,7 @@
       sessieWenk.hidden = true;
       nuutMeld.textContent = "Nuwe poging. Die vorige poging is veilig bewaar.";
       nuutMeld.hidden = false;
+      tekenVorige();
       teken();
     });
     if (area) {
@@ -576,6 +658,9 @@
     vroegsteBegin,
     nuwePoging,
     moetNuwePoging,
+    werkVanRekord,
+    vandagWerk,
+    metBewaring,
     dagSleutel,
     hhmm,
     eventData,

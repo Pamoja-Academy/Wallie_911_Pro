@@ -46,6 +46,19 @@ eq(VK.kontroleer({ id: "v", kind: "rooi", minutes: 20, soort: "voor-eksamen" }, 
 eq(VK.kontroleer({ id: "v", kind: "rooi", minutes: 20, soort: "voor-eksamen" }, [sess("v", 0)], null, NOU), null, "voor-eksamen met 0-min sessie: ook nie");
 ok(VK.teks({ soort: "geen_minute" }).includes("geen minute"), "waarskuwingsteks (0 minute)");
 
+/* O1: eksamenmodus-werk van vandag (nog nie "Stoor my punte" nie) tel as werk */
+eq(VK.kontroleer(blok, [], null, NOU, [], { minute: 40, werk: true }), null, "O1: item sonder sessie, papier-boks, 40 min, klaar → geen waarskuwing");
+eq(VK.kontroleer(blok, [], null, NOU, undefined, { minute: 24, werk: true }), null, "O1: 24/40 min (60%) eksamenmodus-werk = ok");
+eq(VK.kontroleer(blok, [], null, NOU, [], { minute: 23, werk: true }).kode, "VROEG KLAAR", "O1: 23/40 min = steeds VROEG KLAAR (60%-reël bly)");
+eq(VK.kontroleer(blok, [], null, NOU, [], { minute: 23, werk: true }).soort, "vroeg", "O1: werk met minute is nie geen_sessie nie");
+eq(VK.kontroleer(blok, [], null, NOU, [], { minute: 0, werk: true }).kode, "GEEN POGING", "O1: 0 minute = GEEN POGING (bly)");
+eq(VK.kontroleer(blok, [], null, NOU, [], { minute: 0, werk: true }).soort, "geen_minute", "O1: werk met 0 minute = geen_minute");
+eq(VK.kontroleer(blok, [], null, NOU, [], { minute: 40, werk: false }).soort, "geen_sessie", "O1: werk=false tel niks (hoeveel minute ook al)");
+eq(VK.kontroleer(blok, [], null, NOU, [], null).soort, "geen_sessie", "O1: eksamen null = geen_sessie");
+eq(VK.kontroleer(blok, [sess("d-b1", 30)], null, NOU, [pog(5)], { minute: 10, werk: true }), null, "O1: maks(sessie 30, poging 5, eksamen 10), nie die som nie");
+eq(VK.kontroleer(blok, [sess("d-b1", 10)], null, NOU, [pog(5)], { minute: 20, werk: true }).gedoen, 20, "O1: eksamen 20 is die maks");
+eq(VK.kontroleer({ id: "v", kind: "rooi", minutes: 20, soort: "voor-eksamen" }, [], null, NOU, [], { minute: 0, werk: true }), null, "O1: voor-eksamen bly sonder waarskuwing");
+
 /* Pa-konsole: PK.blockFlag uit die bestaande oorsig-velde */
 const ctx = { console, setTimeout, clearTimeout, setInterval, clearInterval, Date };
 ctx.window = ctx;
@@ -60,6 +73,11 @@ eq(F({ manual: true, status: "done", minutes: 40, doneMin: 24 }), null, "Pa: 24/
 eq(F({ manual: false, status: "done", minutes: 40, doneMin: 30 }), null, "Pa: deur gemete tyd klaar = ok");
 eq(F({ manual: true, status: "planned", minutes: 40, doneMin: 0 }), null, "Pa: nie klaar nie");
 eq(F({ manual: true, status: "done", minutes: 0, doneMin: 0 }), null, "Pa: geen minute");
+/* O2: blokke met kind "warm" (opwarm / voor-eksamen) kry nooit 'n vlag nie */
+eq(F({ kind: "warm", manual: true, status: "done", minutes: 20, doneMin: 0 }), null, "Pa: warm-blok, 0 min = geen vlag");
+eq(F({ kind: "warm", manual: true, status: "done", minutes: 20, doneMin: 5 }), null, "Pa: warm-blok, 5/20 min = geen vlag");
+eq(F({ kind: "rooi", manual: true, status: "done", minutes: 20, doneMin: 0 }), "GEEN POGING", "Pa: ander kind (rooi) bly gevlag");
+eq(F({ kind: "geel", manual: true, status: "done", minutes: 20, doneMin: 5 }), "VROEG KLAAR", "Pa: geel bly gevlag");
 
 if (fails.length) {
   console.error("vroeg-klaar: FOUT\n - " + fails.join("\n - "));

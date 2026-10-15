@@ -110,6 +110,9 @@ for (const vp of VIEWPORTS) {
       await page.goto("/#skryfwerk");
       await page.locator(`.sw-item[data-id="${item.id}"]`).click();
       await expect(page.locator(".em-bevestig")).toContainText("Ek het dit op papier geskryf");
+      /* O5: die plekhouer verwys na die blokkie en sê nie meer "tik dit oor" nie */
+      await expect(page.locator(".em-antwoord")).toHaveAttribute("placeholder", "Skryf jou antwoord hier — of skryf op papier en merk die blokkie hieronder.");
+      expect(await page.locator(".em-antwoord").evaluate((e) => e.compareDocumentPosition(document.querySelector(".em-bevestig")) & Node.DOCUMENT_POSITION_FOLLOWING), "die blokkie is ONDER die antwoordarea").toBeTruthy();
       await page.locator(".em-bevestig input").check();
       await page.locator(".em-klaar").click();
       /* Bevestig + klaar, maar nog nie 60% van die tyd nie */
@@ -234,6 +237,152 @@ for (const vp of VIEWPORTS) {
       rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
       expect(rec.konsep).toBe("tweede poging");
       expect(rec.vorige).toHaveLength(1);
+      expectNoLeaks(mock);
+    });
+
+    test("O4: 'n vroeër sessie-begin vervang die eie begin; die eie begin word bewaar (begin_eie)", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const sessieBegin = new Date("2026-10-16T08:00:00+02:00").getTime();
+      const eieBegin = new Date("2026-10-16T08:20:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          wallie911_v2_bok: { sessions: [{ id: "s_1", date: "2026-10-16", subjectSlug: "afrikaans", startedAt: sessieBegin, block: { id: "2026-10-16-afr-a1" } }] },
+          [DRAF]: { v: 1, items: { [item.id]: { begin: eieBegin, konsep: "my begin", bevestig: false, lêer: "", klaarMin: null } } }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator(".em-sessie-wenk")).toHaveText("Klok loop sedert jou sessie om 08:00 begin het.");
+      let rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.begin).toBe(sessieBegin);
+      expect(rec.begin_eie).toBe(eieBegin);
+      expect(rec.konsep).toBe("my begin");
+      /* Tweede keer oopmaak: niks verander nie, begin_eie bly die eerste waarde */
+      await page.reload();
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.begin).toBe(sessieBegin);
+      expect(rec.begin_eie).toBe(eieBegin);
+      expectNoLeaks(mock);
+    });
+
+    test("O4: 'n sessie sonder eie begin laat geen begin_eie na nie; nuwe poging twee keer bewaar die eerste sedert", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const sessieBegin = new Date("2026-10-16T08:00:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          wallie911_v2_bok: { sessions: [{ id: "s_1", date: "2026-10-16", subjectSlug: "afrikaans", startedAt: sessieBegin, block: { id: "2026-10-16-afr-a1" } }] }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      const lees = () => page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      let rec = await lees();
+      expect(rec.begin).toBe(sessieBegin);
+      expect(rec.begin_eie, "geen eie begin om te bewaar nie").toBeUndefined();
+      /* Eerste 'nuwe poging': geen ou sedert nie */
+      await page.locator(".em-nuut").click();
+      rec = await lees();
+      const sedert1 = rec.sedert;
+      expect(typeof sedert1).toBe("number");
+      expect(rec.sedert_vorige).toBeUndefined();
+      /* Tweede 'nuwe poging': die eerste sedert word bewaar */
+      await page.locator(".em-antwoord").fill("tweede");
+      await page.clock.fastForward(60 * 1000);
+      await page.locator(".em-nuut").click();
+      rec = await lees();
+      expect(rec.sedert).toBeGreaterThan(sedert1);
+      expect(rec.sedert_vorige).toBe(sedert1);
+      /* Derde: sedert_vorige bly die EERSTE waarde */
+      await page.locator(".em-antwoord").fill("derde");
+      await page.clock.fastForward(60 * 1000);
+      await page.locator(".em-nuut").click();
+      const rec3 = await lees();
+      expect(rec3.sedert).toBeGreaterThan(rec.sedert);
+      expect(rec3.sedert_vorige).toBe(sedert1);
+      expect(rec3.vorige.map((v) => v.konsep), "alle pogings geargiveer").toEqual(["", "tweede", "derde"]);
+      expectNoLeaks(mock);
+    });
+
+    test("O3: vorige pogings sigbaar (lees-net): datum, konsep as gewone teks, lêer; die memo bly toe", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      const g1 = new Date("2026-10-15T09:00:00+02:00").getTime();
+      const g2 = new Date("2026-10-15T14:30:00+02:00").getTime();
+      await boot(page, {
+        time: new Date("2026-10-16T08:35:00+02:00"),
+        seed: {
+          [DRAF]: {
+            v: 1,
+            items: {
+              [item.id]: {
+                begin: null, konsep: "", bevestig: false, lêer: "", klaarMin: null,
+                vorige: [
+                  { begin: g1, konsep: "Eerste reël\n<b>nie vet nie</b>\nTweede reël", bevestig: false, lêer: "", klaarMin: 50, geargiveerOp: g1 + 3000000 },
+                  { begin: g2, konsep: "", bevestig: true, lêer: "opstel-foto.jpg", klaarMin: 90, geargiveerOp: g2 + 5400000 }
+                ]
+              }
+            }
+          }
+        }
+      });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      const vorige = page.locator("details.em-vorige");
+      await expect(vorige).toBeVisible();
+      await expect(vorige.locator("summary")).toHaveText("Vorige pogings (2)");
+      /* Toe tot Wallie dit oopmaak; dan die inhoud */
+      expect(await vorige.evaluate((d) => d.open)).toBe(false);
+      await vorige.locator("summary").click();
+      const pogings = vorige.locator(".em-vorige-poging");
+      await expect(pogings).toHaveCount(2);
+      await expect(pogings.nth(0).locator(".em-vorige-datum")).toHaveText("Poging 1 · 2026-10-15 09:00");
+      await expect(pogings.nth(1).locator(".em-vorige-datum")).toHaveText("Poging 2 · 2026-10-15 14:30");
+      const konsep = pogings.nth(0).locator(".em-vorige-konsep");
+      await expect(konsep).toHaveText("Eerste reël\n<b>nie vet nie</b>\nTweede reël");
+      expect(await konsep.evaluate((e) => getComputedStyle(e).whiteSpace)).toBe("pre-wrap");
+      expect(await konsep.evaluate((e) => e.children.length), "teks, nie opmaak nie (textContent)").toBe(0);
+      await expect(pogings.nth(0).locator(".em-vorige-lêer")).toHaveCount(0);
+      await expect(pogings.nth(1).locator(".em-vorige-konsep")).toHaveText("(geen teks bewaar nie)");
+      await expect(pogings.nth(1).locator(".em-vorige-lêer")).toHaveText("Lêer: opstel-foto.jpg");
+      /* Lees-net: die huidige poging is steeds skoon en die memo bly gesluit */
+      await expect(page.locator(".em-antwoord")).toHaveValue("");
+      await expect(page.locator(".em-memo-knoppie")).toBeDisabled();
+      await expect(page.locator(".em-memo-knoppie")).toHaveText("Memo gesluit");
+      await expect(page.locator(".sw-memo")).toBeHidden();
+      const rec = await page.evaluate(([k, id]) => JSON.parse(localStorage.getItem(k)).items[id], [DRAF, item.id]);
+      expect(rec.vorige).toHaveLength(2);
+      expect(rec.vorige[1]).toMatchObject({ konsep: "", lêer: "opstel-foto.jpg", klaarMin: 90 });
+      expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
+
+    test("O3: geen vorige pogings → geen blok; 'Begin nuwe poging' laat dit verskyn (1) en dit groei", async ({ page, context }) => {
+      const item = V3.find((i) => i.id === "afr-v3-A1");
+      const mock = new MockBackend({ mode: "v2" });
+      await mock.attach(context);
+      await boot(page, { time: new Date("2026-10-16T08:35:00+02:00") });
+      await page.goto("/#skryfwerk");
+      await page.locator(`.sw-item[data-id="${item.id}"]`).click();
+      await expect(page.locator("details.em-vorige")).toBeHidden();
+      await page.locator(".em-antwoord").fill("eerste poging");
+      await page.locator(".em-nuut").click();
+      await expect(page.locator("details.em-vorige summary")).toHaveText("Vorige pogings (1)");
+      await page.locator("details.em-vorige summary").click();
+      await expect(page.locator(".em-vorige-konsep")).toHaveText("eerste poging");
+      await page.locator(".em-antwoord").fill("tweede poging");
+      await page.locator(".em-nuut").click();
+      await expect(page.locator("details.em-vorige summary")).toHaveText("Vorige pogings (2)");
+      await expect(page.locator(".em-vorige-konsep")).toHaveText(["eerste poging", "tweede poging"]);
+      await expect(page.locator(".em-memo-knoppie")).toBeDisabled();
       expectNoLeaks(mock);
     });
 

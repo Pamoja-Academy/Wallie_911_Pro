@@ -102,15 +102,16 @@ if (typeof W.buildDayPlan === "function") {
     assert(eng && eng.minutes >= 40 && eng.minutes <= 50, `${d} Engels 40–50 min`);
     assert(toe && toe.minutes >= 20 && toe.minutes <= 30, `${d} Toerisme 20–30 min`);
   }
-  /* 13-20 Okt is vaste planne (Engels V3, dan plan v5: Afrikaans V3 tot en met die eksamendag) — geen geel-rotasie nie.
-     Die eerste dae daarna sonder vaste plan (21 en 22 Okt) roteer steeds Engels / Toerisme. */
-  for (const d of ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"]) {
+  /* 13-22 Okt is vaste planne (Engels V3, dan plan v5: Afrikaans V3 tot en met die eksamendag, vervolg: Wisk. Gel. V1 op 21 en 22 Okt)
+     — geen geel-rotasie nie. 23 Okt (Wisk. Gel. V1-eksamendag) het nog nie 'n vaste plan nie. Die twee dae
+     daarna sonder vaste plan (24 en 25 Okt) roteer steeds Engels / Toerisme. */
+  for (const d of ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22"]) {
     assert(!W.buildDayPlan(d).blocks.some((b) => b.id.endsWith("-geel")), `${d} is 'n vaste plan (geen geel-rotasie)`);
   }
-  const rotated = ["2026-10-21", "2026-10-22"].map((d) =>
+  const rotated = ["2026-10-24", "2026-10-25"].map((d) =>
     W.buildDayPlan(d).blocks.find((b) => b.id.endsWith("-geel"))?.subjectSlug
   );
-  assert(rotated[0] && rotated[1] && rotated[0] !== rotated[1] && !rotated.includes("rtt"), "geel rotates Engels / Toerisme on 21 and 22 Okt");
+  assert(rotated[0] && rotated[1] && rotated[0] !== rotated[1] && !rotated.includes("rtt"), "geel rotates Engels / Toerisme on 24 and 25 Okt");
   {
     const g = W.buildDayPlan("2026-10-10").blocks.find((b) => b.id === "2026-10-10-geel");
     assert(g && g.subjectSlug === "rtt" && g.kind === "rooi" && g.title === "RTT V1 — praktiese oefening (Oefenvrae)", "2026-10-10 geel-blok is RTT V1");
