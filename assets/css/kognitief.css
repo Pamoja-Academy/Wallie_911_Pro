@@ -49,7 +49,8 @@ body.fokus-sessie #session-lesson .btn.primary { background: transparent; color:
 .next-card:not(.all-done) > .next-body > .next-agtergrond,
 .next-card:not(.all-done) > .next-body > .next-concept,
 .next-card:not(.all-done) > .next-body > .next-cues { order: 6; }
-.next-body:has(.next-hoof[data-soort="item"]) > .next-titel { display: none; }
+/* Geen herhaling (redundancy): die titel wys net as die hooftaak iets ANDERS sê ('n gaping-teks) */
+.next-body:has(.next-hoof:not([data-soort="gaping"])) > .next-titel { display: none; }
 .next-hoof { font-size: 1.25rem; }
 .next-concept { font-size: 1rem; color: var(--muted); margin: 0.15rem 0 0.25rem; }
 .next-cues { font-size: 0.95rem; color: var(--muted); margin-bottom: 0; }
@@ -117,7 +118,7 @@ body { line-height: 1.5; }
 .em-rede, .em-sessie-wenk { font-size: 1rem; color: #d5e6db; }
 
 /* ---------- K7 Kontras en teikengroottes ---------- */
-.zone-tag.rooi, .zone-tag.groen, .kind.rooi, .kind.groen, .btn.danger { color: var(--ink); }
+.zone-tag.rooi, .zone-tag.groen, .kind.rooi, .btn.danger { color: var(--ink); }
 .btn, .nav-btn, .nav-more > summary,
 .field input, .field select, #unlock-pin, #new-pin,
 .fault-form input, .fault-form select, .upload-form input, .upload-form select,
@@ -169,7 +170,8 @@ a.btn { display: inline-flex; align-items: center; }
 .md-card.done { order: 1; }
 .md-card:not(.is-volgende) .start-block { background: transparent; color: var(--text); border-color: var(--line-ui); }
 .md-card.is-nou { outline: 3px solid var(--accent); outline-offset: 2px; }
-.md-card:has(.md-hoof[data-soort="item"]) .md-label { display: none; }
+.md-card:has(.md-hoof:not([data-soort="gaping"])) .md-label { display: none; }
+.md-card.kind-break.done .md-concept { display: none; }
 
 /* ---------- K10 Kleursemantiek: let op = geel, gevaar = rooi; "Seker?" wys die alternatief ---------- */
 .vroeg-wenk {
@@ -233,4 +235,12 @@ a.btn { display: inline-flex; align-items: center; }
   .md-card { display: block; position: relative; }
   .md-card .md-thumb { position: absolute; top: 0.75rem; right: 0.75rem; width: 88px; margin: 0; }
   .md-card:not(.kind-break) .md-meta, .md-card:not(.kind-break) .md-body > h3 { padding-right: 96px; }
+}
+
+/* ---------- QC #31 ---------- */
+/* Topbalk ondeursigtig: geen teks wat agter die nav deurskemer nie (coherence) */
+.topbar { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* Foon: die Hulp-knoppie na regs onder (die voetbalk wys net #live-dot links), sodat dit nie oor "Ek is klaar" of die memo-rede lê nie */
+@media (max-width: 640px) {
+  .hulp-fab { left: auto; right: 0.75rem; bottom: 0.25rem; min-height: 44px; }
 }
