@@ -1,4 +1,4 @@
-/* Plan v5 (15-22 Okt): vaste dagplanne vir Do 15 (Engels V3-eksamendag) tot Di 20 Okt (Afrikaans HT V3-eksamendag),
+/* Plan v5 (15-26 Okt): vaste dagplanne vir Do 15 (Engels V3-eksamendag) tot Di 20 Okt (Afrikaans HT V3-eksamendag),
    en die vervolg Wo 21 / Do 22 Okt (Wisk. Gel. V1 is Vr 23 Okt). Geen Gasvryheid/Toerisme/RTT-rotasie nie. Elke studieblok se hooftaak is 'n eksamenvlak-item (`item`)
    of eie eksamenwerk, nooit sy agtergrond-les-kaart nie. Klok vals; alle netwerk onderskep (mock-backend). */
 const { test, expect } = require("@playwright/test");
@@ -135,6 +135,63 @@ const DAE = [
       ["tas", "10:25", "10:45"],
       ["klaar", "10:45", "10:45"]
     ]
+  },
+  {
+    dag: "2026-10-23",
+    tyd: "2026-10-23T07:20:00+02:00",
+    blokke: [
+      ["opstaan", "06:45", "07:15"],
+      ["formules", "07:15", "07:35"],
+      ["tas", "07:35", "08:00"],
+      ["eksamen", "09:00", "12:00"],
+      ["rus", "12:00", "14:00"],
+      ["terugskou", "14:00", "14:20"],
+      ["pouse1", "14:20", "14:30"],
+      ["wg-v2", "14:30", "15:45"],
+      ["merk-wg-v2", "15:45", "16:05"],
+      ["klaar", "16:05", "16:05"]
+    ]
+  },
+  {
+    dag: "2026-10-24",
+    tyd: "2026-10-24T08:10:00+02:00",
+    blokke: [
+      ["opstaan", "08:00", "08:30"],
+      ["wg-v2", "08:30", "09:45"],
+      ["merk-wg-v2", "09:45", "10:05"],
+      ["pouse1", "10:05", "10:25"],
+      ["wg-v2-5", "10:25", "11:05"],
+      ["merk-wg-v2-5", "11:05", "11:25"],
+      ["middag", "11:25", "12:30"],
+      ["foutlog", "12:30", "13:00"],
+      ["klaar", "13:00", "13:00"]
+    ]
+  },
+  {
+    dag: "2026-10-25",
+    tyd: "2026-10-25T08:40:00+02:00",
+    blokke: [
+      ["opstaan", "08:30", "09:00"],
+      ["formules", "09:00", "09:40"],
+      ["pouse1", "09:40", "10:00"],
+      ["foutlog", "10:00", "10:40"],
+      ["middag", "10:40", "13:00"],
+      ["tas", "13:00", "13:20"],
+      ["klaar", "13:20", "13:20"]
+    ]
+  },
+  {
+    dag: "2026-10-26",
+    tyd: "2026-10-26T07:20:00+02:00",
+    blokke: [
+      ["opstaan", "06:45", "07:15"],
+      ["formules", "07:15", "07:35"],
+      ["tas", "07:35", "08:00"],
+      ["eksamen", "09:00", "12:00"],
+      ["rus", "12:00", "14:00"],
+      ["terugskou", "14:00", "14:20"],
+      ["klaar", "14:20", "14:20"]
+    ]
   }
 ];
 
@@ -265,6 +322,26 @@ for (const vp of VIEWPORTS) {
       expect(await noOverflow(page)).toBe(true);
       expectNoLeaks(mock);
     });
+
+    for (const [dag, naam] of [["2026-10-23", "V1"], ["2026-10-26", "V2"]]) {
+      test(`${dag} 07:20: Wisk. Gel. ${naam}-eksamendag - formules is voor-eksamen, eksamen 09:00-12:00 is 'n pouse (geen oortjie-slot-probleme)`, async ({ page, context }) => {
+        const mock = await openPlan(page, context, `${dag}T07:20:00+02:00`);
+        const formules = page.locator(`#block-list .md-card[data-id="${dag}-formules"]`);
+        await expect(formules.locator(".md-hoof")).toHaveAttribute("data-soort", "blok");
+        await expect(formules.locator(".md-hoof")).toContainText("Laaste kyk: formuleblad en eenhede");
+        await expect(formules.locator(".open-item")).toHaveCount(0);
+        const eksamen = page.locator(`#block-list .md-card[data-id="${dag}-eksamen"]`);
+        await expect(eksamen).toHaveClass(/kind-break/);
+        await expect(eksamen).toContainText(`WISK. GEL. ${naam}-EKSAMEN (skool) 09:00-12:00`);
+        await expect(page.locator("#next-up .next-hoof")).toContainText("Laaste kyk: formuleblad en eenhede");
+        /* 'n eksamen-blok (break) gee geen waarskuwing of slot nie */
+        expect(mock.byKind("warn")).toHaveLength(0);
+        expect(mock.byKind("lock")).toHaveLength(0);
+        await expect(page.locator("#lock-box")).toBeHidden();
+        expect(await noOverflow(page)).toBe(true);
+        expectNoLeaks(mock);
+      });
+    }
 
     test("21 Okt: Wisk. Gel. V1 proefeksamen (150 punte, 3 uur) is 'n skrif-blok met sy eie hooftaak en sonder 'n item", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-21T07:50:00+02:00");
