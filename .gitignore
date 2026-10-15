@@ -11,3 +11,7 @@ test-artifacts/playwright-output/
 test-artifacts/playwright-results.json
 gate_report.json
 scripts/qa/__pycache__/
+
+# DBE-vraestelle (kopiereg): nooit in git nie
+.dbe-cache/
+DBE-cache/

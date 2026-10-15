@@ -1,10 +1,26 @@
 {
   "vak": "wiskgelett",
   "vraestel": "Wiskundige Geletterdheid V1 en V2",
-  "geverifieer": false,
-  "ONGEVERIFIEER": "ONGEVERIFIEER — Hanno moet bevestig. Tyd (3 u) kom uit die eksamenrooster (assets/js/pa-konsole/exams.js). Die totale punte is 150 punte (CAPS; Hanno moet bevestig). Afdelings, vraag-groottes en subvraag-telling is nie teen 'n DBE-vraestel/memo in hierdie repo nagegaan nie (dbe-vraestelle.js verwys net na RTT).",
+  "geverifieer": true,
   "punte": 150,
   "tyd_min": 180,
   "hoofwerk_bank": null,
-  "afdelings": null
+  "afdelings": null,
+  "verifikasie": "Voorblad/memo van die DBE November 2025-vraestel (education.gov.za, nagegaan 15 Okt 2026). Geen DBE-teks in die repo nie, net getalle. Wisk. Gel. V1 en V2: elk 150 punte, 5 vrae (V1: 30/32/30/28/30; V2: 28/34/32/30/26), 3 uur.",
+  "vrae_punte": {
+    "V1": [
+      30,
+      32,
+      30,
+      28,
+      30
+    ],
+    "V2": [
+      28,
+      34,
+      32,
+      30,
+      26
+    ]
+  }
 }
