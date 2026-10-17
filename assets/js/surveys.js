@@ -187,6 +187,9 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
   }
 
   wallie.forEach((w) => {
+    /* Kort surveys bevat net fokus + moeilikheid (+ blokkade): reëls wat 'n afwesige veld nodig het, word oorgeslaan */
+    w = { ...w, answers: w.answers || {} };
+    const hetFokus = w.answers.fokus != null && w.answers.fokus !== "";
     const matchPa = pa.find((p) => p.sessionId === w.sessionId) || pa[0];
     if (w.answers?.metode === "nee") {
       flags.push({
@@ -202,7 +205,7 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
       });
       aksies.push("Pa: mid-blok check + foon by jou / buite bereik.");
     }
-    if (Number(w.answers?.fokus) <= 2) {
+    if (hetFokus && Number(w.answers.fokus) <= 2) {
       flags.push({
         level: "warn",
         text: `${subjectLabel(w.subjectSlug)}: fokus self ≤2.`
@@ -226,7 +229,7 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
       }
       if (
         matchPa.answers?.produksie === "besig" &&
-        (w.answers?.fokus >= 4 || w.answers?.eerlikheid === "100")
+        ((hetFokus && Number(w.answers.fokus) >= 4) || w.answers.eerlikheid === "100")
       ) {
         flags.push({
           level: "alert",
@@ -234,7 +237,7 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
         });
         aksies.push("Moenie sy survey as wet vat — vereis bewys (foto van werk / foutlog).");
       }
-      if (matchPa.answers?.teenwoordig === "nee" && Number(w.answers?.fokus) >= 4) {
+      if (matchPa.answers?.teenwoordig === "nee" && hetFokus && Number(w.answers.fokus) >= 4) {
         flags.push({
           level: "alert",
           text: "MISMATCH: Pa sê nie teenwoordig; hy sê hoë fokus."

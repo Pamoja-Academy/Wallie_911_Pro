@@ -780,10 +780,19 @@
     const wallie = vis(state.wallieSurveys).filter((s) => s.date === today);
     const pa = (state.paSurveys || []).filter((s) => s.date === today);
     const raw = [
-      ...wallie.map(
-        (w) =>
-          `<li><strong>Wallie</strong> ${subjectBySlug(w.subjectSlug)?.naam || w.subjectSlug}: fokus ${w.answers.fokus}/5 · metode ${w.answers.metode} · blokkade ${w.answers.blokkade} · eerlikheid ${w.answers.eerlikheid}${w.answers.help_more ? ` · “${w.answers.help_more}”` : ""}</li>`
-      ),
+      ...wallie.map((w) => {
+        /* Kort surveys het net 'n deel van die velde: afwesig = "—", nooit "undefined" nie */
+        const a = w.answers || {};
+        const v = (k) => (a[k] != null && a[k] !== "" ? String(a[k]) : "—");
+        const li = document.createElement("li");
+        const sterk = document.createElement("strong");
+        sterk.textContent = "Wallie";
+        li.append(
+          sterk,
+          ` ${subjectBySlug(w.subjectSlug)?.naam || w.subjectSlug}: fokus ${a.fokus != null && a.fokus !== "" ? a.fokus + "/5" : "—"} · metode ${v("metode")} · blokkade ${v("blokkade")} · eerlikheid ${v("eerlikheid")}${a.help_more ? ` · “${a.help_more}”` : ""}`
+        );
+        return li.outerHTML;
+      }),
       ...pa.map(
         (p) =>
           `<li><strong>Pa</strong>: teenwoordig ${p.answers.teenwoordig} · produksie ${p.answers.produksie} · vertroue ${p.answers.vertroue} · roep ${p.answers.verandering}${p.answers.nota ? ` · ${p.answers.nota}` : ""}</li>`

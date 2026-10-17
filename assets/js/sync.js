@@ -692,7 +692,7 @@ WALLIE.SYNC = {
       a.eerlikheid ? `Eerlikheid: ${a.eerlikheid}` : null,
       a.help_more ? `Help: ${a.help_more}` : null,
       ...Object.entries(a)
-        .filter(([k]) => !["fokus", "metode", "blokkade", "eerlikheid", "help_more"].includes(k))
+        .filter(([k, v]) => v != null && !["fokus", "metode", "blokkade", "eerlikheid", "help_more"].includes(k))
         .map(([k, v]) => `${k}: ${v}`)
     ]
       .filter(Boolean)
