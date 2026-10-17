@@ -283,7 +283,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       { suffix: "klaar", kind: "break", slug: "break", start: "19:50", end: "19:50", soort: "pouse",
         title: "Klaar. Skerms af 21:30, bed 22:00.", detail: "Werk is klaar. Skerms af om 21:30, bed 22:00." }
     ],
-    /* Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): 15-26 Okt: Do 15 eksamendag Engels V3,
+    /* Plan 19 Okt (17 Okt, gereedheid-kruiskontrole + Hanno se ja): keuse-en-beplan-drill + een B-teks getimed + inleiding/paragraaf/slot, i.p.v. nog 'n volle 100-min-opstel. Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): 15-26 Okt: Do 15 eksamendag Engels V3,
        dan Afrikaans HT V3 (Di 20), Wisk. Gel. V1 (Vr 23) en V2 (Ma 26) (ook vaste eksamendag-planne) met eksamenvlak-items; elke studieblok se hooftaak is 'n item (`item`) of DBE-werk.
        `item` is die id van 'n eksamenvlak-item (data/vraebank-v3.json) en wen as hooftaak (lesson-ui.js hoofTaak).
        Soort "voor-eksamen" is 'n ligte eksamendag-opwarm wat sy eie titel as hooftaak hou. */
@@ -395,14 +395,20 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
     "2026-10-19": [
       { suffix: "opstaan", kind: "break", slug: "break", start: "07:30", end: "08:00", soort: "pouse",
         title: "Opstaan, ontbyt", detail: "" },
-      { suffix: "afr-a1-weer", kind: "rooi", slug: "afrikaans", start: "08:00", end: "09:40", soort: "toets",
-        item: "afr-v3-A1", punte: 50,
-        title: "Afrikaans V3 opstel weer (50 punte, 100 min): ander onderwerp uit A1 se vraag",
-        detail: "Volle eksamentyd. Kies 'n ander onderwerp as Vrydag." },
-      { suffix: "pouse1", kind: "break", slug: "break", start: "09:40", end: "10:00", soort: "pouse",
+      { suffix: "keuse", kind: "rooi", slug: "afrikaans", start: "08:00", end: "08:30", soort: "toets",
+        title: "Afrikaans V3: kies en beplan (30 min): lees AL die Afdeling A- en B-opsies van die DBE Nov 2025 V3-vraestel (Pa gee)",
+        detail: "Eksamen-oefening: 15 min lees en kies (1 opstel + 2 transaksionele tekste), 15 min 'n breinkaart vir al drie. Skryf nog niks uit nie." },
+      { suffix: "afr-b2", kind: "rooi", slug: "afrikaans", start: "08:30", end: "09:10", soort: "toets",
+        item: "afr-v3-B2", punte: 25,
+        title: "Afrikaans V3 B2 getimed (25 punte, 40 min)",
+        detail: "Volle eksamentyd vir een teks. Skryf dit klaar; moenie iets oop los nie." },
+      { suffix: "pouse1", kind: "break", slug: "break", start: "09:10", end: "09:30", soort: "pouse",
         title: "Pouse", detail: "" },
-      { suffix: "merk-afr-a1-weer", kind: "rooi", slug: "afrikaans", start: "10:00", end: "10:30", soort: "merk",
-        title: "Merk die opstel met die rubriek", detail: "" },
+      { suffix: "merk-afr-b2", kind: "rooi", slug: "afrikaans", start: "09:30", end: "09:50", soort: "merk",
+        title: "Merk B2 met die rubriek", detail: "Pa merk saam; nie selfnasien alleen nie." },
+      { suffix: "inl-slot", kind: "rooi", slug: "afrikaans", start: "09:50", end: "10:30", soort: "toets",
+        title: "Afrikaans V3: net die inleiding, een paragraaf en die slot van jou gekose opstel (40 min)",
+        detail: "Gebruik jou breinkaart. Dit oefen die deel waar die meeste punte lê: 'n sterk begin en 'n slot wat by die titel aansluit." },
       { suffix: "formaat", kind: "rooi", slug: "afrikaans", start: "10:30", end: "11:00", soort: "herdoen",
         title: "Afrikaans: formaat van elke transaksionele teks (een bladsy)",
         detail: "Brief, dagboek, verslag, toespraak, e-pos: net die formaat." },
