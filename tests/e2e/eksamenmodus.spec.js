@@ -127,7 +127,12 @@ for (const vp of VIEWPORTS) {
       expect(typeof e.data.memo_oopgemaak_na_min).toBe("number");
       /* Geen konsep-teks of ander persoonlike data in die payload nie */
       expect(JSON.stringify(e)).not.toContain("woord10");
-      /* Aflewering klaar: tou leeg, en die mock het presies een v3_poging-ry */
+      /* Aflewering klaar: tou leeg, en die mock het presies een v3_poging-ry.
+         Die app se klok is vals: laat dit loop tot die "afgelewer → uit die tou"-stap klaar is (LL-15: wisselvallig op CI). */
+      for (let i = 0; i < 20 && (await queue(page)).length; i++) {
+        await page.clock.runFor(1000);
+        await page.waitForTimeout(25);
+      }
       expect(await queue(page)).toEqual([]);
       expect(mock.events.filter((x) => x.kind === "v3_poging")).toHaveLength(1);
       expectNoLeaks(mock);
