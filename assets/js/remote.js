@@ -554,7 +554,8 @@ WALLIE.REMOTE = {
       subject_slug: block.subjectSlug,
       client_at: at || Date.now(),
       title: "BLOK KLAAR GEMERK",
-      body: `${block.title || block.id} (${block.start || "?"}–${block.end || "?"})`,
+      /* Pa se gebeure-lys wys net die body (die oorsig gee nie die event-data terug nie): papier-minute hier meld */
+      body: `${block.title || block.id} (${block.start || "?"}–${block.end || "?"})${ekstra && ekstra.papier_min != null ? ` (Wallie sê: ${ekstra.papier_min} min op papier)` : ""}`,
       data: ekstra ? { blockId: block.id, done: true, ...ekstra } : { blockId: block.id, done: true }
     });
   },
