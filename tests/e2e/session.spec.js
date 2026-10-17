@@ -63,7 +63,7 @@ test("volle sessie: elke gebeurtenis bereik Supabase met die presiese payload", 
       title: "IN SESSIE — begin",
       body: expect.stringContaining(`${subject} · ${minutes}m`),
       device_id: deviceId,
-      app_version: "2026-10-15e",
+      app_version: "2026-10-17a",
       backfill: false,
       data: { value: null, _event_id: `start:${sid}` }
     }
@@ -133,27 +133,23 @@ test("volle sessie: elke gebeurtenis bereik Supabase met die presiese payload", 
   expect(end.body).toMatch(/tab weg: 0m|tab weg: 1m/);
   expect(end.data._event_id).toBe(`end:${sid}`);
 
-  /* Survey ná die sessie */
+  /* Survey ná die sessie: eerste blok van die dag = KORT vorm (fokus + moeilikheid; blokkade net by fokus ≤ 3) */
   await expect(page.locator("#wallie-survey-modal")).toBeVisible();
-  await page.locator('[data-scale="wallie-fokus"][data-val="4"]').click();
-  await page.locator('input[name="metode"][value="ja"]').check();
+  await expect(page.locator("#wallie-survey-kop")).toHaveText("Kort vraelys (2 vrae)");
+  await expect(page.locator("#wallie-survey-form .survey-q:visible")).toHaveCount(2);
+  await page.locator('[data-scale="wallie-fokus"][data-val="3"]').click();
   await page.locator('input[name="moeilikheid"][value="reg"]').check();
+  await expect(page.locator("#wallie-survey-form .survey-q:visible")).toHaveCount(3);
   await page.locator('input[name="blokkade"][value="moeg"]').check();
-  await page.locator('input[name="eerlikheid"][value="meeste"]').check();
-  await page.locator('textarea[name="help_more"]').fill("Meer ou vraestelle asseblief — en ’n kort breek.");
   await page.locator("#wallie-survey-save").click();
   await runUntil(page, async () => mock.byKind("survey").length === 1, { label: "survey afgelewer" });
   const sv = mock.byKind("survey")[0].body.p;
   expect(sv.event_id).toMatch(/^survey:ws_\d+$/);
   expect(sv).toMatchObject({ kind: "survey", session_id: sid, subject, subject_slug: slug, title: "SURVEY — Wallie ná sessie" });
-  expect(sv.data).toMatchObject({
-    sessionId: sid,
-    subjectSlug: slug,
-    answers: { fokus: "4", metode: "ja", moeilikheid: "reg", blokkade: "moeg", eerlikheid: "meeste", help_more: "Meer ou vraestelle asseblief — en ’n kort breek." }
-  });
-  expect(sv.body).toBe(
-    [`Vak: ${subject}`, "Fokus: 4/5", "Metode: ja", "Blokkade: moeg", "Eerlikheid: meeste", "Help: Meer ou vraestelle asseblief — en ’n kort breek.", "moeilikheid: reg"].join("\n")
-  );
+  expect(sv.data).toMatchObject({ sessionId: sid, subjectSlug: slug });
+  /* Net die gewysde velde word gestoor en gestuur (geen metode/eerlikheid/help_more nie) */
+  expect(sv.data.answers).toEqual({ fokus: "3", moeilikheid: "reg", blokkade: "moeg" });
+  expect(sv.body).toBe([`Vak: ${subject}`, "Fokus: 3/5", "Blokkade: moeg", "moeilikheid: reg"].join("\n"));
 
   /* Kamera-stills (toestemming gegee) */
   expect(mock.stills.length).toBeGreaterThanOrEqual(1);

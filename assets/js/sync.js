@@ -12,7 +12,7 @@
    - As sinkronisering langer as 10 min misluk, kry Pa ’n ntfy-waarskuwing. */
 window.WALLIE = window.WALLIE || {};
 
-WALLIE.APP_VERSION = "2026-10-15e";
+WALLIE.APP_VERSION = "2026-10-17a";
 
 WALLIE.SYNC = {
   key: "wallie911_sync_v2",
@@ -692,7 +692,7 @@ WALLIE.SYNC = {
       a.eerlikheid ? `Eerlikheid: ${a.eerlikheid}` : null,
       a.help_more ? `Help: ${a.help_more}` : null,
       ...Object.entries(a)
-        .filter(([k]) => !["fokus", "metode", "blokkade", "eerlikheid", "help_more"].includes(k))
+        .filter(([k, v]) => v != null && !["fokus", "metode", "blokkade", "eerlikheid", "help_more"].includes(k))
         .map(([k, v]) => `${k}: ${v}`)
     ]
       .filter(Boolean)

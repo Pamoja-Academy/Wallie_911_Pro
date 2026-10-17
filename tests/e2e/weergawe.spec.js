@@ -121,11 +121,8 @@ test("ou weergawe TYDENS 'n sessie: geen herlaai nie, banier; herlaai eers ná d
   expect(await loads(page)).toBe(1);
 
   await page.locator('[data-scale="wallie-fokus"][data-val="4"]').click();
-  await page.locator('input[name="metode"][value="ja"]').check();
+  /* Kort vorm: fokus + moeilikheid (fokus 4 en "reg": geen blokkade-vraag nie) */
   await page.locator('input[name="moeilikheid"][value="reg"]').check();
-  await page.locator('input[name="blokkade"][value="moeg"]').check();
-  await page.locator('input[name="eerlikheid"][value="meeste"]').check();
-  await page.locator('textarea[name="help_more"]').fill("Dankie.");
   ctl.once = true; /* die herlaaide bladsy kry die nuwe (regte) weergawe */
   await page.locator("#wallie-survey-save").click();
   await expect(page.locator("#wallie-survey-modal")).toBeHidden();

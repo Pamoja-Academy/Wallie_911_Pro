@@ -63,6 +63,55 @@ WALLIE.SURVEY = {
     }
   ],
 
+  /* Velde wat net een keer per dag gevra word (die volle dagvorm) */
+  dagVelde: ["metode", "eerlikheid", "help_more"],
+
+  /** Is hierdie die volle dagvorm of die kort vorm? Suiwer funksie (geen skerm, geen stoor).
+   *  blok: { id } van die sessie se blok (of null); state: { blocks, wallieSurveys }; nou: Date of ms.
+   *  Volledig as: geen blok gekoppel / blok nie in die dagplan nie; OF dit die LAASTE studieblok (nie "break") is;
+   *  OF daar vandag nog geen volledige vorm gestoor is nie EN (dit is ná 16:00 OF daar kom vandag geen latere
+   *  toets-/skrif-blok meer nie). Sonder die laaste deel kry Wallie op 'n normale dag nooit die dagvorm nie: die laaste
+   *  blok is gewoonlik 'n merk-/voorbereidingsblok sonder sessie, en sy dag eindig dikwels voor 16:00 (QC 17 Okt, simulasie
+   *  oor die plan van 15-26 Okt). */
+  volledig(blok, state, nou) {
+    const wanneer = nou instanceof Date ? nou : new Date(nou == null ? Date.now() : nou);
+    const blokke = (state && Array.isArray(state.blocks) ? state.blocks : []).filter((b) => b && b.id);
+    const studie = blokke.filter((b) => b.kind !== "break");
+    if (!blok || !blok.id || !studie.some((b) => b.id === blok.id)) return true;
+    const i = studie.findIndex((b) => b.id === blok.id);
+    if (i === studie.length - 1) return true;
+    const dag = `${wanneer.getFullYear()}-${String(wanneer.getMonth() + 1).padStart(2, "0")}-${String(wanneer.getDate()).padStart(2, "0")}`;
+    const alGehad = ((state && state.wallieSurveys) || []).some(
+      (x) => x && x.date === dag && x.answers && WALLIE.SURVEY.dagVelde.some((k) => k in x.answers)
+    );
+    if (alGehad) return false;
+    if (wanneer.getHours() * 60 + wanneer.getMinutes() >= 16 * 60) return true;
+    /* Net 'n vaste plan het blokke met 'n `soort`; die generiese rotasie nie (dan bly dit die laaste blok / ná 16:00). */
+    const metSoort = studie.filter((b) => b.soort);
+    if (!metSoort.length) return false;
+    /* Die dag se "werk"-blokke: toets/skrif; sonder dié, enige blok met 'n soort behalwe "voor-eksamen" (net kyk, tas pak). */
+    const werk = metSoort.filter((b) => b.soort === "toets" || b.soort === "skrif");
+    const reeks = werk.length ? werk : metSoort.filter((b) => b.soort !== "voor-eksamen");
+    return !studie.slice(i + 1).some((b) => reeks.includes(b));
+  },
+
+  /** Watter velde (ids, in vraelys-volgorde) moet nou sigbaar wees?
+   *  fokus + moeilikheid altyd; blokkade net as fokus ≤ 3 OF moeilikheid ≠ "reg"; die dag-velde net by die volle vorm. */
+  velde(blok, state, nou, antwoorde) {
+    const a = antwoorde || {};
+    const vol = WALLIE.SURVEY.volledig(blok, state, nou);
+    const fokus = a.fokus != null && a.fokus !== "" ? Number(a.fokus) : NaN;
+    const moeil = a.moeilikheid != null && a.moeilikheid !== "" ? String(a.moeilikheid) : null;
+    const blokkade = fokus <= 3 || (moeil != null && moeil !== "reg");
+    return WALLIE.SURVEY.wallieFields
+      .map((f) => f.id)
+      .filter((id) => {
+        if (id === "blokkade") return blokkade;
+        if (WALLIE.SURVEY.dagVelde.includes(id)) return vol;
+        return true;
+      });
+  },
+
   /** Pa — na jy gekyk / einde van blok of dag */
   paFields: [
     {
@@ -150,6 +199,9 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
   }
 
   wallie.forEach((w) => {
+    /* Kort surveys bevat net fokus + moeilikheid (+ blokkade): reëls wat 'n afwesige veld nodig het, word oorgeslaan */
+    w = { ...w, answers: w.answers || {} };
+    const hetFokus = w.answers.fokus != null && w.answers.fokus !== "";
     const matchPa = pa.find((p) => p.sessionId === w.sessionId) || pa[0];
     if (w.answers?.metode === "nee") {
       flags.push({
@@ -165,7 +217,7 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
       });
       aksies.push("Pa: mid-blok check + foon by jou / buite bereik.");
     }
-    if (Number(w.answers?.fokus) <= 2) {
+    if (hetFokus && Number(w.answers.fokus) <= 2) {
       flags.push({
         level: "warn",
         text: `${subjectLabel(w.subjectSlug)}: fokus self ≤2.`
@@ -189,7 +241,7 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
       }
       if (
         matchPa.answers?.produksie === "besig" &&
-        (w.answers?.fokus >= 4 || w.answers?.eerlikheid === "100")
+        ((hetFokus && Number(w.answers.fokus) >= 4) || w.answers.eerlikheid === "100")
       ) {
         flags.push({
           level: "alert",
@@ -197,7 +249,7 @@ WALLIE.synthesizeDay = function synthesizeDay(state, dateKey) {
         });
         aksies.push("Moenie sy survey as wet vat — vereis bewys (foto van werk / foutlog).");
       }
-      if (matchPa.answers?.teenwoordig === "nee" && Number(w.answers?.fokus) >= 4) {
+      if (matchPa.answers?.teenwoordig === "nee" && hetFokus && Number(w.answers.fokus) >= 4) {
         flags.push({
           level: "alert",
           text: "MISMATCH: Pa sê nie teenwoordig; hy sê hoë fokus."

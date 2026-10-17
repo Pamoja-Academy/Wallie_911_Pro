@@ -631,6 +631,7 @@
   }
 
   function buildSurveyForm(formEl, fields, prefix) {
+    /* Vragetekste en opsies kom uit WALLIE.SURVEY (vaste tekste); geen gebruikersteks nie */
     formEl.innerHTML = fields
       .map((f) => {
         if (f.type === "scale") {
@@ -679,6 +680,9 @@
   function readSurveyAnswers(formEl, fields) {
     const answers = {};
     for (const f of fields) {
+      /* Verborge (of nie-gewysde) velde word nie gestoor nie en tel nie as "ontbreek" nie */
+      const vraag = formEl.querySelector(`.survey-q[data-field="${f.id}"]`);
+      if (!vraag || vraag.classList.contains("hidden")) continue;
       if (f.type === "choice") {
         const checked = formEl.querySelector(`input[name="${f.id}"]:checked`);
         if (!checked) return { ok: false, missing: f.label };
@@ -698,9 +702,34 @@
     return { ok: true, answers };
   }
 
+  /* Fokus + moeilikheid soos tans ingevul (vir die lewendige blokkade-reël) */
+  function surveyHuidig(form) {
+    const f = form.querySelector('input[type="hidden"][name="fokus"]');
+    const m = form.querySelector('input[name="moeilikheid"]:checked');
+    return { fokus: f?.value || null, moeilikheid: m?.value || null };
+  }
+
+  /* Wys/verberg die vrae volgens WALLIE.SURVEY.velde (blokkade verskyn en verdwyn lewendig) */
+  function surveyWerkby(form) {
+    const sigbaar = WALLIE.SURVEY.velde(form._blok, state, new Date(), surveyHuidig(form));
+    form.querySelectorAll(".survey-q").forEach((q) => q.classList.toggle("hidden", !sigbaar.includes(q.dataset.field)));
+  }
+
   function openWallieSurvey(session) {
     const form = $("#wallie-survey-form");
-    buildSurveyForm(form, WALLIE.SURVEY.wallieFields, "wallie");
+    const blok = session.block || null;
+    const nou = new Date();
+    const vol = WALLIE.SURVEY.volledig(blok, state, nou);
+    /* Die vorm bou al die velde wat hierdie vorm ooit kan wys (blokkade ingesluit); surveyWerkby wys net die regte */
+    const kandidaat = WALLIE.SURVEY.velde(blok, state, nou, { fokus: 1, moeilikheid: "te_swaar" });
+    buildSurveyForm(form, WALLIE.SURVEY.wallieFields.filter((f) => kandidaat.includes(f.id)), "wallie");
+    form._blok = blok;
+    surveyWerkby(form);
+    form.onclick = () => surveyWerkby(form);
+    form.onchange = () => surveyWerkby(form);
+    const naam = blok?.title || subjectBySlug(session.subjectSlug)?.naam || session.subjectSlug;
+    $("#wallie-survey-kop").textContent = vol ? "Dagvraelys (einde van die dag)" : "Kort vraelys (2 vrae)";
+    $("#wallie-survey-nota").textContent = `Blok: ${naam} · ±${vol ? 45 : 15} sekondes`;
     $("#wallie-survey-meta").textContent = `${subjectBySlug(session.subjectSlug)?.naam || session.subjectSlug} · ${session.durationMin}m · waarskuwings ${session.warnings}`;
     form.dataset.sessionId = session.id;
     form.dataset.subjectSlug = session.subjectSlug;
@@ -751,10 +780,19 @@
     const wallie = vis(state.wallieSurveys).filter((s) => s.date === today);
     const pa = (state.paSurveys || []).filter((s) => s.date === today);
     const raw = [
-      ...wallie.map(
-        (w) =>
-          `<li><strong>Wallie</strong> ${subjectBySlug(w.subjectSlug)?.naam || w.subjectSlug}: fokus ${w.answers.fokus}/5 · metode ${w.answers.metode} · blokkade ${w.answers.blokkade} · eerlikheid ${w.answers.eerlikheid}${w.answers.help_more ? ` · “${w.answers.help_more}”` : ""}</li>`
-      ),
+      ...wallie.map((w) => {
+        /* Kort surveys het net 'n deel van die velde: afwesig = "—", nooit "undefined" nie */
+        const a = w.answers || {};
+        const v = (k) => (a[k] != null && a[k] !== "" ? String(a[k]) : "—");
+        const li = document.createElement("li");
+        const sterk = document.createElement("strong");
+        sterk.textContent = "Wallie";
+        li.append(
+          sterk,
+          ` ${subjectBySlug(w.subjectSlug)?.naam || w.subjectSlug}: fokus ${a.fokus != null && a.fokus !== "" ? a.fokus + "/5" : "—"} · metode ${v("metode")} · blokkade ${v("blokkade")} · eerlikheid ${v("eerlikheid")}${a.help_more ? ` · “${a.help_more}”` : ""}`
+        );
+        return li.outerHTML;
+      }),
       ...pa.map(
         (p) =>
           `<li><strong>Pa</strong>: teenwoordig ${p.answers.teenwoordig} · produksie ${p.answers.produksie} · vertroue ${p.answers.vertroue} · roep ${p.answers.verandering}${p.answers.nota ? ` · ${p.answers.nota}` : ""}</li>`
@@ -979,11 +1017,34 @@
         wenk.setAttribute("role", "alert");
         wenk.textContent = window.VroegKlaar.teks(vroeg) + " Druk weer om te bevestig.";
         done.closest(".md-body")?.append(wenk);
+        /* Opsionele self-gerapporteerde papier-minute (verander nie die waarskuwing of Pa se vlag nie) */
+        const papier = document.createElement("div");
+        papier.className = "papier-min";
+        const papierLabel = document.createElement("label");
+        papierLabel.htmlFor = "papier-min-" + done.dataset.id;
+        papierLabel.textContent = "Hoeveel minute het jy op papier gewerk? (opsioneel)";
+        const papierVeld = document.createElement("input");
+        papierVeld.type = "number";
+        papierVeld.id = papierLabel.htmlFor;
+        papierVeld.className = "papier-min-veld";
+        papierVeld.min = "0";
+        papierVeld.max = "600";
+        papierVeld.step = "1";
+        papierVeld.inputMode = "numeric";
+        papier.append(papierLabel, papierVeld);
+        done.closest(".md-body")?.append(papier);
         return;
+      }
+      /* Papier-minute: net as die waarskuwing getoon is en die getal 'n geldige heelgetal 0–600 is */
+      let papierMin = null;
+      if (vroeg) {
+        const rou = done.closest(".md-body")?.querySelector(".papier-min-veld")?.value;
+        const n = rou != null && rou.trim() !== "" ? Number(rou) : NaN;
+        if (Number.isInteger(n) && n >= 0 && n <= 600) papierMin = n;
       }
       /* Spoor vir Pa (LL-01): het die eksamenmodus-werk die waarskuwing onderdruk, stuur die minute saam (bestaande soort "block"). */
       const spoor = vroeg
-        ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan }
+        ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan, ...(papierMin != null ? { papier_min: papierMin } : {}) }
         : eksamen && eksamen.werk
           ? { eksamen_min: eksamen.minute }
           : null;

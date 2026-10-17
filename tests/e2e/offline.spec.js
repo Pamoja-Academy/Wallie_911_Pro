@@ -53,10 +53,10 @@ test("vanlyn → tou + rooi aanwyser + Pa-waarskuwing → herstel sonder verlies
   /* 3. Sessie eindig en survey word ingevul terwyl dit steeds nie sinkroniseer nie */
   await page.locator("#end-session").click();
   await page.locator('[data-scale="wallie-fokus"][data-val="3"]').click();
-  for (const [n, v] of [["metode", "gedeeltelik"], ["moeilikheid", "te_swaar"], ["blokkade", "verward"], ["eerlikheid", "100"]]) {
+  /* Kort vorm (blok in die dagplan, nie die laaste nie): fokus + moeilikheid, en blokkade omdat fokus <= 3 */
+  for (const [n, v] of [["moeilikheid", "te_swaar"], ["blokkade", "verward"]]) {
     await page.locator(`input[name="${n}"][value="${v}"]`).check();
   }
-  await page.locator('textarea[name="help_more"]').fill("VLOOKUP verstaan ek nog nie.");
   await page.locator("#wallie-survey-save").click();
   q = await queue(page);
   const waiting = q.filter((i) => i.kind !== "heartbeat" && i.state !== "parked").map((i) => i.id);
@@ -77,7 +77,7 @@ test("vanlyn → tou + rooi aanwyser + Pa-waarskuwing → herstel sonder verlies
   expect(end.outcome).toBe("handmatig");
   expect(end.client_at).toBeLessThanOrEqual(pageNowAtRecovery);
   const sv = mock.byKind("survey")[0].body.p;
-  expect(sv.data.answers.help_more).toBe("VLOOKUP verstaan ek nog nie.");
+  expect(sv.data.answers).toEqual({ fokus: "3", moeilikheid: "te_swaar", blokkade: "verward" });
   /* Volgorde: einde vóór survey (op toestel-tyd) */
   expect(delivered.indexOf(`end:${sid}`)).toBeLessThan(delivered.indexOf(sv.event_id));
   /* Ou hartkloppe is nie na die ou bediener gestuur nie (sou ’n klaar sessie lewendig laat lyk) */
