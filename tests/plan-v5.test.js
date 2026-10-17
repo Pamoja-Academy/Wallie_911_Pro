@@ -222,6 +222,19 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
   if (b && b.kind !== kind) fails.push(`${id}: kind is ${b.kind}, verwag ${kind}`);
 }
 
+/* 19 Okt (dag voor Afrikaans V3): kies-en-beplan-drill + een B-teks getimed + inleiding/paragraaf/slot; GEEN tweede volle 100-min-opstel
+   (gereedheid-kruiskontrole 17 Okt: die eksamentegniek-gaping — kies, beplan, nooit 'n afdeling oop laat nie — is groter as nog 'n opstel) */
+{
+  const p19 = ctx.WALLIE.buildDayPlan("2026-10-19").blocks;
+  const kort = (s) => p19.find((b) => b.id === "2026-10-19-" + s);
+  const keuse = kort("keuse"), b2 = kort("afr-b2"), inl = kort("inl-slot");
+  if (!keuse || keuse.minutes !== 30 || keuse.soort !== "toets" || keuse.item) fails.push("19 Okt: keuse moet 'n 30-min toets sonder item wees");
+  if (!b2 || b2.item !== "afr-v3-B2" || b2.minutes !== 40 || b2.punte !== 25) fails.push("19 Okt: afr-b2 moet item afr-v3-B2 (25 punte, 40 min) wees");
+  if (!inl || inl.minutes !== 40 || inl.soort !== "toets" || !/inleiding.*slot/.test(inl.title)) fails.push("19 Okt: inl-slot moet 'n 40-min inleiding/paragraaf/slot-blok wees");
+  if (p19.some((b) => b.item === "afr-v3-A1")) fails.push("19 Okt: geen tweede volle A1-opstel (100 min) meer nie");
+  if (p19.some((b) => b.minutes >= 100 && b.kind !== "break")) fails.push("19 Okt: geen studieblok van 100+ min meer nie");
+}
+
 if (fails.length) {
   console.error("plan-v5: FOUT\n - " + fails.join("\n - "));
   process.exit(1);
