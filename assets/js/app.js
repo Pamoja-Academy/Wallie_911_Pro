@@ -1017,11 +1017,34 @@
         wenk.setAttribute("role", "alert");
         wenk.textContent = window.VroegKlaar.teks(vroeg) + " Druk weer om te bevestig.";
         done.closest(".md-body")?.append(wenk);
+        /* Opsionele self-gerapporteerde papier-minute (verander nie die waarskuwing of Pa se vlag nie) */
+        const papier = document.createElement("div");
+        papier.className = "papier-min";
+        const papierLabel = document.createElement("label");
+        papierLabel.htmlFor = "papier-min-" + done.dataset.id;
+        papierLabel.textContent = "Hoeveel minute het jy op papier gewerk? (opsioneel)";
+        const papierVeld = document.createElement("input");
+        papierVeld.type = "number";
+        papierVeld.id = papierLabel.htmlFor;
+        papierVeld.className = "papier-min-veld";
+        papierVeld.min = "0";
+        papierVeld.max = "600";
+        papierVeld.step = "1";
+        papierVeld.inputMode = "numeric";
+        papier.append(papierLabel, papierVeld);
+        done.closest(".md-body")?.append(papier);
         return;
+      }
+      /* Papier-minute: net as die waarskuwing getoon is en die getal 'n geldige heelgetal 0–600 is */
+      let papierMin = null;
+      if (vroeg) {
+        const rou = done.closest(".md-body")?.querySelector(".papier-min-veld")?.value;
+        const n = rou != null && rou.trim() !== "" ? Number(rou) : NaN;
+        if (Number.isInteger(n) && n >= 0 && n <= 600) papierMin = n;
       }
       /* Spoor vir Pa (LL-01): het die eksamenmodus-werk die waarskuwing onderdruk, stuur die minute saam (bestaande soort "block"). */
       const spoor = vroeg
-        ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan }
+        ? { vroeg_klaar: vroeg.kode, minute_gedoen: vroeg.gedoen, minute_beplan: vroeg.plan, ...(papierMin != null ? { papier_min: papierMin } : {}) }
         : eksamen && eksamen.werk
           ? { eksamen_min: eksamen.minute }
           : null;

@@ -583,6 +583,9 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
 }
 .modal-card h2 { margin: 0 0 0.35rem; font-family: var(--display); font-size: 1.35rem; }
 .survey-kop { margin: 0 0 0.25rem; font-weight: 700; color: var(--accent); }
+.papier-min { display: grid; gap: 0.35rem; margin: 0.5rem 0 0; }
+.papier-min label { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+.papier-min input { min-height: 44px; width: 8rem; font: inherit; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
 .survey-form { display: grid; gap: 0.9rem; margin: 0.85rem 0; }
 .survey-q { display: grid; gap: 0.4rem; }
 .survey-q label.q-label { font-size: 0.9rem; font-weight: 600; color: var(--text); }
