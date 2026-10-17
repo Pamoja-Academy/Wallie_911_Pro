@@ -63,6 +63,43 @@ WALLIE.SURVEY = {
     }
   ],
 
+  /* Velde wat net een keer per dag gevra word (die volle dagvorm) */
+  dagVelde: ["metode", "eerlikheid", "help_more"],
+
+  /** Is hierdie die volle dagvorm of die kort vorm? Suiwer funksie (geen skerm, geen stoor).
+   *  blok: { id } van die sessie se blok (of null); state: { blocks, wallieSurveys }; nou: Date of ms.
+   *  Volledig as: geen blok gekoppel / blok nie in die dagplan nie; OF dit die LAASTE studieblok (nie "break") is;
+   *  OF daar vandag nog geen volledige vorm gestoor is nie en dit reeds ná 16:00 is. */
+  volledig(blok, state, nou) {
+    const wanneer = nou instanceof Date ? nou : new Date(nou == null ? Date.now() : nou);
+    const blokke = (state && Array.isArray(state.blocks) ? state.blocks : []).filter((b) => b && b.id);
+    const studie = blokke.filter((b) => b.kind !== "break");
+    if (!blok || !blok.id || !studie.some((b) => b.id === blok.id)) return true;
+    if (studie[studie.length - 1].id === blok.id) return true;
+    const dag = `${wanneer.getFullYear()}-${String(wanneer.getMonth() + 1).padStart(2, "0")}-${String(wanneer.getDate()).padStart(2, "0")}`;
+    const alGehad = ((state && state.wallieSurveys) || []).some(
+      (x) => x && x.date === dag && x.answers && WALLIE.SURVEY.dagVelde.some((k) => k in x.answers)
+    );
+    return !alGehad && wanneer.getHours() * 60 + wanneer.getMinutes() >= 16 * 60;
+  },
+
+  /** Watter velde (ids, in vraelys-volgorde) moet nou sigbaar wees?
+   *  fokus + moeilikheid altyd; blokkade net as fokus ≤ 3 OF moeilikheid ≠ "reg"; die dag-velde net by die volle vorm. */
+  velde(blok, state, nou, antwoorde) {
+    const a = antwoorde || {};
+    const vol = WALLIE.SURVEY.volledig(blok, state, nou);
+    const fokus = a.fokus != null && a.fokus !== "" ? Number(a.fokus) : NaN;
+    const moeil = a.moeilikheid != null && a.moeilikheid !== "" ? String(a.moeilikheid) : null;
+    const blokkade = fokus <= 3 || (moeil != null && moeil !== "reg");
+    return WALLIE.SURVEY.wallieFields
+      .map((f) => f.id)
+      .filter((id) => {
+        if (id === "blokkade") return blokkade;
+        if (WALLIE.SURVEY.dagVelde.includes(id)) return vol;
+        return true;
+      });
+  },
+
   /** Pa — na jy gekyk / einde van blok of dag */
   paFields: [
     {

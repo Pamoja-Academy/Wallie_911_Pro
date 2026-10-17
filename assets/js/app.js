@@ -631,6 +631,7 @@
   }
 
   function buildSurveyForm(formEl, fields, prefix) {
+    /* Vragetekste en opsies kom uit WALLIE.SURVEY (vaste tekste); geen gebruikersteks nie */
     formEl.innerHTML = fields
       .map((f) => {
         if (f.type === "scale") {
@@ -679,6 +680,9 @@
   function readSurveyAnswers(formEl, fields) {
     const answers = {};
     for (const f of fields) {
+      /* Verborge (of nie-gewysde) velde word nie gestoor nie en tel nie as "ontbreek" nie */
+      const vraag = formEl.querySelector(`.survey-q[data-field="${f.id}"]`);
+      if (!vraag || vraag.classList.contains("hidden")) continue;
       if (f.type === "choice") {
         const checked = formEl.querySelector(`input[name="${f.id}"]:checked`);
         if (!checked) return { ok: false, missing: f.label };
@@ -698,9 +702,34 @@
     return { ok: true, answers };
   }
 
+  /* Fokus + moeilikheid soos tans ingevul (vir die lewendige blokkade-reël) */
+  function surveyHuidig(form) {
+    const f = form.querySelector('input[type="hidden"][name="fokus"]');
+    const m = form.querySelector('input[name="moeilikheid"]:checked');
+    return { fokus: f?.value || null, moeilikheid: m?.value || null };
+  }
+
+  /* Wys/verberg die vrae volgens WALLIE.SURVEY.velde (blokkade verskyn en verdwyn lewendig) */
+  function surveyWerkby(form) {
+    const sigbaar = WALLIE.SURVEY.velde(form._blok, state, new Date(), surveyHuidig(form));
+    form.querySelectorAll(".survey-q").forEach((q) => q.classList.toggle("hidden", !sigbaar.includes(q.dataset.field)));
+  }
+
   function openWallieSurvey(session) {
     const form = $("#wallie-survey-form");
-    buildSurveyForm(form, WALLIE.SURVEY.wallieFields, "wallie");
+    const blok = session.block || null;
+    const nou = new Date();
+    const vol = WALLIE.SURVEY.volledig(blok, state, nou);
+    /* Die vorm bou al die velde wat hierdie vorm ooit kan wys (blokkade ingesluit); surveyWerkby wys net die regte */
+    const kandidaat = WALLIE.SURVEY.velde(blok, state, nou, { fokus: 1, moeilikheid: "te_swaar" });
+    buildSurveyForm(form, WALLIE.SURVEY.wallieFields.filter((f) => kandidaat.includes(f.id)), "wallie");
+    form._blok = blok;
+    surveyWerkby(form);
+    form.onclick = () => surveyWerkby(form);
+    form.onchange = () => surveyWerkby(form);
+    const naam = blok?.title || subjectBySlug(session.subjectSlug)?.naam || session.subjectSlug;
+    $("#wallie-survey-kop").textContent = vol ? "Dagvraelys (einde van die dag)" : "Kort vraelys (2 vrae)";
+    $("#wallie-survey-nota").textContent = `Blok: ${naam} · ±${vol ? 45 : 15} sekondes`;
     $("#wallie-survey-meta").textContent = `${subjectBySlug(session.subjectSlug)?.naam || session.subjectSlug} · ${session.durationMin}m · waarskuwings ${session.warnings}`;
     form.dataset.sessionId = session.id;
     form.dataset.subjectSlug = session.subjectSlug;
