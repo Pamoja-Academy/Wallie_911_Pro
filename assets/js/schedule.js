@@ -283,7 +283,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       { suffix: "klaar", kind: "break", slug: "break", start: "19:50", end: "19:50", soort: "pouse",
         title: "Klaar. Skerms af 21:30, bed 22:00.", detail: "Werk is klaar. Skerms af om 21:30, bed 22:00." }
     ],
-    /* Plan 19 Okt (17 Okt, gereedheid-kruiskontrole + Hanno se ja): keuse-en-beplan-drill + een B-teks getimed + inleiding/paragraaf/slot, i.p.v. nog 'n volle 100-min-opstel. Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): 15-26 Okt: Do 15 eksamendag Engels V3,
+    /* Plan 18-19 Okt (17 Okt aand, Hanno: 'hy moet nog BAIE Afrikaans studeer'): So 18 kry 'n volle A1-opstel (100 min) + merk saam met Pa; Ma 19 keuse-en-beplan-drill + een B-teks + inleiding/paragraaf/slot, en dan die gekose Nov 2025-opstel volledig op papier (skrif, 100 min) + merk saam met Pa. Plan v5 (Claude as projekbestuurder, 14 Okt aand; Hanno moet bevestig): 15-26 Okt: Do 15 eksamendag Engels V3,
        dan Afrikaans HT V3 (Di 20), Wisk. Gel. V1 (Vr 23) en V2 (Ma 26) (ook vaste eksamendag-planne) met eksamenvlak-items; elke studieblok se hooftaak is 'n item (`item`) of DBE-werk.
        `item` is die id van 'n eksamenvlak-item (data/vraebank-v3.json) en wen as hooftaak (lesson-ui.js hoofTaak).
        Soort "voor-eksamen" is 'n ligte eksamendag-opwarm wat sy eie titel as hooftaak hou. */
@@ -389,7 +389,15 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         title: "Wisk. Gel. V1: Vraag 5 (die res van die DBE-vraestel), op papier, getimed (30 punte, 40 min)", detail: "" },
       { suffix: "merk-wg-v1", kind: "groen", slug: "wiskgelett", start: "13:40", end: "14:00", soort: "merk",
         title: "Merk Wisk. Gel. met die memo", detail: "" },
-      { suffix: "klaar", kind: "break", slug: "break", start: "14:00", end: "14:00", soort: "pouse",
+      { suffix: "pouse2", kind: "break", slug: "break", start: "14:00", end: "14:20", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "afr-a1", kind: "rooi", slug: "afrikaans", start: "14:20", end: "16:00", soort: "toets",
+        item: "afr-v3-A1", punte: 50,
+        title: "Afrikaans V3 A1 opstel, volledig en getimed (50 punte, 100 min)",
+        detail: "Beplan 10 min, skryf 80, lees oor 10. 400-450 woorde. Skryf tot die tyd om is: 'n onvoltooide opstel kos die meeste punte." },
+      { suffix: "merk-afr-a1", kind: "rooi", slug: "afrikaans", start: "16:00", end: "16:30", soort: "merk",
+        title: "Merk A1 saam met Pa (rubriek 30/15/5)", detail: "Inhoud 30, taal 15, struktuur 5. Skryf die 3 grootste foute neer vir môre." },
+      { suffix: "klaar", kind: "break", slug: "break", start: "16:30", end: "16:30", soort: "pouse",
         title: "Klaar. Skerms af 21:30.", detail: "" }
     ],
     "2026-10-19": [
@@ -414,9 +422,16 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         detail: "Brief, dagboek, verslag, toespraak, e-pos: net die formaat." },
       { suffix: "middag", kind: "break", slug: "break", start: "11:00", end: "12:00", soort: "pouse",
         title: "Middagete", detail: "" },
-      { suffix: "tas", kind: "rooi", slug: "afrikaans", start: "12:00", end: "12:30", soort: "voor-eksamen",
+      { suffix: "opstel", kind: "rooi", slug: "afrikaans", start: "12:00", end: "13:40", soort: "skrif",
+        title: "Afrikaans V3 proef: skryf die opstel wat jy vanoggend gekies het, volledig op papier (50 punte, 100 min)",
+        detail: "DBE Nov 2025 V3-vraestel (Pa gee). Jou breinkaart en inleiding is klaar: skryf 400-450 woorde, lees oor in die laaste 10 min. Hou aan tot die tyd om is." },
+      { suffix: "pouse2", kind: "break", slug: "break", start: "13:40", end: "14:00", soort: "pouse",
+        title: "Pouse", detail: "" },
+      { suffix: "merk-opstel", kind: "rooi", slug: "afrikaans", start: "14:00", end: "14:30", soort: "merk",
+        title: "Merk die opstel saam met Pa (rubriek 30/15/5)", detail: "Een ding om môre anders te doen: skryf dit bo-aan jou kontrolelys." },
+      { suffix: "tas", kind: "rooi", slug: "afrikaans", start: "14:30", end: "15:00", soort: "voor-eksamen",
         title: "Kontrolelys en tas pak vir môre", detail: "ID, toelatingsbrief, penne, water. Slaap vroeg." },
-      { suffix: "klaar", kind: "break", slug: "break", start: "12:30", end: "12:30", soort: "pouse",
+      { suffix: "klaar", kind: "break", slug: "break", start: "15:00", end: "15:00", soort: "pouse",
         title: "Klaar. Skerms af 21:00, bed 21:30.", detail: "Rus is deel van die voorbereiding." }
     ],
     "2026-10-20": [

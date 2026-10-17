@@ -72,7 +72,7 @@ for (const dag of DAE) {
 }
 
 /* Afrikaans-minute per dag (A1/A2 = 100 min, B = 40 min, merk/herdoen/voor-eksamen soos in die plan) */
-const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30, "2026-10-19": 100 + 30 + 30 + 30, "2026-10-20": 20 + 20, "2026-10-21": 0, "2026-10-22": 0, "2026-10-23": 0, "2026-10-24": 0, "2026-10-25": 0, "2026-10-26": 0 };
+const afrVerwag = { "2026-10-15": 40 + 20 + 40 + 20, "2026-10-16": 100 + 30 + 40 + 20, "2026-10-17": 100 + 30 + 40 + 20, "2026-10-18": 40 + 20 + 30 + 100 + 30, "2026-10-19": 100 + 30 + 30 + 30 + 100 + 30, "2026-10-20": 20 + 20, "2026-10-21": 0, "2026-10-22": 0, "2026-10-23": 0, "2026-10-24": 0, "2026-10-25": 0, "2026-10-26": 0 };
 for (const dag of DAE) {
   const som = ctx.WALLIE.buildDayPlan(dag)
     .blocks.filter((b) => b.kind !== "break" && b.subjectSlug === "afrikaans")
@@ -222,8 +222,10 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
   if (b && b.kind !== kind) fails.push(`${id}: kind is ${b.kind}, verwag ${kind}`);
 }
 
-/* 19 Okt (dag voor Afrikaans V3): kies-en-beplan-drill + een B-teks getimed + inleiding/paragraaf/slot; GEEN tweede volle 100-min-opstel
-   (gereedheid-kruiskontrole 17 Okt: die eksamentegniek-gaping — kies, beplan, nooit 'n afdeling oop laat nie — is groter as nog 'n opstel) */
+/* 18-19 Okt (Hanno, 17 Okt aand: "hy moet nog BAIE Afrikaans studeer"):
+   So 18: ná Wisk. Gel. 'n volle A1-opstel (item, 100 min) + merk saam met Pa.
+   Ma 19: kies-en-beplan-drill + een B-teks getimed + inleiding/paragraaf/slot, dan die gekose Nov 2025-opstel volledig op papier
+   (soort skrif, 100 min, sonder item) + merk saam met Pa, en eers dan die tas. */
 {
   const p19 = ctx.WALLIE.buildDayPlan("2026-10-19").blocks;
   const kort = (s) => p19.find((b) => b.id === "2026-10-19-" + s);
@@ -231,8 +233,14 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
   if (!keuse || keuse.minutes !== 30 || keuse.soort !== "toets" || keuse.item) fails.push("19 Okt: keuse moet 'n 30-min toets sonder item wees");
   if (!b2 || b2.item !== "afr-v3-B2" || b2.minutes !== 40 || b2.punte !== 25) fails.push("19 Okt: afr-b2 moet item afr-v3-B2 (25 punte, 40 min) wees");
   if (!inl || inl.minutes !== 40 || inl.soort !== "toets" || !/inleiding.*slot/.test(inl.title)) fails.push("19 Okt: inl-slot moet 'n 40-min inleiding/paragraaf/slot-blok wees");
-  if (p19.some((b) => b.item === "afr-v3-A1")) fails.push("19 Okt: geen tweede volle A1-opstel (100 min) meer nie");
-  if (p19.some((b) => b.minutes >= 100 && b.kind !== "break")) fails.push("19 Okt: geen studieblok van 100+ min meer nie");
+  const opstel = kort("opstel"), merkOp = kort("merk-opstel"), tas = kort("tas");
+  if (!opstel || opstel.soort !== "skrif" || opstel.minutes !== 100 || opstel.item || opstel.subjectSlug !== "afrikaans" || !/Nov 2025/.test(opstel.detail)) fails.push("19 Okt: opstel moet 'n Afrikaans skrif-blok van 100 min sonder item wees (DBE Nov 2025, op papier)");
+  if (!merkOp || merkOp.soort !== "merk" || merkOp.minutes !== 30) fails.push("19 Okt: merk-opstel moet 'n merk-blok van 30 min wees");
+  if (!tas || !opstel || tas.start < opstel.end) fails.push("19 Okt: die tas kom ná die opstel");
+  const p18 = ctx.WALLIE.buildDayPlan("2026-10-18").blocks;
+  const a1 = p18.find((b) => b.id === "2026-10-18-afr-a1"), merkA1 = p18.find((b) => b.id === "2026-10-18-merk-afr-a1");
+  if (!a1 || a1.item !== "afr-v3-A1" || a1.minutes !== 100 || a1.punte !== 50 || a1.soort !== "toets") fails.push("18 Okt: afr-a1 moet item afr-v3-A1 (50 punte, 100 min) wees");
+  if (!merkA1 || merkA1.soort !== "merk" || merkA1.minutes !== 30) fails.push("18 Okt: merk-afr-a1 moet 'n merk-blok van 30 min wees");
 }
 
 if (fails.length) {
