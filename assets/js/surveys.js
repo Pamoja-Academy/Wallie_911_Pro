@@ -69,18 +69,30 @@ WALLIE.SURVEY = {
   /** Is hierdie die volle dagvorm of die kort vorm? Suiwer funksie (geen skerm, geen stoor).
    *  blok: { id } van die sessie se blok (of null); state: { blocks, wallieSurveys }; nou: Date of ms.
    *  Volledig as: geen blok gekoppel / blok nie in die dagplan nie; OF dit die LAASTE studieblok (nie "break") is;
-   *  OF daar vandag nog geen volledige vorm gestoor is nie en dit reeds ná 16:00 is. */
+   *  OF daar vandag nog geen volledige vorm gestoor is nie EN (dit is ná 16:00 OF daar kom vandag geen latere
+   *  toets-/skrif-blok meer nie). Sonder die laaste deel kry Wallie op 'n normale dag nooit die dagvorm nie: die laaste
+   *  blok is gewoonlik 'n merk-/voorbereidingsblok sonder sessie, en sy dag eindig dikwels voor 16:00 (QC 17 Okt, simulasie
+   *  oor die plan van 15-26 Okt). */
   volledig(blok, state, nou) {
     const wanneer = nou instanceof Date ? nou : new Date(nou == null ? Date.now() : nou);
     const blokke = (state && Array.isArray(state.blocks) ? state.blocks : []).filter((b) => b && b.id);
     const studie = blokke.filter((b) => b.kind !== "break");
     if (!blok || !blok.id || !studie.some((b) => b.id === blok.id)) return true;
-    if (studie[studie.length - 1].id === blok.id) return true;
+    const i = studie.findIndex((b) => b.id === blok.id);
+    if (i === studie.length - 1) return true;
     const dag = `${wanneer.getFullYear()}-${String(wanneer.getMonth() + 1).padStart(2, "0")}-${String(wanneer.getDate()).padStart(2, "0")}`;
     const alGehad = ((state && state.wallieSurveys) || []).some(
       (x) => x && x.date === dag && x.answers && WALLIE.SURVEY.dagVelde.some((k) => k in x.answers)
     );
-    return !alGehad && wanneer.getHours() * 60 + wanneer.getMinutes() >= 16 * 60;
+    if (alGehad) return false;
+    if (wanneer.getHours() * 60 + wanneer.getMinutes() >= 16 * 60) return true;
+    /* Net 'n vaste plan het blokke met 'n `soort`; die generiese rotasie nie (dan bly dit die laaste blok / ná 16:00). */
+    const metSoort = studie.filter((b) => b.soort);
+    if (!metSoort.length) return false;
+    /* Die dag se "werk"-blokke: toets/skrif; sonder dié, enige blok met 'n soort behalwe "voor-eksamen" (net kyk, tas pak). */
+    const werk = metSoort.filter((b) => b.soort === "toets" || b.soort === "skrif");
+    const reeks = werk.length ? werk : metSoort.filter((b) => b.soort !== "voor-eksamen");
+    return !studie.slice(i + 1).some((b) => reeks.includes(b));
   },
 
   /** Watter velde (ids, in vraelys-volgorde) moet nou sigbaar wees?

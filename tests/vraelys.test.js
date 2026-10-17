@@ -29,10 +29,10 @@ const S = sb.WALLIE.SURVEY;
 /* Dagplan: pouse, 3 studieblokke, pouse (soos 'n VASTE_PLANNE-dag, 17 Okt) */
 const BLOKKE = [
   { id: "d-opstaan", kind: "break" },
-  { id: "d-a", kind: "rooi" },
+  { id: "d-a", kind: "rooi", soort: "toets" },
   { id: "d-pouse", kind: "break" },
-  { id: "d-b", kind: "rooi" },
-  { id: "d-c", kind: "groen" },
+  { id: "d-b", kind: "rooi", soort: "toets" },
+  { id: "d-c", kind: "groen", soort: "toets" },
   { id: "d-klaar", kind: "break" }
 ];
 const dag = (uur, min = 0) => new Date(2026, 9, 17, uur, min, 0);
@@ -58,6 +58,30 @@ ok(S.volledig({ id: "d-b" }, state([{ ...GEHAD, date: "2026-10-16" }]), dag(18))
 ok(S.volledig({ id: "d-b" }, state([{ date: "2026-10-17", answers: { fokus: "4", moeilikheid: "reg" } }]), dag(18)) === true, "'n kort survey vandag tel nie as volledig nie");
 ok(S.volledig({ id: "d-b" }, state([GEHAD]), dag(18).getTime()) === false, "nou as ms werk ook");
 ok(S.volledig({ id: "d-c" }, state([GEHAD]), dag(18)) === true, "laaste blok = altyd volledig, ook as een reeds gestoor is");
+
+/* R2 (QC 17 Okt): volledig as vandag nog geen dagvorm is nie EN geen latere toets-/skrif-blok kom nie.
+   Sonder dit kry Wallie op 'n normale dag nooit die dagvorm nie (laaste blok = merk/voorbereiding sonder sessie). */
+const BLOKKE_MERK = [
+  { id: "m-a", kind: "rooi", soort: "toets" },
+  { id: "m-merk-a", kind: "rooi", soort: "merk" },
+  { id: "m-b", kind: "rooi", soort: "toets" },
+  { id: "m-merk-b", kind: "rooi", soort: "merk" },
+  { id: "m-tas", kind: "warm", soort: "voor-eksamen" }
+];
+const stM = (w = []) => ({ blocks: BLOKKE_MERK, wallieSurveys: w });
+ok(S.volledig({ id: "m-a" }, stM(), dag(9)) === false, "R2: eerste toets, nog 'n toets kom = kort");
+ok(S.volledig({ id: "m-merk-a" }, stM(), dag(10)) === false, "R2: merk-blok, nog 'n toets kom = kort");
+ok(S.volledig({ id: "m-b" }, stM(), dag(11)) === true, "R2: LAASTE toets van die dag = volledig (al is die laaste studieblok 'n voorbereidingsblok)");
+ok(S.volledig({ id: "m-b" }, stM([GEHAD]), dag(11)) === false, "R2: dagvorm reeds gestoor = kort");
+ok(S.volledig({ id: "m-merk-b" }, stM(), dag(12)) === true, "R2: merk ná die laaste toets, nog geen dagvorm = volledig");
+ok(S.volledig({ id: "m-merk-b" }, stM([GEHAD]), dag(12)) === false, "R2: merk ná die laaste toets, dagvorm reeds = kort");
+/* Generiese rotasie (geen blok het 'n soort): bly die oorspronklike reël — net die laaste blok / ná 16:00 */
+const GEN = { blocks: [{ id: "g1", kind: "rooi" }, { id: "g2", kind: "geel" }, { id: "g3", kind: "slot" }], wallieSurveys: [] };
+ok(S.volledig({ id: "g1" }, GEN, dag(9)) === false && S.volledig({ id: "g2" }, GEN, dag(11)) === false, "generies: eerste/middel-blok = kort (nie elke survey volledig nie)");
+ok(S.volledig({ id: "g3" }, GEN, dag(13)) === true, "generies: laaste blok = volledig");
+/* Dae sonder toets/skrif: herdoen-blokke tel, voor-eksamen nie */
+const HERD = { blocks: [{ id: "h1", kind: "groen", soort: "herdoen" }, { id: "h2", kind: "groen", soort: "herdoen" }, { id: "h-tas", kind: "warm", soort: "voor-eksamen" }], wallieSurveys: [] };
+ok(S.volledig({ id: "h1" }, HERD, dag(9)) === false && S.volledig({ id: "h2" }, HERD, dag(10)) === true, "herdoen-dag: die laaste herdoen-blok (voor die tas) = volledig");
 
 /* velde(): blokkade net by fokus <= 3 of moeilikheid anders as reg */
 const kort = (a) => S.velde({ id: "d-a" }, state(), dag(9), a);
@@ -146,6 +170,38 @@ ok(ouSyn.flags.some((f) => /self-aangee foon/.test(f.text)), "ou survey: blokkad
 ok(ouSyn.flags.some((f) => /fokus self ≤2/.test(f.text)), "ou survey: fokus-vlag onveranderd");
 ok(ouSyn.flags.some((f) => /eerlikheid was swak/.test(f.text)), "ou survey: eerlikheid-vlag onveranderd");
 ok(ouSyn.aksies.some((a) => a.includes("Pa check mid-sessie")), "ou survey: help_more-aksie onveranderd");
+
+/* Plan-gebaseerd (QC 17 Okt): op elke vaste plan-dag 15-26 Okt kry Wallie, as hy net op toets-/skrif-blokke 'n sessie doen
+   (merk-/les-/voor-eksamen-blokke net klaar gemerk), TEN MINSTE EEN volle dagvorm. Die survey maak 2 min ná die blok se einde oop. */
+{
+  const ps = { console, localStorage: { getItem: () => null, setItem() {} }, navigator: {}, document: { addEventListener() {} }, addEventListener() {}, setInterval() {}, setTimeout() {} };
+  ps.window = ps;
+  vm.createContext(ps);
+  for (const f of ["assets/js/data.js", "assets/js/pa-konsole/exams.js", "assets/js/schedule.js", "assets/js/surveys.js"]) {
+    vm.runInContext(fs.readFileSync(path.join(__dirname, "..", f), "utf8"), ps, { filename: f });
+  }
+  for (let d = 15; d <= 26; d++) {
+    const dagStr = "2026-10-" + d;
+    const plan = ps.WALLIE.buildDayPlan(dagStr);
+    const surveys = [];
+    let volle = 0;
+    /* Waar sessies realisties is: toets/skrif; op dae sonder dié (bv. 25 Okt) die herdoen-blokke (nie voor-eksamen nie) */
+    const studieBl = plan.blocks.filter((b) => b.kind !== "break");
+    const toetse = studieBl.filter((b) => b.soort === "toets" || b.soort === "skrif");
+    const reeks = toetse.length ? toetse : studieBl.filter((b) => b.soort && b.soort !== "voor-eksamen");
+    for (const b of plan.blocks) {
+      if (b.kind === "break" || !reeks.includes(b)) continue;
+      const [h, m] = b.end.split(":").map(Number);
+      const nou = new Date(2026, 9, d, h, m + 2, 0);
+      const vol = ps.WALLIE.SURVEY.volledig({ id: b.id }, { blocks: plan.blocks, wallieSurveys: surveys }, nou);
+      if (vol) {
+        volle += 1;
+        surveys.push({ date: dagStr, answers: { fokus: "4", moeilikheid: "reg", metode: "ja", eerlikheid: "100", help_more: "" } });
+      }
+    }
+    if (reeks.length) ok(volle >= 1, "plan " + dagStr + ": 'n normale dag (sessies op toets/skrif-blokke) gee ten minste een volle dagvorm, nie " + volle);
+  }
+}
 
 if (fails.length) {
   console.error(`✗ ${fails.length} mislukking(s):\n` + fails.map((f) => " - " + f).join("\n"));
