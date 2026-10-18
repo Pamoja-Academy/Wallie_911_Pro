@@ -235,7 +235,7 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
   const a18 = blok(p18, "2026-10-18", "afr-a-nov25");
   if (!skrif(a18, 100, 50) || !/REGTE DBE Nov 2025/.test(a18.title)) fails.push("18 Okt: afr-a-nov25 moet 'n Afrikaans skrif-blok (100 min, 50 punte, sonder item) uit die regte DBE Nov 2025-vraestel wees");
   const m18 = blok(p18, "2026-10-18", "merk-afr-a-nov25");
-  if (!m18 || m18.soort !== "merk" || m18.minutes !== 30 || !/Nov 2025-memo/.test(m18.title)) fails.push("18 Okt: merk-afr-a-nov25 moet 30 min merk met die Nov 2025-memo wees");
+  if (!m18 || m18.soort !== "merk" || m18.minutes !== 30 || !/amptelike DBE-opstelrubriek/.test(m18.title)) fails.push("18 Okt: merk-afr-a-nov25 moet 30 min merk met die amptelike DBE-opstelrubriek wees");
   if (p18.some((b) => b.item && b.start >= "14:00")) fails.push("18 Okt: geen vraebank-item in die middag nie");
   const keuse = blok(p19, "2026-10-19", "keuse-b");
   if (!keuse || keuse.soort !== "toets" || keuse.minutes !== 20 || keuse.item || !/Afdeling B/.test(keuse.title)) fails.push("19 Okt: keuse-b moet 'n 20-min Afdeling B-kies-en-beplan sonder item wees");
