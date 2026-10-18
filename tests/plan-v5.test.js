@@ -249,6 +249,16 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
   if (p19.some((b) => b.item)) fails.push("19 Okt: geen vraebank-item nie (net die regte DBE-vraestel)");
   const tas = blok(p19, "2026-10-19", "tas");
   if (!tas || !a19 || tas.start < a19.end) fails.push("19 Okt: die tas kom ná die tweede opstel");
+  /* Ma 19: Hanno werk; Wallie werk alleen met die gedrukte vraestel en rubriek (geen blok wag op Pa nie) */
+  for (const b of p19) if (/saam met Pa|Pa gee|Pa merk/.test(b.title + " " + b.detail)) fails.push(`19 Okt ${b.id}: wag op Pa (Hanno werk Ma 19)`);
+  for (const id of ["merk-b", "merk-a-2"]) {
+    const m = blok(p19, "2026-10-19", id);
+    if (!m || !/self, streng, met die gedrukte amptelike DBE/.test(m.title)) fails.push(`19 Okt ${id}: moet self streng met die gedrukte DBE-rubriek merk`);
+  }
+  /* Di 20: eksamendag-tydkaart (gereedheidsverslag R5) */
+  const f20 = ctx.WALLIE.buildDayPlan("2026-10-20").blocks.find((b) => b.id === "2026-10-20-formaat");
+  if (!f20 || !["09:00-09:15", "10:40", "11:20", "12:00", "nooit 'n afdeling oop"].every((x) => f20.detail.includes(x)))
+    fails.push("20 Okt: formaat-blok moet die eksamen-tydkaart (09:00-09:15 / 10:40 / 11:20 / 12:00) en 'nooit oop laat' hê");
 }
 
 if (fails.length) {
