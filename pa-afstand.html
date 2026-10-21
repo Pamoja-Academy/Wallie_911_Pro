@@ -641,6 +641,12 @@
 
     async function refresh() {
       if (!token) return;
+      /* Bugbot (PR #45): ook 'n oortjie wat langer as 12 uur oopbly, vra weer die wagwoord (soos die Pa-konsole by elke RPC) */
+      const at = Number(localStorage.getItem(TOKEN_AT_KEY));
+      if (!at || Date.now() - at > 12 * 3600 * 1000) {
+        showLogin("Sessie het verval — teken weer in.");
+        return;
+      }
       const day = $("day-pick").value;
       const isToday = !day || day === sastDay(Date.now());
       let r = null;

@@ -63,3 +63,22 @@ test("pa-afstand: 'n aanmelding ouer as 12 uur word vergeet en die wagwoord word
   await expect(page.locator("#login-card")).toBeVisible({ timeout: 20000 });
   await expect(page.locator("#login-err")).toContainText("verval");
 });
+
+test("pa-afstand: 'n oop oortjie wat die 12 uur oorskry, vra by die volgende verversing weer die wagwoord (Bugbot #45)", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await page.clock.install({ time: NOW });
+  await page.addInitScript((t) => {
+    if (sessionStorage.getItem("__s")) return;
+    sessionStorage.setItem("__s", "1");
+    localStorage.setItem("wallie911_pa_token", "tok_test");
+    localStorage.setItem("wallie911_pa_token_at", String(t - 11.99 * 3600 * 1000));
+  }, NOW.getTime());
+  await page.goto("/pa-afstand.html");
+  await expect(page.locator("#login-card")).toBeHidden({ timeout: 20000 });
+  /* 'n Paar minute later is die 12 uur verby: die volgende verversing (elke 15 s) gaan terug na aanmelding */
+  await page.clock.runFor(5 * 60 * 1000);
+  await expect(page.locator("#login-card")).toBeVisible({ timeout: 20000 });
+  await expect(page.locator("#login-err")).toContainText("verval");
+  expect(await page.evaluate(() => localStorage.getItem("wallie911_pa_token"))).toBeNull();
+});

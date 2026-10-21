@@ -317,7 +317,7 @@ test("5b. So 11 Okt: die nuwe plan kom deur, maar elke gestoorde rekord bly gree
   expect(bok.blocks.length).toBeGreaterThan(20);
   expect(bok.blocks.some((b) => b.werk && b.werk.id === "dbe-2026-jun-v1")).toBe(true);
   /* Net een nuwe sleutel */
-  const nuwe = Object.keys(na).filter((k) => !(k in seed) && !/^wallie911_(sync|synced|outbox|remote|device)/.test(k));
+  const nuwe = Object.keys(na).filter((k) => !(k in seed) && !/^wallie911_(sync|synced|outbox|remote|device|toegang)/.test(k)); /* toegang: die toetse se aanmelding (helpers.boot) */
   expect(nuwe).toEqual([HIST]);
   expectNoLeaks(mock);
 });
