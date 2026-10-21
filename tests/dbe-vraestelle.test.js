@@ -84,6 +84,10 @@ if (DBE) {
   assert(new Set(wgAlle).size === wgAlle.length, "al 12 Wisk. Gel.-skakels is uniek");
   assert(DBE.punte({ tipe: "vrae", id: "dbe-2025-nov-wg-v1", nrs: [1, 2] }) === 62, "Nov 2025 Wisk. Gel. V1 Vraag 1+2 is 62 punte");
   assert(DBE.punte({ tipe: "vrae", id: "dbe-2025-nov-wg-v2", nrs: [5] }) === 26, "Nov 2025 Wisk. Gel. V2 Vraag 5 is 26 punte");
+  assert(
+    DBE.vraagLabels({ tipe: "vrae", id: "dbe-2025-nov-wg-v1", nrs: [1, 2] }).join(",") === "Vraag 1,Vraag 2",
+    "Wisk. Gel.: vrae voluit ('V1' sou Vraestel 1 beteken)"
+  );
 
   for (const id of ids) {
     const p = DBE.KATALOGUS[id];

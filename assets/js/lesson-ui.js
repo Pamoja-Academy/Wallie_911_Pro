@@ -119,7 +119,7 @@
     const wysPer = nrs.length > 1;
     const dele = nrs.map((n) => {
       const p = wysPer ? d.vraagPunte(werk, n) : null;
-      return p ? `${d.vraagLabel(n)} (${p})` : d.vraagLabel(n);
+      return p ? `${d.vraagLabel(n, werk)} (${p})` : d.vraagLabel(n, werk);
     });
     const tot = punte != null ? ` — ${punte} punte` : "";
     return `<p class="werk-vrae"><strong>Doen:</strong> ${esc(dele.join(" · "))}${tot}</p>`;
@@ -218,7 +218,8 @@
       const vas = (window.VRAEBANK_V3 || []).concat(window.VRAEBANK_RTT_V1 || []).find((i) => i.id === b.item);
       if (vas) return itemTaak(vas, vas.vak || "rtt");
     }
-    if (werk) return { soort: "werk", tekst: `${b.title} · ${DBE()?.werkLabel(werk) || ""}` };
+    /* Wisk. Gel. se titel noem self die vraestel en vrae (plan-v5.test): geen herhaling nie (AGENTS §2.8) */
+    if (werk) return { soort: "werk", tekst: DBE()?.item(werk.id)?.vak ? b.title : `${b.title} · ${DBE()?.werkLabel(werk) || ""}` };
     if (b.soort && EIE_TAAK.has(b.soort)) return { soort: "blok", tekst: b.title };
     if (bank.length) {
       /* Net items wat in die blok pas: 'n 15-min-blok kry nie 'n ±80-min-opstel as hooftaak nie */

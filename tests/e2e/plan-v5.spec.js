@@ -362,7 +362,7 @@ for (const vp of VIEWPORTS) {
       await expect(proef).toContainText("150 punte, 3 uur");
       /* Die hooftaak is die regte DBE-vraestel (21 Okt: nie meer "Pa gee" nie) */
       await expect(proef.locator(".md-hoof")).toHaveAttribute("data-soort", "werk");
-      await expect(proef.locator(".md-hoof")).toContainText("DBE Mei/Junie 2026 Wisk. Gel. V1 (Afr)");
+      await expect(proef.locator(".md-hoof")).toContainText("DBE Mei/Junie 2026 V1, volledige vraestel");
       await expect(proef).not.toContainText("Pa gee");
       await expect(proef.locator(".open-item")).toHaveCount(0);
       const b = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-21-wg-v1-proef"));
@@ -399,7 +399,9 @@ for (const vp of VIEWPORTS) {
       const blok = page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"]');
       await expect(blok).toBeVisible();
       await expect(blok).not.toContainText("Pa gee");
-      await expect(blok.locator(".md-hoof")).toContainText("DBE November 2025 Wisk. Gel. V1 (Afr)");
+      await expect(blok.locator(".md-hoof")).toContainText("DBE November 2025 V1, Vraag 1 en 2");
+      /* Geen herhaling van die vraestel se naam in die hooftaak nie (AGENTS §2.8) */
+      await expect(blok.locator(".md-hoof")).not.toContainText("(Afr)");
       const soort = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-22-wg-v1").soort);
       expect(soort).toBe("skrif");
       await blok.locator(".start-block").click();
@@ -415,9 +417,8 @@ for (const vp of VIEWPORTS) {
       await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveAttribute("href", kat.antwoordeboek);
       await expect(hoof.locator('[data-werk="data"]')).toHaveCount(0);
       await expect(paneel).not.toContainText("Wagwoordbeskermde .exe");
-      await expect(paneel).toContainText("V1");
-      await expect(paneel).toContainText("V2");
-      await expect(paneel).toContainText("62 punte");
+      /* By Wisk. Gel. is "V1" Vraestel 1: die vrae staan voluit */
+      await expect(paneel.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (30) · Vraag 2 (32) — 62 punte");
 
       /* Memo toe terwyl die tyd loop */
       const memo = hoof.locator('[data-werk="memo"]');

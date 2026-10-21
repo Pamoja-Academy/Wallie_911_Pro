@@ -113,8 +113,10 @@ window.WALLIE = window.WALLIE || {};
 
   const item = (id) => KATALOGUS[id] || null;
 
-  function vraagLabel(nr) {
-    return "V" + String(nr);
+  /* RTT: "V5". Wisk. Gel.: "Vraag 1" — daar beteken "V1" Vraestel 1, dus voluit. */
+  function vraagLabel(nr, werk) {
+    const p = werk ? item(werk.id) : null;
+    return (p && p.vak ? "Vraag " : "V") + String(nr);
   }
 
   /* Watter vrae moet gedoen word? ’n Volle vraestel = V1–V7. */
@@ -128,7 +130,7 @@ window.WALLIE = window.WALLIE || {};
   }
 
   function vraagLabels(werk) {
-    return vraagNommers(werk).map(vraagLabel);
+    return vraagNommers(werk).map((n) => vraagLabel(n, werk));
   }
 
   /* Punte: die blok se eie telling eerste (sub-vrae kan nie uit vrae[] bereken word nie). */
