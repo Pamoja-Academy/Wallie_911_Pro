@@ -65,7 +65,14 @@
   function werkKaart(state) {
     const blocks = state?.blocks || [];
     const dag = state?.planDate || WALLIE.todayKey();
-    const sleutel = `${dag}|${blocks.map((b) => b.id).join("|")}`;
+    /* Die omruil-antwoorde (wallie911_vraestel_gesien) is deel van die sleutel: 'n antwoord bou die kaart oor */
+    let gesien = "";
+    try {
+      gesien = localStorage.getItem(DBE()?.ruil?.KEY || "") || "";
+    } catch {
+      gesien = "";
+    }
+    const sleutel = `${dag}|${blocks.map((b) => b.id).join("|")}|${gesien}`;
     if (werkKas.sleutel === sleutel && werkKas.kaart) return werkKas.kaart;
     const kaart = {};
     const gebruik = [];
@@ -219,6 +226,11 @@
       if (vas) return itemTaak(vas, vas.vak || "rtt");
     }
     /* Wisk. Gel. se titel noem self die vraestel en vrae (plan-v5.test): geen herhaling nie (AGENTS §2.8) */
+    if (werk && werk.ruilVan) {
+      /* Omgeruil: die titel noem die ou vraestel, dus beskryf die hooftaak die vervanger self */
+      const p = DBE()?.punte(werk, b);
+      return { soort: "werk", tekst: `${DBE()?.werkLabel(werk) || ""}${p != null ? ` · ${p} punte` : ""} (in plaas van ${DBE()?.item(werk.ruilVan)?.titel || werk.ruilVan})` };
+    }
     if (werk) return { soort: "werk", tekst: DBE()?.item(werk.id)?.vak ? b.title : `${b.title} · ${DBE()?.werkLabel(werk) || ""}` };
     if (b.soort && EIE_TAAK.has(b.soort)) return { soort: "blok", tekst: b.title };
     if (bank.length) {
@@ -467,7 +479,9 @@
       ? `<a class="btn werk-knoppie" data-werk="data" href="${esc(sk.data)}" target="_blank" rel="noopener noreferrer">Datalêers</a>`
       : sk.antwoordeboek
         ? `<a class="btn werk-knoppie" data-werk="antwoordeboek" href="${esc(sk.antwoordeboek)}" target="_blank" rel="noopener noreferrer">Antwoordeboek (PDF)</a>`
-        : "";
+        : sk.bylae
+          ? `<a class="btn werk-knoppie" data-werk="bylae" href="${esc(sk.bylae)}" target="_blank" rel="noopener noreferrer">Bylae (PDF)</a>`
+          : "";
     return `
         <div class="btn-row werk-knoppies">
           <a class="btn primary werk-knoppie" data-werk="vraestel" href="${esc(sk.vraestel)}" target="_blank" rel="noopener noreferrer">Vraestel (PDF)</a>
@@ -526,9 +540,32 @@
     }
     const gesluit = memoGesluit(blok);
     el.hidden = false;
+    const ruil = DBE()?.ruil;
+    /* Omruil (21 Okt): eers vra die app self of hy die vraestel al gedoen het; die knoppies kom ná die antwoord */
+    if (hoof && ruil?.moetVra(hoof)) {
+      el.innerHTML = `
+      <div class="panel-head"><h2>Vandag se vraestel</h2><span class="hint">Eers een vraag</span></div>
+      <div class="werk-vra" data-werk-id="${esc(hoof.id)}">
+        <p class="werk-titel">Het jy <strong>${esc(DBE().item(hoof.id).titel)}</strong> al voorheen gedoen of gesien?</p>
+        <p class="hint">Wees eerlik: as jy dit al gedoen het, kry jy dadelik 'n ander amptelike DBE-vraestel.</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary werk-vra-nee">Nee, dis nuut vir my</button>
+          <button type="button" class="btn werk-vra-ja">Ja, ek het dit al gedoen</button>
+        </div>
+      </div>`;
+      stopMemoTimer();
+      return;
+    }
+    const ruilNota = hoof && hoof.ruilVan
+      ? `<p class="hint werk-ruil-nota">Ander vraestel: jy het ${esc(DBE().item(hoof.ruilVan)?.titel || hoof.ruilVan)} al gedoen. Doen nou ${esc(DBE().werkLabel(hoof))}.</p>`
+      : "";
+    const almal = hoof && ruil?.almalGesien(hoof)
+      ? `<p class="hint werk-ruil-nota">Jy het al hierdie vraestelle gedoen: doen dit weer onder volle eksamentoestande, sonder die memo.</p>`
+      : "";
     el.innerHTML = `
       <div class="panel-head"><h2>Vandag se vraestel</h2><span class="hint">Amptelike DBE-lêers · maak in ’n nuwe oortjie oop</span></div>
       <p class="werk-blok-titel">${esc(blok.title)}</p>
+      ${ruilNota}${almal}
       ${hoof ? werkBlok(hoof, blok, { hoof: true, gesluit }) : ""}
       ${ekstra.length ? `<p class="werk-ekstra-kop">${hoof ? "Ook hierdie blok:" : "Laai alles hier af:"}</p>` : ""}
       ${ekstra.map((w) => werkBlok(w, blok)).join("")}`;
@@ -721,6 +758,17 @@
   );
 
   document.addEventListener("click", (e) => {
+    /* Omruil-vraag op die vraestel-paneel */
+    const vra = e.target.closest(".werk-vra-ja, .werk-vra-nee");
+    if (vra) {
+      const id = vra.closest(".werk-vra")?.dataset.werkId;
+      DBE()?.ruil?.antwoord(id, vra.classList.contains("werk-vra-ja"));
+      vergeetWerkKas();
+      const blok = blokById(sessieBlokId);
+      if (blok) WALLIE.DBE?.setAktief?.(werkVan(blok.id));
+      renderSessionWerk();
+      return;
+    }
     const open = e.target.closest(".open-lesson");
     if (open && lesson(open.dataset.slug)) {
       e.preventDefault();
