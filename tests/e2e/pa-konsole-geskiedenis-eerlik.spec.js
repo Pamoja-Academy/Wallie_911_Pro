@@ -61,7 +61,7 @@ const BLK = "Blokke klaar (geen tyd gemeet)";
 
 async function open(page, context, mock) {
   await mock.attach(context);
-  await boot(page, { time: NOW, consent: false, seed: { wallie911_pa_token: "tok_test" } });
+  await boot(page, { time: NOW, consent: false, seed: { wallie911_pa_token: "tok_test", wallie911_pa_token_at: String(NOW.getTime()) } });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/pa-konsole.html");
@@ -225,7 +225,7 @@ test("mislukte dae word ook tydens 'n sessie weer probeer", async ({ page, conte
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await mock.attach(context);
-  await boot(page, { time: new Date(t0), consent: false, seed: { wallie911_pa_token: "tok_test" } });
+  await boot(page, { time: new Date(t0), consent: false, seed: { wallie911_pa_token: "tok_test", wallie911_pa_token_at: String(new Date(t0).getTime()) } });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/pa-konsole.html");

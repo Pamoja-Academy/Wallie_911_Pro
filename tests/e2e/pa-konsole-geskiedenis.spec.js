@@ -101,7 +101,7 @@ test("Pa-konsole: volle geskiedenis sedert 27 Sep, blok-merkers, enige week, war
 
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await boot(page, { time: NOW, consent: false, seed: { wallie911_pa_token: "tok_test", wallie911_pa_hist_v1: poisonedV1() } });
+  await boot(page, { time: NOW, consent: false, seed: { wallie911_pa_token: "tok_test", wallie911_pa_token_at: String(NOW.getTime()), wallie911_pa_hist_v1: poisonedV1() } });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" }); /* geen in-gly nie: kaarte is dadelik sigbaar vir die skermskote */
   await page.goto("/pa-konsole.html");

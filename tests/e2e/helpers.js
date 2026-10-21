@@ -10,16 +10,20 @@ const CONSENT = "wallie911_remote_consent_v2";
 /* Vaste "nou": Vrydag 9 Okt 2026 09:05 SAST (dag-plan het blokke) */
 const T0 = new Date("2026-10-09T09:05:00+02:00");
 
-async function boot(page, { consent = true, seed = null, time = T0 } = {}) {
+/* Toegang (21 Okt): die toetse is 'n aangemelde toestel. Die hash kom uit assets/js/toegang.js self (geen wagwoord nie). */
+const TOEGANG_HASH = (fs.readFileSync(path.join(__dirname, "..", "..", "assets", "js", "toegang.js"), "utf8").match(/var HASH = "([0-9a-f]{64})"/) || [])[1];
+
+async function boot(page, { consent = true, seed = null, time = T0, aangemeld = true } = {}) {
   await page.clock.install({ time });
   await page.addInitScript(
-    ([consentKey, give, seedState]) => {
+    ([consentKey, give, seedState, hash]) => {
+      if (hash) localStorage.setItem("wallie911_toegang_v1", JSON.stringify({ v: 1, h: hash }));
       if (sessionStorage.getItem("__seeded")) return;
       sessionStorage.setItem("__seeded", "1");
       if (give) localStorage.setItem(consentKey, "1");
       if (seedState) Object.entries(seedState).forEach(([k, v]) => localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v)));
     },
-    [CONSENT, consent, seed]
+    [CONSENT, consent, seed, aangemeld ? TOEGANG_HASH : null]
   );
   page.on("pageerror", (e) => console.log("[pageerror]", e.message));
 }
