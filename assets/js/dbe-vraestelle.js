@@ -479,7 +479,9 @@ window.WALLIE = window.WALLIE || {};
 
   /* ’n Les-, opstel-, merk-, pouse- of skrif-blok kry NOOIT werk uit die rotasie nie.
      "skrif" is ’n papier-eksamen: net ’n vaste `werk` uit die rooster (bv. Wisk. Gel. sedert 21 Okt), nooit rotasie nie. */
-  const GEEN_ROTASIE = ["les", "opstel", "merk", "pouse", "skrif"];
+  /* QC PR #44: ook "voor-eksamen" (net lees) en "herdoen" (foutlog) kry NOOIT rotasie-werk nie; die 29 Okt-blok
+     "RTT V2: die vier reëls (net lees)" het anders 'n volle RTT V1-praktiese vraestel gewys. */
+  const GEEN_ROTASIE = ["les", "opstel", "merk", "pouse", "skrif", "voor-eksamen", "herdoen"];
 
   /* Die werk van ’n blok: vas uit die rooster, anders uit die rotasie. */
   function werkVirBlok(blok, ctx = {}) {

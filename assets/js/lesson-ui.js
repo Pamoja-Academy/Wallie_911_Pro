@@ -271,6 +271,10 @@
     return parts.length > 1 ? parts.slice(1).join(" — ") : String(b.title || "");
   }
 
+  /* 21 Okt (Wallie se video): die 5 Wisk. Gel.-lesse het hom by elke sessie dieselfde 5 toe-boek-vrae gewys en soos die
+     werk gelyk. 'n Eksamenproef (skrif met 'n DBE-vraestel) kry daarom GEEN agtergrond-les nie: net die vraestel. */
+  const isProef = (b) => Boolean(b && b.soort === "skrif" && b.werk);
+
   function matchdayCard(b, done, occurrence, ctx = {}) {
     const kindLabel = KIND_LABEL[b.kind] || b.kind;
     const time = b.start && b.end ? `${b.start}–${b.end}` : `${b.minutes} min`;
@@ -286,7 +290,7 @@
       </li>`;
     }
     const slug = b.subjectSlug;
-    const c = pickConcept(slug, occurrence, b.id);
+    const c = isProef(b) ? null : pickConcept(slug, occurrence, b.id);
     const img = c ? WALLIE.lessonImg(slug, c.id) : WALLIE.lessonImg(slug, "cover");
     const werk = ctx.werk || null;
     const opsomming = werkOpsomming(b, werk);
@@ -306,10 +310,15 @@
           : "");
     return `
       <li class="md-card kind-${b.kind} ${done ? "done" : ""}${ctx.volgende ? " is-volgende" : ""}${ctx.nou ? " is-nou" : ""}" data-id="${b.id}">
-        <button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c?.id || ""}" aria-label="Kyk les: ${esc(c?.titel || subjectName(slug))}">
+        ${
+          /* Bugbot (PR #44): sonder 'n konsep (eksamenproef) is die prentjie net 'n prent, nie 'n knoppie na die vak se eerste les nie */
+          c
+            ? `<button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c.id}" aria-label="Kyk les: ${esc(c.titel)}">`
+            : `<div class="md-thumb" aria-hidden="true">`
+        }
           <img src="${img}" alt="${esc(c?.titel || subjectName(slug))}" loading="lazy" />
           ${done ? `<span class="md-done-badge">KLAAR ✓</span>` : ""}
-        </button>
+        ${c ? "</button>" : "</div>"}
         <div class="md-body">
           <div class="md-meta">
             <span class="zone-tag ${b.kind}">${kindLabel}</span>
@@ -370,7 +379,7 @@
       return;
     }
     const seen = state.blocks.filter((b) => b.subjectSlug === next.subjectSlug).indexOf(next);
-    const c = pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
+    const c = isProef(next) ? null : pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
     const werk = werkKaart(state)[next.id] || null;
     const opsomming = werkOpsomming(next, werk);
     const time = next.start && next.end ? `${next.start}–${next.end} · ` : "";
@@ -378,9 +387,9 @@
     const task = hoof.tekst;
     el.innerHTML = `
       <div class="next-card kind-${next.kind}">
-        <button type="button" class="next-img open-lesson" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" aria-label="Kyk les">
+        ${c ? `<button type="button" class="next-img open-lesson" data-slug="${next.subjectSlug}" data-concept="${c.id}" aria-label="Kyk les">` : `<div class="next-img" aria-hidden="true">`}
           <img src="${c ? WALLIE.lessonImg(next.subjectSlug, c.id) : WALLIE.lessonImg(next.subjectSlug, "cover")}" alt="${esc(c?.titel || "")}" />
-        </button>
+        ${c ? "</button>" : "</div>"}
         <div class="next-body">
           <p class="next-kicker"><span class="zone-tag ${next.kind}">${KIND_LABEL[next.kind] || next.kind}</span> Volgende blok · ${time}${next.minutes} min</p>
           <h2>${esc(subjectName(next.subjectSlug))}</h2>
@@ -562,10 +571,15 @@
       stopMemoTimer();
       return;
     }
-    /* QC 21 Okt (7b): ná 'n omruil kan die vrae meer punte hê as wat die blok se tyd teen 1,2 min per punt dek; sê dit */
+    /* QC 21 Okt (7b) en QC PR #44: ná 'n omruil kan die vrae meer punte hê as wat die blok se tyd teen die vak se
+       DBE-tempo dek; sê dit. Tempo = vraestel se minute / punte (Wisk. Gel. en RTT 1,2; Engels V1 1,5; Toerisme en
+       Gasvryheid 0,9; Afrikaans V1 1,7). */
+    const TEMPO = { wiskgelett: 1.2, rtt: 1.2, engels: 1.5, toerisme: 0.9, gasvryheid: 0.9, afrikaans: 1.7 };
     const ruilPunte = hoof && hoof.ruilVan ? DBE().punte(hoof, blok) : null;
+    const tempo = TEMPO[DBE()?.item(hoof?.id)?.vak] || 1.2;
+    const ruilMin = ruilPunte != null ? Math.ceil(ruilPunte * tempo) : null;
     const ruilTyd = ruilPunte != null
-      ? ` Dit is ${ruilPunte} punte: mik op ±${Math.ceil(ruilPunte * 1.2)} min (1,2 min per punt, soos in die eksamen)${Math.ceil(ruilPunte * 1.2) > blok.minutes ? `; die blok is ${blok.minutes} min, dus werk vinnig en laat niks oop nie` : ""}.`
+      ? ` Dit is ${ruilPunte} punte: mik op ±${ruilMin} min (${String(tempo).replace(".", ",")} min per punt, soos in die eksamen)${ruilMin > blok.minutes ? `; die blok is ${blok.minutes} min, dus werk vinnig en laat niks oop nie` : ""}.`
       : "";
     const ruilNota = hoof && hoof.ruilVan
       ? `<p class="hint werk-ruil-nota">Ander vraestel: jy het ${esc(DBE().item(hoof.ruilVan)?.titel || hoof.ruilVan)} al gedoen. Doen nou ${esc(DBE().werkLabel(hoof))}.${esc(ruilTyd)}</p>`
@@ -616,6 +630,13 @@
     if (!el) return;
     slug = slug || $("#session-subject")?.value;
     if (!slug || !lesson(slug)) {
+      el.innerHTML = "";
+      return;
+    }
+    /* 21 Okt (Hanno: "dieselfde vrae as voorheen"): tydens 'n eksamenproef (skrif met 'n DBE-vraestel) GEEN agtergrond-les
+       nie. Die 5 Wisk. Gel.-kaarte se toe-boek-vrae het elke sessie herhaal; in 'n proef is net die vraestel die werk. */
+    const sessieBlok = blokById(sessieBlokId);
+    if (sessieBlok && sessieBlok.soort === "skrif" && sessieBlok.werk) {
       el.innerHTML = "";
       return;
     }

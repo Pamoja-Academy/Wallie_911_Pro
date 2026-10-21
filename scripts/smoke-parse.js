@@ -66,6 +66,7 @@ const order = [
   "assets/js/surveys.js",
   "assets/js/proctor.js",
   "assets/js/dbe-vraestelle.js",
+  "assets/js/dbe-vraestelle-oorblywend.js",
   "assets/js/live-config.js",
   "assets/js/sync.js",
   "assets/js/remote.js",
@@ -105,13 +106,13 @@ if (typeof W.buildDayPlan === "function") {
   /* 13-26 Okt is vaste planne (Engels V3, dan plan v5: Afrikaans V3 tot en met die eksamendag, vervolg: Wisk. Gel. V1 op 21 en 22 Okt, V1- en V2-eksamen 23 en 26 Okt)
      — geen geel-rotasie nie. 27 Okt (die dag voor Engels V1) het nog nie 'n vaste plan nie: 27 en
      28 Okt (sonder vaste plan) roteer steeds Engels / Toerisme. */
-  for (const d of ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26"]) {
+  /* Roete (21 Okt): 13 Okt tot 6 Nov is nou vaste planne (geen generiese rotasie nie, LL-02). Die eerste dag ná 6 Nov
+     sonder vaste plan (7 Nov) roteer steeds Engels / Toerisme totdat stap 3 (Afrikaans V1, letterkunde) gebou is. */
+  const vasteDae = [];
+  for (let d = new Date("2026-10-13T12:00:00Z"); d <= new Date("2026-11-06T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 1)) vasteDae.push(d.toISOString().slice(0, 10));
+  for (const d of vasteDae) {
     assert(!W.buildDayPlan(d).blocks.some((b) => b.id.endsWith("-geel")), `${d} is 'n vaste plan (geen geel-rotasie)`);
   }
-  const rotated = ["2026-10-27", "2026-10-28"].map((d) =>
-    W.buildDayPlan(d).blocks.find((b) => b.id.endsWith("-geel"))?.subjectSlug
-  );
-  assert(rotated[0] && rotated[1] && rotated[0] !== rotated[1] && !rotated.includes("rtt"), "geel rotates Engels / Toerisme on 27 and 28 Okt");
   {
     const g = W.buildDayPlan("2026-10-10").blocks.find((b) => b.id === "2026-10-10-geel");
     assert(g && g.subjectSlug === "rtt" && g.kind === "rooi" && g.title === "RTT V1 — praktiese oefening (Oefenvrae)", "2026-10-10 geel-blok is RTT V1");
@@ -213,6 +214,7 @@ assert(html.includes('id="view-leer"'), "index has Lesse view");
 assert(html.includes("assets/js/lesson-ui.js"), "index loads lesson-ui.js");
 assert(html.includes("assets/js/dbe-vraestelle.js"), "index loads dbe-vraestelle.js");
 assert(html.indexOf("assets/js/dbe-vraestelle.js") < html.indexOf("assets/js/praktiese.js"), "dbe-vraestelle.js laai voor praktiese.js");
+assert(html.indexOf("assets/js/dbe-vraestelle.js") > -1 && html.indexOf("assets/js/dbe-vraestelle.js") < html.indexOf("assets/js/dbe-vraestelle-oorblywend.js") && html.indexOf("assets/js/dbe-vraestelle-oorblywend.js") < html.indexOf("assets/js/lesson-ui.js"), "dbe-vraestelle-oorblywend.js laai na dbe-vraestelle.js en voor lesson-ui.js");
 assert(html.includes('id="session-werk"'), "index has the vraestel panel on the session screen");
 assert(html.indexOf("assets/js/sync.js") > -1 && html.indexOf("assets/js/sync.js") < html.indexOf("assets/js/remote.js"), "index loads sync.js before remote.js");
 assert(html.includes('id="sync-pill"'), "index has sync indicator");
