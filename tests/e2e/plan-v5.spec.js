@@ -142,9 +142,9 @@ const DAE = [
       ["wg-v1", "08:00", "09:15"],
       ["merk-wg-v1", "09:15", "09:35"],
       ["pouse1", "09:35", "09:55"],
-      ["wg-v1-34", "09:55", "11:05"],
-      ["merk-wg-v1-34", "11:05", "11:25"],
-      ["middag", "11:25", "12:15"],
+      ["wg-v1-34", "09:55", "11:10"],
+      ["merk-wg-v1-34", "11:10", "11:30"],
+      ["middag", "11:30", "12:15"],
       ["wg-v1-5", "12:15", "12:55"],
       ["merk-wg-v1-5", "12:55", "13:15"],
       ["pouse2", "13:15", "13:30"],
@@ -370,6 +370,9 @@ for (const vp of VIEWPORTS) {
       /* Die hooftaak is die regte DBE-vraestel (21 Okt: nie meer "Pa gee" nie) */
       await expect(proef.locator(".md-hoof")).toHaveAttribute("data-soort", "werk");
       await expect(proef.locator(".md-hoof")).toContainText("DBE Mei/Junie 2026 V1, volledige vraestel");
+      /* Die middag-inhaal gee 'n vraestel wat hy NOG NIE gesien het nie (LL-18) */
+      const inhaal = page.locator('#block-list .md-card[data-id="2026-10-21-wg-v1-proef-inhaal"] .md-hoof');
+      await expect(inhaal).toContainText("DBE Mei/Junie 2024 V1 (nuut vir jou)");
       await expect(proef).not.toContainText("Pa gee");
       await expect(proef.locator(".open-item")).toHaveCount(0);
       const b = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-21-wg-v1-proef"));
@@ -402,11 +405,11 @@ for (const vp of VIEWPORTS) {
 
     test("22 Okt 08:05: Wallie kry die DBE Nov 2025 V1-vraestel self in die app; PDF-oortjie gee geen waarskuwing; memo eers ná die tyd", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-22T08:05:00+02:00");
-      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2025-nov-wg-v1"]);
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2024-nov-wg-v1"]);
       const blok = page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"]');
       await expect(blok).toBeVisible();
       await expect(blok).not.toContainText("Pa gee");
-      await expect(blok.locator(".md-hoof")).toContainText("DBE November 2025 V1, Vraag 1 en 2");
+      await expect(blok.locator(".md-hoof")).toContainText("DBE November 2024 V1, Vraag 1 en 2");
       /* Geen herhaling van die vraestel se naam in die hooftaak nie (AGENTS §2.8) */
       await expect(blok.locator(".md-hoof")).not.toContainText("(Afr)");
       const soort = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-22-wg-v1").soort);
@@ -417,19 +420,19 @@ for (const vp of VIEWPORTS) {
       /* Omruil (21 Okt): eers vra die app of hy die vraestel al gedoen het; geen knoppies voor die antwoord nie */
       const paneel = page.locator("#session-werk");
       await expect(paneel).toBeVisible();
-      await expect(paneel.locator(".werk-vra")).toContainText("Het jy DBE November 2025 Wisk. Gel. V1 (Afr) al voorheen gedoen of gesien?");
+      await expect(paneel.locator(".werk-vra")).toContainText("Het jy DBE November 2024 Wisk. Gel. V1 (Afr) al voorheen gedoen of gesien?");
       await expect(paneel.locator('[data-werk="vraestel"]')).toHaveCount(0);
       await paneel.locator(".werk-vra-nee").click();
       await expect(paneel.locator(".werk-vra")).toHaveCount(0);
       const hoof = paneel.locator(".werk-hoof");
       await expect(hoof.locator('[data-werk="vraestel"]')).toHaveText("Vraestel (PDF)");
       await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
-      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveText("Antwoordeboek (PDF)");
-      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveAttribute("href", kat.antwoordeboek);
+      await expect(hoof.locator('[data-werk="bylae"]')).toHaveText("Bylae (PDF)");
+      await expect(hoof.locator('[data-werk="bylae"]')).toHaveAttribute("href", kat.bylae);
       await expect(hoof.locator('[data-werk="data"]')).toHaveCount(0);
       await expect(paneel).not.toContainText("Wagwoordbeskermde .exe");
       /* By Wisk. Gel. is "V1" Vraestel 1: die vrae staan voluit */
-      await expect(paneel.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (30) · Vraag 2 (32) — 62 punte");
+      await expect(paneel.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (30) — 59 punte. Dit is hoofvrae met baie subvrae: al die vrae staan in die Vraestel (PDF).");
 
       /* Memo toe terwyl die tyd loop */
       const memo = hoof.locator('[data-werk="memo"]');
@@ -458,42 +461,59 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
-    test("22 Okt 08:05: 'Ja, ek het dit al gedoen' ruil na DBE Nov 2024 V1 (bylae, 59 punte); die merk-blok volg", async ({ page, context }) => {
+    test("22 Okt 08:05: 'Ja, ek het dit al gedoen' ruil na DBE Jun 2025 V1 (antwoordeboek, 64 punte); die merk-blok volg", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-22T08:05:00+02:00");
-      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2024-nov-wg-v1"]);
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2025-jun-wg-v1"]);
       await page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"] .start-block').click();
       await runUntil(page, async () => mock.byKind("start").length === 1, { label: "skrif begin" });
       const paneel = page.locator("#session-werk");
       await paneel.locator(".werk-vra-ja").click();
       /* Die app vra weer, nou oor die vervanger */
-      await expect(paneel.locator(".werk-vra")).toContainText("DBE November 2024 Wisk. Gel. V1 (Afr)");
+      await expect(paneel.locator(".werk-vra")).toContainText("DBE Mei/Junie 2025 Wisk. Gel. V1 (Afr)");
       await paneel.locator(".werk-vra-nee").click();
-      await expect(paneel.locator(".werk-ruil-nota")).toContainText("jy het DBE November 2025 Wisk. Gel. V1 (Afr) al gedoen");
+      await expect(paneel.locator(".werk-ruil-nota")).toContainText("jy het DBE November 2024 Wisk. Gel. V1 (Afr) al gedoen");
       const hoof = paneel.locator(".werk-hoof");
-      await expect(hoof.locator(".werk-titel")).toHaveText("DBE November 2024 Wisk. Gel. V1 (Afr) · Vraag 1, Vraag 2");
-      await expect(hoof.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (30) — 59 punte");
+      await expect(hoof.locator(".werk-titel")).toHaveText("DBE Mei/Junie 2025 Wisk. Gel. V1 (Afr) · Vraag 1, Vraag 2");
+      await expect(hoof.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (35) — 64 punte. Dit is hoofvrae met baie subvrae: al die vrae staan in die Vraestel (PDF).");
+      /* QC 7b: 64 punte teen 1,2 min per punt is 77 min, die blok is 75: die skerm sê dit */
+      await expect(paneel.locator(".werk-ruil-nota")).toContainText("Dit is 64 punte: mik op ±77 min (1,2 min per punt, soos in die eksamen); die blok is 75 min, dus werk vinnig en laat niks oop nie.");
       await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
-      await expect(hoof.locator('[data-werk="bylae"]')).toHaveText("Bylae (PDF)");
-      await expect(hoof.locator('[data-werk="bylae"]')).toHaveAttribute("href", kat.bylae);
-      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveCount(0);
+      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveText("Antwoordeboek (PDF)");
+      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveAttribute("href", kat.antwoordeboek);
+      await expect(hoof.locator('[data-werk="bylae"]')).toHaveCount(0);
       await expect(hoof.locator('[data-werk="memo"]')).toHaveAttribute("aria-disabled", "true");
       /* Die antwoord is gestoor (nuwe sleutel; niks anders nie) */
       const gestoor = await page.evaluate(() => JSON.parse(localStorage.getItem("wallie911_vraestel_gesien")));
-      expect(gestoor).toEqual({ v: 1, gesien: { "dbe-2025-nov-wg-v1": true, "dbe-2024-nov-wg-v1": false } });
+      expect(gestoor).toEqual({ v: 1, gesien: { "dbe-2024-nov-wg-v1": true, "dbe-2025-jun-wg-v1": false } });
       /* Missie: die hooftaak noem die vervanger; die merk-blok gebruik die vervanger se memo */
       await page.evaluate(() => WALLIE.app.showView("missie"));
       await page.clock.runFor(500);
-      await expect(page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"] .md-hoof')).toContainText("DBE November 2024 Wisk. Gel. V1 (Afr) · Vraag 1, Vraag 2 · 59 punte (in plaas van DBE November 2025 Wisk. Gel. V1 (Afr))");
+      await expect(page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"] .md-hoof')).toContainText("DBE Mei/Junie 2025 Wisk. Gel. V1 (Afr) · Vraag 1, Vraag 2 · 64 punte (in plaas van DBE November 2024 Wisk. Gel. V1 (Afr))");
       const merkWerk = await page.evaluate(() => WALLIE.werkVirBlok(WALLIE.app.state().blocks.find((b) => b.id === "2026-10-22-merk-wg-v1"), {}));
-      expect(merkWerk.id).toBe("dbe-2024-nov-wg-v1");
+      expect(merkWerk.id).toBe("dbe-2025-jun-wg-v1");
+      expectNoLeaks(mock);
+    });
+
+    test("21 Okt 13:05: die INHAAL-paneel gee Jun 2024 V1 (nuut) en sê dit is 5 hoofvrae met subvrae, nie 5 vragies nie", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-21T13:05:00+02:00");
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2024-jun-wg-v1"]);
+      await page.locator('#block-list .md-card[data-id="2026-10-21-wg-v1-proef-inhaal"] .start-block').click();
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "inhaal begin" });
+      const paneel = page.locator("#session-werk");
+      await expect(paneel.locator(".werk-vra")).toHaveCount(0);
+      const hoof = paneel.locator(".werk-hoof");
+      await expect(hoof.locator(".werk-vrae")).toHaveText("Volledige vraestel: 5 hoofvrae, elk met baie subvrae (Vraag 1–5) — 150 punte. Al die vrae staan in die Vraestel (PDF).");
+      await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
+      await expect(hoof.locator('[data-werk="bylae"]')).toHaveAttribute("href", kat.bylae);
+      await expect(paneel).not.toContainText("Mei/Junie 2026");
       expectNoLeaks(mock);
     });
 
     test("22 Okt 09:20: die merk-blok het die DBE-memo dadelik oop", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-22T09:20:00+02:00");
-      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2025-nov-wg-v1"]);
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2024-nov-wg-v1"]);
       const merk = page.locator('#block-list .md-card[data-id="2026-10-22-merk-wg-v1"]');
-      await expect(merk).toContainText("DBE-memo (November 2025 V1)");
+      await expect(merk).toContainText("DBE-memo (November 2024 V1)");
       await merk.locator(".start-block").click();
       await runUntil(page, async () => mock.byKind("start").length === 1, { label: "merk begin" });
       /* Nog nie geantwoord nie (bv. die skrif-blok oorgeslaan): die merk-blok vra ook */
