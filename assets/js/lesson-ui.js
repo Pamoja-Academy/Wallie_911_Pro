@@ -310,10 +310,15 @@
           : "");
     return `
       <li class="md-card kind-${b.kind} ${done ? "done" : ""}${ctx.volgende ? " is-volgende" : ""}${ctx.nou ? " is-nou" : ""}" data-id="${b.id}">
-        <button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c?.id || ""}" aria-label="Kyk les: ${esc(c?.titel || subjectName(slug))}">
+        ${
+          /* Bugbot (PR #44): sonder 'n konsep (eksamenproef) is die prentjie net 'n prent, nie 'n knoppie na die vak se eerste les nie */
+          c
+            ? `<button type="button" class="md-thumb open-lesson" data-slug="${slug}" data-concept="${c.id}" aria-label="Kyk les: ${esc(c.titel)}">`
+            : `<div class="md-thumb" aria-hidden="true">`
+        }
           <img src="${img}" alt="${esc(c?.titel || subjectName(slug))}" loading="lazy" />
           ${done ? `<span class="md-done-badge">KLAAR ✓</span>` : ""}
-        </button>
+        ${c ? "</button>" : "</div>"}
         <div class="md-body">
           <div class="md-meta">
             <span class="zone-tag ${b.kind}">${kindLabel}</span>
@@ -382,9 +387,9 @@
     const task = hoof.tekst;
     el.innerHTML = `
       <div class="next-card kind-${next.kind}">
-        <button type="button" class="next-img open-lesson" data-slug="${next.subjectSlug}" data-concept="${c?.id || ""}" aria-label="Kyk les">
+        ${c ? `<button type="button" class="next-img open-lesson" data-slug="${next.subjectSlug}" data-concept="${c.id}" aria-label="Kyk les">` : `<div class="next-img" aria-hidden="true">`}
           <img src="${c ? WALLIE.lessonImg(next.subjectSlug, c.id) : WALLIE.lessonImg(next.subjectSlug, "cover")}" alt="${esc(c?.titel || "")}" />
-        </button>
+        ${c ? "</button>" : "</div>"}
         <div class="next-body">
           <p class="next-kicker"><span class="zone-tag ${next.kind}">${KIND_LABEL[next.kind] || next.kind}</span> Volgende blok · ${time}${next.minutes} min</p>
           <h2>${esc(subjectName(next.subjectSlug))}</h2>

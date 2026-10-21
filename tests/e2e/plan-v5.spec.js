@@ -275,6 +275,8 @@ for (const vp of VIEWPORTS) {
           const blokRaw = await page.evaluate((id) => WALLIE.app.state().blocks.find((b) => b.id === id), k.id);
           if (blokRaw && blokRaw.soort === "skrif" && blokRaw.werk) {
             expect(k.les, `${k.id}: proef sonder agtergrond-les`).not.toContain("Agtergrond (opsioneel)");
+            /* Bugbot (PR #44): ook die prentjie open geen les nie */
+            await expect(page.locator(`#block-list .md-card[data-id="${k.id}"] .open-lesson`), `${k.id}: geen les-knoppie`).toHaveCount(0);
           } else {
             expect(k.les, `${k.id}: les gemerk as agtergrond`).toContain("Agtergrond (opsioneel)");
             const titel = k.les.replace("Agtergrond (opsioneel)", "").trim();
@@ -508,6 +510,9 @@ for (const vp of VIEWPORTS) {
     test("21 Okt 13:05: die INHAAL-paneel gee Jun 2024 V1 (nuut) en sê dit is 5 hoofvrae met subvrae, nie 5 vragies nie", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-21T13:05:00+02:00");
       const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2024-jun-wg-v1"]);
+      /* Bugbot (PR #44): die volgende-kaart van 'n proef het geen les-knoppie nie (ook nie die prentjie nie) */
+      await expect(page.locator("#next-up .next-titel")).toContainText("proefeksamen");
+      await expect(page.locator("#next-up .open-lesson")).toHaveCount(0);
       await page.locator('#block-list .md-card[data-id="2026-10-21-wg-v1-proef-inhaal"] .start-block').click();
       await runUntil(page, async () => mock.byKind("start").length === 1, { label: "inhaal begin" });
       const paneel = page.locator("#session-werk");
