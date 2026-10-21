@@ -126,11 +126,12 @@ const DAE = [
     blokke: [
       ["opstaan", "07:30", "08:00"],
       ["wg-v1-proef", "08:00", "11:00"],
-      ["middag", "11:00", "12:00"],
-      ["merk-wg-v1-proef", "12:00", "13:00"],
-      ["pouse1", "13:00", "13:15"],
-      ["foutlog", "13:15", "13:45"],
-      ["klaar", "13:45", "13:45"]
+      ["middag", "11:00", "13:00"],
+      ["wg-v1-proef-inhaal", "13:00", "16:00"],
+      ["pouse1", "16:00", "16:15"],
+      ["merk-wg-v1-proef", "16:15", "17:15"],
+      ["foutlog", "17:15", "17:45"],
+      ["klaar", "17:45", "17:45"]
     ]
   },
   {
@@ -141,9 +142,15 @@ const DAE = [
       ["wg-v1", "08:00", "09:15"],
       ["merk-wg-v1", "09:15", "09:35"],
       ["pouse1", "09:35", "09:55"],
-      ["formules", "09:55", "10:25"],
-      ["tas", "10:25", "10:45"],
-      ["klaar", "10:45", "10:45"]
+      ["wg-v1-34", "09:55", "11:05"],
+      ["merk-wg-v1-34", "11:05", "11:25"],
+      ["middag", "11:25", "12:15"],
+      ["wg-v1-5", "12:15", "12:55"],
+      ["merk-wg-v1-5", "12:55", "13:15"],
+      ["pouse2", "13:15", "13:30"],
+      ["formules", "13:30", "14:00"],
+      ["tas", "14:00", "14:20"],
+      ["klaar", "14:20", "14:20"]
     ]
   },
   {
@@ -238,7 +245,7 @@ for (const vp of VIEWPORTS) {
 
         /* Geen Gasvryheid/Toerisme/RTT-blokke nie, en presies die verwagte blokke in volgorde */
         const state = await page.evaluate(() =>
-          WALLIE.app.state().blocks.map((b) => ({ id: b.id, slug: b.subjectSlug, start: b.start, end: b.end, item: b.item || null }))
+          WALLIE.app.state().blocks.map((b) => ({ id: b.id, slug: b.subjectSlug, start: b.start, end: b.end, item: b.item || null, werk: Boolean(b.werk) }))
         );
         for (const s of VERBODE) expect(state.map((b) => b.slug), `${dag}: geen ${s}`).not.toContain(s);
         expect(state.map((b) => b.id)).toEqual(blokke.map(([suffix]) => `${dag}-${suffix}`));
@@ -264,7 +271,9 @@ for (const vp of VIEWPORTS) {
           expect(k.hoof, `${k.id}: hooftaak gewys`).toContain("Hooftaak");
           expect(k.hoof, `${k.id}: hooftaak is nie die agtergrondkaart nie`).not.toContain(titel);
           const item = blokke.find(([suffix]) => `${dag}-${suffix}` === k.id)[3];
-          expect(k.hoofSoort, `${k.id}: hooftaak-soort`).toBe(item ? "item" : "blok");
+          /* 'n Blok met 'n DBE-vraestel (werk, sedert 21 Okt ook Wisk. Gel.) se hooftaak is daardie vraestel */
+          const metWerk = state.find((x) => x.id === k.id).werk;
+          expect(k.hoofSoort, `${k.id}: hooftaak-soort`).toBe(item ? "item" : metWerk ? "werk" : "blok");
         }
 
         /* Blokke met 'n item: "Maak item oop" open die regte item in Skryfwerk */
@@ -358,10 +367,13 @@ for (const vp of VIEWPORTS) {
       const proef = page.locator('#block-list .md-card[data-id="2026-10-21-wg-v1-proef"]');
       await expect(proef).toContainText("Wisk. Gel. V1 proefeksamen");
       await expect(proef).toContainText("150 punte, 3 uur");
-      await expect(proef.locator(".md-hoof")).toHaveAttribute("data-soort", "blok");
+      /* Die hooftaak is die regte DBE-vraestel (21 Okt: nie meer "Pa gee" nie) */
+      await expect(proef.locator(".md-hoof")).toHaveAttribute("data-soort", "werk");
+      await expect(proef.locator(".md-hoof")).toContainText("DBE Mei/Junie 2026 V1, volledige vraestel");
+      await expect(proef).not.toContainText("Pa gee");
       await expect(proef.locator(".open-item")).toHaveCount(0);
       const b = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-21-wg-v1-proef"));
-      expect(b).toMatchObject({ soort: "skrif", kind: "groen", subjectSlug: "wiskgelett", minutes: 180 });
+      expect(b).toMatchObject({ soort: "skrif", kind: "groen", subjectSlug: "wiskgelett", minutes: 180, werk: { tipe: "vraestel", id: "dbe-2026-jun-wg-v1" } });
       expect(await noOverflow(page)).toBe(true);
       expectNoLeaks(mock);
     });
@@ -388,14 +400,40 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
-    test("22 Okt 08:05: die gewone Wisk. Gel.-toets (soort toets) is wel onder oortjie-slot (kontras met die skrif-proef)", async ({ page, context }) => {
+    test("22 Okt 08:05: Wallie kry die DBE Nov 2025 V1-vraestel self in die app; PDF-oortjie gee geen waarskuwing; memo eers ná die tyd", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-22T08:05:00+02:00");
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2025-nov-wg-v1"]);
       const blok = page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"]');
       await expect(blok).toBeVisible();
+      await expect(blok).not.toContainText("Pa gee");
+      await expect(blok.locator(".md-hoof")).toContainText("DBE November 2025 V1, Vraag 1 en 2");
+      /* Geen herhaling van die vraestel se naam in die hooftaak nie (AGENTS §2.8) */
+      await expect(blok.locator(".md-hoof")).not.toContainText("(Afr)");
       const soort = await page.evaluate(() => WALLIE.app.state().blocks.find((x) => x.id === "2026-10-22-wg-v1").soort);
-      expect(soort).toBe("toets");
+      expect(soort).toBe("skrif");
       await blok.locator(".start-block").click();
-      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "toets begin" });
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "skrif begin" });
+
+      /* Die vraestel-paneel: amptelike vraestel en antwoordeboek, geen RTT-datalêers nie */
+      const paneel = page.locator("#session-werk");
+      await expect(paneel).toBeVisible();
+      const hoof = paneel.locator(".werk-hoof");
+      await expect(hoof.locator('[data-werk="vraestel"]')).toHaveText("Vraestel (PDF)");
+      await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
+      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveText("Antwoordeboek (PDF)");
+      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveAttribute("href", kat.antwoordeboek);
+      await expect(hoof.locator('[data-werk="data"]')).toHaveCount(0);
+      await expect(paneel).not.toContainText("Wagwoordbeskermde .exe");
+      /* By Wisk. Gel. is "V1" Vraestel 1: die vrae staan voluit */
+      await expect(paneel.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (30) · Vraag 2 (32) — 62 punte");
+
+      /* Memo toe terwyl die tyd loop */
+      const memo = hoof.locator('[data-werk="memo"]');
+      await expect(memo).toHaveAttribute("aria-disabled", "true");
+      await expect(memo).not.toHaveAttribute("href", /./);
+      await expect(paneel).toContainText("Memo sluit oop wanneer die tyd verstreke is");
+
+      /* Hy lees die PDF in 'n ander oortjie: geen waarskuwing of slot nie */
       await page.clock.runFor(10000);
       for (let i = 0; i < 3; i++) {
         await hideTab(page);
@@ -403,15 +441,37 @@ for (const vp of VIEWPORTS) {
         await showTab(page);
         await page.clock.runFor(5000);
       }
-      expect(mock.byKind("warn").length, "die gewone toets waarsku wel").toBeGreaterThan(0);
+      expect(mock.byKind("warn")).toHaveLength(0);
+      expect(mock.byKind("lock")).toHaveLength(0);
+      await expect(page.locator("#lock-box")).toBeHidden();
+
+      /* 75 min verby: die sessie eindig en die memo sluit oop */
+      await page.clock.fastForward(75 * 60 * 1000 + 2000);
+      await page.clock.runFor(2000);
+      await runUntil(page, async () => mock.byKind("end").length === 1, { label: "skrif klaar" });
+      await expect(memo).not.toHaveAttribute("aria-disabled", "true");
+      await expect(memo).toHaveAttribute("href", kat.memo);
       expectNoLeaks(mock);
     });
 
-    test("22 Okt 10:30: tas pak is 'n voor-eksamen-blok en kry nooit 'n waarskuwing nie", async ({ page, context }) => {
+    test("22 Okt 09:20: die merk-blok het die DBE-memo dadelik oop", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-22T09:20:00+02:00");
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2025-nov-wg-v1"]);
+      const merk = page.locator('#block-list .md-card[data-id="2026-10-22-merk-wg-v1"]');
+      await expect(merk).toContainText("DBE-memo (November 2025 V1)");
+      await merk.locator(".start-block").click();
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "merk begin" });
+      const memo = page.locator("#session-werk .werk-hoof [data-werk='memo']");
+      await expect(memo).toHaveAttribute("href", kat.memo);
+      await expect(page.locator("#session-werk")).not.toContainText("Memo sluit oop");
+      expectNoLeaks(mock);
+    });
+
+    test("22 Okt 14:05: tas pak is 'n voor-eksamen-blok en kry nooit 'n waarskuwing nie", async ({ page, context }) => {
       /* blok-gebeure word net in modus v2 afgelewer */
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
-      await boot(page, { time: new Date("2026-10-22T10:30:00+02:00") });
+      await boot(page, { time: new Date("2026-10-22T14:05:00+02:00") });
       await page.goto("/#missie");
       await page.clock.runFor(1500);
       const tas = page.locator('#block-list .md-card[data-id="2026-10-22-tas"]');

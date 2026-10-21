@@ -46,13 +46,48 @@ const DBE = sandbox.WALLIE && sandbox.WALLIE.DBE;
 assert(DBE && DBE.KATALOGUS, "WALLIE.DBE gelaai");
 
 if (DBE) {
-  const ids = Object.keys(DBE.KATALOGUS);
-  assert(ids.length === 4, `4 vraestelle in die katalogus (gekry: ${ids.length})`);
+  const alleIds = Object.keys(DBE.KATALOGUS);
+  /* RTT (met datalêers) en Wisk. Gel. (met 'n antwoordeboek, 21 Okt) */
+  const ids = alleIds.filter((id) => !DBE.KATALOGUS[id].vak);
+  const wgIds = alleIds.filter((id) => DBE.KATALOGUS[id].vak === "wiskgelett");
+  assert(ids.length === 4, `4 RTT-vraestelle in die katalogus (gekry: ${ids.length})`);
+  assert(wgIds.length === 4, `4 Wisk. Gel.-vraestelle in die katalogus (gekry: ${wgIds.length})`);
+  assert(ids.length + wgIds.length === alleIds.length, "elke vraestel is RTT of Wisk. Gel.");
   assert(
     JSON.stringify(DBE.ORDE.slice().sort()) === JSON.stringify(ids.slice().sort()),
-    "ORDE dek presies die katalogus"
+    "ORDE dek presies die RTT-vraestelle (Wisk. Gel. roteer nie)"
   );
   assert(DBE.DATA_NOTA === NOTA, "die .exe-nota staan woordeliks in die katalogus");
+
+  for (const id of wgIds) {
+    const p = DBE.KATALOGUS[id];
+    assert(p.id === id, `${id}: id stem met die sleutel ooreen`);
+    assert(/Wisk\. Gel\. V[12] \(Afr\)$/.test(p.titel), `${id}: titel noem Wisk. Gel. V1/V2 (Afr)`);
+    assert(!p.data && !p.datatipe, `${id}: geen datalêers nie`);
+    assert(Array.isArray(p.vrae) && p.vrae.length === 5, `${id}: punte vir V1–V5`);
+    const tot = (p.vrae || []).reduce((s, n) => s + n, 0);
+    assert(tot === 150, `${id}: die vrae tel op na 150 punte (gekry: ${tot})`);
+    for (const soort of ["vraestel", "antwoordeboek", "memo"]) {
+      let u = null;
+      try {
+        u = new URL(p[soort]);
+      } catch {
+        u = null;
+      }
+      assert(!!u && u.protocol === "https:" && TOEGELATE.includes(u.hostname), `${id}/${soort}: amptelike https-skakel`);
+    }
+    assert(new Set([p.vraestel, p.antwoordeboek, p.memo]).size === 3, `${id}: vraestel, antwoordeboek en memo verskil`);
+    const sk = DBE.skakels({ tipe: "vraestel", id });
+    assert(sk.antwoordeboek === p.antwoordeboek && sk.data === null, `${id}: skakels() gee die antwoordeboek en geen data nie`);
+  }
+  const wgAlle = wgIds.flatMap((id) => ["vraestel", "antwoordeboek", "memo"].map((k) => DBE.KATALOGUS[id][k]));
+  assert(new Set(wgAlle).size === wgAlle.length, "al 12 Wisk. Gel.-skakels is uniek");
+  assert(DBE.punte({ tipe: "vrae", id: "dbe-2025-nov-wg-v1", nrs: [1, 2] }) === 62, "Nov 2025 Wisk. Gel. V1 Vraag 1+2 is 62 punte");
+  assert(DBE.punte({ tipe: "vrae", id: "dbe-2025-nov-wg-v2", nrs: [5] }) === 26, "Nov 2025 Wisk. Gel. V2 Vraag 5 is 26 punte");
+  assert(
+    DBE.vraagLabels({ tipe: "vrae", id: "dbe-2025-nov-wg-v1", nrs: [1, 2] }).join(",") === "Vraag 1,Vraag 2",
+    "Wisk. Gel.: vrae voluit ('V1' sou Vraestel 1 beteken)"
+  );
 
   for (const id of ids) {
     const p = DBE.KATALOGUS[id];

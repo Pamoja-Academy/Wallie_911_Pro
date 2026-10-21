@@ -65,13 +65,58 @@ window.WALLIE = window.WALLIE || {};
     }
   };
 
-  /* Rotasie-orde: die nuutste vraestel eerste. */
+  /* Wisk. Gel. (21 Okt 2026): amptelike DBE-skakels van education.gov.za (tabid 5742 = Nov 2025, 5956 = Mei/Junie 2026,
+     module "Mathematical Literacy"). Elke skakel is op 21 Okt afgelaai (HTTP 200, application/pdf); waar Hanno se
+     DBE-cache 'n kopie het, is die md5 dieselfde. Punte per vraag uit die vraestel se [..]-totale.
+     Geen datalêers nie: 'n antwoordeboek (PDF) in die plek daarvan. NIE in ORDE nie (net RTT roteer). */
+  Object.assign(KATALOGUS, {
+    "dbe-2025-nov-wg-v1": {
+      id: "dbe-2025-nov-wg-v1",
+      vak: "wiskgelett",
+      titel: "DBE November 2025 Wisk. Gel. V1 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=gKiab-SE09Q%3d&tabid=5742&portalid=0&mid=14844",
+      antwoordeboek: "https://www.education.gov.za/LinkClick.aspx?fileticket=Gg-Yp4dFJA4%3d&tabid=5742&portalid=0&mid=14844",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=yfBLrkeMk2o%3d&tabid=5742&portalid=0&mid=14844",
+      vrae: [30, 32, 30, 28, 30]
+    },
+    "dbe-2025-nov-wg-v2": {
+      id: "dbe-2025-nov-wg-v2",
+      vak: "wiskgelett",
+      titel: "DBE November 2025 Wisk. Gel. V2 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=D-fiCJdePQI%3d&tabid=5742&portalid=0&mid=14844",
+      antwoordeboek: "https://www.education.gov.za/LinkClick.aspx?fileticket=jE9sqVNsZLE%3d&tabid=5742&portalid=0&mid=14844",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=anKb8eamj_M%3d&tabid=5742&portalid=0&mid=14844",
+      vrae: [28, 34, 32, 30, 26]
+    },
+    "dbe-2026-jun-wg-v1": {
+      id: "dbe-2026-jun-wg-v1",
+      vak: "wiskgelett",
+      titel: "DBE Mei/Junie 2026 Wisk. Gel. V1 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=Wk4aKGMlwr8%3d&tabid=5956&portalid=0&mid=15142",
+      antwoordeboek: "https://www.education.gov.za/LinkClick.aspx?fileticket=NMxdLVQYRf4%3d&tabid=5956&portalid=0&mid=15142",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=wiNqbHyjNNk%3d&tabid=5956&portalid=0&mid=15142",
+      vrae: [29, 34, 29, 32, 26]
+    },
+    "dbe-2026-jun-wg-v2": {
+      id: "dbe-2026-jun-wg-v2",
+      vak: "wiskgelett",
+      titel: "DBE Mei/Junie 2026 Wisk. Gel. V2 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=m6zeTIq0eoA%3d&tabid=5956&portalid=0&mid=15142",
+      antwoordeboek: "https://www.education.gov.za/LinkClick.aspx?fileticket=9JUHcH95YjU%3d&tabid=5956&portalid=0&mid=15142",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=63tH7Zy437I%3d&tabid=5956&portalid=0&mid=15142",
+      vrae: [30, 28, 31, 33, 28]
+    }
+  });
+
+  /* Rotasie-orde (net RTT): die nuutste vraestel eerste. */
   const ORDE = ["dbe-2026-jun-v1", "dbe-2025-nov-v1", "dbe-2024-nov-v1", "dbe-2025-jun-v1"];
 
   const item = (id) => KATALOGUS[id] || null;
 
-  function vraagLabel(nr) {
-    return "V" + String(nr);
+  /* RTT: "V5". Wisk. Gel.: "Vraag 1" — daar beteken "V1" Vraestel 1, dus voluit. */
+  function vraagLabel(nr, werk) {
+    const p = werk ? item(werk.id) : null;
+    return (p && p.vak ? "Vraag " : "V") + String(nr);
   }
 
   /* Watter vrae moet gedoen word? ’n Volle vraestel = V1–V7. */
@@ -85,7 +130,7 @@ window.WALLIE = window.WALLIE || {};
   }
 
   function vraagLabels(werk) {
-    return vraagNommers(werk).map(vraagLabel);
+    return vraagNommers(werk).map((n) => vraagLabel(n, werk));
   }
 
   /* Punte: die blok se eie telling eerste (sub-vrae kan nie uit vrae[] bereken word nie). */
@@ -136,7 +181,14 @@ window.WALLIE = window.WALLIE || {};
   function skakels(werk) {
     const p = werk ? item(werk.id) : null;
     if (!p) return null;
-    return { vraestel: p.vraestel, data: p.data, memo: p.memo, datatipe: p.datatipe, titel: p.titel };
+    return {
+      vraestel: p.vraestel,
+      data: p.data || null,
+      antwoordeboek: p.antwoordeboek || null,
+      memo: p.memo,
+      datatipe: p.datatipe || null,
+      titel: p.titel
+    };
   }
 
   /* ---------- geskiedenis (nuwe sleutel) ---------- */
@@ -285,7 +337,7 @@ window.WALLIE = window.WALLIE || {};
   }
 
   /* ’n Les-, opstel-, merk-, pouse- of skrif-blok kry NOOIT werk uit die rotasie nie.
-     "skrif" is ’n papier-eksamen (Pa gee die vraestel) — geen DBE-titel uit die katalogus nie. */
+     "skrif" is ’n papier-eksamen: net ’n vaste `werk` uit die rooster (bv. Wisk. Gel. sedert 21 Okt), nooit rotasie nie. */
   const GEEN_ROTASIE = ["les", "opstel", "merk", "pouse", "skrif"];
 
   /* Die werk van ’n blok: vas uit die rooster, anders uit die rotasie. */
