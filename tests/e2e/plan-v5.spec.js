@@ -569,6 +569,18 @@ for (const vp of VIEWPORTS) {
       const memo = page.locator("#session-werk .werk-hoof [data-werk='memo']");
       await expect(memo).toHaveAttribute("href", kat.memo);
       await expect(page.locator("#session-werk")).not.toContainText("Memo sluit oop");
+      /* 21 Okt 20:41: die merk-blok het hom gesluit terwyl hy die DBE-memo in 'n ander oortjie gelees het. Nou: geen
+         waarskuwing of slot nie (soos die skrif-blok). */
+      await page.clock.runFor(10000);
+      for (let i = 0; i < 3; i++) {
+        await hideTab(page);
+        await page.clock.runFor(20000);
+        await showTab(page);
+        await page.clock.runFor(5000);
+      }
+      expect(mock.byKind("warn")).toHaveLength(0);
+      expect(mock.byKind("lock")).toHaveLength(0);
+      await expect(page.locator("#lock-box")).toBeHidden();
       expectNoLeaks(mock);
     });
 
