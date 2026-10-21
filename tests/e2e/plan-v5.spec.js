@@ -181,7 +181,9 @@ const DAE = [
       ["merk-wg-v2-5", "11:05", "11:25"],
       ["middag", "11:25", "12:30"],
       ["foutlog", "12:30", "13:00"],
-      ["klaar", "13:00", "13:00"]
+      ["rus", "13:00", "14:00"],
+      ["wg-v2-proef", "14:00", "17:00"],
+      ["klaar", "17:00", "17:00"]
     ]
   },
   {
@@ -189,12 +191,13 @@ const DAE = [
     tyd: "2026-10-25T08:40:00+02:00",
     blokke: [
       ["opstaan", "08:30", "09:00"],
-      ["formules", "09:00", "09:40"],
-      ["pouse1", "09:40", "10:00"],
+      ["merk-wg-v2-proef", "09:00", "10:00"],
       ["foutlog", "10:00", "10:40"],
-      ["middag", "10:40", "13:00"],
-      ["tas", "13:00", "13:20"],
-      ["klaar", "13:20", "13:20"]
+      ["middag", "10:40", "13:30"],
+      ["eng-v1-a", "13:30", "15:30"],
+      ["merk-eng-v1-a", "15:45", "16:25"],
+      ["tas", "16:30", "16:50"],
+      ["klaar", "16:50", "16:50"]
     ]
   },
   {
@@ -207,7 +210,9 @@ const DAE = [
       ["eksamen", "09:00", "12:00"],
       ["rus", "12:00", "14:00"],
       ["terugskou", "14:00", "14:20"],
-      ["klaar", "14:20", "14:20"]
+      ["eng-v1-b", "14:30", "16:30"],
+      ["merk-eng-v1-b", "16:45", "17:25"],
+      ["klaar", "17:25", "17:25"]
     ]
   }
 ];
@@ -265,11 +270,17 @@ for (const vp of VIEWPORTS) {
         const lyst = await kaarte(page);
         expect(lyst.length, `${dag}: studie-kaarte`).toBeGreaterThan(0);
         for (const k of lyst) {
-          expect(k.les, `${k.id}: les gemerk as agtergrond`).toContain("Agtergrond (opsioneel)");
-          const titel = k.les.replace("Agtergrond (opsioneel)", "").trim();
-          expect(titel.length, `${k.id}: konseptitel`).toBeGreaterThan(3);
           expect(k.hoof, `${k.id}: hooftaak gewys`).toContain("Hooftaak");
-          expect(k.hoof, `${k.id}: hooftaak is nie die agtergrondkaart nie`).not.toContain(titel);
+          /* 21 Okt: 'n eksamenproef (skrif met 'n DBE-vraestel) wys GEEN agtergrond-les nie (Wallie: "dieselfde 5 vrae") */
+          const blokRaw = await page.evaluate((id) => WALLIE.app.state().blocks.find((b) => b.id === id), k.id);
+          if (blokRaw && blokRaw.soort === "skrif" && blokRaw.werk) {
+            expect(k.les, `${k.id}: proef sonder agtergrond-les`).not.toContain("Agtergrond (opsioneel)");
+          } else {
+            expect(k.les, `${k.id}: les gemerk as agtergrond`).toContain("Agtergrond (opsioneel)");
+            const titel = k.les.replace("Agtergrond (opsioneel)", "").trim();
+            expect(titel.length, `${k.id}: konseptitel`).toBeGreaterThan(3);
+            expect(k.hoof, `${k.id}: hooftaak is nie die agtergrondkaart nie`).not.toContain(titel);
+          }
           const item = blokke.find(([suffix]) => `${dag}-${suffix}` === k.id)[3];
           /* 'n Blok met 'n DBE-vraestel (werk, sedert 21 Okt ook Wisk. Gel.) se hooftaak is daardie vraestel */
           const metWerk = state.find((x) => x.id === k.id).werk;
@@ -506,6 +517,38 @@ for (const vp of VIEWPORTS) {
       await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
       await expect(hoof.locator('[data-werk="bylae"]')).toHaveAttribute("href", kat.bylae);
       await expect(paneel).not.toContainText("Mei/Junie 2026");
+      /* Wallie se video (21 Okt): geen agtergrond-les (die 5 herhaalde Wisk. Gel.-kaarte) tydens die proef nie */
+      await expect(page.locator("#session-lesson")).toBeEmpty();
+      await expect(page.locator("#session-lesson .open-lesson")).toHaveCount(0);
+      expectNoLeaks(mock);
+    });
+
+    test("27 Okt 13:05 (roete): RTT V2-proef vra eers, gee dan die amptelike Jun 2026 RTT V2 (vraestel + memo, 10 hoofvrae, 150 punte)", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-27T13:05:00+02:00");
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2026-jun-rtt-v2"]);
+      expect(kat && kat.vrae.reduce((s, x) => s + x, 0)).toBe(150);
+      const blok = page.locator('#block-list .md-card[data-id="2026-10-27-rtt-v2-a"]');
+      await expect(blok).toContainText("RTT V2 (teorie) proef: DBE Mei/Junie 2026 RTT V2");
+      await blok.locator(".start-block").click();
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "rtt begin" });
+      const paneel = page.locator("#session-werk");
+      await expect(paneel.locator(".werk-vra")).toContainText("Het jy DBE Mei/Junie 2026 RTT V2 (teorie) (Afr) al voorheen gedoen of gesien?");
+      await paneel.locator(".werk-vra-nee").click();
+      const hoof = paneel.locator(".werk-hoof");
+      await expect(hoof.locator(".werk-vrae")).toHaveText("Volledige vraestel: 10 hoofvrae, elk met baie subvrae (Vraag 1–10) — 150 punte. Al die vrae staan in die Vraestel (PDF).");
+      await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
+      await expect(hoof.locator('[data-werk="memo"]')).toHaveAttribute("aria-disabled", "true");
+      await expect(hoof.locator('[data-werk="data"], [data-werk="antwoordeboek"], [data-werk="bylae"]')).toHaveCount(0);
+      /* PDF in 'n ander oortjie: skrif, geen waarskuwing nie */
+      await page.clock.runFor(10000);
+      for (let i = 0; i < 3; i++) {
+        await hideTab(page);
+        await page.clock.runFor(20000);
+        await showTab(page);
+        await page.clock.runFor(5000);
+      }
+      expect(mock.byKind("warn")).toHaveLength(0);
+      expect(await noOverflow(page)).toBe(true);
       expectNoLeaks(mock);
     });
 

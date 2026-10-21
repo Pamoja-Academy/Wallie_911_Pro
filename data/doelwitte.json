@@ -1,0 +1,51 @@
+{
+  "_beskrywing": "Wallie se vasgelegde doelwitte en die roete-reël (21 Okt 2026). Een bron van waarheid vir tests/roete.test.js en scripts/roete-verslag.js. Wysig net met Hanno se uitdruklike ja.",
+  "bron": {
+    "punte": "K3/Prelim-rapport (23 Sep 2026): prelim = rekordeksamen-punt (Hanno, 21 Okt). Ook assets/js/data.js en docs/superpowers/specs/2026-09-27-wallie-911-pro-design.md §1 en §3.",
+    "metode": "Ontwerp-spes §2: praktyktoetsing met terugvoer en spasiëring (Dunlosky e.a., 2013, 'high utility'); eksamentegniek bo herlees; ou vraestelle; foutlog is die leerplan."
+  },
+  "ope_vraag": "Hanno (21 Okt): '[verander van Engels na Afrikaans]' — moet die 70%-teiken van Engels na Afrikaans skuif? Tot hy bevestig, geld die spes (Engels 70, Afrikaans 60).",
+  "vakke": {
+    "gasvryheid": { "naam": "Gasvryheidstudie", "prelim": 27, "jaar": 45, "teiken": 60 },
+    "afrikaans": { "naam": "Afrikaans Huistaal", "prelim": 39, "jaar": 39, "teiken": 60 },
+    "rtt": { "naam": "RTT (CAT)", "prelim": 37, "jaar": 46, "teiken": 60 },
+    "engels": { "naam": "Engels EAT", "prelim": 50, "jaar": 56, "teiken": 70 },
+    "toerisme": { "naam": "Toerisme", "prelim": 61, "jaar": 61, "teiken": 60 },
+    "wiskgelett": { "naam": "Wiskundige Geletterdheid", "prelim": 66, "jaar": 66, "teiken": 80 }
+  },
+  "reel": {
+    "beskrywing": "Gaping = teiken - prelim (persentasiepunte). Voor elke vraestel moet die rooster minstens R volle-vraestel-ekwivalente getimede, amptelike DBE-werk (soort skrif, met werk uit die katalogus) bevat, elk met 'n merk-blok op dieselfde of die volgende dag, oor minstens 2 verskillende dae as R >= 2. Tempo = vraestel se minute / punte (DBE).",
+    "R": [
+      { "gaping_tot_en_met": 0, "R": 1 },
+      { "gaping_tot_en_met": 10, "R": 2 },
+      { "gaping_tot_en_met": 25, "R": 3 },
+      { "gaping_tot_en_met": 100, "R": 4 }
+    ],
+    "vanaf": "2026-10-21T13:00:00+02:00"
+  },
+  "vraestelle": [
+    {
+      "eksamen": "Wiskundige Geletterdheid V1", "vak": "wiskgelett", "katalogus": "wg-v1", "punte": 150, "duur_min": 180,
+      "aanvaar": "Net 370 min moontlik tussen 21 Okt 13:00 en die eksamen (Vr 23 Okt 09:00): die inhaal-proef (3 u) plus die hele Nov 2024 V1 in drie dele op Do 22. Meer sou die dag voor die eksamen oorlaai."
+    },
+    {
+      "eksamen": "Wiskundige Geletterdheid V2", "vak": "wiskgelett", "katalogus": "wg-v2", "punte": 150, "duur_min": 180,
+      "aanvaar": "Net 370 min tussen die V1-eksamen (Vr 12:00) en V2 (Ma 09:00): die hele Nov 2025 V2 in drie dele plus die volle Jun 2026 V2 op Sa 24. Sondag bly lig (merk, foutlog, tas)."
+    },
+    { "eksamen": "Engels EAT V1 · Taal", "vak": "engels", "katalogus": "eng-v1", "punte": 80, "duur_min": 120 },
+    {
+      "eksamen": "RTT (CAT) V2 · Teorie", "vak": "rtt", "katalogus": "rtt-v2", "punte": 150, "duur_min": 180,
+      "aanvaar": "Die eksamen is Do 29 Okt 14:00 en die dae ná die Wisk. Gel. V2 is ook vir Engels V1 nodig: twee volle RTT V2-vraestelle (Di 27, Wo 28) plus Vraag 1-6 van 'n derde (75 punte) op Do-oggend = 450 min."
+    },
+    {
+      "eksamen": "Toerisme", "vak": "toerisme", "katalogus": "toer", "punte": 200, "duur_min": 180,
+      "aanvaar": "Op teiken (prelim 61 teen 60): die doel is om nie punte te verloor nie. Die week is vol (4 eksamens in 5 dae); afdeling A + B (90 punte) op die oggend van die eksamen = 85 min."
+    },
+    { "eksamen": "Gasvryheidstudie", "vak": "gasvryheid", "katalogus": "gas", "punte": 200, "duur_min": 180 }
+  ],
+  "oop": [
+    { "eksamen": "Afrikaans HT V1 · Taal", "teen": "2026-10-24", "wat": "Planne 7-10 Nov uit die Nov 2025- en Jun 2026-vraestelle (katalogus 'afr-v1'); opsomming en taal C eerste." },
+    { "eksamen": "Engels EAT V2 · Letterkunde", "teen": "2026-10-24", "wat": "Hanno moet die voorgeskrewe werke bevestig; dan kontekstuele vrae uit ou V2-vraestelle." },
+    { "eksamen": "Afrikaans HT V2 · Letterkunde", "teen": "2026-10-24", "wat": "Hanno moet die voorgeskrewe werke bevestig; ongesiene gedig (10 punte) is suiwer tegniek." }
+  ]
+}

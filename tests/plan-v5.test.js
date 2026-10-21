@@ -176,15 +176,18 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
     ],
     "2026-10-24": [
       ["opstaan", "08:00", "08:30", "break"], ["wg-v2", "08:30", "09:45", "groen"], ["merk-wg-v2", "09:45", "10:05", "groen"], ["pouse1", "10:05", "10:25", "break"],
-      ["wg-v2-5", "10:25", "11:05", "groen"], ["merk-wg-v2-5", "11:05", "11:25", "groen"], ["middag", "11:25", "12:30", "break"], ["foutlog", "12:30", "13:00", "groen"], ["klaar", "13:00", "13:00", "break"]
+      ["wg-v2-5", "10:25", "11:05", "groen"], ["merk-wg-v2-5", "11:05", "11:25", "groen"], ["middag", "11:25", "12:30", "break"], ["foutlog", "12:30", "13:00", "groen"], ["rus", "13:00", "14:00", "break"],
+      ["wg-v2-proef", "14:00", "17:00", "groen"], ["klaar", "17:00", "17:00", "break"]
     ],
     "2026-10-25": [
-      ["opstaan", "08:30", "09:00", "break"], ["formules", "09:00", "09:40", "groen"], ["pouse1", "09:40", "10:00", "break"], ["foutlog", "10:00", "10:40", "groen"],
-      ["middag", "10:40", "13:00", "break"], ["tas", "13:00", "13:20", "warm"], ["klaar", "13:20", "13:20", "break"]
+      ["opstaan", "08:30", "09:00", "break"], ["merk-wg-v2-proef", "09:00", "10:00", "groen"], ["foutlog", "10:00", "10:40", "groen"],
+      ["middag", "10:40", "13:30", "break"], ["eng-v1-a", "13:30", "15:30", "geel"], ["merk-eng-v1-a", "15:45", "16:25", "geel"],
+      ["tas", "16:30", "16:50", "warm"], ["klaar", "16:50", "16:50", "break"]
     ],
     "2026-10-26": [
       ["opstaan", "06:45", "07:15", "break"], ["formules", "07:15", "07:35", "warm"], ["tas", "07:35", "08:00", "break"], ["eksamen", "09:00", "12:00", "break"],
-      ["rus", "12:00", "14:00", "break"], ["terugskou", "14:00", "14:20", "groen"], ["klaar", "14:20", "14:20", "break"]
+      ["rus", "12:00", "14:00", "break"], ["terugskou", "14:00", "14:20", "groen"], ["eng-v1-b", "14:30", "16:30", "geel"],
+      ["merk-eng-v1-b", "16:45", "17:25", "geel"], ["klaar", "17:25", "17:25", "break"]
     ]
   };
   for (const [dag, lysVerwag] of Object.entries(verwag)) {
@@ -196,6 +199,7 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
       if (!b || b.start !== a || b.end !== e) fails.push(`${dag} ${s}: tye ${b && b.start}-${b && b.end}, verwag ${a}-${e}`);
       if (b && b.kind !== kind) fails.push(`${dag} ${s}: kind ${b.kind}, verwag ${kind}`);
       if (b && kind === "groen" && b.subjectSlug !== "wiskgelett") fails.push(`${dag} ${s}: groen blok moet wiskgelett wees`);
+      if (b && kind === "geel" && b.subjectSlug !== "engels") fails.push(`${dag} ${s}: geel blok (roete) moet engels wees`);
       if (b && kind === "break" && (b.subjectSlug !== "break" || b.soort !== "pouse")) fails.push(`${dag} ${s}: pouse moet break/break/pouse wees`);
       if (b && b.minutes !== min(e) - min(a)) fails.push(`${dag} ${s}: minute ${b.minutes} ≠ ${min(e) - min(a)}`);
       if (b && b.item) fails.push(`${dag} ${s}: Wisk. Gel. het geen item nie`);
@@ -220,9 +224,10 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
     if (b && b.minutes < Math.round(punte * 1.2)) fails.push(`${dag}-${id}: ${b.minutes} min is te min vir ${punte} punte (1,2 min per punt)`);
   }
   if (ctx.WALLIE.buildDayPlan("2026-10-23").totalMinutes !== 20 + 20 + 75 + 20) fails.push("23 Okt: totalMinutes verwag 135");
-  if (ctx.WALLIE.buildDayPlan("2026-10-24").totalMinutes !== 75 + 20 + 40 + 20 + 30) fails.push("24 Okt: totalMinutes verwag 185");
-  if (ctx.WALLIE.buildDayPlan("2026-10-25").totalMinutes !== 40 + 40 + 20) fails.push("25 Okt: totalMinutes verwag 100");
-  if (ctx.WALLIE.buildDayPlan("2026-10-26").totalMinutes !== 20 + 20) fails.push("26 Okt: totalMinutes verwag 40");
+  /* Roete (21 Okt): Sa 24 + volle Jun 2026 V2 (180); So 25 merk (60) + foutlog (40) + Engels V1 (120 + 40) + tas (20); Ma 26 + Engels V1 (120 + 40) */
+  if (ctx.WALLIE.buildDayPlan("2026-10-24").totalMinutes !== 75 + 20 + 40 + 20 + 30 + 180) fails.push("24 Okt: totalMinutes verwag 365");
+  if (ctx.WALLIE.buildDayPlan("2026-10-25").totalMinutes !== 60 + 40 + 120 + 40 + 20) fails.push("25 Okt: totalMinutes verwag 280");
+  if (ctx.WALLIE.buildDayPlan("2026-10-26").totalMinutes !== 20 + 20 + 120 + 40) fails.push("26 Okt: totalMinutes verwag 200");
   /* Eksamenrooster: Wisk. Gel. V1 Vr 23 Okt 09:00, V2 Ma 26 Okt 09:00 */
   for (const [re, at] of [[/V1/, "2026-10-23T09:00"], [/V2/, "2026-10-26T09:00"]]) {
     const ex = ctx.PK.EXAMS.find((x) => x.s === "wiskgelett" && re.test(x.n));
@@ -305,7 +310,7 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
       if (b.werk.tipe === "vraestel" && b.soort === "skrif" && !/150 punte/.test(b.title)) fails.push(`${b.id}: volle vraestel moet 150 punte noem`);
     }
   }
-  if (gekoppel !== 15) fails.push(`Wisk. Gel. 21-24 Okt: ${gekoppel} blokke met DBE-werk, verwag 15`);
+  if (gekoppel !== 16) fails.push(`Wisk. Gel. 21-24 Okt: ${gekoppel} blokke met DBE-werk, verwag 16`);
   /* Elke Wisk. Gel.-vraestel: 5 vrae, 150 punte (Nov 2025 uit die memo, Jun 2026 uit die vraestel se [..]-totale) */
   for (const id of ["dbe-2025-nov-wg-v1", "dbe-2025-nov-wg-v2", "dbe-2026-jun-wg-v1", "dbe-2026-jun-wg-v2", "dbe-2024-jun-wg-v1", "dbe-2023-nov-wg-v1", "dbe-2024-nov-wg-v1"]) {
     const p = DBE.item(id);

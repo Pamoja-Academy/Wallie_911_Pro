@@ -271,6 +271,10 @@
     return parts.length > 1 ? parts.slice(1).join(" — ") : String(b.title || "");
   }
 
+  /* 21 Okt (Wallie se video): die 5 Wisk. Gel.-lesse het hom by elke sessie dieselfde 5 toe-boek-vrae gewys en soos die
+     werk gelyk. 'n Eksamenproef (skrif met 'n DBE-vraestel) kry daarom GEEN agtergrond-les nie: net die vraestel. */
+  const isProef = (b) => Boolean(b && b.soort === "skrif" && b.werk);
+
   function matchdayCard(b, done, occurrence, ctx = {}) {
     const kindLabel = KIND_LABEL[b.kind] || b.kind;
     const time = b.start && b.end ? `${b.start}–${b.end}` : `${b.minutes} min`;
@@ -286,7 +290,7 @@
       </li>`;
     }
     const slug = b.subjectSlug;
-    const c = pickConcept(slug, occurrence, b.id);
+    const c = isProef(b) ? null : pickConcept(slug, occurrence, b.id);
     const img = c ? WALLIE.lessonImg(slug, c.id) : WALLIE.lessonImg(slug, "cover");
     const werk = ctx.werk || null;
     const opsomming = werkOpsomming(b, werk);
@@ -370,7 +374,7 @@
       return;
     }
     const seen = state.blocks.filter((b) => b.subjectSlug === next.subjectSlug).indexOf(next);
-    const c = pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
+    const c = isProef(next) ? null : pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
     const werk = werkKaart(state)[next.id] || null;
     const opsomming = werkOpsomming(next, werk);
     const time = next.start && next.end ? `${next.start}–${next.end} · ` : "";
@@ -616,6 +620,13 @@
     if (!el) return;
     slug = slug || $("#session-subject")?.value;
     if (!slug || !lesson(slug)) {
+      el.innerHTML = "";
+      return;
+    }
+    /* 21 Okt (Hanno: "dieselfde vrae as voorheen"): tydens 'n eksamenproef (skrif met 'n DBE-vraestel) GEEN agtergrond-les
+       nie. Die 5 Wisk. Gel.-kaarte se toe-boek-vrae het elke sessie herhaal; in 'n proef is net die vraestel die werk. */
+    const sessieBlok = blokById(sessieBlokId);
+    if (sessieBlok && sessieBlok.soort === "skrif" && sessieBlok.werk) {
       el.innerHTML = "";
       return;
     }
