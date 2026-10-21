@@ -51,7 +51,7 @@ if (DBE) {
   const ids = alleIds.filter((id) => !DBE.KATALOGUS[id].vak);
   const wgIds = alleIds.filter((id) => DBE.KATALOGUS[id].vak === "wiskgelett");
   assert(ids.length === 4, `4 RTT-vraestelle in die katalogus (gekry: ${ids.length})`);
-  assert(wgIds.length === 8, `8 Wisk. Gel.-vraestelle in die katalogus (gekry: ${wgIds.length})`);
+  assert(wgIds.length === 10, `10 Wisk. Gel.-vraestelle in die katalogus (gekry: ${wgIds.length})`);
   assert(ids.length + wgIds.length === alleIds.length, "elke vraestel is RTT of Wisk. Gel.");
   assert(
     JSON.stringify(DBE.ORDE.slice().sort()) === JSON.stringify(ids.slice().sort()),
@@ -84,39 +84,41 @@ if (DBE) {
     assert(sk[tweede] === p[tweede] && sk.data === null, `${id}: skakels() gee die ${tweede} en geen data nie`);
   }
   const wgAlle = wgIds.flatMap((id) => ["vraestel", "antwoordeboek", "bylae", "memo"].map((k) => DBE.KATALOGUS[id][k]).filter(Boolean));
-  assert(wgAlle.length === 24 && new Set(wgAlle).size === 24, "al 24 Wisk. Gel.-skakels is uniek");
+  assert(wgAlle.length === 30 && new Set(wgAlle).size === 30, "al 30 Wisk. Gel.-skakels is uniek");
 
   /* Omruil (21 Okt): die app vra self; "ja" ruil na die volgende amptelike vraestel in die groep */
   const R = DBE.ruil;
-  const blokV1 = { id: "2026-10-22-wg-v1", subjectSlug: "wiskgelett", soort: "skrif", punte: 62, werk: { tipe: "vrae", id: "dbe-2025-nov-wg-v1", nrs: [1, 2] } };
+  const blokV1 = { id: "2026-10-22-wg-v1", subjectSlug: "wiskgelett", soort: "skrif", punte: 59, werk: { tipe: "vrae", id: "dbe-2024-nov-wg-v1", nrs: [1, 2] } };
   delete store[R.KEY];
   assert(R.GROEPE.flat().every((id) => DBE.KATALOGUS[id] && DBE.KATALOGUS[id].vak === "wiskgelett"), "omruil-groepe bevat net Wisk. Gel.-vraestelle in die katalogus");
-  assert(!R.GROEPE.flat().includes("dbe-2026-jun-wg-v1"), "die inhaal-proef (Jun 2026 V1) word nie omgeruil nie");
+  assert(!R.GROEPE.flat().some((id) => R.REEDS_GESIEN[id]), "geen reeds gesiene vraestel in 'n omruil-groep nie");
+  assert(!R.GROEPE.flat().includes("dbe-2024-jun-wg-v1"), "vandag se inhaal (Jun 2024 V1) is nie 'n vervanger nie");
+  assert(R.REEDS_GESIEN["dbe-2026-jun-wg-v1"] && R.REEDS_GESIEN["dbe-2025-nov-wg-v1"], "Jun 2026 V1 en Nov 2025 V1 is as reeds gesien gemerk");
   let w = sandbox.WALLIE.werkVirBlok(blokV1, { dag: "2026-10-22" });
-  assert(w.id === "dbe-2025-nov-wg-v1" && !w.ruilVan && R.moetVra(w), "onbeantwoord: rooster se vraestel, en die app vra");
-  assert(DBE.punte(w, blokV1) === 62, "onbeantwoord: die blok se 62 punte");
-  R.antwoord("dbe-2025-nov-wg-v1", false);
-  w = sandbox.WALLIE.werkVirBlok(blokV1, { dag: "2026-10-22" });
-  assert(w.id === "dbe-2025-nov-wg-v1" && !R.moetVra(w), "'nee': dieselfde vraestel en nie weer gevra nie");
-  delete store[R.KEY];
-  R.antwoord("dbe-2025-nov-wg-v1", true);
-  w = sandbox.WALLIE.werkVirBlok(blokV1, { dag: "2026-10-22" });
-  assert(w.id === "dbe-2024-nov-wg-v1" && w.ruilVan === "dbe-2025-nov-wg-v1" && R.moetVra(w), "'ja': Nov 2024 V1, en die app vra weer oor die vervanger");
-  assert(JSON.stringify(w.nrs) === "[1,2]" && DBE.punte(w, blokV1) === 59, "dieselfde vrae (1+2); punte uit die vervanger (29+30 = 59)");
+  assert(w.id === "dbe-2024-nov-wg-v1" && !w.ruilVan && R.moetVra(w), "onbeantwoord: rooster se vraestel (Nov 2024), en die app vra");
+  assert(DBE.punte(w, blokV1) === 59, "onbeantwoord: die blok se 59 punte");
   assert(DBE.skakels(w).bylae && !DBE.skakels(w).antwoordeboek, "Nov 2024 se tweede lêer is die bylae");
-  const merk = { id: "2026-10-22-merk-wg-v1", subjectSlug: "wiskgelett", soort: "merk", werk: { tipe: "vrae", id: "dbe-2025-nov-wg-v1", nrs: [1, 2] } };
-  assert(sandbox.WALLIE.werkVirBlok(merk, {}).id === "dbe-2024-nov-wg-v1", "die merk-blok volg die omruil (memo van die regte vraestel)");
+  R.antwoord("dbe-2024-nov-wg-v1", false);
+  w = sandbox.WALLIE.werkVirBlok(blokV1, { dag: "2026-10-22" });
+  assert(w.id === "dbe-2024-nov-wg-v1" && !R.moetVra(w), "'nee': dieselfde vraestel en nie weer gevra nie");
+  delete store[R.KEY];
   R.antwoord("dbe-2024-nov-wg-v1", true);
-  assert(sandbox.WALLIE.werkVirBlok(blokV1, {}).id === "dbe-2025-jun-wg-v1", "Nov 2024 ook gesien: Jun 2025 V1");
+  w = sandbox.WALLIE.werkVirBlok(blokV1, { dag: "2026-10-22" });
+  assert(w.id === "dbe-2025-jun-wg-v1" && w.ruilVan === "dbe-2024-nov-wg-v1" && R.moetVra(w), "'ja': Jun 2025 V1, en die app vra weer oor die vervanger");
+  assert(JSON.stringify(w.nrs) === "[1,2]" && DBE.punte(w, blokV1) === 64, "dieselfde vrae (1+2); punte uit die vervanger (29+35 = 64)");
+  const merk = { id: "2026-10-22-merk-wg-v1", subjectSlug: "wiskgelett", soort: "merk", werk: { tipe: "vrae", id: "dbe-2024-nov-wg-v1", nrs: [1, 2] } };
+  assert(sandbox.WALLIE.werkVirBlok(merk, {}).id === "dbe-2025-jun-wg-v1", "die merk-blok volg die omruil (memo van die regte vraestel)");
   R.antwoord("dbe-2025-jun-wg-v1", true);
+  assert(sandbox.WALLIE.werkVirBlok(blokV1, {}).id === "dbe-2023-nov-wg-v1", "Jun 2025 ook gesien: Nov 2023 V1");
+  R.antwoord("dbe-2023-nov-wg-v1", true);
   w = sandbox.WALLIE.werkVirBlok(blokV1, {});
-  assert(w.id === "dbe-2025-jun-wg-v1" && R.almalGesien(w) && !R.moetVra(w), "almal gesien: die laaste bly, en nie weer gevra nie");
+  assert(w.id === "dbe-2023-nov-wg-v1" && R.almalGesien(w) && !R.moetVra(w), "almal gesien: die laaste bly, en nie weer gevra nie");
   const v2 = { id: "x", subjectSlug: "wiskgelett", soort: "skrif", werk: { tipe: "vrae", id: "dbe-2025-nov-wg-v2", nrs: [5] } };
   assert(sandbox.WALLIE.werkVirBlok(v2, {}).id === "dbe-2025-nov-wg-v2", "V1-antwoorde raak nie die V2-groep nie");
-  const proef = { id: "p", subjectSlug: "wiskgelett", soort: "skrif", werk: { tipe: "vraestel", id: "dbe-2026-jun-wg-v1" } };
-  assert(!R.moetVra(sandbox.WALLIE.werkVirBlok(proef, {})), "die inhaal-proef vra nie");
+  const inhaal = { id: "p", subjectSlug: "wiskgelett", soort: "skrif", werk: { tipe: "vraestel", id: "dbe-2024-jun-wg-v1" } };
+  assert(!R.moetVra(sandbox.WALLIE.werkVirBlok(inhaal, {})), "vandag se inhaal vra nie");
   store[R.KEY] = "{stukkend";
-  assert(sandbox.WALLIE.werkVirBlok(blokV1, {}).id === "dbe-2025-nov-wg-v1", "stukkende stoor: terug na die rooster se vraestel, geen fout nie");
+  assert(sandbox.WALLIE.werkVirBlok(blokV1, {}).id === "dbe-2024-nov-wg-v1", "stukkende stoor: terug na die rooster se vraestel, geen fout nie");
   delete store[R.KEY];
   assert(DBE.punte({ tipe: "vrae", id: "dbe-2025-nov-wg-v1", nrs: [1, 2] }) === 62, "Nov 2025 Wisk. Gel. V1 Vraag 1+2 is 62 punte");
   assert(DBE.punte({ tipe: "vrae", id: "dbe-2025-nov-wg-v2", nrs: [5] }) === 26, "Nov 2025 Wisk. Gel. V2 Vraag 5 is 26 punte");

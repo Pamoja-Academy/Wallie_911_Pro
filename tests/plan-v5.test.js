@@ -120,8 +120,8 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   ];
   const verwag22 = [
     ["opstaan", "07:30", "08:00", "break"], ["wg-v1", "08:00", "09:15", "groen"], ["merk-wg-v1", "09:15", "09:35", "groen"],
-    ["pouse1", "09:35", "09:55", "break"], ["wg-v1-34", "09:55", "11:05", "groen"], ["merk-wg-v1-34", "11:05", "11:25", "groen"],
-    ["middag", "11:25", "12:15", "break"], ["wg-v1-5", "12:15", "12:55", "groen"], ["merk-wg-v1-5", "12:55", "13:15", "groen"],
+    ["pouse1", "09:35", "09:55", "break"], ["wg-v1-34", "09:55", "11:10", "groen"], ["merk-wg-v1-34", "11:10", "11:30", "groen"],
+    ["middag", "11:30", "12:15", "break"], ["wg-v1-5", "12:15", "12:55", "groen"], ["merk-wg-v1-5", "12:55", "13:15", "groen"],
     ["pouse2", "13:15", "13:30", "break"], ["formules", "13:30", "14:00", "groen"], ["tas", "14:00", "14:20", "warm"], ["klaar", "14:20", "14:20", "break"]
   ];
   for (const [dag, verwag] of [["2026-10-21", verwag21], ["2026-10-22", verwag22]]) {
@@ -141,22 +141,22 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   if (!proef || !proef.werk || proef.werk.tipe !== "vraestel" || proef.werk.id !== "dbe-2026-jun-wg-v1") fails.push("21 Okt: wg-v1-proef moet die volle DBE Mei/Junie 2026 Wisk. Gel. V1 as werk hê");
   if (proef && !/150 punte, 3 uur/.test(proef.title)) fails.push("21 Okt: proef-titel noem nie 150 punte, 3 uur nie");
   if (p21.totalMinutes !== 180 + 180 + 60 + 30) fails.push(`21 Okt: totalMinutes ${p21.totalMinutes}, verwag 450`);
-  /* Inhaal (21 Okt, Hanno): die volle Jun 2026 V1-vraestel vanmiddag, 3 uur, skrif */
+  /* Inhaal (21 Okt, Hanno): 'n volle V1-vraestel wat hy NOG NIE gesien het nie (Jun 2024), vanmiddag, 3 uur, skrif */
   const inhaal = p21.blocks.find((b) => b.id === "2026-10-21-wg-v1-proef-inhaal");
-  if (!inhaal || inhaal.soort !== "skrif" || inhaal.minutes !== 180 || !inhaal.werk || inhaal.werk.id !== "dbe-2026-jun-wg-v1")
-    fails.push("21 Okt: inhaal-blok moet skrif, 180 min, met die volle Jun 2026 V1 wees");
+  if (!inhaal || inhaal.soort !== "skrif" || inhaal.minutes !== 180 || !inhaal.werk || inhaal.werk.id !== "dbe-2024-jun-wg-v1")
+    fails.push("21 Okt: inhaal-blok moet skrif, 180 min, met die volle Jun 2024 V1 wees");
   const merk21 = p21.blocks.find((b) => b.id === "2026-10-21-merk-wg-v1-proef");
   if (!merk21 || merk21.soort !== "merk") fails.push("21 Okt: merk-blok moet soort merk wees");
   const foutlog = p21.blocks.find((b) => b.id === "2026-10-21-foutlog");
   if (!foutlog || foutlog.soort !== "herdoen") fails.push("21 Okt: foutlog moet soort herdoen wees");
   const p22 = ctx.WALLIE.buildDayPlan("2026-10-22");
   const wg22 = p22.blocks.find((b) => b.id === "2026-10-22-wg-v1");
-  if (!wg22 || wg22.soort !== "skrif" || wg22.punte !== 62 || wg22.minutes !== 75) fails.push("22 Okt: wg-v1 moet 'n skrif-blok van 62 punte / 75 min wees (die PDF is in 'n ander oortjie oop)");
+  if (!wg22 || wg22.soort !== "skrif" || wg22.punte !== 59 || wg22.minutes !== 75) fails.push("22 Okt: wg-v1 moet 'n skrif-blok van 59 punte (Nov 2024 V1 Vraag 1+2) / 75 min wees");
   const tas22 = p22.blocks.find((b) => b.id === "2026-10-22-tas");
   if (!tas22 || tas22.soort !== "voor-eksamen" || !/sakrekenaar/.test(tas22.detail)) fails.push("22 Okt: tas moet voor-eksamen wees en die sakrekenaar noem");
-  if (p22.totalMinutes !== 75 + 20 + 70 + 20 + 40 + 20 + 30 + 20) fails.push(`22 Okt: totalMinutes ${p22.totalMinutes}, verwag 295`);
+  if (p22.totalMinutes !== 75 + 20 + 75 + 20 + 40 + 20 + 30 + 20) fails.push(`22 Okt: totalMinutes ${p22.totalMinutes}, verwag 300`);
   /* Inhaal: Do 22 dek die HELE Nov 2025 V1-vraestel (Vraag 1-5, 150 punte) voor die eksamen */
-  const nrs22 = p22.blocks.filter((b) => b.soort === "skrif" && b.werk && b.werk.id === "dbe-2025-nov-wg-v1").flatMap((b) => b.werk.nrs);
+  const nrs22 = p22.blocks.filter((b) => b.soort === "skrif" && b.werk && b.werk.id === "dbe-2024-nov-wg-v1").flatMap((b) => b.werk.nrs);
   if (nrs22.slice().sort().join() !== "1,2,3,4,5") fails.push(`22 Okt: die skrif-blokke dek Vraag ${nrs22.join(",")}, verwag 1-5`);
   /* Die Wisk. Gel.-toetse tot 20 Okt was "toets" (oortjie-slot). Vanaf 21 Okt is die DBE-PDF in die app, dus "skrif" (hierbo). */
   for (const dag of ["2026-10-16", "2026-10-17", "2026-10-18", "2026-10-20"]) {
@@ -295,7 +295,7 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
       gekoppel += 1;
       if (p.vak !== "wiskgelett") fails.push(`${b.id}: ${p.id} is nie 'n Wisk. Gel.-vraestel nie`);
       const sk = DBE.skakels(b.werk);
-      for (const k of ["vraestel", "antwoordeboek", "memo"])
+      for (const k of ["vraestel", sk.antwoordeboek ? "antwoordeboek" : "bylae", "memo"])
         if (!/^https:\/\/www\.education\.gov\.za\/LinkClick\.aspx\?fileticket=/.test(sk[k] || "")) fails.push(`${b.id}: ${k}-skakel is nie 'n amptelike DBE-skakel nie`);
       if (b.punte != null) {
         const nrs = DBE.vraagNommers(b.werk);
@@ -307,10 +307,24 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
   }
   if (gekoppel !== 15) fails.push(`Wisk. Gel. 21-24 Okt: ${gekoppel} blokke met DBE-werk, verwag 15`);
   /* Elke Wisk. Gel.-vraestel: 5 vrae, 150 punte (Nov 2025 uit die memo, Jun 2026 uit die vraestel se [..]-totale) */
-  for (const id of ["dbe-2025-nov-wg-v1", "dbe-2025-nov-wg-v2", "dbe-2026-jun-wg-v1", "dbe-2026-jun-wg-v2"]) {
+  for (const id of ["dbe-2025-nov-wg-v1", "dbe-2025-nov-wg-v2", "dbe-2026-jun-wg-v1", "dbe-2026-jun-wg-v2", "dbe-2024-jun-wg-v1", "dbe-2023-nov-wg-v1", "dbe-2024-nov-wg-v1"]) {
     const p = DBE.item(id);
     if (!p || p.vrae.length !== 5 || p.vrae.reduce((s, x) => s + x, 0) !== 150) fails.push(`${id}: moet 5 vrae en 150 punte hê`);
   }
+  /* LL-18 (21 Okt 13:00, "dieselfde vrae as voorheen"): geen blok vanaf 21 Okt 13:00 mag 'n vraestel gee wat Wallie al
+     gekry het nie (REEDS_GESIEN), ook nie ná 'n omruil nie; en geen vervanger in 'n omruil-groep mag reeds gesien wees nie. */
+  const gesien = DBE.ruil.REEDS_GESIEN;
+  for (const dag of ["2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26"]) {
+    for (const b of ctx.WALLIE.buildDayPlan(dag).blocks) {
+      if (!b.werk || (dag === "2026-10-21" && b.end <= "13:00")) continue;
+      const w = ctx.WALLIE.werkVirBlok(b, {});
+      if (gesien[b.werk.id] || gesien[w.id]) fails.push(`${b.id}: gee ${w.id}, wat Wallie al gekry het (${gesien[b.werk.id] || gesien[w.id]})`);
+    }
+  }
+  for (const g of DBE.ruil.GROEPE) for (const id of g) if (gesien[id]) fails.push(`omruil-groep bevat ${id}, wat reeds gesien is`);
+  /* Die inhaal-vraestel van vandag (Jun 2024) mag nie môre as vervanger terugkom nie */
+  if (DBE.ruil.GROEPE.some((g) => g.includes("dbe-2024-jun-wg-v1"))) fails.push("omruil-groep bevat vandag se inhaal-vraestel (Jun 2024 V1)");
+
   /* Net RTT roteer: geen Wisk. Gel.-vraestel in ORDE nie */
   if (DBE.ORDE.some((id) => DBE.item(id).vak === "wiskgelett")) fails.push("ORDE bevat 'n Wisk. Gel.-vraestel; net RTT roteer");
 }

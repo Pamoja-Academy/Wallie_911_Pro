@@ -150,6 +150,41 @@ window.WALLIE = window.WALLIE || {};
     }
   });
 
+  /* Nog twee V1-vraestelle wat Wallie nooit gekry het nie (21 Okt, ná "dieselfde vrae as voorheen"). Skakels uit
+     tabid 4933 (Mei/Junie 2024) en 4682 (Nov 2023), op 21 Okt afgelaai (HTTP 200, application/pdf); punte uit die
+     memo se [..]-totale (elk 150). Albei het 'n bylae. */
+  Object.assign(KATALOGUS, {
+    "dbe-2024-jun-wg-v1": {
+      id: "dbe-2024-jun-wg-v1",
+      vak: "wiskgelett",
+      titel: "DBE Mei/Junie 2024 Wisk. Gel. V1 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=i5dGGr50CPk%3d&tabid=4933&portalid=0&mid=13145",
+      bylae: "https://www.education.gov.za/LinkClick.aspx?fileticket=BOPUHpWGhoU%3d&tabid=4933&portalid=0&mid=13145",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=l7QkiUN-twE%3d&tabid=4933&portalid=0&mid=13145",
+      vrae: [32, 31, 30, 26, 31]
+    },
+    "dbe-2023-nov-wg-v1": {
+      id: "dbe-2023-nov-wg-v1",
+      vak: "wiskgelett",
+      titel: "DBE November 2023 Wisk. Gel. V1 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=rnvTYpISoiA%3d&tabid=4682&portalid=0&mid=12680",
+      bylae: "https://www.education.gov.za/LinkClick.aspx?fileticket=rmrgcIJPBF8%3d&tabid=4682&portalid=0&mid=12680",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=2JxLqGZq7Cw%3d&tabid=4682&portalid=0&mid=12680",
+      vrae: [29, 40, 27, 33, 21]
+    }
+  });
+
+  /* Reeds gesien (21 Okt, LL-18): vraestelle wat Wallie al gekry het. Die rooster mag hulle NOOIT weer as werk gee nie
+     (tests/plan-v5.test.js). Bron per vraestel: */
+  const REEDS_GESIEN = {
+    /* Op 19 Okt as "Pa gee"-vraestel vir 20/21 Okt voorberei (DBE-cache\vandag\...JUNIE2026...druk-dit.pdf);
+       Wallie op 21 Okt 13:00: "dieselfde vrae as voorheen". */
+    "dbe-2026-jun-wg-v1": "gegee 19-21 Okt (Pa gee) en 21 Okt 13:00 in die app",
+    /* Die enigste V1-vraestel in die DBE-cache (afgelaai 15 Okt) toe die 16-18 Okt-blokke "een DBE-vraestel (Pa gee)"
+       gesê het: waarskynlik gegee. Nie bewys nie, maar 'n herhaling kos meer as 'n ander vraestel. */
+    "dbe-2025-nov-wg-v1": "waarskynlik gegee 16-18 Okt (Pa gee, die enigste V1 in die cache)"
+  };
+
   /* ---------- Omruil (21 Okt, Hanno) ----------
      Die app vra Wallie self of hy 'n vraestel al gedoen of gesien het. Ja → die volgende vraestel in dieselfde groep
      (amptelik, dieselfde vrae-nommers). Die antwoord geld per VRAESTEL, dus volg die merk-blokke en die latere vrae
@@ -158,7 +193,8 @@ window.WALLIE = window.WALLIE || {};
        { v: 1, gesien: { "<vraestel-id>": true | false } } */
   const RUIL_KEY = "wallie911_vraestel_gesien";
   const RUIL_GROEPE = [
-    ["dbe-2025-nov-wg-v1", "dbe-2024-nov-wg-v1", "dbe-2025-jun-wg-v1"],
+    /* V1: Nov 2025 is reeds gesien (REEDS_GESIEN); Jun 2024 is vandag (21 Okt) se inhaal en dus nie 'n vervanger nie */
+    ["dbe-2024-nov-wg-v1", "dbe-2025-jun-wg-v1", "dbe-2023-nov-wg-v1"],
     ["dbe-2025-nov-wg-v2", "dbe-2024-nov-wg-v2", "dbe-2025-jun-wg-v2"]
   ];
   const groepVan = (id) => RUIL_GROEPE.find((g) => g.includes(id)) || null;
@@ -186,6 +222,7 @@ window.WALLIE = window.WALLIE || {};
   const ruil = {
     KEY: RUIL_KEY,
     GROEPE: RUIL_GROEPE,
+    REEDS_GESIEN,
     opgelosId,
     /* Moet die app vra? Net vir 'n vraestel in 'n groep waaroor Wallie nog nie geantwoord het nie. */
     moetVra(werk) {

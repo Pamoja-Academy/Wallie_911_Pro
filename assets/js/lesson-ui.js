@@ -123,6 +123,10 @@
     const nrs = d.vraagNommers(werk);
     const punte = d.punte(werk, blok);
     if (!nrs.length && punte == null) return "";
+    /* 21 Okt: "Vraag 1 (29) · … · Vraag 5 (26)" het soos 5 klein vragies gelyk. 'n Volle Wisk. Gel.-vraestel sê dit voluit. */
+    if (werk.tipe === "vraestel" && d.item(werk.id)?.vak) {
+      return `<p class="werk-vrae"><strong>Volledige vraestel:</strong> ${nrs.length} hoofvrae, elk met baie subvrae (Vraag 1–${nrs.length})${punte != null ? ` — ${punte} punte` : ""}. Al die vrae staan in die Vraestel (PDF).</p>`;
+    }
     const wysPer = nrs.length > 1;
     const dele = nrs.map((n) => {
       const p = wysPer ? d.vraagPunte(werk, n) : null;
