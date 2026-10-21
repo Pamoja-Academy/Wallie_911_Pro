@@ -114,12 +114,15 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
    Do 22 = Vraag 1 en 2, formuleblad en tas pak. Alles groen/wiskgelett; pouses break/break. */
 {
   const verwag21 = [
-    ["opstaan", "07:30", "08:00", "break"], ["wg-v1-proef", "08:00", "11:00", "groen"], ["middag", "11:00", "12:00", "break"],
-    ["merk-wg-v1-proef", "12:00", "13:00", "groen"], ["pouse1", "13:00", "13:15", "break"], ["foutlog", "13:15", "13:45", "groen"], ["klaar", "13:45", "13:45", "break"]
+    ["opstaan", "07:30", "08:00", "break"], ["wg-v1-proef", "08:00", "11:00", "groen"], ["middag", "11:00", "13:00", "break"],
+    ["wg-v1-proef-inhaal", "13:00", "16:00", "groen"], ["pouse1", "16:00", "16:15", "break"], ["merk-wg-v1-proef", "16:15", "17:15", "groen"],
+    ["foutlog", "17:15", "17:45", "groen"], ["klaar", "17:45", "17:45", "break"]
   ];
   const verwag22 = [
     ["opstaan", "07:30", "08:00", "break"], ["wg-v1", "08:00", "09:15", "groen"], ["merk-wg-v1", "09:15", "09:35", "groen"],
-    ["pouse1", "09:35", "09:55", "break"], ["formules", "09:55", "10:25", "groen"], ["tas", "10:25", "10:45", "warm"], ["klaar", "10:45", "10:45", "break"]
+    ["pouse1", "09:35", "09:55", "break"], ["wg-v1-34", "09:55", "11:05", "groen"], ["merk-wg-v1-34", "11:05", "11:25", "groen"],
+    ["middag", "11:25", "12:15", "break"], ["wg-v1-5", "12:15", "12:55", "groen"], ["merk-wg-v1-5", "12:55", "13:15", "groen"],
+    ["pouse2", "13:15", "13:30", "break"], ["formules", "13:30", "14:00", "groen"], ["tas", "14:00", "14:20", "warm"], ["klaar", "14:20", "14:20", "break"]
   ];
   for (const [dag, verwag] of [["2026-10-21", verwag21], ["2026-10-22", verwag22]]) {
     const lys = ctx.WALLIE.buildDayPlan(dag).blocks;
@@ -137,7 +140,11 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   if (!proef || proef.soort !== "skrif" || proef.minutes !== 180 || proef.item) fails.push("21 Okt: wg-v1-proef moet soort skrif, 180 min, sonder item wees (papier-eksamen, geen oortjie-slot)");
   if (!proef || !proef.werk || proef.werk.tipe !== "vraestel" || proef.werk.id !== "dbe-2026-jun-wg-v1") fails.push("21 Okt: wg-v1-proef moet die volle DBE Mei/Junie 2026 Wisk. Gel. V1 as werk hê");
   if (proef && !/150 punte, 3 uur/.test(proef.title)) fails.push("21 Okt: proef-titel noem nie 150 punte, 3 uur nie");
-  if (p21.totalMinutes !== 180 + 60 + 30) fails.push(`21 Okt: totalMinutes ${p21.totalMinutes}, verwag 270`);
+  if (p21.totalMinutes !== 180 + 180 + 60 + 30) fails.push(`21 Okt: totalMinutes ${p21.totalMinutes}, verwag 450`);
+  /* Inhaal (21 Okt, Hanno): die volle Jun 2026 V1-vraestel vanmiddag, 3 uur, skrif */
+  const inhaal = p21.blocks.find((b) => b.id === "2026-10-21-wg-v1-proef-inhaal");
+  if (!inhaal || inhaal.soort !== "skrif" || inhaal.minutes !== 180 || !inhaal.werk || inhaal.werk.id !== "dbe-2026-jun-wg-v1")
+    fails.push("21 Okt: inhaal-blok moet skrif, 180 min, met die volle Jun 2026 V1 wees");
   const merk21 = p21.blocks.find((b) => b.id === "2026-10-21-merk-wg-v1-proef");
   if (!merk21 || merk21.soort !== "merk") fails.push("21 Okt: merk-blok moet soort merk wees");
   const foutlog = p21.blocks.find((b) => b.id === "2026-10-21-foutlog");
@@ -147,7 +154,10 @@ if (eksamenBlok && eksamenBlok.kind !== "break") fails.push("15 Okt: eksamen-blo
   if (!wg22 || wg22.soort !== "skrif" || wg22.punte !== 62 || wg22.minutes !== 75) fails.push("22 Okt: wg-v1 moet 'n skrif-blok van 62 punte / 75 min wees (die PDF is in 'n ander oortjie oop)");
   const tas22 = p22.blocks.find((b) => b.id === "2026-10-22-tas");
   if (!tas22 || tas22.soort !== "voor-eksamen" || !/sakrekenaar/.test(tas22.detail)) fails.push("22 Okt: tas moet voor-eksamen wees en die sakrekenaar noem");
-  if (p22.totalMinutes !== 75 + 20 + 30 + 20) fails.push(`22 Okt: totalMinutes ${p22.totalMinutes}, verwag 145`);
+  if (p22.totalMinutes !== 75 + 20 + 70 + 20 + 40 + 20 + 30 + 20) fails.push(`22 Okt: totalMinutes ${p22.totalMinutes}, verwag 295`);
+  /* Inhaal: Do 22 dek die HELE Nov 2025 V1-vraestel (Vraag 1-5, 150 punte) voor die eksamen */
+  const nrs22 = p22.blocks.filter((b) => b.soort === "skrif" && b.werk && b.werk.id === "dbe-2025-nov-wg-v1").flatMap((b) => b.werk.nrs);
+  if (nrs22.slice().sort().join() !== "1,2,3,4,5") fails.push(`22 Okt: die skrif-blokke dek Vraag ${nrs22.join(",")}, verwag 1-5`);
   /* Die Wisk. Gel.-toetse tot 20 Okt was "toets" (oortjie-slot). Vanaf 21 Okt is die DBE-PDF in die app, dus "skrif" (hierbo). */
   for (const dag of ["2026-10-16", "2026-10-17", "2026-10-18", "2026-10-20"]) {
     const wgb = ctx.WALLIE.buildDayPlan(dag).blocks.find((b) => b.id === `${dag}-wg-v1`);
@@ -295,7 +305,7 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
       if (b.werk.tipe === "vraestel" && b.soort === "skrif" && !/150 punte/.test(b.title)) fails.push(`${b.id}: volle vraestel moet 150 punte noem`);
     }
   }
-  if (gekoppel !== 10) fails.push(`Wisk. Gel. 21-24 Okt: ${gekoppel} blokke met DBE-werk, verwag 10`);
+  if (gekoppel !== 15) fails.push(`Wisk. Gel. 21-24 Okt: ${gekoppel} blokke met DBE-werk, verwag 15`);
   /* Elke Wisk. Gel.-vraestel: 5 vrae, 150 punte (Nov 2025 uit die memo, Jun 2026 uit die vraestel se [..]-totale) */
   for (const id of ["dbe-2025-nov-wg-v1", "dbe-2025-nov-wg-v2", "dbe-2026-jun-wg-v1", "dbe-2026-jun-wg-v2"]) {
     const p = DBE.item(id);

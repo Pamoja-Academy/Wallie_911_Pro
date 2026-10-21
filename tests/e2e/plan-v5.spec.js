@@ -126,11 +126,12 @@ const DAE = [
     blokke: [
       ["opstaan", "07:30", "08:00"],
       ["wg-v1-proef", "08:00", "11:00"],
-      ["middag", "11:00", "12:00"],
-      ["merk-wg-v1-proef", "12:00", "13:00"],
-      ["pouse1", "13:00", "13:15"],
-      ["foutlog", "13:15", "13:45"],
-      ["klaar", "13:45", "13:45"]
+      ["middag", "11:00", "13:00"],
+      ["wg-v1-proef-inhaal", "13:00", "16:00"],
+      ["pouse1", "16:00", "16:15"],
+      ["merk-wg-v1-proef", "16:15", "17:15"],
+      ["foutlog", "17:15", "17:45"],
+      ["klaar", "17:45", "17:45"]
     ]
   },
   {
@@ -141,9 +142,15 @@ const DAE = [
       ["wg-v1", "08:00", "09:15"],
       ["merk-wg-v1", "09:15", "09:35"],
       ["pouse1", "09:35", "09:55"],
-      ["formules", "09:55", "10:25"],
-      ["tas", "10:25", "10:45"],
-      ["klaar", "10:45", "10:45"]
+      ["wg-v1-34", "09:55", "11:05"],
+      ["merk-wg-v1-34", "11:05", "11:25"],
+      ["middag", "11:25", "12:15"],
+      ["wg-v1-5", "12:15", "12:55"],
+      ["merk-wg-v1-5", "12:55", "13:15"],
+      ["pouse2", "13:15", "13:30"],
+      ["formules", "13:30", "14:00"],
+      ["tas", "14:00", "14:20"],
+      ["klaar", "14:20", "14:20"]
     ]
   },
   {
@@ -460,11 +467,11 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
-    test("22 Okt 10:30: tas pak is 'n voor-eksamen-blok en kry nooit 'n waarskuwing nie", async ({ page, context }) => {
+    test("22 Okt 14:05: tas pak is 'n voor-eksamen-blok en kry nooit 'n waarskuwing nie", async ({ page, context }) => {
       /* blok-gebeure word net in modus v2 afgelewer */
       const mock = new MockBackend({ mode: "v2" });
       await mock.attach(context);
-      await boot(page, { time: new Date("2026-10-22T10:30:00+02:00") });
+      await boot(page, { time: new Date("2026-10-22T14:05:00+02:00") });
       await page.goto("/#missie");
       await page.clock.runFor(1500);
       const tas = page.locator('#block-list .md-card[data-id="2026-10-22-tas"]');
