@@ -14,9 +14,9 @@
   "use strict";
   var KEY = "wallie911_toegang_v1";
   var GEBRUIKER = "wallie";
-  var SALT = "5da21a3de425678e229421225d924693";
+  var SALT = "1ea9384ce9f15ff6bc7c12406c72203d";
   var ITER = 150000;
-  var HASH = "0b3eccf9d74e99886ab6e3b4d19f80f75923a55043f388a9d5305d5f3d13acb5";
+  var HASH = "5aaa9eb40f971b81fc62a6a5f3da67d5c952a8f8c775d08127596d08455fc819";
 
   try {
     var d = JSON.parse(window.localStorage.getItem(KEY) || "null");
