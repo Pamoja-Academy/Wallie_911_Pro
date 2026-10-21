@@ -1,8 +1,9 @@
 /* Hard-proctor sessie-logika */
 window.WALLIE = window.WALLIE || {};
 
-/* Papier-eksamen (soort "skrif"): Wallie skryf op papier wat Pa gee.
-   Tab weg / fokus-verlies mag nie ’n waarskuwing of slot word nie. */
+/* Papier-eksamen (soort "skrif") en die merk daarvan (soort "merk" met ’n DBE-vraestel): Wallie werk op papier en lees
+   die vraestel of die memo (PDF) in ’n ander oortjie. Tab weg / fokus-verlies mag nie ’n waarskuwing of slot word nie.
+   21 Okt 20:41: die merk-blok het hom binne 1 min gesluit (3× "Tab weg") terwyl hy die DBE-memo gelees het. */
 function skrifSessie() {
   try {
     const raw = localStorage.getItem("wallie911_v2_bok");
@@ -11,7 +12,7 @@ function skrifSessie() {
     const id = s && s.live && s.live.block && s.live.block.id;
     if (!id || !Array.isArray(s.blocks)) return false;
     const blok = s.blocks.find((b) => b && b.id === id);
-    return Boolean(blok && blok.soort === "skrif");
+    return Boolean(blok && (blok.soort === "skrif" || (blok.soort === "merk" && blok.werk)));
   } catch (e) {
     return false;
   }
