@@ -389,10 +389,10 @@ function excursions(B, n) {
   const K = B.win.WALLIE.DBE.KATALOGUS;
   const rtt = Object.values(K).filter((v) => !v.vak);
   const wg = Object.values(K).filter((v) => v.vak === "wiskgelett");
-  assert(rtt.length === 4 && wg.length === 4 && Object.keys(K).length === 8, "4 RTT- en 4 Wisk. Gel.-vraestelle in die katalogus");
+  assert(rtt.length === 4 && wg.length === 8 && Object.keys(K).length === 12, "4 RTT- en 8 Wisk. Gel.-vraestelle in die katalogus (4 + 4 vervangers)");
   const amptelik = (u) => /^https:\/\/www\.education\.gov\.za\//.test(u || "");
   assert(rtt.every((v) => amptelik(v.vraestel) && amptelik(v.data) && amptelik(v.memo)), "elke RTT-vraestel het amptelike skakels (met data)");
-  assert(wg.every((v) => amptelik(v.vraestel) && amptelik(v.antwoordeboek) && amptelik(v.memo) && !v.data), "elke Wisk. Gel.-vraestel het amptelike skakels (met antwoordeboek)");
+  assert(wg.every((v) => amptelik(v.vraestel) && amptelik(v.antwoordeboek || v.bylae) && amptelik(v.memo) && !v.data), "elke Wisk. Gel.-vraestel het amptelike skakels (met antwoordeboek of bylae)");
   assert(B.win.WALLIE.DBE.punte(WERK) === 35, "Jun 2026 V5 = 35 punte");
 }
 

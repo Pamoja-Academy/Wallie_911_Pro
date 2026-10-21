@@ -1094,6 +1094,10 @@ body.les-open { overflow: hidden; }
 .werk-knoppies { margin: 0.5rem 0 0.25rem; }
 .werk-knoppie { text-decoration: none; }
 .werk-knoppie.is-gesluit { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+/* Omruil-vraag (21 Okt): eers vra, dan die vraestel */
+.werk-vra { margin-top: 0.4rem; }
+.werk-vra .btn-row { margin-top: 0.6rem; }
+.werk-ruil-nota { color: var(--accent); margin: 0.3rem 0 0; overflow-wrap: anywhere; }
 .werk-data-nota, .werk-memo-wenk { margin: 0.15rem 0 0; overflow-wrap: anywhere; }
 .werk-memo-wenk { color: var(--warn, #e2b04a); }
 .werk-ekstra-kop { margin: 0.9rem 0 0; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 800; }

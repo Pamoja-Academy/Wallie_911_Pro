@@ -414,9 +414,13 @@ for (const vp of VIEWPORTS) {
       await blok.locator(".start-block").click();
       await runUntil(page, async () => mock.byKind("start").length === 1, { label: "skrif begin" });
 
-      /* Die vraestel-paneel: amptelike vraestel en antwoordeboek, geen RTT-datalêers nie */
+      /* Omruil (21 Okt): eers vra die app of hy die vraestel al gedoen het; geen knoppies voor die antwoord nie */
       const paneel = page.locator("#session-werk");
       await expect(paneel).toBeVisible();
+      await expect(paneel.locator(".werk-vra")).toContainText("Het jy DBE November 2025 Wisk. Gel. V1 (Afr) al voorheen gedoen of gesien?");
+      await expect(paneel.locator('[data-werk="vraestel"]')).toHaveCount(0);
+      await paneel.locator(".werk-vra-nee").click();
+      await expect(paneel.locator(".werk-vra")).toHaveCount(0);
       const hoof = paneel.locator(".werk-hoof");
       await expect(hoof.locator('[data-werk="vraestel"]')).toHaveText("Vraestel (PDF)");
       await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
@@ -454,6 +458,37 @@ for (const vp of VIEWPORTS) {
       expectNoLeaks(mock);
     });
 
+    test("22 Okt 08:05: 'Ja, ek het dit al gedoen' ruil na DBE Nov 2024 V1 (bylae, 59 punte); die merk-blok volg", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-22T08:05:00+02:00");
+      const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2024-nov-wg-v1"]);
+      await page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"] .start-block').click();
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "skrif begin" });
+      const paneel = page.locator("#session-werk");
+      await paneel.locator(".werk-vra-ja").click();
+      /* Die app vra weer, nou oor die vervanger */
+      await expect(paneel.locator(".werk-vra")).toContainText("DBE November 2024 Wisk. Gel. V1 (Afr)");
+      await paneel.locator(".werk-vra-nee").click();
+      await expect(paneel.locator(".werk-ruil-nota")).toContainText("jy het DBE November 2025 Wisk. Gel. V1 (Afr) al gedoen");
+      const hoof = paneel.locator(".werk-hoof");
+      await expect(hoof.locator(".werk-titel")).toHaveText("DBE November 2024 Wisk. Gel. V1 (Afr) · Vraag 1, Vraag 2");
+      await expect(hoof.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (30) — 59 punte");
+      await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
+      await expect(hoof.locator('[data-werk="bylae"]')).toHaveText("Bylae (PDF)");
+      await expect(hoof.locator('[data-werk="bylae"]')).toHaveAttribute("href", kat.bylae);
+      await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveCount(0);
+      await expect(hoof.locator('[data-werk="memo"]')).toHaveAttribute("aria-disabled", "true");
+      /* Die antwoord is gestoor (nuwe sleutel; niks anders nie) */
+      const gestoor = await page.evaluate(() => JSON.parse(localStorage.getItem("wallie911_vraestel_gesien")));
+      expect(gestoor).toEqual({ v: 1, gesien: { "dbe-2025-nov-wg-v1": true, "dbe-2024-nov-wg-v1": false } });
+      /* Missie: die hooftaak noem die vervanger; die merk-blok gebruik die vervanger se memo */
+      await page.evaluate(() => WALLIE.app.showView("missie"));
+      await page.clock.runFor(500);
+      await expect(page.locator('#block-list .md-card[data-id="2026-10-22-wg-v1"] .md-hoof')).toContainText("DBE November 2024 Wisk. Gel. V1 (Afr) · Vraag 1, Vraag 2 · 59 punte (in plaas van DBE November 2025 Wisk. Gel. V1 (Afr))");
+      const merkWerk = await page.evaluate(() => WALLIE.werkVirBlok(WALLIE.app.state().blocks.find((b) => b.id === "2026-10-22-merk-wg-v1"), {}));
+      expect(merkWerk.id).toBe("dbe-2024-nov-wg-v1");
+      expectNoLeaks(mock);
+    });
+
     test("22 Okt 09:20: die merk-blok het die DBE-memo dadelik oop", async ({ page, context }) => {
       const mock = await openPlan(page, context, "2026-10-22T09:20:00+02:00");
       const kat = await page.evaluate(() => WALLIE.DBE.KATALOGUS["dbe-2025-nov-wg-v1"]);
@@ -461,6 +496,8 @@ for (const vp of VIEWPORTS) {
       await expect(merk).toContainText("DBE-memo (November 2025 V1)");
       await merk.locator(".start-block").click();
       await runUntil(page, async () => mock.byKind("start").length === 1, { label: "merk begin" });
+      /* Nog nie geantwoord nie (bv. die skrif-blok oorgeslaan): die merk-blok vra ook */
+      await page.locator("#session-werk .werk-vra-nee").click();
       const memo = page.locator("#session-werk .werk-hoof [data-werk='memo']");
       await expect(memo).toHaveAttribute("href", kat.memo);
       await expect(page.locator("#session-werk")).not.toContainText("Memo sluit oop");

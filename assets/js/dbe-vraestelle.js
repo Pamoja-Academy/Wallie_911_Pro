@@ -108,6 +108,108 @@ window.WALLIE = window.WALLIE || {};
     }
   });
 
+  /* Vervangers vir die omruil (21 Okt): Nov 2024 en Mei/Junie 2025. Skakels uit die DBE-bladsye (tabid 5193 / 5475,
+     module "Mathematical Literacy"), op 21 Okt afgelaai (HTTP 200, application/pdf). Punte uit die memo se [..]-totale.
+     Nov 2024 het 'n bylae (addendum) in plaas van 'n antwoordeboek. */
+  Object.assign(KATALOGUS, {
+    "dbe-2024-nov-wg-v1": {
+      id: "dbe-2024-nov-wg-v1",
+      vak: "wiskgelett",
+      titel: "DBE November 2024 Wisk. Gel. V1 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=WNA9rlX5D2M%3d&tabid=5193&portalid=0&mid=13723",
+      bylae: "https://www.education.gov.za/LinkClick.aspx?fileticket=E-UFBXpUSoM%3d&tabid=5193&portalid=0&mid=13723",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=AY2Qj8huxtE%3d&tabid=5193&portalid=0&mid=13723",
+      vrae: [29, 30, 29, 31, 31]
+    },
+    "dbe-2024-nov-wg-v2": {
+      id: "dbe-2024-nov-wg-v2",
+      vak: "wiskgelett",
+      titel: "DBE November 2024 Wisk. Gel. V2 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=fdlSPCKEn7c%3d&tabid=5193&portalid=0&mid=13723",
+      bylae: "https://www.education.gov.za/LinkClick.aspx?fileticket=hXgDoScLtNo%3d&tabid=5193&portalid=0&mid=13723",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=xrUiB59LW4E%3d&tabid=5193&portalid=0&mid=13723",
+      vrae: [26, 31, 31, 29, 33]
+    },
+    "dbe-2025-jun-wg-v1": {
+      id: "dbe-2025-jun-wg-v1",
+      vak: "wiskgelett",
+      titel: "DBE Mei/Junie 2025 Wisk. Gel. V1 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=QLJBnZkweC0%3d&tabid=5475&portalid=0&mid=14243",
+      antwoordeboek: "https://www.education.gov.za/LinkClick.aspx?fileticket=mYCJEL39Ebc%3d&tabid=5475&portalid=0&mid=14243",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=Hakbp9Ydxnc%3d&tabid=5475&portalid=0&mid=14243",
+      vrae: [29, 35, 33, 25, 28]
+    },
+    "dbe-2025-jun-wg-v2": {
+      id: "dbe-2025-jun-wg-v2",
+      vak: "wiskgelett",
+      titel: "DBE Mei/Junie 2025 Wisk. Gel. V2 (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=7ToCqmDpYoA%3d&tabid=5475&portalid=0&mid=14243",
+      antwoordeboek: "https://www.education.gov.za/LinkClick.aspx?fileticket=2ax8mDY48Gk%3d&tabid=5475&portalid=0&mid=14243",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=Ri0TH5cCuZA%3d&tabid=5475&portalid=0&mid=14243",
+      vrae: [28, 23, 27, 36, 36]
+    }
+  });
+
+  /* ---------- Omruil (21 Okt, Hanno) ----------
+     Die app vra Wallie self of hy 'n vraestel al gedoen of gesien het. Ja → die volgende vraestel in dieselfde groep
+     (amptelik, dieselfde vrae-nommers). Die antwoord geld per VRAESTEL, dus volg die merk-blokke en die latere vrae
+     van dieselfde vraestel outomaties. Jun 2026 V1 (die inhaal-proef) is in geen groep nie: daar word nie gevra nie.
+     Nuwe localStorage-sleutel (die enigste een wat hiervoor geskryf word): wallie911_vraestel_gesien
+       { v: 1, gesien: { "<vraestel-id>": true | false } } */
+  const RUIL_KEY = "wallie911_vraestel_gesien";
+  const RUIL_GROEPE = [
+    ["dbe-2025-nov-wg-v1", "dbe-2024-nov-wg-v1", "dbe-2025-jun-wg-v1"],
+    ["dbe-2025-nov-wg-v2", "dbe-2024-nov-wg-v2", "dbe-2025-jun-wg-v2"]
+  ];
+  const groepVan = (id) => RUIL_GROEPE.find((g) => g.includes(id)) || null;
+
+  function gesienLees() {
+    try {
+      const d = JSON.parse(localStorage.getItem(RUIL_KEY) || "null");
+      if (d && d.v === 1 && d.gesien && typeof d.gesien === "object" && !Array.isArray(d.gesien)) return d;
+    } catch {
+      /* stukkende of geblokkeerde stoor: begin skoon (Wallie se ander data word nie geraak nie) */
+    }
+    return { v: 1, gesien: {} };
+  }
+
+  /* Die vraestel wat werklik gebruik word: vanaf die rooster s'n, die eerste in die groep wat Wallie nie al gesien het nie.
+     Het hy almal gesien, die laaste (hy doen dit dan weer onder eksamentoestande). */
+  function opgelosId(id) {
+    const g = groepVan(id);
+    if (!g) return id;
+    const gs = gesienLees().gesien;
+    const vanaf = g.slice(g.indexOf(id));
+    return vanaf.find((x) => gs[x] !== true) || vanaf[vanaf.length - 1];
+  }
+
+  const ruil = {
+    KEY: RUIL_KEY,
+    GROEPE: RUIL_GROEPE,
+    opgelosId,
+    /* Moet die app vra? Net vir 'n vraestel in 'n groep waaroor Wallie nog nie geantwoord het nie. */
+    moetVra(werk) {
+      return Boolean(werk && werk.id && groepVan(werk.id) && gesienLees().gesien[werk.id] === undefined);
+    },
+    /* Al die vraestelle in die groep gesien: geen ander meer nie. */
+    almalGesien(werk) {
+      const g = werk && groepVan(werk.id);
+      const gs = gesienLees().gesien;
+      return Boolean(g && g.every((x) => gs[x] === true));
+    },
+    antwoord(id, gesien) {
+      if (!id || !groepVan(id)) return false;
+      const d = gesienLees();
+      d.gesien[id] = Boolean(gesien);
+      try {
+        localStorage.setItem(RUIL_KEY, JSON.stringify(d));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  };
+
   /* Rotasie-orde (net RTT): die nuutste vraestel eerste. */
   const ORDE = ["dbe-2026-jun-v1", "dbe-2025-nov-v1", "dbe-2024-nov-v1", "dbe-2025-jun-v1"];
 
@@ -135,7 +237,8 @@ window.WALLIE = window.WALLIE || {};
 
   /* Punte: die blok se eie telling eerste (sub-vrae kan nie uit vrae[] bereken word nie). */
   function punte(werk, blok) {
-    if (blok && Number.isFinite(blok.punte)) return blok.punte;
+    /* Die blok se punte geld net vir die rooster se eie vraestel; ná 'n omruil tel ons die vervanger se vrae op. */
+    if (blok && Number.isFinite(blok.punte) && (!blok.werk || !werk || blok.werk.id === werk.id)) return blok.punte;
     const p = werk ? item(werk.id) : null;
     if (!p) return null;
     const nrs = vraagNommers(werk);
@@ -185,6 +288,7 @@ window.WALLIE = window.WALLIE || {};
       vraestel: p.vraestel,
       data: p.data || null,
       antwoordeboek: p.antwoordeboek || null,
+      bylae: p.bylae || null,
       memo: p.memo,
       datatipe: p.datatipe || null,
       titel: p.titel
@@ -345,7 +449,9 @@ window.WALLIE = window.WALLIE || {};
     if (!blok) return null;
     if (blok.werk && blok.werk.id) {
       geskiedenis.noteWerk(blok.id, blok.werk, ctx.dag || null);
-      return blok.werk;
+      /* Omruil: het Wallie die rooster se vraestel al gesien, kry hy die volgende een in die groep */
+      const id = opgelosId(blok.werk.id);
+      return id === blok.werk.id ? blok.werk : Object.assign({}, blok.werk, { id, ruilVan: blok.werk.id });
     }
     if (blok.subjectSlug !== "rtt") return null;
     if (blok.soort && GEEN_ROTASIE.includes(blok.soort)) return null;
@@ -380,6 +486,7 @@ window.WALLIE = window.WALLIE || {};
       return aktief ? werkId(aktief) : "";
     }
   };
+  WALLIE.DBE.ruil = ruil;
   WALLIE.rttGeskiedenis = geskiedenis;
   WALLIE.pickRttWork = pickRttWork;
   WALLIE.werkVirBlok = werkVirBlok;
