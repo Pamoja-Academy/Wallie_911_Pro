@@ -38,10 +38,13 @@ test("Di 13 Okt 08:59:30 en 09:00:01: aftelling skuif na die volgende vraestel",
 
 test("13 Okt 20:05: lewendige aftelling per vak", async ({ page, context }) => {
   await openAt(page, context, "2026-10-13T20:05:00+02:00");
-  await expect(page.locator("#days-left")).toHaveText("1d 12:54:58");
+  /* LL-15/LL-19: die derde wisselvallige lopie (21 Okt, ook op master): met 'n lopende klok het werklike tyd op 'n
+     stadige rekenaar die sekondes laat wegloop. Vries die klok op 'n vaste tyd; dan is die teks deterministies. */
+  await page.clock.pauseAt(new Date("2026-10-13T20:05:10+02:00"));
+  await expect(page.locator("#days-left")).toHaveText("1d 12:54:50");
   await expect(page.locator("#countdown-label")).toHaveText("tot Engels EAT V3 · Skryfwerk");
   await page.clock.runFor(2000);
-  await expect(page.locator("#days-left")).toHaveText("1d 12:54:56");
+  await expect(page.locator("#days-left")).toHaveText("1d 12:54:48");
   await expect(page.locator("#vak-aftel .vak-aftel-item")).toHaveCount(6);
   await expect(page.locator('#vak-aftel [data-vak="afrikaans"]')).toContainText("Di 20 Okt · 09:00");
   await expect(page.locator('#vak-aftel [data-vak="gasvryheid"]')).toContainText("Vr 6 Nov · 14:00");
