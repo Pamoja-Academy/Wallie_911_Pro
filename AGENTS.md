@@ -24,6 +24,10 @@ Eksamenrooster: `assets/js/pa-konsole/exams.js`. Dagplanne: `VASTE_PLANNE` in `a
    in die huidige taak). Geen force-push na `master`. Saamvoeg die aand voor 'n eksamen: verifieer daarna live (foon + laptop, geen konsole-foute) dat die eksamendag-plan reg wys.
 8. **Kognitiewe ontwerp (15 Okt, PR #31)**: een primêre aksie per skerm; tydens 'n sessie is fokusmodus aan (net Missie en Sessie in die nav);
    die eksamenklok is taai bo-aan; die hooftaak staan voor die agtergrond-prent; geen herhaalde teks nie. Spesifikasie: `docs/ontwerp/kognitief/SPESIFIKASIE.md`.
+9. **Die inhoud is IN die app (21 Okt, LL-17)**: geen blok mag op iets buite die app staatmaak nie ("Pa gee die vraestel" is verbode).
+   Elke werk- en merk-blok het 'n `item` of 'n `werk` met die amptelike DBE-skakels (vraestel, antwoordeboek/datalêers, memo)
+   in `WALLIE.DBE.KATALOGUS`; elke skakel is afgelaai en nagegaan (HTTP 200, PDF) en die punte per vraag kom uit die vraestel of memo.
+   'n Blok waarvan die werk in 'n ander oortjie oop is, is soort `skrif` (geen oortjie-slot nie). Toets: `tests/plan-v5.test.js`.
 
 ## 3. Werkwyse (projekbestuur)
 - **Eers data, dan mening.** Status = Supabase SELECT op `wallie911.live`/`events` + `git log origin/master` + live `version.json`.

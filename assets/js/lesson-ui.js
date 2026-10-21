@@ -443,9 +443,9 @@
   const memoOop = new Set();
   let memoTimer = null;
 
-  /* Memo bly toe tydens ’n getimede toets; by merk/herdoen (en enige ander blok) is dit dadelik oop. */
+  /* Memo bly toe tydens ’n getimede toets of ’n volle vraestel (skrif); by merk/herdoen (en enige ander blok) is dit dadelik oop. */
   function memoGesluit(blok) {
-    if (!blok || blok.soort !== "toets") return false;
+    if (!blok || (blok.soort !== "toets" && blok.soort !== "skrif")) return false;
     if (memoOop.has(blok.id)) return false;
     const links = WALLIE.proctor?.active ? WALLIE.proctor.timeLeft() : null;
     if (links != null && links <= 0) return false;
@@ -461,10 +461,16 @@
     const memo = gesluit
       ? `<a class="btn ghost werk-knoppie is-gesluit" data-werk="memo" role="button" aria-disabled="true">Memo</a>`
       : `<a class="btn ghost werk-knoppie" data-werk="memo" href="${esc(sk.memo)}" target="_blank" rel="noopener noreferrer">Memo</a>`;
+    /* RTT het datalêers; Wisk. Gel. het 'n antwoordeboek. */
+    const tweede = sk.data
+      ? `<a class="btn werk-knoppie" data-werk="data" href="${esc(sk.data)}" target="_blank" rel="noopener noreferrer">Datalêers</a>`
+      : sk.antwoordeboek
+        ? `<a class="btn werk-knoppie" data-werk="antwoordeboek" href="${esc(sk.antwoordeboek)}" target="_blank" rel="noopener noreferrer">Antwoordeboek (PDF)</a>`
+        : "";
     return `
         <div class="btn-row werk-knoppies">
           <a class="btn primary werk-knoppie" data-werk="vraestel" href="${esc(sk.vraestel)}" target="_blank" rel="noopener noreferrer">Vraestel (PDF)</a>
-          <a class="btn werk-knoppie" data-werk="data" href="${esc(sk.data)}" target="_blank" rel="noopener noreferrer">Datalêers</a>
+          ${tweede}
           ${memo}
         </div>`;
   }
@@ -478,7 +484,7 @@
         <p class="werk-titel">${esc(d.werkLabel(werk))}</p>
         ${hoof ? vraeReel(werk, blok) : ""}
         ${werkKnoppies(werk, gesluit)}
-        <p class="hint werk-data-nota">${esc(sk.datatipe)} — ${esc(d.DATA_NOTA)}</p>
+        ${sk.data ? `<p class="hint werk-data-nota">${esc(sk.datatipe)} — ${esc(d.DATA_NOTA)}</p>` : ""}
         ${hoof && gesluit ? `<p class="hint werk-memo-wenk">Memo sluit oop wanneer die tyd verstreke is</p>` : ""}
       </div>`;
   }
