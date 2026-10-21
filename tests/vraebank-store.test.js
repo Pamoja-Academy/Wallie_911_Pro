@@ -385,13 +385,14 @@ function excursions(B, n) {
   B2.Pr.merk();
   assert(B2.Pr.taskFor("rtt") === MERK_WERK, "ná herlaai noem die merk steeds die werk");
 
-  /* Die katalogus self: 4 vraestelle, elkeen met vraestel-, data- en memo-skakel */
+  /* Die katalogus self: 4 RTT-vraestelle (vraestel, data, memo) en sedert 21 Okt 4 Wisk. Gel.-vraestelle (vraestel, antwoordeboek, memo) */
   const K = B.win.WALLIE.DBE.KATALOGUS;
-  assert(Object.keys(K).length === 4, "4 DBE-vraestelle in die katalogus");
-  assert(
-    Object.values(K).every((v) => /^https:\/\/www\.education\.gov\.za\//.test(v.vraestel) && v.data && v.memo),
-    "elke vraestel het amptelike skakels"
-  );
+  const rtt = Object.values(K).filter((v) => !v.vak);
+  const wg = Object.values(K).filter((v) => v.vak === "wiskgelett");
+  assert(rtt.length === 4 && wg.length === 4 && Object.keys(K).length === 8, "4 RTT- en 4 Wisk. Gel.-vraestelle in die katalogus");
+  const amptelik = (u) => /^https:\/\/www\.education\.gov\.za\//.test(u || "");
+  assert(rtt.every((v) => amptelik(v.vraestel) && amptelik(v.data) && amptelik(v.memo)), "elke RTT-vraestel het amptelike skakels (met data)");
+  assert(wg.every((v) => amptelik(v.vraestel) && amptelik(v.antwoordeboek) && amptelik(v.memo) && !v.data), "elke Wisk. Gel.-vraestel het amptelike skakels (met antwoordeboek)");
   assert(B.win.WALLIE.DBE.punte(WERK) === 35, "Jun 2026 V5 = 35 punte");
 }
 
