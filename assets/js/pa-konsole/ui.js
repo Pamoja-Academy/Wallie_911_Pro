@@ -1142,7 +1142,7 @@
       showConsole();
       PK.data.start({ onModel: onModel, onAuthLost: onAuthLost, onConn: onConn });
     } else {
-      showLogin('');
+      showLogin(PK.data.tokenVerval && PK.data.tokenVerval() ? 'Sessie het verval — teken weer in.' : '');
     }
   }
 

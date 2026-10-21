@@ -476,13 +476,34 @@
   var histStarted = false;
   var stillCache = new Map();
 
+  /* 21 Okt (Hanno: "geen sekuriteit"): die blaaier onthou Pa se aanmelding hoogstens 12 uur, daarna weer die wagwoord.
+     Nuwe sleutel wallie911_pa_token_at (tyd van aanmelding); 'n ou token sonder tyd tel as verval. */
+  var TOKEN_AT_KEY = 'wallie911_pa_token_at';
+  var TOKEN_MAX_MS = 12 * 3600 * 1000;
+  var tokenVerval = false;
   function token() {
-    try { return window.localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+    try {
+      var t = window.localStorage.getItem(TOKEN_KEY) || '';
+      if (!t) return '';
+      var at = Number(window.localStorage.getItem(TOKEN_AT_KEY));
+      if (!at || Date.now() - at > TOKEN_MAX_MS) {
+        window.localStorage.removeItem(TOKEN_KEY);
+        window.localStorage.removeItem(TOKEN_AT_KEY);
+        tokenVerval = true;
+        return '';
+      }
+      return t;
+    } catch (e) { return ''; }
   }
   function setToken(t) {
     try {
-      if (t) window.localStorage.setItem(TOKEN_KEY, t);
-      else window.localStorage.removeItem(TOKEN_KEY);
+      if (t) {
+        window.localStorage.setItem(TOKEN_KEY, t);
+        window.localStorage.setItem(TOKEN_AT_KEY, String(Date.now()));
+      } else {
+        window.localStorage.removeItem(TOKEN_KEY);
+        window.localStorage.removeItem(TOKEN_AT_KEY);
+      }
     } catch (e) { /* ignore */ }
   }
 
@@ -779,6 +800,11 @@
     hasToken: function () {
       if (demoMode) return true;
       return !!token();
+    },
+
+    /* Was daar 'n aanmelding wat ouer as 12 uur is (en nou weggegooi is)? */
+    tokenVerval: function () {
+      return tokenVerval;
     },
 
     login: function (password) {
