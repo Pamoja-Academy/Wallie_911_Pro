@@ -432,7 +432,7 @@ for (const vp of VIEWPORTS) {
       await expect(hoof.locator('[data-werk="data"]')).toHaveCount(0);
       await expect(paneel).not.toContainText("Wagwoordbeskermde .exe");
       /* By Wisk. Gel. is "V1" Vraestel 1: die vrae staan voluit */
-      await expect(paneel.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (30) — 59 punte");
+      await expect(paneel.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (30) — 59 punte. Dit is hoofvrae met baie subvrae: al die vrae staan in die Vraestel (PDF).");
 
       /* Memo toe terwyl die tyd loop */
       const memo = hoof.locator('[data-werk="memo"]');
@@ -474,7 +474,9 @@ for (const vp of VIEWPORTS) {
       await expect(paneel.locator(".werk-ruil-nota")).toContainText("jy het DBE November 2024 Wisk. Gel. V1 (Afr) al gedoen");
       const hoof = paneel.locator(".werk-hoof");
       await expect(hoof.locator(".werk-titel")).toHaveText("DBE Mei/Junie 2025 Wisk. Gel. V1 (Afr) · Vraag 1, Vraag 2");
-      await expect(hoof.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (35) — 64 punte");
+      await expect(hoof.locator(".werk-vrae")).toHaveText("Doen: Vraag 1 (29) · Vraag 2 (35) — 64 punte. Dit is hoofvrae met baie subvrae: al die vrae staan in die Vraestel (PDF).");
+      /* QC 7b: 64 punte teen 1,2 min per punt is 77 min, die blok is 75: die skerm sê dit */
+      await expect(paneel.locator(".werk-ruil-nota")).toContainText("Dit is 64 punte: mik op ±77 min (1,2 min per punt, soos in die eksamen); die blok is 75 min, dus werk vinnig en laat niks oop nie.");
       await expect(hoof.locator('[data-werk="vraestel"]')).toHaveAttribute("href", kat.vraestel);
       await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveText("Antwoordeboek (PDF)");
       await expect(hoof.locator('[data-werk="antwoordeboek"]')).toHaveAttribute("href", kat.antwoordeboek);

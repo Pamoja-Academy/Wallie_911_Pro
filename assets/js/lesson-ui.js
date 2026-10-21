@@ -133,7 +133,9 @@
       return p ? `${d.vraagLabel(n, werk)} (${p})` : d.vraagLabel(n, werk);
     });
     const tot = punte != null ? ` — ${punte} punte` : "";
-    return `<p class="werk-vrae"><strong>Doen:</strong> ${esc(dele.join(" · "))}${tot}</p>`;
+    /* QC 21 Okt (7a): ook 'n deel van 'n Wisk. Gel.-vraestel is hoofvrae met subvrae, nie 2 vragies nie */
+    const vol = d.item(werk.id)?.vak ? ". Dit is hoofvrae met baie subvrae: al die vrae staan in die Vraestel (PDF)." : "";
+    return `<p class="werk-vrae"><strong>Doen:</strong> ${esc(dele.join(" · "))}${tot}${vol}</p>`;
   }
 
   /* Een reël vir die matchday-kaart: "DBE Mei/Junie 2026 V1 (Afr) · V5 · 35 punte" */
@@ -560,8 +562,13 @@
       stopMemoTimer();
       return;
     }
+    /* QC 21 Okt (7b): ná 'n omruil kan die vrae meer punte hê as wat die blok se tyd teen 1,2 min per punt dek; sê dit */
+    const ruilPunte = hoof && hoof.ruilVan ? DBE().punte(hoof, blok) : null;
+    const ruilTyd = ruilPunte != null
+      ? ` Dit is ${ruilPunte} punte: mik op ±${Math.ceil(ruilPunte * 1.2)} min (1,2 min per punt, soos in die eksamen)${Math.ceil(ruilPunte * 1.2) > blok.minutes ? `; die blok is ${blok.minutes} min, dus werk vinnig en laat niks oop nie` : ""}.`
+      : "";
     const ruilNota = hoof && hoof.ruilVan
-      ? `<p class="hint werk-ruil-nota">Ander vraestel: jy het ${esc(DBE().item(hoof.ruilVan)?.titel || hoof.ruilVan)} al gedoen. Doen nou ${esc(DBE().werkLabel(hoof))}.</p>`
+      ? `<p class="hint werk-ruil-nota">Ander vraestel: jy het ${esc(DBE().item(hoof.ruilVan)?.titel || hoof.ruilVan)} al gedoen. Doen nou ${esc(DBE().werkLabel(hoof))}.${esc(ruilTyd)}</p>`
       : "";
     const almal = hoof && ruil?.almalGesien(hoof)
       ? `<p class="hint werk-ruil-nota">Jy het al hierdie vraestelle gedoen: doen dit weer onder volle eksamentoestande, sonder die memo.</p>`

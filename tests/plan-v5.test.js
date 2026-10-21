@@ -322,6 +322,19 @@ for (const [dag, id, kind] of [["2026-10-15", "2026-10-15-formaat", "warm"], ["2
     }
   }
   for (const g of DBE.ruil.GROEPE) for (const id of g) if (gesien[id]) fails.push(`omruil-groep bevat ${id}, wat reeds gesien is`);
+  /* QC 21 Okt (7c): geen vraag van 'n vraestel word in twee skrif-blokke gegee nie (vanaf 21 Okt 13:00), na omruil */
+  const gegee = {};
+  for (const dag of ["2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26"]) {
+    for (const b of ctx.WALLIE.buildDayPlan(dag).blocks) {
+      if (!b.werk || b.soort !== "skrif" || (dag === "2026-10-21" && b.end <= "13:00")) continue;
+      const w = ctx.WALLIE.werkVirBlok(b, {});
+      for (const n of DBE.vraagNommers(w)) {
+        const k = `${w.id} Vraag ${n}`;
+        if (gegee[k]) fails.push(`${b.id}: ${k} is reeds in ${gegee[k]} gegee`);
+        gegee[k] = b.id;
+      }
+    }
+  }
   /* Die inhaal-vraestel van vandag (Jun 2024) mag nie môre as vervanger terugkom nie */
   if (DBE.ruil.GROEPE.some((g) => g.includes("dbe-2024-jun-wg-v1"))) fails.push("omruil-groep bevat vandag se inhaal-vraestel (Jun 2024 V1)");
 
