@@ -571,10 +571,15 @@
       stopMemoTimer();
       return;
     }
-    /* QC 21 Okt (7b): ná 'n omruil kan die vrae meer punte hê as wat die blok se tyd teen 1,2 min per punt dek; sê dit */
+    /* QC 21 Okt (7b) en QC PR #44: ná 'n omruil kan die vrae meer punte hê as wat die blok se tyd teen die vak se
+       DBE-tempo dek; sê dit. Tempo = vraestel se minute / punte (Wisk. Gel. en RTT 1,2; Engels V1 1,5; Toerisme en
+       Gasvryheid 0,9; Afrikaans V1 1,7). */
+    const TEMPO = { wiskgelett: 1.2, rtt: 1.2, engels: 1.5, toerisme: 0.9, gasvryheid: 0.9, afrikaans: 1.7 };
     const ruilPunte = hoof && hoof.ruilVan ? DBE().punte(hoof, blok) : null;
+    const tempo = TEMPO[DBE()?.item(hoof?.id)?.vak] || 1.2;
+    const ruilMin = ruilPunte != null ? Math.ceil(ruilPunte * tempo) : null;
     const ruilTyd = ruilPunte != null
-      ? ` Dit is ${ruilPunte} punte: mik op ±${Math.ceil(ruilPunte * 1.2)} min (1,2 min per punt, soos in die eksamen)${Math.ceil(ruilPunte * 1.2) > blok.minutes ? `; die blok is ${blok.minutes} min, dus werk vinnig en laat niks oop nie` : ""}.`
+      ? ` Dit is ${ruilPunte} punte: mik op ±${ruilMin} min (${String(tempo).replace(".", ",")} min per punt, soos in die eksamen)${ruilMin > blok.minutes ? `; die blok is ${blok.minutes} min, dus werk vinnig en laat niks oop nie` : ""}.`
       : "";
     const ruilNota = hoof && hoof.ruilVan
       ? `<p class="hint werk-ruil-nota">Ander vraestel: jy het ${esc(DBE().item(hoof.ruilVan)?.titel || hoof.ruilVan)} al gedoen. Doen nou ${esc(DBE().werkLabel(hoof))}.${esc(ruilTyd)}</p>`

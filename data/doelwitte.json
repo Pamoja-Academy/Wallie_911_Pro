@@ -14,7 +14,7 @@
     "wiskgelett": { "naam": "Wiskundige Geletterdheid", "prelim": 66, "jaar": 66, "teiken": 80 }
   },
   "reel": {
-    "beskrywing": "Gaping = teiken - prelim (persentasiepunte). Voor elke vraestel moet die rooster minstens R volle-vraestel-ekwivalente getimede, amptelike DBE-werk (soort skrif, met werk uit die katalogus) bevat, elk met 'n merk-blok op dieselfde of die volgende dag, oor minstens 2 verskillende dae as R >= 2. Tempo = vraestel se minute / punte (DBE).",
+    "beskrywing": "VOORSTEL (Claude, 21 Okt; Hanno bevestig): die R-tabel is 'n heuristiek, nie uit die spes nie. Gaping = teiken - prelim (persentasiepunte). Voor elke vraestel moet die rooster minstens R volle-vraestel-ekwivalente getimede, amptelike DBE-werk (soort skrif, met werk uit die katalogus) bevat, elk met 'n merk-blok op dieselfde of die volgende dag, oor minstens 2 verskillende dae as R >= 2. Tempo = vraestel se minute / punte (DBE).",
     "R": [
       { "gaping_tot_en_met": 0, "R": 1 },
       { "gaping_tot_en_met": 10, "R": 2 },
@@ -26,16 +26,16 @@
   "vraestelle": [
     {
       "eksamen": "Wiskundige Geletterdheid V1", "vak": "wiskgelett", "katalogus": "wg-v1", "punte": 150, "duur_min": 180,
-      "aanvaar": "Net 370 min moontlik tussen 21 Okt 13:00 en die eksamen (Vr 23 Okt 09:00): die inhaal-proef (3 u) plus die hele Nov 2024 V1 in drie dele op Do 22. Meer sou die dag voor die eksamen oorlaai."
+      "aanvaar": "Gekies (nie afgedwing nie): 370 min tussen 21 Okt 13:00 en die eksamen (Vr 23 Okt 09:00): die inhaal-proef (3 u) plus die hele Nov 2024 V1 in drie dele op Do 22, wat 14:20 eindig. 'n Derde vraestel Do-middag sou kon, maar maak die dag voor die eksamen ±8 u. Hanno kan dit vra."
     },
     {
       "eksamen": "Wiskundige Geletterdheid V2", "vak": "wiskgelett", "katalogus": "wg-v2", "punte": 150, "duur_min": 180,
-      "aanvaar": "Net 370 min tussen die V1-eksamen (Vr 12:00) en V2 (Ma 09:00): die hele Nov 2025 V2 in drie dele plus die volle Jun 2026 V2 op Sa 24. Sondag bly lig (merk, foutlog, tas)."
+      "aanvaar": "370 min tussen die V1-eksamen (Vr 12:00) en V2 (Ma 09:00): die hele Nov 2025 V2 in drie dele plus die volle Jun 2026 V2 op Sa 24. Sondag is vir die merk en foutlog van V2 en die eerste Engels V1-proef (Engels V1 is Wo 28), nie vir 'n derde V2-vraestel nie."
     },
     { "eksamen": "Engels EAT V1 · Taal", "vak": "engels", "katalogus": "eng-v1", "punte": 80, "duur_min": 120 },
     {
       "eksamen": "RTT (CAT) V2 · Teorie", "vak": "rtt", "katalogus": "rtt-v2", "punte": 150, "duur_min": 180,
-      "aanvaar": "Die eksamen is Do 29 Okt 14:00 en die dae ná die Wisk. Gel. V2 is ook vir Engels V1 nodig: twee volle RTT V2-vraestelle (Di 27, Wo 28) plus Vraag 1-6 van 'n derde (75 punte) op Do-oggend = 450 min."
+      "aanvaar": "Keuse: Engels V1 (eksamen Wo 28, gaping 20) kry sy volle 3 proewe op So 25 - Di 27, want dit kom eerste; RTT V2 (Do 29, gaping 23) kry 450/540 min: twee volle vraestelle (Di 27, Wo 28) plus Vraag 1-6 van 'n derde (75 punte) op Do-oggend. Volgens die spes se prioriteit is RTT hoër as Engels; Hanno kan die verdeling omdraai."
     },
     {
       "eksamen": "Toerisme", "vak": "toerisme", "katalogus": "toer", "punte": 200, "duur_min": 180,

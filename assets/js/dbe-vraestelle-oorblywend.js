@@ -225,8 +225,11 @@
     }
   });
 
-  /* Omruil-groepe (soos Wisk. Gel., PR #42): die app vra by elke vraestel of Wallie dit al gedoen het. Elke beplande
-     vraestel kry sy EIE vervangers wat nêrens anders in die rooster gebruik word nie (tests/plan-v5.test.js 7c). */
+  /* Omruil-groepe (soos Wisk. Gel., PR #42): die app vra by elke beplande vraestel of Wallie dit al gedoen het.
+     Elke beplande vraestel kry sy EIE vervangers wat nêrens anders in die rooster gebruik word nie; waar daar geen
+     ongebruikte vraestel oor is nie (al 5 Gasvryheid, Jun 2024 Engels V1, Jun 2026 Wisk. Gel. V2), is die groep net
+     die vraestel self: die app vra steeds, teken die antwoord aan, en sê "doen dit weer onder eksamentoestande".
+     Hek: tests/roete.test.js (geen herhaling nie, ook nie ná enige kombinasie van omruil-antwoorde nie). */
   const R = window.WALLIE.DBE.ruil;
   if (R && Array.isArray(R.GROEPE)) {
     R.GROEPE.push(
@@ -235,7 +238,14 @@
       ["dbe-2025-jun-rtt-v2", "dbe-2023-nov-rtt-v2", "dbe-2023-jun-rtt-v2"],
       ["dbe-2025-jun-eng-v1", "dbe-2023-nov-eng-v1"],
       ["dbe-2024-nov-eng-v1", "dbe-2023-jun-eng-v1"],
-      ["dbe-2026-jun-toer", "dbe-2025-nov-toer", "dbe-2025-jun-toer"]
+      ["dbe-2026-jun-toer", "dbe-2025-nov-toer", "dbe-2025-jun-toer"],
+      ["dbe-2024-jun-eng-v1"],
+      ["dbe-2026-jun-gas"],
+      ["dbe-2025-jun-gas"],
+      ["dbe-2024-nov-gas"],
+      ["dbe-2023-nov-gas"],
+      ["dbe-2023-jun-gas"],
+      ["dbe-2026-jun-wg-v2"]
     );
   }
 })();

@@ -65,6 +65,63 @@ if (!gas || gas.A + gas.B + gas.C + gas.D !== 200) fails.push("gasvryheid.json: 
 const toer = spec("toerisme").afdeling_punte;
 if (!toer || toer.E !== 30 || Object.values(toer).reduce((s, x) => s + x, 0) !== 200) fails.push("toerisme.json: afdeling E (30) en totaal 200");
 
+/* 8. QC PR #44: GEEN herhaling nie, van 21 Okt 13:00 tot 6 Nov, ook nie ná enige kombinasie van omruil-antwoorde nie.
+   - geen vraag van 'n vraestel word twee keer as skrif gegee nie;
+   - geen vraestel uit REEDS_GESIEN nie;
+   - elke merk-blok gebruik dieselfde (opgeloste) vraestel as sy skrif-blok;
+   - 'n blok sonder rooster-werk (voor-eksamen, herdoen, ...) kry nooit werk nie (bv. rotasie). */
+{
+  const W = ctx.WALLIE;
+  const R = W.DBE.ruil;
+  const dae = [];
+  for (let d = new Date("2026-10-21T12:00:00Z"); d <= new Date("2026-11-06T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 1)) dae.push(d.toISOString().slice(0, 10));
+  const blokke = dae.flatMap((dag) => W.buildDayPlan(dag).blocks.filter((b) => !(dag === "2026-10-21" && b.end <= "13:00")));
+  for (const b of blokke) if (!b.werk && W.werkVirBlok(b, {})) fails.push(`${b.id}: kry werk (${W.werkVirBlok(b, {}).id}) sonder dat die rooster dit gee`);
+  const scenario = (naam, gesien) => {
+    ctx.localStorage.setItem(R.KEY, JSON.stringify({ v: 1, gesien }));
+    const gegee = {};
+    for (const b of blokke) {
+      if (!b.werk || b.soort !== "skrif") continue;
+      const w = W.werkVirBlok(b, {});
+      if (R.REEDS_GESIEN[w.id]) fails.push(`[${naam}] ${b.id}: gee ${w.id}, wat reeds gesien is`);
+      for (const n of W.DBE.vraagNommers(w)) {
+        const k = `${w.id} Vraag ${n}`;
+        if (gegee[k]) fails.push(`[${naam}] ${b.id}: ${k} is reeds in ${gegee[k]} gegee`);
+        gegee[k] = b.id;
+      }
+    }
+    for (const b of blokke) {
+      if (!b.werk || b.soort !== "merk") continue;
+      const skrif = blokke.find((x) => x.soort === "skrif" && x.werk && x.werk.id === b.werk.id && JSON.stringify(x.werk.nrs || null) === JSON.stringify(b.werk.nrs || null));
+      if (skrif && W.werkVirBlok(b, {}).id !== W.werkVirBlok(skrif, {}).id) fails.push(`[${naam}] ${b.id}: merk-vraestel verskil van ${skrif.id}`);
+    }
+  };
+  scenario("niemand geantwoord", {});
+  let n = 1;
+  for (const g of R.GROEPE) {
+    for (let k = 1; k <= g.length; k++) {
+      const gs = {};
+      g.slice(0, k).forEach((id) => (gs[id] = true));
+      scenario(`groep ${g[0]} ${k}x ja`, gs);
+      n++;
+    }
+  }
+  for (let k = 1; k <= 3; k++) {
+    const gs = {};
+    for (const g of R.GROEPE) g.slice(0, k).forEach((id) => (gs[id] = true));
+    scenario(`alle groepe ${k}x ja`, gs);
+    n++;
+  }
+  ctx.localStorage.removeItem(R.KEY);
+  /* Elke beplande skrif-vraestel (sonder vaste uitsondering) word deur die app gevra */
+  for (const b of blokke) {
+    if (!b.werk || b.soort !== "skrif") continue;
+    if (b.werk.id === "dbe-2024-jun-wg-v1") continue; /* vandag se inhaal: bewustelik nie gevra nie */
+    if (!R.GROEPE.some((g) => g.includes(b.werk.id))) fails.push(`${b.id}: ${b.werk.id} het geen omruil-groep nie; die app vra nooit "al gedoen?" nie`);
+  }
+  if (!fails.length) console.log(`roete: herhaling-hek ${n} omruil-scenario's ok`);
+}
+
 /* Die prioriteit van die ontwerp: die vak met die grootste gaping (Gasvryheid, 33) moet die vereiste haal sonder verskoning */
 const grootste = roete.slice().sort((a, b) => b.gaping - a.gaping)[0];
 if (grootste && (grootste.aanvaar || !grootste.genoeg)) fails.push(`${grootste.eksamen}: die grootste gaping (${grootste.gaping}) moet die volle vereiste haal`);
