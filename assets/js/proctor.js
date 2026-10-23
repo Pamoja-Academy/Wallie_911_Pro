@@ -12,7 +12,8 @@ function skrifSessie() {
     const id = s && s.live && s.live.block && s.live.block.id;
     if (!id || !Array.isArray(s.blocks)) return false;
     const blok = s.blocks.find((b) => b && b.id === id);
-    return Boolean(blok && (blok.soort === "skrif" || (blok.soort === "merk" && blok.werk)));
+    /* QC PR #46 (opvolg): ook "herdoen" (foutlog: toe-boek, dan die memo van die merk-blok in 'n ander oortjie) */
+    return Boolean(blok && (blok.soort === "skrif" || blok.soort === "herdoen" || (blok.soort === "merk" && blok.werk)));
   } catch (e) {
     return false;
   }

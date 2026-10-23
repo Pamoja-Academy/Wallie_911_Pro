@@ -163,27 +163,19 @@ const DAE = [
       ["eksamen", "09:00", "12:00"],
       ["rus", "12:00", "14:00"],
       ["terugskou", "14:00", "14:20"],
-      ["pouse1", "14:20", "14:30"],
-      ["wg-v2", "14:30", "15:45"],
-      ["merk-wg-v2", "15:45", "16:05"],
-      ["klaar", "16:05", "16:05"]
+      ["klaar", "14:20", "14:20"]
     ]
   },
   {
     dag: "2026-10-24",
-    tyd: "2026-10-24T08:10:00+02:00",
+    tyd: "2026-10-24T08:40:00+02:00",
     blokke: [
-      ["opstaan", "08:00", "08:30"],
-      ["wg-v2", "08:30", "09:45"],
-      ["merk-wg-v2", "09:45", "10:05"],
-      ["pouse1", "10:05", "10:25"],
-      ["wg-v2-5", "10:25", "11:05"],
-      ["merk-wg-v2-5", "11:05", "11:25"],
-      ["middag", "11:25", "12:30"],
-      ["foutlog", "12:30", "13:00"],
-      ["rus", "13:00", "14:00"],
-      ["wg-v2-proef", "14:00", "17:00"],
-      ["klaar", "17:00", "17:00"]
+      ["opstaan", "08:30", "09:00"],
+      ["wg-v2-proef-a", "09:00", "12:00"],
+      ["merk-wg-v2-proef-a", "12:15", "13:15"],
+      ["middag", "13:15", "14:00"],
+      ["foutlog", "14:00", "14:30"],
+      ["klaar", "14:30", "14:30"]
     ]
   },
   {
@@ -191,13 +183,13 @@ const DAE = [
     tyd: "2026-10-25T08:40:00+02:00",
     blokke: [
       ["opstaan", "08:30", "09:00"],
-      ["merk-wg-v2-proef", "09:00", "10:00"],
-      ["foutlog", "10:00", "10:40"],
-      ["middag", "10:40", "13:30"],
-      ["eng-v1-a", "13:30", "15:30"],
-      ["merk-eng-v1-a", "15:45", "16:25"],
-      ["tas", "16:30", "16:50"],
-      ["klaar", "16:50", "16:50"]
+      ["wg-v2-proef", "09:00", "12:00"],
+      ["merk-wg-v2-proef", "12:15", "13:15"],
+      ["middag", "13:15", "14:00"],
+      ["eng-v1-a", "14:00", "16:00"],
+      ["merk-eng-v1-a", "16:15", "16:55"],
+      ["tas", "17:00", "17:20"],
+      ["klaar", "17:20", "17:20"]
     ]
   },
   {
@@ -554,6 +546,22 @@ for (const vp of VIEWPORTS) {
       }
       expect(mock.byKind("warn")).toHaveLength(0);
       expect(await noOverflow(page)).toBe(true);
+      expectNoLeaks(mock);
+    });
+
+    test("24 Okt 14:05: die foute-blok (herdoen) sluit hom nie as hy die memo in 'n ander oortjie lees nie", async ({ page, context }) => {
+      const mock = await openPlan(page, context, "2026-10-24T14:05:00+02:00");
+      await page.locator('#block-list .md-card[data-id="2026-10-24-foutlog"] .start-block').click();
+      await runUntil(page, async () => mock.byKind("start").length === 1, { label: "foutlog begin" });
+      await page.clock.runFor(10000);
+      for (let i = 0; i < 3; i++) {
+        await hideTab(page);
+        await page.clock.runFor(20000);
+        await showTab(page);
+        await page.clock.runFor(5000);
+      }
+      expect(mock.byKind("warn")).toHaveLength(0);
+      expect(mock.byKind("lock")).toHaveLength(0);
       expectNoLeaks(mock);
     });
 
