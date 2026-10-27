@@ -1191,3 +1191,7 @@ body.les-open .hulp-fab, body:has(.modal:not(.hidden)) .hulp-fab { display: none
 /* Vroeg-klaar-waarskuwing op die blok-kaart */
 .mark-done.is-waarsku { border-color: var(--danger, #e5484d); color: var(--danger, #e5484d); }
 .vroeg-wenk { margin: 0.5rem 0 0; font-size: 0.95rem; font-weight: 700; color: var(--danger, #e5484d); overflow-wrap: anywhere; }
+/* Realtyd-ondersteuning (24 Okt 2026): die nagegane reël bokant die vraestel-paneel */
+.werk-kontrole { margin: 0.35rem 0 0.5rem; font-size: 0.88rem; overflow-wrap: anywhere; }
+.werk-kontrole[data-vlak="geel"] { color: var(--warn, #e2b04a); font-weight: 600; }
+.werk-kontrole[data-vlak="rooi"] { color: var(--danger-teks, #ff8a7a); font-weight: 700; }

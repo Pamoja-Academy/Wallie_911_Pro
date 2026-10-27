@@ -536,6 +536,23 @@
       <button type="button" class="btn big primary open-item sessie-hoof-knop" data-view="${h.view}" data-item="${esc(h.itemId)}">Maak hooftaak oop</button>`;
   }
 
+  /* Realtyd-ondersteuning (24 Okt 2026): een reël wat die werk wat op die skerm staan nagegaan het —
+     teen die DBE-teks se punte, die herhaling-register en die formaat-reëls. Lees net; dit skryf niks. */
+  function ondersteuningReel(werk, blok) {
+    let o = null;
+    try {
+      o = WALLIE.ONDERSTEUNING && WALLIE.ONDERSTEUNING.kontroleer
+        ? WALLIE.ONDERSTEUNING.kontroleer(werk, blok)
+        : null;
+    } catch (e) {
+      /* Die kontrole mag NOOIT die vraestel-paneel laat val nie (QC W4). */
+      o = null;
+    }
+    /* Net geel of rooi kom op die skerm: groen is geen ekstra teks bo die hooftaak nie (§2.8, QC 27 Okt 2/3/8). */
+    if (!o || !o.opsomming || o.vlak === "groen") return "";
+    return `<p class="hint werk-kontrole" data-vlak="${esc(o.vlak)}">${esc(o.opsomming)}</p>`;
+  }
+
   /* Die vraestel-paneel: drie knoppies (vraestel, datalêers, memo) vir die blok se eie werk. */
   function renderSessionWerk(blockId) {
     const el = $("#session-werk");
@@ -589,6 +606,7 @@
       : "";
     el.innerHTML = `
       <div class="panel-head"><h2>Vandag se vraestel</h2><span class="hint">Amptelike DBE-lêers · maak in ’n nuwe oortjie oop</span></div>
+      ${hoof ? ondersteuningReel(hoof, blok) : ""}
       <p class="werk-blok-titel">${esc(blok.title)}</p>
       ${ruilNota}${almal}
       ${hoof ? werkBlok(hoof, blok, { hoof: true, gesluit }) : ""}
