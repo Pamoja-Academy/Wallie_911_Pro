@@ -3,6 +3,9 @@
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
 const { boot, syncLabel, runUntil, queue, shot, expectNoLeaks } = require("./helpers");
+/* Die weergawe kom uit version.json: 'n vrystelling moet nie hierdie toetse laat faal nie (28 Okt). */
+const APP_VERSION = require("../../version.json").v;
+
 
 const at = (iso) => Date.parse(iso);
 
@@ -135,7 +138,7 @@ test("terugvul: alle historiese log-inskrywings, een keer elk, ou bediener nou +
     title: "SESSIE-VERSLAG (teruggevul)",
     body: expect.stringContaining("Datum: 2026-09-27"),
     device_id: expect.stringMatching(/^d_/),
-    app_version: "2026-10-27a",
+    app_version: APP_VERSION,
     backfill: true,
     data: { ...STATE.sessions[3], backfill: true, _event_id: `end:s_${OLD1_END}` }
   });

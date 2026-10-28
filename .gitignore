@@ -15,3 +15,8 @@ scripts/qa/__pycache__/
 # DBE-vraestelle (kopiereg): nooit in git nie
 .dbe-cache/
 DBE-cache/
+
+# Persoonlike boodskappe aan Wallie: die repo word van master op GitHub Pages bedien, dus is enigiets
+# hier publiek afhaalbaar. WhatsApp-konsepte bly plaaslik (28 Okt, QC-bevinding R8).
+WHATSAPP-WALLIE-*.txt
+playwright.local*.config.js

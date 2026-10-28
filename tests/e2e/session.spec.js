@@ -3,6 +3,9 @@
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
 const { boot, syncLabel, runUntil, hideTab, showTab, queue, shot, expectNoLeaks, T0 } = require("./helpers");
+/* Die weergawe kom uit version.json: 'n vrystelling moet nie hierdie toetse laat faal nie (28 Okt). */
+const APP_VERSION = require("../../version.json").v;
+
 
 test("volle sessie: elke gebeurtenis bereik Supabase met die presiese payload", async ({ page, context }) => {
   const mock = new MockBackend({ mode: "v1" });
@@ -63,7 +66,7 @@ test("volle sessie: elke gebeurtenis bereik Supabase met die presiese payload", 
       title: "IN SESSIE — begin",
       body: expect.stringContaining(`${subject} · ${minutes}m`),
       device_id: deviceId,
-      app_version: "2026-10-27a",
+      app_version: APP_VERSION,
       backfill: false,
       data: { value: null, _event_id: `start:${sid}` }
     }
