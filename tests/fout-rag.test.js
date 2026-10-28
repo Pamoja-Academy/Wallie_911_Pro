@@ -351,6 +351,35 @@ const voor = fetchKeer;
 for (let i = 0; i < 5; i += 1) sb2.WALLIE.FOUTRAG.laai();
 assert(fetchKeer - voor <= 1, `laai() moet ná die eerste mislukking ophou, het ${fetchKeer - voor} keer meer probeer`);
 
+/* --- 9. die keuse-pad (28 Okt, Hanno): Wallie kies wat gebeur en kry die antwoord direk --- */
+RAG._setKorpus(korpus); /* vorige afdelings het stukkende korpusse ingesit */
+const VAKKE = ["rtt", "engels", "afrikaans", "gasvryheid", "toerisme", "wiskgelett", "algemeen", ""];
+const bereik = {};
+VAKKE.forEach((v) => {
+  const ks = RAG.keuses(v);
+  assert(ks.length >= 10, `vak "${v}": net ${ks.length} keuses — te min om mee te help`);
+  const ids = {};
+  ks.forEach((x) => {
+    assert(!ids[x.id], `vak "${v}": ${x.id} kom twee keer voor`);
+    ids[x.id] = true;
+    bereik[x.id] = true;
+    const a = RAG.antwoordVir(x.id);
+    const e = korpus.inskrywings.find((i) => i.id === x.id);
+    assert(Boolean(a && e && a.antwoord === e.antwoord), `${x.id}: antwoordVir gee nie die inskrywing se eie antwoord nie`);
+    assert(Boolean(e && e.simptome.indexOf(x.teks) >= 0), `${x.id}: etiket "${x.teks}" is nie een van sy simptome nie`);
+    /* 'n vak-spesifieke inskrywing mag nie by 'n ander vak verskyn nie */
+    if (v && v !== "algemeen") {
+      assert(e.vakke.indexOf(v) >= 0 || e.vakke.indexOf("algemeen") >= 0, `vak "${v}" wys ${x.id} (${e.vakke.join(",")})`);
+    }
+  });
+});
+korpus.inskrywings.forEach((e) => assert(Boolean(bereik[e.id]), `${e.id} is uit geen vak se keuselys bereikbaar nie`));
+assert(RAG.antwoordVir("bestaan-nie") === null, "'n onbekende id moet null gee");
+assert(JSON.stringify(RAG.keuses("rtt")) === JSON.stringify(RAG.keuses("rtt")), "keuses moet deterministies wees");
+const leeg = maakSandbox().WALLIE.FOUTRAG;
+assert(Array.isArray(leeg.keuses("rtt")) && leeg.keuses("rtt").length === 0, "sonder korpus: leë lys, geen fout nie");
+assert(leeg.antwoordVir("faq-tyd") === null, "sonder korpus: antwoordVir gee null");
+
 if (fails.length) {
   console.error("fout-rag: FOUT\n - " + fails.join("\n - "));
   process.exit(1);

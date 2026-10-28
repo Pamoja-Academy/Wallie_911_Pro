@@ -247,10 +247,47 @@ window.WALLIE = window.WALLIE || {};
       }, function () { /* vanlyn — die vanger werk sonder 'n antwoord voort */ });
   }
 
+  /* Die keuse-pad (28 Okt, Hanno): vrye teks kan nie betroubaar reg van verkeerd onderskei nie
+     (QC rondte 3: 40 van 49 eie simptome gee null). Wallie KIES dus wat gebeur, en kry die inskrywing
+     se antwoord direk: geen telling, geen raaiwerk nie. Een keuse per inskrywing, met sy eerste simptoom
+     as etiket; die vak se eie inskrywings eerste, dan die algemene. Geen vak: alles. */
+  function keuses(vak) {
+    try {
+      if (!korpus || !korpus.inskrywings) return [];
+      var eie = [], alg = [], gesien = {};
+      korpus.inskrywings.forEach(function (e) {
+        var teks = e.simptome && e.simptome[0];
+        if (!teks || gesien[teks]) return;
+        var vakke = e.vakke || [];
+        var isEie = vak && vakke.indexOf(vak) >= 0;
+        var isAlg = vakke.indexOf("algemeen") >= 0;
+        if (vak && !isEie && !isAlg) return;
+        gesien[teks] = true;
+        (isEie && vak !== "algemeen" ? eie : alg).push({ id: e.id, teks: teks });
+      });
+      return eie.concat(alg);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function antwoordVir(id) {
+    try {
+      if (!korpus || !korpus.inskrywings) return null;
+      for (var i = 0; i < korpus.inskrywings.length; i++) {
+        var e = korpus.inskrywings[i];
+        if (e.id === id) return { id: e.id, soort: e.soort, antwoord: e.antwoord, bron: e.bron };
+      }
+    } catch (e) { /* stil */ }
+    return null;
+  }
+
   WALLIE.FOUTRAG = {
     MIN_PUNT: MIN_PUNT,
     TEKS_PUNT: TEKS_PUNT,
     soek: soek,
+    keuses: keuses,
+    antwoordVir: antwoordVir,
     laai: laai,
     gereed: function () { return !!(korpus && korpus.inskrywings && korpus.inskrywings.length); },
     korpus: function () { return korpus; },

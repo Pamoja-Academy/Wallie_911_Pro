@@ -264,6 +264,52 @@ test("hulp: ou 'Iets werk nie'-vorm skryf ook na wallie911.support", async ({ pa
   });
 });
 
+test("hulp: Wallie KIES wat gebeur en die antwoord verskyn dadelik, nog voor hy stuur", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v1" });
+  await mock.attach(context);
+  await boot(page);
+  await page.goto("/#leer");
+  await page.click('.leer-subject[data-leer="rtt"]');
+  await page.click("#hulp-fab");
+  await page.locator("#hulp-vak").selectOption("rtt");
+  const sel = page.locator("#hulp-simptoom");
+  await expect(sel).toBeVisible();
+  await expect.poll(() => sel.locator("option").count()).toBeGreaterThan(10);
+  await sel.selectOption("les-sessie-begin-nie");
+  /* Dadelik, sonder om te stuur: */
+  await expect(page.locator("#hulp-antwoord")).toBeVisible();
+  await expect(page.locator("#hulp-antwoord")).toContainText("kamera");
+  expect(mock.support).toHaveLength(0);
+  /* Stuur: Pa kry die gekose simptoom (en die antwoord bly staan) */
+  await page.locator("#hulp-stuur").click();
+  await expect(page.locator("#hulp-status")).toHaveText(GESTUUR_MET_ANTWOORD);
+  await expect.poll(() => mock.support.length).toBe(1);
+  expect(mock.support[0].body.gebeur).toBe("Die sessie wil nie begin nie.");
+  await expect(page.locator("#hulp-antwoord")).toContainText("kamera");
+});
+
+test("hulp: 'Iets werk nie' — kies 'n simptoom, die antwoord staan dadelik op die skerm en in die bevestiging", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v1" });
+  await mock.attach(context);
+  await boot(page);
+  await page.goto("/#probleem");
+  const sel = page.locator("#bug-simptoom");
+  await sel.focus();
+  await expect.poll(() => sel.locator("option").count()).toBeGreaterThan(10);
+  await sel.selectOption("les-oortjie-slot");
+  await expect(page.locator("#bug-antwoord")).toBeVisible();
+  await expect(page.locator("#bug-antwoord")).toContainText("NIE toe of weer oop nie");
+  const dialoog = new Promise((r) => page.once("dialog", async (d) => { r(d.message()); await d.accept(); }));
+  await page.locator('input[name="bugTipe"][value="proctor"]').check();
+  await page.locator("#bug-form button[type=submit]").click();
+  const boodskap = await dialoog;
+  expect(boodskap).toContain("Doen dit solank:");
+  expect(boodskap).toContain("NIE toe of weer oop nie");
+  expect(boodskap).not.toMatch(VERBODE);
+  await expect.poll(() => mock.support.length).toBe(1);
+  expect(mock.support[0].body.gebeur).toContain("Die skerm het gesluit terwyl ek die memo in 'n ander oortjie gelees het.");
+});
+
 test("hulp: 'Iets werk nie' belowe nie e-pos as die tou nie gestoor kon word nie", async ({ page, context }) => {
   const mock = new MockBackend({ mode: "offline" });
   await mock.attach(context);
