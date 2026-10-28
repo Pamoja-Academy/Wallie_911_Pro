@@ -2,7 +2,14 @@
 const { test, expect } = require("@playwright/test");
 const { MockBackend } = require("./mock-backend");
 const { boot } = require("./helpers");
-const GESTUUR = "Gestuur. Hulp kom binne ongeveer 10 minute per e-pos (kyk jou Gmail). Pa kry ook 'n kopie.";
+/* 28 Okt: die ou teks het hulp "binne ongeveer 10 minute per e-pos" belowe. Daar is geen e-pos-pad
+   in hierdie app nie en daar was nooit een nie — die melding het in wallie911.support gaan lê, wat
+   niks lees nie. Die nuwe teks sê net wat gebeur, en die vorm stuur nou ook 'n `probleem`-event
+   sodat Pa dit werklik sien. Sien docs/SPEK-FOUTVANGER-2026-10-28.md §1 (F1, F2, F4). */
+const GESTUUR = "Gestuur. Pa sien dit op sy konsole.";
+const GESTUUR_MET_ANTWOORD = "Gestuur — Pa sien dit. Hier is wat jy nou kan doen:";
+/* Geen boodskap in die app mag ooit weer hulp per e-pos belowe nie. */
+const VERBODE = /e-pos|gmail|epos/i;
 
 test("hulp-paneel: oop, navigeer, toe", async ({ page, context }) => {
   await new MockBackend({ mode: "v1" }).attach(context);
@@ -143,10 +150,14 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
   await page.click("#hulp-fab");
 
   await page.locator("#hulp-vak").selectOption("engels");
-  await page.locator("#hulp-gebeur").fill("Die memo-knoppie reageer nie.");
+  await page.locator("#hulp-gebeur").fill("Die app het my gesluit terwyl ek die memo lees.");
   await expect(page.locator("#hulp-skerm")).toHaveValue("Engels EAT");
   await page.locator("#hulp-stuur").click();
-  await expect(page.locator("#hulp-status")).toHaveText(GESTUUR);
+  /* Dit is 'n simptoom wat die fout-RAG sterk ken (les-oortjie-slot, >0.5), dus kom die antwoord-weergawe.
+     "Die memo-knoppie reageer nie" is 28 Okt (QC rondte 2) bewus na 'n eerlike null verskuif: vrye teks onder 0.5 is onbetroubaar. */
+  await expect(page.locator("#hulp-status")).toHaveText(GESTUUR_MET_ANTWOORD);
+  await expect(page.locator("#hulp-antwoord")).toBeVisible();
+  await expect(page.locator("#hulp-status")).not.toHaveText(VERBODE);
 
   const key = await page.evaluate(() => WALLIE.LIVE.key);
   expect(mock.support).toHaveLength(1);
@@ -155,8 +166,8 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
     apikey: key,
     profile: "wallie911",
     body: {
-      vak: "engels", gebeur: "Die memo-knoppie reageer nie.", skerm: "Engels EAT",
-      category: "engels", message: "Die memo-knoppie reageer nie.",
+      vak: "engels", gebeur: "Die app het my gesluit terwyl ek die memo lees.", skerm: "Engels EAT",
+      category: "engels", message: "Die app het my gesluit terwyl ek die memo lees.",
       context: { skerm: "Engels EAT", bron: "hulp" }
     }
   });
@@ -178,6 +189,31 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
   expect(mock.support[1].profile).toBe("wallie911");
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("w911_support_queue") || "[]"))).toEqual([]);
   await expect(page.locator("#hulp-status")).toHaveText(GESTUUR);
+});
+
+/* F1/F2: die vorm moet ook 'n `probleem`-event stuur, anders sien Pa dit nooit (support word nie gelees).
+   `probleem` is 'n soort wat wallie_ingest_v2 reeds ken — geen skemawysiging nie (AGENTS.md §2.2). */
+test("hulp: Stuur probleem stuur ook 'n probleem-event sodat Pa dit sien", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v2" });
+  await mock.attach(context);
+  await boot(page);
+  await page.goto("/#leer");
+  await page.click("#hulp-fab");
+  await page.locator("#hulp-vak").selectOption("rtt");
+  await page.locator("#hulp-gebeur").fill("Die datalêer wil nie oopgaan nie.");
+  await page.locator("#hulp-skerm").fill("Sessie");
+  await page.locator("#hulp-stuur").click();
+
+  await expect.poll(() => mock.byKind("probleem").length).toBe(1);
+  const p = mock.byKind("probleem")[0].body.p;
+  expect(p.body).toContain("Die datalêer wil nie oopgaan nie.");
+  expect(p.body).toContain("Vak: rtt");
+  expect(p.data).toMatchObject({ bron: "hulp", vak: "rtt", skerm: "Sessie" });
+  /* Geen nuwe event-soort nie: net soorte wat wallie_ingest_v2 reeds ken. */
+  const bekend = ["start", "heartbeat", "warn", "lock", "unlock", "memo", "end", "survey",
+    "pa-survey", "probleem", "offline", "idle", "active", "visibility", "block", "plan"];
+  const soorte = [...new Set(mock.calls.filter((c) => /wallie_ingest/.test(c.name)).map((c) => c.body.p.kind))];
+  expect(soorte.filter((k) => !bekend.includes(k))).toEqual([]);
 });
 
 const GESTUUR_TEKS = GESTUUR;
@@ -209,14 +245,20 @@ test("hulp: ou 'Iets werk nie'-vorm skryf ook na wallie911.support", async ({ pa
   await page.goto("/#probleem");
   const dialoog = new Promise((r) => page.once("dialog", async (d) => { r(d.message()); await d.accept(); }));
   await page.locator('input[name="bugTipe"][value="proctor"]').check();
-  await page.locator("#bug-detail").fill("Skerm sluit as ek na Word gaan.");
+  await page.locator("#bug-detail").fill("Die app het my gesluit terwyl ek die memo lees.");
   await page.locator("#bug-form button[type=submit]").click();
-  expect(await dialoog).toContain("10 minute per e-pos");
+  const boodskap1 = await dialoog;
+  /* Hierdie toets het vroeër die e-pos-belofte GEËIS ("10 minute per e-pos"). Dit was 'n belofte wat
+     die app nooit kon hou. Nou is dit die omgekeerde: die boodskap mag e-pos nooit noem nie. */
+  expect(boodskap1).not.toMatch(VERBODE);
+  expect(boodskap1).toContain("Pa sien dit onder Verbeter");
+  /* Hierdie simptoom ken die fout-RAG sterk: die raad moet saamkom. */
+  expect(boodskap1).toContain("Doen dit solank:");
   await expect.poll(() => mock.support.length).toBe(1);
   expect(mock.support[0].profile).toBe("wallie911");
   expect(mock.support[0].body).toMatchObject({
     vak: "algemeen",
-    gebeur: "Skerm sluit as ek na Word gaan.",
+    gebeur: "Die app het my gesluit terwyl ek die memo lees.",
     skerm: "Iets werk nie (proctor, irriterend)",
     context: { bron: "iets-werk-nie", extra: { tipe: "proctor", severity: "irriterend" } }
   });
@@ -240,7 +282,26 @@ test("hulp: 'Iets werk nie' belowe nie e-pos as die tou nie gestoor kon word nie
   await page.locator("#bug-detail").fill("Geen berging nie.");
   await page.locator("#bug-form button[type=submit]").click();
   const boodskap = await dialoog;
-  expect(boodskap).toContain("kon nie vir hulp gestuur");
-  expect(boodskap).not.toContain("kom hulp per e-pos");
+  expect(boodskap).toContain("kon nie gestuur");
+  expect(boodskap).not.toMatch(VERBODE);
   expect(mock.support).toHaveLength(0);
+});
+
+/* Die hele app mag nooit weer hulp per e-pos belowe nie — 'n hek op die bronkode self, want die
+   belofte het 6 dae lank in twee lêers gestaan sonder dat 'n toets dit gevang het. */
+test("geen boodskap in die app belowe hulp per e-pos nie", async () => {
+  const fs = require("fs");
+  const path = require("path");
+  const root = path.join(__dirname, "..", "..");
+  for (const lêer of ["assets/js/hulp.js", "assets/js/app.js", "assets/js/fout-vanger.js"]) {
+    const bron = fs.readFileSync(path.join(root, lêer), "utf8").replace(/\r\n/g, "\n");
+    bron.split("\n").forEach((reël, i) => {
+      /* kommentaar mag die ou belofte beskryf; teks wat Wallie sien, nooit */
+      const kaal = reël.trim();
+      if (kaal.startsWith("/*") || kaal.startsWith("*") || kaal.startsWith("//")) return;
+      if (/hulp kom|per e-pos|kyk jou gmail/i.test(reël)) {
+        throw new Error(`${lêer}:${i + 1} belowe weer hulp per e-pos: ${kaal.slice(0, 120)}`);
+      }
+    });
+  }
 });

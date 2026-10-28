@@ -38,7 +38,12 @@
   var SKRYF = ["engels", "afrikaans"];
   var ALMAL = ["rtt", "engels", "afrikaans", "gasvryheid", "toerisme", "wiskgelett", "algemeen"];
 
-  var GESTUUR = "Gestuur. Hulp kom binne ongeveer 10 minute per e-pos (kyk jou Gmail). Pa kry ook 'n kopie.";
+  /* 28 Okt: die ou teks het hulp "binne ongeveer 10 minute per e-pos" belowe. Daar is geen e-pos-pad
+     in hierdie app nie en dit was nooit waar nie (spek §1 F4). Die nuwe teks sê net wat werklik gebeur:
+     die melding gaan as 'n `probleem`-event na Pa se konsole, en die app gee self dadelik 'n antwoord
+     as die fout-RAG een het. */
+  var GESTUUR = "Gestuur. Pa sien dit op sy konsole.";
+  var GESTUUR_MET_ANTWOORD = "Gestuur — Pa sien dit. Hier is wat jy nou kan doen:";
 
   var SUPPORT_FAQ = [
     {
@@ -276,6 +281,10 @@
   body.appendChild(form);
   var statusEl = el("p", { id: "hulp-status", class: "hulp-status", role: "status" }, "");
   body.appendChild(statusEl);
+  /* Die dadelike antwoord uit die fout-RAG. Hergebruik die FAQ se `.hulp-qa`-styl, sodat hierdie
+     module geen nuwe CSS nodig het nie. */
+  var antwoordEl = el("div", { id: "hulp-antwoord", hidden: "" });
+  body.appendChild(antwoordEl);
   body.appendChild(el("p", { class: "hulp-voet" }, "Sneltoets: druk Esc om hierdie paneel toe te maak."));
   panel.appendChild(body);
 
@@ -394,6 +403,51 @@
     statusEl.className = "hulp-status" + (ok ? " is-ok" : "");
   }
 
+  /* Die dadelike antwoord: wat Wallie NOU kan doen. Gee die RAG niks terug nie, bly dit leeg —
+     ons dink nooit 'n antwoord uit nie (AGENTS.md §2.4). Gee true as daar 'n antwoord was. */
+  function wysAntwoord(vraag, vak) {
+    antwoordEl.textContent = "";
+    antwoordEl.hidden = true;
+    try {
+      var rag = window.WALLIE && WALLIE.FOUTRAG;
+      if (!rag || !rag.soek) return false;
+      var t = rag.soek(vraag, { vak: vak });
+      if (!t || !t.antwoord) return false;
+      var art = el("article", { class: "hulp-qa" });
+      art.appendChild(el("h4", null, "Doen dit solank"));
+      art.appendChild(el("p", null, t.antwoord));
+      antwoordEl.appendChild(art);
+      antwoordEl.hidden = false;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /* Pa moet dit SIEN. `wallie911.support` word deur niks gelees nie (spek §1 F2), daarom gaan
+     dieselfde melding ook as 'n `probleem`-event deur die gewone sinkronisering — 'n soort wat
+     `wallie_ingest_v2` reeds ken, dus geen skemawysiging nie (AGENTS.md §2.2). */
+  function meldAanPa(row) {
+    try {
+      var r = window.WALLIE && WALLIE.REMOTE;
+      if (!r || typeof r.bugReport !== "function") return;
+      r.bugReport({
+        text: ["Vak: " + (row.vak || "algemeen"), "Skerm: " + (row.skerm || "?"), row.gebeur]
+          .filter(Boolean)
+          .join("\n"),
+        data: {
+          id: row.id,
+          bron: row.bron || "hulp",
+          vak: row.vak,
+          skerm: row.skerm,
+          subjectSlug: row.vak,
+          href: String(location.href || "").slice(0, 300)
+        },
+        blocking: false
+      });
+    } catch (e) { /* die melding mag nooit die vorm breek nie */ }
+  }
+
   function flush() {
     if (flushing) return;
     var q = loadQueue();
@@ -436,11 +490,14 @@
       return;
     }
     stuur.disabled = true;
+    /* Eers Pa in kennis stel (dit staan in die tou en oorleef vanlyn), dan die antwoord wys. */
+    meldAanPa(row);
+    var hetAntwoord = wysAntwoord(row.gebeur, row.vak);
     insertRow(row).then(function (ok) {
       stuur.disabled = false;
       if (ok) {
         gebeur.value = "";
-        setStatus(GESTUUR, true);
+        setStatus(hetAntwoord ? GESTUUR_MET_ANTWOORD : GESTUUR, true);
         return;
       }
       var q = loadQueue();

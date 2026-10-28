@@ -1292,7 +1292,8 @@
       data: bug,
       blocking: bug.severity === "blokkeer"
     });
-    /* Dieselfde pad as die Hulp-paneel: wallie911.support (die hulp-roetine antwoord per e-pos). Push bly. */
+    /* Dieselfde pad as die Hulp-paneel: wallie911.support is net die rekord. Die `probleem`-event
+       hierbo is die een wat Pa werklik sien (28 Okt, spek §1 F2). */
     const supportBelofte = WALLIE.HULP?.stuur({
       vak: bug.subjectSlug || "algemeen",
       gebeur: bug.detail + (bug.code ? `\nKode: ${bug.code}` : ""),
@@ -1305,13 +1306,23 @@
     $("#bug-code").value = "";
     document.querySelectorAll('input[name="bugTipe"]').forEach((r) => (r.checked = false));
     renderBugs();
+    /* 28 Okt: die ou teks het hulp "binne ongeveer 10 minute per e-pos" belowe; daar is geen e-pos-pad
+       in hierdie app nie (spek §1 F4). Die app gee nou self dadelik die antwoord as die fout-RAG een het. */
+    const raad = (() => {
+      try {
+        const t = WALLIE.FOUTRAG?.soek(bug.detail, { vak: bug.subjectSlug || "" });
+        return t && t.antwoord ? `\n\nDoen dit solank:\n${t.antwoord}` : "";
+      } catch (e) {
+        return "";
+      }
+    })();
     const melding = (uitslag) =>
       alert(
-        uitslag === "gestuur"
-          ? "Dankie — gestuur. Hulp kom binne ongeveer 10 minute per e-pos (kyk jou Gmail). Pa sien dit ook onder Verbeter."
+        (uitslag === "gestuur"
+          ? "Dankie — gestuur. Pa sien dit onder Verbeter."
           : uitslag === "tou"
-            ? "Dankie — probleem gestoor. Geen verbinding nie: dit gaan deur sodra jy weer internet het, en dan kom hulp per e-pos."
-            : "Dankie — probleem gestoor op hierdie toestel, maar kon nie vir hulp gestuur of in die tou gesit word nie (blaaier in privaat modus of geheue vol?). Maak 'n gewone venster oop en probeer weer, of sê vir Pa."
+            ? "Dankie — probleem gestoor. Geen verbinding nie: dit gaan deur sodra jy weer internet het."
+            : "Dankie — probleem gestoor op hierdie toestel, maar kon nie gestuur of in die tou gesit word nie (blaaier in privaat modus of geheue vol?). Maak 'n gewone venster oop en probeer weer, of sê vir Pa.") + raad
       );
     if (supportBelofte && typeof supportBelofte.then === "function") supportBelofte.then(melding, () => melding("fout"));
     else melding("fout");
