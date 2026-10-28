@@ -135,8 +135,12 @@ Die eerste weergawe is **afgekeur**. Die blokkers, en die regstelling:
 2. **B2 "Pa kry dit":** net REMOTE+SYNC tel as aflewering. `HULP.stuur` skryf net na `wallie911.support` (niemand lees dit nie):
    dit word steeds gestuur, maar belowe niks en maak die sein nie stil nie. `faq-stuur` is uit die RAG gehou.
 3. **Vrye-teks-drempel:** sonder 'n woordelikse sein moet die punt ≥ `TEKS_PUNT` (0.5) wees; vak-spesifieke inskrywings word ook
-   gestraf as geen vak bekend is. 110 QC-navrae het tussen 0.26 en 0.54 verkeerde antwoorde gegee. Gevolg: 6 vroeër treffers is nou
-   eerlike `null` (gelys in `tests/fout-rag.test.js`). Die outomatiese pad (egte sein, 0.9+) is onveranderd.
+   gestraf as geen vak bekend is. 110 QC-navrae het tussen 0.26 en 0.54 verkeerde antwoorde gegee. Gevolg (QC rondte 3 gemeet): van die korpus se 49 eie simptome, woordeliks getik, gee 40 nou eerlike `null`;
+   die mens-pad (Hulp-vorm, "Iets werk nie") lewer dus feitlik nooit meer 'n antwoord nie. Dit is veilig, maar 'n gaping: die
+   volgende stap is dat Wallie 'n simptoom uit 'n lys kies in plaas daarvan om vry te tik. Die outomatiese pad (egte sein, 0.9+)
+   is onveranderd.
+5. **QC rondte 3:** drie antwoorde het Wallie steeds uit sy sessie gestuur ("maak die blad weer oop", "gewone venster", "laai die
+   blad"); herskryf of uit die RAG gehou, en die toets vang nou ook daardie formulerings.
 4. **B3 bewys-meganisme: NIE opgelos nie.** `bewys` kyk net of 'n string in 'n lêer staan; dit koppel nie die antwoordteks aan die
    kode nie. Net die inskrywings wat 'n bewering oor die app maak en wat QC uitgewys het, het 'n `bewys`. Moenie §8.2 lees as
    "elke antwoord is bewys" nie. 'n Mens moet nuwe handgeskrewe antwoorde teen die kode nagaan.

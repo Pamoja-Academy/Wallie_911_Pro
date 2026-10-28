@@ -48,7 +48,12 @@ const UITGESLUIT = {
   "vraestel-memo": true,
   /* "Pa kry dit." — hulp.js skryf net na wallie911.support wat niemand lees nie (QC rondte 2). Die
      antwoord het ook by "dit stuur nie na Pa nie" uitgekom, juis wanneer sending stukkend is. */
-  stuur: true
+  stuur: true,
+  /* "...Laai die blad dan, laat weet vir Pa." (hulp.js:59) — lees as herlaai-raad en stuur na Pa (QC rondte 3). */
+  "rtt-skakel": true,
+  /* "…Sien jy 'Kon nie stoor nie', maak 'n gewone venster oop" (hulp.js:31): 'n nuwe venster kos 'n sessie sy fokus (QC rondte 3).
+     Die outomatiese `sein-stoor-vol` dek hierdie geval reeds, sonder die venster-raad. */
+  "skryf-stoor": true
 };
 
 /* ---------- 1. SUPPORT_FAQ uit hulp.js ---------- */
@@ -98,7 +103,7 @@ const UIT_LESSE = [
     antwoord:
       "'n Merk- of skrifblok waarvan die vraestel of memo in 'n ander oortjie oop is, mag jou NIE sluit nie. " +
       "Gebeur dit, is dit 'n fout in die app en nie jou skuld nie. " +
-      "Maak die blad weer oop en gaan aan met merk; jou tyd en punte bly geldig. By 'n RTT-praktiese blok " +
+      "Maak die blad NIE toe of weer oop nie (dit beëindig die sessie): gaan aan met merk; jou tyd en punte bly geldig. By 'n RTT-praktiese blok " +
       "druk eers 'Begin praktiese blok (Office)', dan tel Word, Excel, Access en Notepad nie as wegkyk nie."
   },
   {
@@ -283,8 +288,9 @@ const SEINE = [
     simptome: ["Dit sê 'Kon nie stoor nie'.", "My punte stoor nie.", "My self-nasien stoor nie."],
     seine: ["quotaexceedederror", "exceeded the quota", "securityerror", "setitem"],
     antwoord:
-      "Jou blaaier is in privaat modus, of die geheue is vol. Maak 'n gewone venster oop (nie privaat/incognito " +
-      "nie) en probeer weer. Neem solank 'n foto van jou bladsy en skryf jou punt in die foutbank, sodat niks verlore gaan nie."
+      "Jou blaaier is in privaat modus, of die geheue is vol. Moenie nou 'n ander venster oopmaak terwyl 'n sessie loop nie: " +
+      "dit tel as wegkyk. Neem solank 'n foto van jou bladsy en skryf jou punt in die foutbank, sodat niks verlore gaan nie; " +
+      "probeer weer ná die sessie."
   },
   {
     id: "sein-netwerk",

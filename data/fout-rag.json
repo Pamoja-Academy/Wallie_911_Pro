@@ -2,8 +2,8 @@
  "gegenereer_deur": "scripts/bou-fout-rag.js",
  "metode": "Onttrek uit assets/js/hulp.js (SUPPORT_FAQ, woordeliks), docs/LESSONS-LEARNED.md (lesse met 'n simptoom wat Wallie sien) en docs/SPEK-FOUTVANGER-2026-10-28.md §4 (tegniese foutseine). Elke inskrywing wys na sy bron; tests/fout-rag.test.js faal as 'n bron nie bestaan nie.",
  "korpus": {
-  "inskrywings": 24,
-  "faq": 13,
+  "inskrywings": 22,
+  "faq": 11,
   "lesse": 5,
   "seine": 6
  },
@@ -48,19 +48,6 @@
    "seine": [],
    "antwoord": "Kies RTT (CAT) op die Sessie-skerm, druk Begin sessie en dan die groot knoppie 'Begin praktiese blok (Office)'. Van daar af mag jy die blaaier minimiseer en in Word, Excel, Access of Notepad werk: geen waarskuwing en geen slot nie (tot 3 uur 15 min). Druk 'Klaar met prakties' wanneer jy klaar is. Sonder die praktiese blok tel elke keer wat jy weggaan as 'n waarskuwing, en na 3 sluit die skerm.",
    "bron": "assets/js/hulp.js:68"
-  },
-  {
-   "id": "faq-rtt-skakel",
-   "soort": "faq",
-   "vakke": [
-    "rtt"
-   ],
-   "simptome": [
-    "Die DBE-skakel (vraestel, datalêer of memo) laai nie."
-   ],
-   "seine": [],
-   "antwoord": "By RTT (CAT) maak die knoppies Vraestel (PDF), Datalêers en Memo die DBE-webwerf (education.gov.za) in 'n nuwe oortjie oop. Dit het internet nodig. As dit nie laai nie, kyk of jy internet het en probeer weer. Laai die blad dan, laat weet vir Pa.",
-   "bron": "assets/js/hulp.js:56"
   },
   {
    "id": "faq-rtt-slot",
@@ -133,20 +120,6 @@
    "seine": [],
    "antwoord": "Ja, gebruik 'n gewone sakrekenaar op die tafel, soos in die eksamen (Wiskundige Geletterdheid het dit nodig; Toerisme vir wisselkoerse en tydsones; Gasvryheid vir koste en porsies). Moenie die Windows-sakrekenaar gebruik nie: oorskakel na 'n ander program tel in 'n sessie as 'n waarskuwing.",
    "bron": "assets/js/hulp.js:92"
-  },
-  {
-   "id": "faq-skryf-stoor",
-   "soort": "faq",
-   "vakke": [
-    "afrikaans",
-    "engels"
-   ],
-   "simptome": [
-    "My skryfstuk (opstel, brief, dialoog) stoor nie in die app nie."
-   ],
-   "seine": [],
-   "antwoord": "Die app stoor nie jou skryfwerk self nie: jy skryf met die hand op lynpapier, soos in die eksamen. Die app stoor net jou self-nasien-uitslag op hierdie toestel wanneer jy op 'Stoor' druk. Sien jy 'Kon nie stoor nie', is jou blaaier waarskynlik in privaat modus of die geheue is vol: maak 'n gewone venster oop en probeer weer. Neem 'n foto van jou bladsy en skryf jou punt in die foutlog sodat niks verlore gaan nie.",
-   "bron": "assets/js/hulp.js:110"
   },
   {
    "id": "faq-skryf-tyd-vraag",
@@ -245,7 +218,7 @@
     "Dit sê ek kyk weg maar ek lees die memo."
    ],
    "seine": [],
-   "antwoord": "'n Merk- of skrifblok waarvan die vraestel of memo in 'n ander oortjie oop is, mag jou NIE sluit nie. Gebeur dit, is dit 'n fout in die app en nie jou skuld nie. Maak die blad weer oop en gaan aan met merk; jou tyd en punte bly geldig. By 'n RTT-praktiese blok druk eers 'Begin praktiese blok (Office)', dan tel Word, Excel, Access en Notepad nie as wegkyk nie.",
+   "antwoord": "'n Merk- of skrifblok waarvan die vraestel of memo in 'n ander oortjie oop is, mag jou NIE sluit nie. Gebeur dit, is dit 'n fout in die app en nie jou skuld nie. Maak die blad NIE toe of weer oop nie (dit beëindig die sessie): gaan aan met merk; jou tyd en punte bly geldig. By 'n RTT-praktiese blok druk eers 'Begin praktiese blok (Office)', dan tel Word, Excel, Access en Notepad nie as wegkyk nie.",
    "bron": "docs/LESSONS-LEARNED.md:27"
   },
   {
@@ -425,7 +398,7 @@
     "securityerror",
     "setitem"
    ],
-   "antwoord": "Jou blaaier is in privaat modus, of die geheue is vol. Maak 'n gewone venster oop (nie privaat/incognito nie) en probeer weer. Neem solank 'n foto van jou bladsy en skryf jou punt in die foutbank, sodat niks verlore gaan nie.",
+   "antwoord": "Jou blaaier is in privaat modus, of die geheue is vol. Moenie nou 'n ander venster oopmaak terwyl 'n sessie loop nie: dit tel as wegkyk. Neem solank 'n foto van jou bladsy en skryf jou punt in die foutbank, sodat niks verlore gaan nie; probeer weer ná die sessie.",
    "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76"
   },
   {

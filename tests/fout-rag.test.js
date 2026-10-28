@@ -300,6 +300,15 @@ assert(Boolean(vreemdeVak), "'n vreemde vak mag 'n egte sein nie heeltemal wegne
 /* --- 6b. QC rondte 2, B1: geen antwoord mag Wallie sê om te herlaai nie (dit beëindig 'n sessie) --- */
 korpus.inskrywings.forEach((e) => {
   assert(!/herlaai(?! nie)/i.test(e.antwoord), `${e.id}: sê vir Wallie om te herlaai — app.js:1356 beëindig dan sy sessie`);
+  /* QC rondte 3: ander maniere om die blad/sessie te verlaat. "NIE/moenie ... oop" is toegelaat (dit verbied dit). */
+  const sinne = e.antwoord.split(/(?<=[.;:])\s+/);
+  sinne.forEach((s) => {
+    if (/\b(nie|moenie|mag jou nie)\b/i.test(s)) return;
+    assert(
+      !/weer oop|laai die blad|nuwe venster|gewone venster|ander venster|ctrl\+r|f5\b/i.test(s),
+      `${e.id}: sin lees as 'n raad om die blad/venster te verlaat: "${s}"`
+    );
+  });
 });
 
 /* --- 7. deterministies, stil, sonder netwerk en sonder foute --- */
