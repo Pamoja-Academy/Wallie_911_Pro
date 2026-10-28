@@ -385,6 +385,26 @@ window.WALLIE = window.WALLIE || {};
     return paaie > 0;
   }
 
+  /* ---------- meldings wat moes wag vir sync.js/remote.js ---------- */
+  var wag = [];
+
+  function syncKlaar() {
+    var Wl = W.WALLIE;
+    return !!(Wl && Wl.REMOTE && typeof Wl.REMOTE.bugReport === "function" &&
+      Wl.SYNC && typeof Wl.SYNC.enqueue === "function");
+  }
+
+  function leegWag() {
+    try {
+      if (!wag.length || !syncKlaar()) return;
+      var w = wag;
+      wag = [];
+      for (var i = 0; i < w.length; i++) {
+        try { if (rapporteer(w[i][0], w[i][1], w[i][2])) merkSein(w[i][1]); } catch (e) { /* stil */ }
+      }
+    } catch (e) { /* stil */ }
+  }
+
   /* ---------- die kern ---------- */
 
   /* Gee: "gemeld" | "dubbel" | "limiet" | "ignoreer" | "besig" | "fout" (net vir toetse; niemand anders lees dit). */
@@ -402,6 +422,9 @@ window.WALLIE = window.WALLIE || {};
       var gestuur = rapporteer(info, sein, treffer);
       /* Net 'n melding wat werklik in die tou is, maak die sein vir 10 min stil. */
       if (gestuur) merkSein(sein);
+      /* Cursor Bugbot, 28 Okt: 'n fout wat voor sync.js/remote.js laai (juis 'n skrip wat nie laai nie) kan niks
+         tou nie, en dit vuur nie weer nie. Hou dit en probeer weer wanneer die blad klaar gelaai het. */
+      else if (!syncKlaar() && wag.length < MAKS_PER_SESSIE) wag.push([info, sein, treffer]);
       if (info.wys !== false) wysStrokie(treffer ? treffer.antwoord : "", gestuur);
       return "gemeld";
     } catch (e) {
@@ -480,5 +503,6 @@ window.WALLIE = window.WALLIE || {};
     /* Vang-fase op window: sien beide JS-foute en hulpbron-foute (wat nie borrel nie). */
     W.addEventListener("error", opFout, true);
     W.addEventListener("unhandledrejection", opBelofte);
+    W.addEventListener("load", leegWag);
   } catch (e) { /* geen blaaier-omgewing nie: niks om te vang nie */ }
 })();

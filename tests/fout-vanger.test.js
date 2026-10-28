@@ -156,7 +156,7 @@ tik("luisteraars", () => {
   assert(Boolean(t.FV), "WALLIE.FOUTVANGER is nie gedefinieer nie");
   assert(Boolean(t.luisteraars.error && t.luisteraars.error[0] && t.luisteraars.error[0].vang === true), "'error' moet in die vang-fase op window hang");
   assert(Boolean(t.luisteraars.unhandledrejection), "'unhandledrejection' ontbreek");
-  assert(Object.keys(t.luisteraars).sort().join(",") === "error,unhandledrejection", "net error + unhandledrejection op window; kry: " + Object.keys(t.luisteraars));
+  assert(Object.keys(t.luisteraars).sort().join(",") === "error,load,unhandledrejection", "net error + load (vir wag-meldings) + unhandledrejection op window; kry: " + Object.keys(t.luisteraars));
   assert(!("blur" in t.luisteraars) && !("focus" in t.luisteraars) && !("visibilitychange" in t.docLuisteraars), "die vanger raak nie proctor se blur/focus/visibilitychange aan nie");
   /* tweede laai gee nie dubbele luisteraars nie */
   vm.runInNewContext(bron, t.sb, { filename: FILE });
@@ -423,6 +423,20 @@ tik("sonder-afhanklikhede", () => {
   const ns = bou({ remote: true, hulp: false, sync: false });
   ns.jsFout(new Error("remote sonder sync"));
   assert(ns.strokieTeks() === "Onbekende fout.", "REMOTE sonder SYNC mag nie 'Pa kry dit' se nie; kry: " + ns.strokieTeks());
+  /* Cursor Bugbot 28 Okt: 'n fout voor sync.js/remote.js laai moet nie vir ewig verlore wees nie. Dit wag, en word
+     gestuur wanneer die blad klaar gelaai het (die "load"-gebeurtenis). Die sein is intussen nie stilgemaak nie. */
+  const vroeg = bou({ remote: true, hulp: false, sync: false });
+  vroeg.jsFout(new Error("voor sync"));
+  assert(vroeg.bugReports.length === 0, "voor sync.js: nog niks gestuur");
+  vroeg.sb.WALLIE.SYNC = { enqueue() { return true; } };
+  vroeg.fire("load", {});
+  assert(vroeg.bugReports.length === 1, "ná laai: die vroeë fout word nou gestuur; kry " + vroeg.bugReports.length);
+  vroeg.fire("load", {});
+  assert(vroeg.bugReports.length === 1, "'n tweede 'load' stuur nie weer nie");
+  const nooit = bou({ remote: true, hulp: false, sync: false });
+  nooit.jsFout(new Error("sync kom nooit"));
+  nooit.fire("load", {});
+  assert(nooit.bugReports.length === 0, "sonder SYNC bly dit ongestuur (geen valse sukses)");
   const h = bou({ remote: false, hulp: true });
   h.jsFout(new Error("net hulp"));
   /* QC rondte 2, B2: HULP skryf net na wallie911.support wat niemand lees nie — dit is GEEN aflewering aan Pa nie.

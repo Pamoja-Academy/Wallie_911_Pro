@@ -329,6 +329,15 @@ function seinInskrywings() {
       bron: SPEK + ":" + reël
     };
     if (e.sein_algemeen) uit.sein_algemeen = true;
+    /* Cursor Bugbot, 28 Okt: die bewys van die sein-inskrywings is stilweg weggelaat. Dieselfde kontrole as vir lesse. */
+    if (e.bewys) {
+      uit.bewys = e.bewys.map((b) => {
+        if (lees(b.lêer).indexOf(b.patroon) < 0) {
+          throw new Error(e.id + ": bewys ontbreek in " + b.lêer + ': "' + b.patroon + '"');
+        }
+        return { lêer: b.lêer, patroon: b.patroon };
+      });
+    }
     return uit;
   });
 }

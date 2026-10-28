@@ -377,7 +377,13 @@
    ],
    "antwoord": "'n Deel van die app het nie gelaai nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. Werk op papier aan met dieselfde vraestel en merk die blok daarna klaar: jou minute tel.",
    "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76",
-   "sein_algemeen": true
+   "sein_algemeen": true,
+   "bewys": [
+    {
+     "lêer": "assets/js/app.js",
+     "patroon": "outcome: \"onderbreek\""
+    }
+   ]
   },
   {
    "id": "sein-stoor-vol",
@@ -421,7 +427,13 @@
     "null is not an object"
    ],
    "antwoord": "Daar is 'n fout in die app, nie in jou werk nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. Gaan aan op papier en merk die blok klaar wanneer jy klaar is. Jy hoef niks te tik nie.",
-   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76"
+   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76",
+   "bewys": [
+    {
+     "lêer": "assets/js/app.js",
+     "patroon": "outcome: \"onderbreek\""
+    }
+   ]
   }
  ]
 }
