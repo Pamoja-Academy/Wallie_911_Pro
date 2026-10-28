@@ -895,7 +895,7 @@
     setExportStatus(
       empty
         ? "Geen log in hierdie blaaier nie — leë JSON afgelaai. Geen sessies bygemaak nie."
-        : `Log afgelaai: ${logFileName()}. Stuur die lêer na hannovz@gmail.com.`
+        : `Log afgelaai: ${logFileName()}. Stuur die lêer na die ouer se e-pos.`
     );
   }
 
@@ -903,7 +903,7 @@
     const text = rawLogText();
     try {
       await navigator.clipboard.writeText(text);
-      setExportStatus("Log is in die knipbord. Plak dit in WhatsApp of e-pos na hannovz@gmail.com.");
+      setExportStatus("Log is in die knipbord. Plak dit in WhatsApp of e-pos na die ouer se e-pos.");
       return true;
     } catch {
       setExportStatus("Kopieer het nie gewerk nie. Gebruik “Laai log af (JSON)”.");
@@ -915,11 +915,11 @@
     const text = rawLogText();
     const name = logFileName();
     const file = new File([text], name, { type: "application/json" });
-    const caption = `Wallie_911 kamp-log vir Pa · hannovz@gmail.com · ${WALLIE.todayKey()}`;
+    const caption = `Wallie_911 kamp-log vir Pa · die ouer se e-pos · ${WALLIE.todayKey()}`;
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({ files: [file], title: caption, text: caption });
-        setExportStatus("Deel-kieslys oop. Kies WhatsApp of e-pos na hannovz@gmail.com.");
+        setExportStatus("Deel-kieslys oop. Kies WhatsApp of e-pos na die ouer se e-pos.");
         return;
       } catch (err) {
         if (err && err.name === "AbortError") return;
@@ -931,7 +931,7 @@
       "Pa — Wallie se volle log (wallie911_v2_bok) is in die knipbord en/of die afgelaaide JSON-lêer. Plak dit hier as die lêer nie geheg is nie. Moenie ’n verkorte weergawe as die volle log behandel nie."
     );
     const mail = document.createElement("a");
-    mail.href = `mailto:hannovz@gmail.com?subject=${subject}&body=${body}`;
+    mail.href = `mailto:die ouer se e-pos?subject=${subject}&body=${body}`;
     mail.click();
     const wa = `https://wa.me/?text=${encodeURIComponent(caption + " — log is in die knipbord, plak dit in hierdie klets.")}`;
     window.open(wa, "_blank", "noopener");

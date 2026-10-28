@@ -23,7 +23,7 @@ Stappe:
 2. Dubbelklik START-HIER.bat (of oop Pages-skakel)
 3. Merk **waarneming-toestemming** (een keer) — Pa sien jou sessie-status op sy foon
 4. Missie → Begin by die 09:30-blok (kamera aan)
-5. Pa-PIN as jy slot kry: 9110
+5. Pa-PIN: sien die app se kode (nie in die repo nie)
 
 Vandag matchday 1:
 🟢 09:30–10:30 — Gasvryheid KICKOFF (hard, kamera aan)

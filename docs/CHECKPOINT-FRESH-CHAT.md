@@ -12,7 +12,7 @@ Open **this file** (of `docs/HANDOVER.md`) in a **new Agent chat** in die selfde
 - Wallie cockpit live: https://pamoja-academy.github.io/Wallie_911_Pro/
 - Stadium-aftelling tot **12 Okt 2026 09:00** (Missie + `pa-briefing.html`)
 - Pa afstand: `pa-afstand.html` + ntfy topic `wallie911-pa-15sos-hanno`
-- Wallie: **geen Node** → slegs Pages-URL (nie afgekapte zip). WA `068 376 8239`. PIN `9110`
+- Wallie: **geen Node** → slegs Pages-URL (nie afgekapte zip). WA (verwyder).
 - Figma capture bestaan maar MCP **Starter+View kwota vol** — moenie Figma MCP probeer nie
 
 ## Aktiewe besluit

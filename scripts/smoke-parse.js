@@ -207,7 +207,7 @@ if (typeof W.buildDayPlan === "function") {
 
 assert(html.includes("js-export-log"), "export log button");
 assert(html.includes("wallie911_v2_bok"), "export names storage key");
-assert(html.includes("hannovz@gmail.com"), "export names Pa email");
+assert(html.includes("Pa se e-pos"), "export names Pa email");
 
 assert(html.includes('id="les-viewer"'), "index has lesson viewer");
 assert(html.includes('id="view-leer"'), "index has Lesse view");

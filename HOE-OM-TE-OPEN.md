@@ -8,7 +8,7 @@ Oop in Chrome/Edge:
 
 1. Merk **waarneming-toestemming** (een keer per toestel; dit vra weer omdat kamera-foto’s nou na Pa gaan)
 2. **Missie → Begin**
-3. Pa-PIN by slot: `9110` (Wallie se slot — nie Pa se konsole-wagwoord nie)
+3. Pa-PIN by slot: sien die app se kode (Wallie se slot — nie Pa se konsole-wagwoord nie)
 
 ## Pa — lewendige konsole (met wagwoord)
 

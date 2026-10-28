@@ -8,6 +8,6 @@ echo  (Dis altyd die nuutste weergawe, en dit sinkroniseer na Pa.)
 echo.
 start "" "https://pamoja-academy.github.io/Wallie_911_Pro/#missie"
 echo  Merk waarneming-toestemming ^> Missie ^> Begin.
-echo  Pa-PIN: 9110
+echo  Pa-PIN: sien die app se kode
 timeout /t 5 >nul
 exit /b 0

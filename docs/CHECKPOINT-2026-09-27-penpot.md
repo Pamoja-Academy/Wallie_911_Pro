@@ -10,7 +10,7 @@
 ## Produk-status (Wallie cockpit)
 - Live Pages: https://pamoja-academy.github.io/Wallie_911_Pro/
 - Pa briefing: `pa-briefing.html` + lewendige aftelling tot **12 Okt 2026 09:00**
-- Wallie pad: Pages HTTPS (nie zip/Node); WA `068 376 8239`
+- Wallie pad: Pages HTTPS (nie zip/Node); WA (verwyder)
 - Figma: capture geland in https://www.figma.com/design/GYMSR2Y1A8fCDCRoMUYZGW — **Starter+View MCP-kwota uitgeput**; `use_figma` geblok
 
 ## Brainstorm-besluit (goedgekeur)
