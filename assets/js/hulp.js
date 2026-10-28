@@ -551,6 +551,8 @@
       stuur.disabled = false;
       if (ok) {
         gebeur.value = "";
+        /* Die keuse terug, sodat 'n tweede stuur nie weer dieselfde simptoom stuur nie; die antwoord bly staan. */
+        simptoomSel.value = "";
         setStatus(hetAntwoord ? GESTUUR_MET_ANTWOORD : GESTUUR, true);
         return;
       }
@@ -561,6 +563,7 @@
         return;
       }
       gebeur.value = "";
+      simptoomSel.value = "";
       setStatus("Geen verbinding nie. Jou probleem is op hierdie toestel gestoor en word gestuur sodra jy weer internet het.", true);
     });
   });
@@ -582,6 +585,8 @@
   document.addEventListener("change", function () { if (open) pasKonteks(); });
   window.addEventListener("hashchange", function () { if (open) pasKonteks(); });
   window.addEventListener("online", flush);
+  /* Die korpus laai asinchronies; vul die keuselys sodra dit daar is (QC rondte 5). */
+  window.addEventListener("foutrag-gereed", vulKeuses);
 
   new MutationObserver(function () {
     if (open && overlayOop()) close({ keepFocus: true });

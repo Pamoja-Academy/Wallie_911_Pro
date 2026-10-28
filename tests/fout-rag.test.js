@@ -370,10 +370,18 @@ VAKKE.forEach((v) => {
     /* 'n vak-spesifieke inskrywing mag nie by 'n ander vak verskyn nie */
     if (v && v !== "algemeen") {
       assert(e.vakke.indexOf(v) >= 0 || e.vakke.indexOf("algemeen") >= 0, `vak "${v}" wys ${x.id} (${e.vakke.join(",")})`);
+    } else {
+      /* QC rondte 5, R1: sonder vak net algemene inskrywings — "3 uur vir 200 punte" hoort nie by RTT nie. */
+      assert(e.vakke.indexOf("algemeen") >= 0, `vak "${v}" wys vak-spesifieke ${x.id} (${e.vakke.join(",")})`);
     }
   });
 });
 korpus.inskrywings.forEach((e) => assert(Boolean(bereik[e.id]), `${e.id} is uit geen vak se keuselys bereikbaar nie`));
+/* QC rondte 5, R2: die app loop live op https; "localhost" is ontwikkelaarsraad en verkeerd vir Wallie. */
+korpus.inskrywings.forEach((e) => {
+  const a = e.antwoord.toLowerCase();
+  assert(a.indexOf("localhost") < 0 && a.indexOf("file:") < 0, `${e.id}: noem localhost/file: — verkeerd op die live app`);
+});
 assert(RAG.antwoordVir("bestaan-nie") === null, "'n onbekende id moet null gee");
 assert(JSON.stringify(RAG.keuses("rtt")) === JSON.stringify(RAG.keuses("rtt")), "keuses moet deterministies wees");
 const leeg = maakSandbox().WALLIE.FOUTRAG;

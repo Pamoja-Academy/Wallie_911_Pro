@@ -50,6 +50,7 @@ window.WALLIE = window.WALLIE || {};
   var vektore = null;
   var onbekendeIdf = 0;
   var pogings = 0;
+  var laaiBesig = false;
 
   /* ---------- teks ---------- */
 
@@ -235,22 +236,28 @@ window.WALLIE = window.WALLIE || {};
   /* Twee mislukkings (vanlyn, file://) en dan los ons dit — geen herprobeer-lus nie, dieselfde
      dissipline as ondersteuning.js. */
   function laai() {
-    if (korpus || pogings >= 2 || typeof fetch !== "function") return;
+    /* `laaiBesig`: drie plekke roep laai(); 'n tweede gelyktydige fetch mag nie die laaste poging opgebruik nie. */
+    if (korpus || laaiBesig || pogings >= 2 || typeof fetch !== "function") return;
     pogings += 1;
+    laaiBesig = true;
     fetch(KORPUS_URL, { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
+        laaiBesig = false;
         if (d && d.inskrywings && d.inskrywings.length) {
           korpus = d;
           idf = null;
+          /* Die keuselyste (Hulp, 'Iets werk nie') vul hulself sodra die korpus daar is. */
+          try { window.dispatchEvent(new Event("foutrag-gereed")); } catch (e) { /* ou blaaier: by volgende oopmaak */ }
         }
-      }, function () { /* vanlyn — die vanger werk sonder 'n antwoord voort */ });
+      }, function () { laaiBesig = false; /* vanlyn — die vanger werk sonder 'n antwoord voort */ });
   }
 
   /* Die keuse-pad (28 Okt, Hanno): vrye teks kan nie betroubaar reg van verkeerd onderskei nie
      (QC rondte 3: 40 van 49 eie simptome gee null). Wallie KIES dus wat gebeur, en kry die inskrywing
      se antwoord direk: geen telling, geen raaiwerk nie. Een keuse per inskrywing, met sy eerste simptoom
-     as etiket; die vak se eie inskrywings eerste, dan die algemene. Geen vak: alles. */
+     as etiket; die vak se eie inskrywings eerste, dan die algemene. Geen vak: NET die algemene — 'n
+     vak-spesifieke antwoord ("3 uur vir 200 punte") sonder vak is by 'n ander vak verkeerd (QC rondte 5). */
   function keuses(vak) {
     try {
       if (!korpus || !korpus.inskrywings) return [];
@@ -261,7 +268,7 @@ window.WALLIE = window.WALLIE || {};
         var vakke = e.vakke || [];
         var isEie = vak && vakke.indexOf(vak) >= 0;
         var isAlg = vakke.indexOf("algemeen") >= 0;
-        if (vak && !isEie && !isAlg) return;
+        if (!isEie && !isAlg) return;
         gesien[teks] = true;
         (isEie && vak !== "algemeen" ? eie : alg).push({ id: e.id, teks: teks });
       });

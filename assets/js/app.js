@@ -1303,6 +1303,7 @@
   $("#bug-subject")?.addEventListener("change", () => { bugKeuses(); wysBugAntwoord(); });
   window.addEventListener("hashchange", () => { if (location.hash === "#probleem") bugKeuses(); });
   if (location.hash === "#probleem") setTimeout(bugKeuses, 0);
+  window.addEventListener("foutrag-gereed", bugKeuses);
 
   $("#bug-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -1354,6 +1355,9 @@
     persist();
     $("#bug-detail").value = "";
     $("#bug-code").value = "";
+    /* Keuse terug, sodat 'n tweede stuur nie weer dieselfde simptoom stuur nie; die antwoord staan in die bevestiging. */
+    if ($("#bug-simptoom")) $("#bug-simptoom").value = "";
+    if ($("#bug-antwoord")) $("#bug-antwoord").hidden = true;
     document.querySelectorAll('input[name="bugTipe"]').forEach((r) => (r.checked = false));
     renderBugs();
     /* 28 Okt: die ou teks het hulp "binne ongeveer 10 minute per e-pos" belowe; daar is geen e-pos-pad
