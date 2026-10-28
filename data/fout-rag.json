@@ -2,8 +2,8 @@
  "gegenereer_deur": "scripts/bou-fout-rag.js",
  "metode": "Onttrek uit assets/js/hulp.js (SUPPORT_FAQ, woordeliks), docs/LESSONS-LEARNED.md (lesse met 'n simptoom wat Wallie sien) en docs/SPEK-FOUTVANGER-2026-10-28.md §4 (tegniese foutseine). Elke inskrywing wys na sy bron; tests/fout-rag.test.js faal as 'n bron nie bestaan nie.",
  "korpus": {
-  "inskrywings": 25,
-  "faq": 14,
+  "inskrywings": 24,
+  "faq": 13,
   "lesse": 5,
   "seine": 6
  },
@@ -180,19 +180,6 @@
    "seine": [],
    "antwoord": "Ja. Skryf op papier met 'n horlosie op die tafel; die app hoef nie aan te wees nie. Het die app reeds gelaai, wys die vraag, memo en rubriek ook sonder internet, en jou self-nasien-uitslag stoor op die toestel. Wat na Pa moet gaan, word gestuur wanneer jy weer internet het. Die RTT (CAT)-skakels na DBE-vraestelle en -datalêers het wel internet nodig: laai dit vooraf af wanneer jy internet het.",
    "bron": "assets/js/hulp.js:134"
-  },
-  {
-   "id": "faq-stuur",
-   "soort": "faq",
-   "vakke": [
-    "algemeen"
-   ],
-   "simptome": [
-    "Hoe stuur ek 'n probleem vir Pa?"
-   ],
-   "seine": [],
-   "antwoord": "Gebruik die vorm Stuur probleem hier onder. Kies die vak, skryf wat gebeur het, en op watter skerm jy was. Pa kry dit. Sonder internet bly dit op hierdie toestel en gaan deur sodra jy weer aanlyn is.",
-   "bron": "assets/js/hulp.js:140"
   },
   {
    "id": "faq-tyd",
@@ -415,7 +402,7 @@
     "loading chunk",
     "net::err_abort"
    ],
-   "antwoord": "'n Deel van die app het nie gelaai nie. Herlaai die blad EEN keer (Ctrl+R). Help dit nie, werk op papier aan met dieselfde vraestel en merk die blok daarna klaar: jou minute tel.",
+   "antwoord": "'n Deel van die app het nie gelaai nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. Werk op papier aan met dieselfde vraestel en merk die blok daarna klaar: jou minute tel.",
    "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76",
    "sein_algemeen": true
   },
@@ -460,7 +447,7 @@
     "undefined is not an object",
     "null is not an object"
    ],
-   "antwoord": "Daar is 'n fout in die app, nie in jou werk nie. Herlaai die blad een keer. Werk dit steeds nie, gaan aan op papier en merk die blok klaar wanneer jy klaar is. Jy hoef niks te tik nie.",
+   "antwoord": "Daar is 'n fout in die app, nie in jou werk nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. Gaan aan op papier en merk die blok klaar wanneer jy klaar is. Jy hoef niks te tik nie.",
    "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76"
   }
  ]

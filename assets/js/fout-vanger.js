@@ -370,7 +370,8 @@ window.WALLIE = window.WALLIE || {};
       var H = W.WALLIE && W.WALLIE.HULP;
       if (H && typeof H.stuur === "function") {
         try {
-          paaie += 1;
+          /* HULP skryf net na wallie911.support, wat niemand lees nie (QC 28 Okt, B2): dit tel NIE as
+             aflewering nie, maar word steeds gestuur sodat die rekord bestaan sodra 'n SELECT-beleid kom. */
           stil(H.stuur({
             vak: "algemeen",
             gebeur: tekst,

@@ -128,3 +128,15 @@ Die eerste weergawe is **afgekeur**. Die blokkers, en die regstelling:
 8. `dagverslag.js` kon "GROEN" e-pos sonder dat die e2e-suite geloop het (dit het op 28 Okt gebeur).
    → Dit heet nou "GROEN (SONDER E2E)", sê dit uitdruklik, tel net geslaagde lopies se kontroles, en
    waarsku as die werkkopie ongecommitte wysigings het.
+
+## 9. QC rondte 2 (28 Okt, uitspraak NEE) — wat daaraan gedoen is
+1. **B1 herlaai-raad:** twee antwoorde het gesê "herlaai die blad"; `app.js:1356-1382` teken 'n herlaai tydens 'n sessie as
+   "onderbreek" aan en die sessie is weg. Die antwoorde sê nou "moenie herlaai nie"; 'n toets verbied enige herlaai-raad.
+2. **B2 "Pa kry dit":** net REMOTE+SYNC tel as aflewering. `HULP.stuur` skryf net na `wallie911.support` (niemand lees dit nie):
+   dit word steeds gestuur, maar belowe niks en maak die sein nie stil nie. `faq-stuur` is uit die RAG gehou.
+3. **Vrye-teks-drempel:** sonder 'n woordelikse sein moet die punt ≥ `TEKS_PUNT` (0.5) wees; vak-spesifieke inskrywings word ook
+   gestraf as geen vak bekend is. 110 QC-navrae het tussen 0.26 en 0.54 verkeerde antwoorde gegee. Gevolg: 6 vroeër treffers is nou
+   eerlike `null` (gelys in `tests/fout-rag.test.js`). Die outomatiese pad (egte sein, 0.9+) is onveranderd.
+4. **B3 bewys-meganisme: NIE opgelos nie.** `bewys` kyk net of 'n string in 'n lêer staan; dit koppel nie die antwoordteks aan die
+   kode nie. Net die inskrywings wat 'n bewering oor die app maak en wat QC uitgewys het, het 'n `bewys`. Moenie §8.2 lees as
+   "elke antwoord is bewys" nie. 'n Mens moet nuwe handgeskrewe antwoorde teen die kode nagaan.

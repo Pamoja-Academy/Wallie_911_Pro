@@ -224,24 +224,13 @@ korpus.inskrywings.forEach((e) => {
 
 /* --- 4. die mens-pad: die simptoom in Wallie se eie woorde, nie die FAQ se woorde nie --- */
 const woordGevalle = [
-  { vraag: "my excel lêer wil nie oopgaan nie en vra 'n wagwoord", vak: "rtt", wag: ["faq-rtt-wagwoord", "faq-rtt-maak-oop"] },
-  { vraag: "waar kry ek die puntebande vir die opstel", vak: "engels", wag: ["faq-rubriek"] },
   { vraag: "die app het my gesluit terwyl ek die memo lees", vak: "rtt", wag: ["les-oortjie-slot", "faq-rtt-slot"] },
-  { vraag: "kan ek werk as daar nie internet is nie", vak: "algemeen", wag: ["faq-sonder-net"] },
-  { vraag: "hierdie is dieselfde vraestel wat ek al gedoen het", vak: "wiskgelett", wag: ["les-selfde-vraestel"] },
   { vraag: "mag ek 'n sakrekenaar gebruik", vak: "toerisme", wag: ["faq-sakrekenaar"] },
-  { vraag: "my opstel stoor nie in die app nie", vak: "afrikaans", wag: ["faq-skryf-stoor", "faq-sonder-net"] },
-  { vraag: "die blok sê pa moet vir my die vraestel gee", vak: "gasvryheid", wag: ["les-werk-in-die-app"] },
-  /* 28 Okt: hierdie drie het eers NIKS gegee nie. "reageer" staan nêrens in die korpus nie, en 'n
-     onbekende woord het die hele navraag oorheers. Die model se onbekend-gewig is reggestel én die
-     gewone Afrikaanse variante staan nou by die simptome. Hulle bly hier staan. */
-  { vraag: "Die memo-knoppie reageer nie.", vak: "engels", wag: ["les-memo-hek"] },
-  { vraag: "die app reageer glad nie meer nie", vak: "rtt", wag: ["sein-typeerror", "sein-skrip-laai-nie"] },
-  { vraag: "niks gebeur as ek op die knoppie druk nie", vak: "rtt", wag: ["sein-typeerror", "sein-skrip-laai-nie", "les-memo-hek"] }
+  { vraag: "die blok sê pa moet vir my die vraestel gee", vak: "gasvryheid", wag: ["les-werk-in-die-app"] }
 ];
 woordGevalle.forEach((g) => {
   const r = RAG.soek(g.vraag, { vak: g.vak });
-  assert(Boolean(r), `"${g.vraag}" gee geen treffer nie (drempel ${RAG.MIN_PUNT})`);
+  assert(Boolean(r), `"${g.vraag}" gee geen treffer nie (vrye-teks-drempel ${RAG.TEKS_PUNT})`);
   if (r) {
     assert(
       g.wag.indexOf(r.id) >= 0,
@@ -254,7 +243,7 @@ woordGevalle.forEach((g) => {
 /* Die tweede helfte van hierdie lys kom uit die onafhanklike QC (28 Okt). Elkeen het 'n VERKEERDE
    antwoord bo die ou drempel van 0.17 gekry — "die app werk nie" het RTT se Word/Excel-stoorraad
    gekry, "help" 'n diagnose uit die duim, "waar is die vraestel" die memo-wenk (wat hom na LL-01 se
-   kortpad stuur). Die drempel is 0.30, "waar/wanneer/wie" is stopwoorde, en 'n verkeerde vak straf
+   kortpad stuur). Die drempel vir vrye teks is TEKS_PUNT (0.5), "waar/wanneer/wie" is stopwoorde, en 'n verkeerde vak straf
    nou. Hulle bly hier staan sodat dit nie terugsak nie. */
 const rommel = [
   "zzzz qqqq xxxx",
@@ -267,24 +256,51 @@ const rommel = [
   "waar is my eksamen",
   "my punte is weg",
   "kan ek more skryf",
-  "wat moet ek nou doen"
+  "wat moet ek nou doen",
+  /* QC rondte 2 (28 Okt): elkeen het 'n verkeerde of misleidende antwoord tussen 0.26 en 0.54 gekry. */
+  "my werk is weg",
+  "ek het my antwoorde verloor",
+  "die knoppie doen niks",
+  "die skerm is gesluit",
+  "dit stuur nie na pa nie",
+  "hoe begin ek?",
+  "watter vraestel moet ek doen",
+  "daar is geen blok vir vandag nie",
+  "excel",
+  "hoe verdeel ek my tyd",
+  "Die vraestel of memo maak nie oop nie.",
+  "Die DBE-skakel laai nie.",
+  "My self-nasien stoor nie.",
+  /* Bekende gapings: dit was eers treffers, maar vrye teks kan nie van die verkeerde antwoorde onderskei
+     word nie. Liewer 'n eerlike null as 'n antwoord wat dalk verkeerd is. Die outomatiese pad (sein) bly. */
+  "my excel lêer wil nie oopgaan nie en vra 'n wagwoord",
+  "waar kry ek die puntebande vir die opstel",
+  "kan ek werk as daar nie internet is nie",
+  "my opstel stoor nie in die app nie",
+  "Die memo-knoppie reageer nie.",
+  "die app reageer glad nie meer nie"
 ];
 rommel.forEach((t) => {
   const r = RAG.soek(t);
   assert(r === null, `"${t}" moes null gee, het ${r && r.id} (${r && r.punt})`);
 });
 
-/* --- 6. die vak help, maar sluit nie uit nie --- */
-const sonderVak = RAG.soek("die dbe skakel na die vraestel laai nie");
-const metVak = RAG.soek("die dbe skakel na die vraestel laai nie", { vak: "rtt" });
-assert(Boolean(sonderVak), "sonder vak moes die dbe-skakel-vraag steeds 'n treffer gee");
-assert(Boolean(metVak), "met vak moes die dbe-skakel-vraag 'n treffer gee");
+/* --- 6. die vak help, maar sluit nie uit nie (met 'n egte sein, want vrye teks het 'n hoër drempel) --- */
+const SEIN = "https://www.education.gov.za/memo.pdf 404";
+const sonderVak = RAG.soek("die dbe skakel laai nie", { sein: SEIN });
+const metVak = RAG.soek("die dbe skakel laai nie", { sein: SEIN, vak: "rtt" });
+assert(Boolean(sonderVak), "sonder vak moes 'n egte sein steeds 'n treffer gee");
+assert(Boolean(metVak), "met vak moes 'n egte sein 'n treffer gee");
 if (sonderVak && metVak) {
   assert(metVak.punt >= sonderVak.punt, `die vak-bonus moet nie die punt verlaag nie (${metVak.punt} < ${sonderVak.punt})`);
 }
-/* 'n vak wat niks met die vraag te doen het nie, mag die regte antwoord nie wegneem nie */
-const vreemdeVak = RAG.soek("waar kry ek die rubriek", { vak: "rtt" });
-assert(Boolean(vreemdeVak), "'n vreemde vak mag die treffer nie heeltemal wegneem nie");
+const vreemdeVak = RAG.soek("die dbe skakel laai nie", { sein: SEIN, vak: "algemeen" });
+assert(Boolean(vreemdeVak), "'n vreemde vak mag 'n egte sein nie heeltemal wegneem nie");
+
+/* --- 6b. QC rondte 2, B1: geen antwoord mag Wallie sê om te herlaai nie (dit beëindig 'n sessie) --- */
+korpus.inskrywings.forEach((e) => {
+  assert(!/herlaai(?! nie)/i.test(e.antwoord), `${e.id}: sê vir Wallie om te herlaai — app.js:1356 beëindig dan sy sessie`);
+});
 
 /* --- 7. deterministies, stil, sonder netwerk en sonder foute --- */
 const a = RAG.soek("die skerm het gesluit terwyl ek die memo lees", { vak: "rtt" });

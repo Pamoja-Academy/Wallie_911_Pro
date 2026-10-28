@@ -425,7 +425,10 @@ tik("sonder-afhanklikhede", () => {
   assert(ns.strokieTeks() === "Onbekende fout.", "REMOTE sonder SYNC mag nie 'Pa kry dit' se nie; kry: " + ns.strokieTeks());
   const h = bou({ remote: false, hulp: true });
   h.jsFout(new Error("net hulp"));
-  assert(h.stuurRye.length === 1 && /Pa kry dit sodra daar internet is/.test(h.strokieTeks()), "net HULP beskikbaar = steeds gerapporteer");
+  /* QC rondte 2, B2: HULP skryf net na wallie911.support wat niemand lees nie — dit is GEEN aflewering aan Pa nie.
+     Dit word steeds gestuur (die rekord bestaan), maar die strokie mag niks belowe nie en die sein word nie stilgemaak nie. */
+  assert(h.stuurRye.length === 1, "HULP kry steeds die rekord");
+  assert(h.strokieTeks() === "Onbekende fout.", "net HULP is geen aflewering: geen 'Pa kry dit' nie; kry " + h.strokieTeks());
 });
 
 /* --- 15. fout voor <body> bestaan --- */

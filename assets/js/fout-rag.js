@@ -24,6 +24,10 @@ window.WALLIE = window.WALLIE || {};
      (0.239) en "help" 'n diagnose uit die duim (0.192). Wallie kry liewer niks as iets verkeerds.
      0.26 is gemeet, nie geraai nie: QC se ergste vals treffer was 0.224, die swakste EGTE vraag 0.299. */
   var MIN_PUNT = 0.26;
+  /* 28 Okt, QC rondte 2: sonder 'n woordelikse sein is 'n kosinus-punt tussen 0.26 en 0.5 in 110 toetsnavrae
+     telkens 'n verkeerde antwoord (bv. "my werk is weg" -> "net die nagaan-reël is weg"). Vrye teks moet
+     dus sterker wees; 'n outomatiese melding met 'n egte sein (0.9+) is nie hierdeur geraak nie. */
+  var TEKS_PUNT = 0.5;
   /* 'n Woordelikse sein-treffer is sterker bewys as enige woordooreenkoms. */
   var SEIN_PUNT = 0.9;
   /* Die regte vak maak 'n inskrywing meer waarskynlik... */
@@ -198,17 +202,16 @@ window.WALLIE = window.WALLIE || {};
           var basis = e.sein_algemeen ? SEIN_PUNT - 0.08 : SEIN_PUNT;
           punt = Math.max(punt, basis) + (Math.min(tref, 24) / 24) * 0.06 + punt * 0.02;
         }
-        if (opsies.vak) {
-          var vakke = e.vakke || [];
-          if (vakke.indexOf(opsies.vak) >= 0) punt *= VAK_BONUS;
-          else if (vakke.length && vakke.indexOf("algemeen") < 0) punt *= VAK_STRAF;
-        }
-        if (punt > 0) punte.push({ i: i, punt: punt > 1 ? 1 : punt });
+        var vakke = e.vakke || [];
+        if (opsies.vak && vakke.indexOf(opsies.vak) >= 0) punt *= VAK_BONUS;
+        /* Verkeerde vak, OF geen vak bekend nie: 'n vak-spesifieke antwoord is nie vir 'n onbekende vak bedoel nie. */
+        else if (vakke.length && vakke.indexOf("algemeen") < 0 && (opsies.vak || !tref)) punt *= VAK_STRAF;
+        if (punt > 0) punte.push({ i: i, punt: punt > 1 ? 1 : punt, sein: !!tref });
       }
       if (!punte.length) return null;
       /* Deterministies: gelyke punte val terug op die id se volgorde (die korpus is gesorteer). */
       punte.sort(function (a, b) { return b.punt - a.punt || a.i - b.i; });
-      if (punte[0].punt < MIN_PUNT) return null;
+      if (punte[0].punt < (punte[0].sein ? MIN_PUNT : TEKS_PUNT)) return null;
 
       var wen = korpus.inskrywings[punte[0].i];
       return {
@@ -217,7 +220,7 @@ window.WALLIE = window.WALLIE || {};
         antwoord: wen.antwoord,
         punt: Math.round(punte[0].punt * 1000) / 1000,
         bron: wen.bron,
-        alternatiewe: punte.slice(1, 3).filter(function (p) { return p.punt >= MIN_PUNT; }).map(function (p) {
+        alternatiewe: punte.slice(1, 3).filter(function (p) { return p.punt >= (p.sein ? MIN_PUNT : TEKS_PUNT); }).map(function (p) {
           return { id: korpus.inskrywings[p.i].id, punt: Math.round(p.punt * 1000) / 1000 };
         })
       };
@@ -246,6 +249,7 @@ window.WALLIE = window.WALLIE || {};
 
   WALLIE.FOUTRAG = {
     MIN_PUNT: MIN_PUNT,
+    TEKS_PUNT: TEKS_PUNT,
     soek: soek,
     laai: laai,
     gereed: function () { return !!(korpus && korpus.inskrywings && korpus.inskrywings.length); },

@@ -150,10 +150,11 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
   await page.click("#hulp-fab");
 
   await page.locator("#hulp-vak").selectOption("engels");
-  await page.locator("#hulp-gebeur").fill("Die memo-knoppie reageer nie.");
+  await page.locator("#hulp-gebeur").fill("Die app het my gesluit terwyl ek die memo lees.");
   await expect(page.locator("#hulp-skerm")).toHaveValue("Engels EAT");
   await page.locator("#hulp-stuur").click();
-  /* "Die memo-knoppie reageer nie" is 'n simptoom wat die fout-RAG ken, dus kom die antwoord-weergawe. */
+  /* Dit is 'n simptoom wat die fout-RAG sterk ken (les-oortjie-slot, >0.5), dus kom die antwoord-weergawe.
+     "Die memo-knoppie reageer nie" is 28 Okt (QC rondte 2) bewus na 'n eerlike null verskuif: vrye teks onder 0.5 is onbetroubaar. */
   await expect(page.locator("#hulp-status")).toHaveText(GESTUUR_MET_ANTWOORD);
   await expect(page.locator("#hulp-antwoord")).toBeVisible();
   await expect(page.locator("#hulp-status")).not.toHaveText(VERBODE);
@@ -165,8 +166,8 @@ test("hulp: Stuur probleem skryf na wallie911.support en tou vanlyn", async ({ p
     apikey: key,
     profile: "wallie911",
     body: {
-      vak: "engels", gebeur: "Die memo-knoppie reageer nie.", skerm: "Engels EAT",
-      category: "engels", message: "Die memo-knoppie reageer nie.",
+      vak: "engels", gebeur: "Die app het my gesluit terwyl ek die memo lees.", skerm: "Engels EAT",
+      category: "engels", message: "Die app het my gesluit terwyl ek die memo lees.",
       context: { skerm: "Engels EAT", bron: "hulp" }
     }
   });
@@ -244,20 +245,20 @@ test("hulp: ou 'Iets werk nie'-vorm skryf ook na wallie911.support", async ({ pa
   await page.goto("/#probleem");
   const dialoog = new Promise((r) => page.once("dialog", async (d) => { r(d.message()); await d.accept(); }));
   await page.locator('input[name="bugTipe"][value="proctor"]').check();
-  await page.locator("#bug-detail").fill("Skerm sluit as ek na Word gaan.");
+  await page.locator("#bug-detail").fill("Die app het my gesluit terwyl ek die memo lees.");
   await page.locator("#bug-form button[type=submit]").click();
   const boodskap1 = await dialoog;
   /* Hierdie toets het vroeër die e-pos-belofte GEËIS ("10 minute per e-pos"). Dit was 'n belofte wat
      die app nooit kon hou. Nou is dit die omgekeerde: die boodskap mag e-pos nooit noem nie. */
   expect(boodskap1).not.toMatch(VERBODE);
   expect(boodskap1).toContain("Pa sien dit onder Verbeter");
-  /* "Skerm sluit as ek na Word gaan" ken die fout-RAG: die raad moet saamkom. */
+  /* Hierdie simptoom ken die fout-RAG sterk: die raad moet saamkom. */
   expect(boodskap1).toContain("Doen dit solank:");
   await expect.poll(() => mock.support.length).toBe(1);
   expect(mock.support[0].profile).toBe("wallie911");
   expect(mock.support[0].body).toMatchObject({
     vak: "algemeen",
-    gebeur: "Skerm sluit as ek na Word gaan.",
+    gebeur: "Die app het my gesluit terwyl ek die memo lees.",
     skerm: "Iets werk nie (proctor, irriterend)",
     context: { bron: "iets-werk-nie", extra: { tipe: "proctor", severity: "irriterend" } }
   });

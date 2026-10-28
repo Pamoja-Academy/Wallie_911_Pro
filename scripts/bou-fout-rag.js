@@ -45,7 +45,10 @@ const UITGESLUIT = {
   /* "Het jy die volle vraestel nodig, vra vir Pa" (hulp.js:32) — dieselfde probleem. Die nuttige
      helfte van hierdie inskrywing (hoe die bron-teks en 'Wys memo' werk) word reeds deur
      faq-rubriek en les-memo-hek gedek. */
-  "vraestel-memo": true
+  "vraestel-memo": true,
+  /* "Pa kry dit." — hulp.js skryf net na wallie911.support wat niemand lees nie (QC rondte 2). Die
+     antwoord het ook by "dit stuur nie na Pa nie" uitgekom, juis wanneer sending stukkend is. */
+  stuur: true
 };
 
 /* ---------- 1. SUPPORT_FAQ uit hulp.js ---------- */
@@ -247,6 +250,7 @@ const SEINE = [
   },
   {
     id: "sein-skrip-laai-nie",
+    bewys: [{ lêer: "assets/js/app.js", patroon: 'outcome: "onderbreek"' }],
     vakke: ["algemeen"],
     simptome: ["'n Skerm is leeg.", "'n Knoppie doen niks.", "Die blad lyk stukkend."],
     seine: ["hulpbron|script", "hulpbron|link", "loading chunk", "net::err_abort"],
@@ -254,11 +258,12 @@ const SEINE = [
        lêer of fout noem (bv. rag-dekking) moet hierdie een altyd klop. */
     sein_algemeen: true,
     antwoord:
-      "'n Deel van die app het nie gelaai nie. Herlaai die blad EEN keer (Ctrl+R). Help dit nie, werk " +
-      "op papier aan met dieselfde vraestel en merk die blok daarna klaar: jou minute tel."
+      "'n Deel van die app het nie gelaai nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. " +
+      "Werk op papier aan met dieselfde vraestel en merk die blok daarna klaar: jou minute tel."
   },
   {
     id: "sein-typeerror",
+    bewys: [{ lêer: "assets/js/app.js", patroon: 'outcome: "onderbreek"' }],
     vakke: ["algemeen"],
     simptome: [
       "'n Knoppie doen niks.",
@@ -269,8 +274,8 @@ const SEINE = [
     ],
     seine: ["is not a function", "cannot read properties", "undefined is not an object", "null is not an object"],
     antwoord:
-      "Daar is 'n fout in die app, nie in jou werk nie. Herlaai die blad een keer. Werk dit steeds nie, " +
-      "gaan aan op papier en merk die blok klaar wanneer jy klaar is. Jy hoef niks te tik nie."
+      "Daar is 'n fout in die app, nie in jou werk nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. " +
+      "Gaan aan op papier en merk die blok klaar wanneer jy klaar is. Jy hoef niks te tik nie."
   },
   {
     id: "sein-stoor-vol",
