@@ -14,7 +14,7 @@ if errorlevel 1 (
   echo.
   start "" "https://pamoja-academy.github.io/Wallie_911_Pro/"
   echo  Merk waarneming-toestemming → Missie → Begin.
-  echo  Pa-PIN: 9110
+  echo  Pa-PIN: sien die app se kode
   pause
   exit /b 0
 )

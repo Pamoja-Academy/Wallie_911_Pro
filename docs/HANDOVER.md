@@ -6,9 +6,9 @@
 Afrikaanse matric SOS-cockpit vir Wallie (#15 Springbok narratief). Hard-proctor + Pa afstand via ntfy.
 
 ## Kontakte
-- Wallie e-pos: `wallievanzyl356@gmail.com`
-- Wallie WhatsApp: `068 376 8239` (+27 68 376 8239)
-- Pa (Hanno): `hannovz@gmail.com`
+- Wallie e-pos: (verwyder uit die publieke repo)
+- Wallie WhatsApp: (verwyder uit die publieke repo)
+- Pa (Hanno): (verwyder uit die publieke repo)
 
 ## KEEP pad
 `C:\Users\User\Projects\Wallie_911_Pro` · GitHub `Pamoja-Academy/Wallie_911_Pro` · branch `master`

@@ -8,7 +8,7 @@ Oop in Chrome/Edge:
 
 1. Merk **waarneming-toestemming** (een keer)
 2. **Missie → Begin**
-3. Pa-PIN by slot: `9110`
+3. Pa-PIN by slot: sien die app se kode
 
 ## Opsioneel: plaaslik met START-HIER.bat
 
