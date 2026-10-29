@@ -186,8 +186,8 @@ const UIT_LESSE = [
     seine: ["notallowederror", "notfounderror", "getusermedia"],
     antwoord:
       "Die sessie het die kamera nodig; sonder dit begin dit nie, en weer druk gee dieselfde boodskap. " +
-      "Laat die kamera toe in die blaaier (die slotjie langs die adres) en maak die app oop op " +
-      "http://localhost, nie as 'n lêer nie. Werk dit steeds nie: begin NIE die sessie nie — skryf op " +
+      "Laat die kamera toe in die blaaier (die slotjie langs die adres), en maak seker geen ander program " +
+      "(Teams, Zoom, die kamera-app) gebruik die kamera nie. Werk dit steeds nie: begin NIE die sessie nie — skryf op " +
       "papier met 'n horlosie op die tafel en merk die blok daarna klaar. Jou minute gaan nie verlore " +
       "nie."
   }
@@ -280,7 +280,7 @@ const SEINE = [
     seine: ["is not a function", "cannot read properties", "undefined is not an object", "null is not an object"],
     antwoord:
       "Daar is 'n fout in die app, nie in jou werk nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. " +
-      "Gaan aan op papier en merk die blok klaar wanneer jy klaar is. Jy hoef niks te tik nie."
+      "Gaan aan op papier en merk die blok klaar wanneer jy klaar is."
   },
   {
     id: "sein-stoor-vol",

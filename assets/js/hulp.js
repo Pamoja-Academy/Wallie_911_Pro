@@ -28,7 +28,7 @@
   ];
 
   /* Die vyf skryf-antwoorde staan woordeliks. Hulle hoort by elke vak wat die antwoord self noem. */
-  var SKRYF_STOOR = "Die app stoor nie jou skryfwerk self nie: jy skryf met die hand op lynpapier, soos in die eksamen. Die app stoor net jou self-nasien-uitslag op hierdie toestel wanneer jy op 'Stoor' druk. Sien jy 'Kon nie stoor nie', is jou blaaier waarskynlik in privaat modus of die geheue is vol: maak 'n gewone venster oop en probeer weer. Neem 'n foto van jou bladsy en skryf jou punt in die foutlog sodat niks verlore gaan nie.";
+  var SKRYF_STOOR = "Die app stoor nie jou skryfwerk self nie: jy skryf met die hand op lynpapier, soos in die eksamen. Die app stoor net jou self-nasien-uitslag op hierdie toestel wanneer jy op 'Stoor' druk. Sien jy 'Kon nie stoor nie', is jou blaaier waarskynlik in privaat modus of die geheue is vol: neem 'n foto van jou bladsy sodat niks verlore gaan nie, en probeer weer ná die sessie (moenie tydens 'n sessie 'n ander venster oopmaak nie: dit tel as wegkyk).";
   var VRAESTEL_MEMO = "By die Engels- en Afrikaans-skryfitems wys die app net die bron as teks (bv. 'DBE Nov 2024 EAT V3, bl. 5 (memo bl. 7)'); daar is nie 'n knoppie wat die PDF oopmaak nie. Die vraag self, die modelantwoord, formaatlys en rubriek is reeds in die app onder 'Wys memo'. Het jy die volle vraestel nodig, vra vir Pa. By RTT (CAT) maak die vraestel-, datalêer- en memoskakels die DBE-webwerf oop: as dit nie laai nie, kyk of jy internet het en probeer weer; laai die blad dan, laat weet vir Pa.";
   var TYD = "Engels EAT V3 (100 punte, 2½ uur): opstel 50 punte = 80 min (250–300 woorde); lang transaksionele teks 30 punte = 40 min (120–150 woorde); kort teks 20 punte = 30 min (80–100 woorde). Plan 10% van die tyd, skryf, en hou 5 min vir redigeer en woordtelling. Afrikaans Huistaal V3: volg die punte op die vraestel: ongeveer 1 minuut per punt plus 'n paar minute om te beplan. By die ander vakke se langer antwoorde geld dieselfde: kyk na die punte en gee omtrent 1 minuut per punt.";
   var RUBRIEK = "Maak 'n skryfitem oop en druk 'Wys memo': die rubriek (die DBE se puntebande), die formaatlys en die modelantwoord verskyn saam onder die vraag. Kyk eers ná jou getimede poging. Vir die ander vakke is die nasienriglyne in die memo van die betrokke vraestel.";
@@ -267,14 +267,20 @@
     vakSel.appendChild(el("option", { value: g.vak }, g.titel));
   });
   vakLabel.appendChild(vakSel);
-  var gebeurLabel = el("label", null, "Wat het gebeur");
-  var gebeur = el("textarea", { id: "hulp-gebeur", rows: "3", required: "" });
+  /* Die keuse-pad (28 Okt): Wallie kies wat gebeur en kry dadelik die antwoord, nog voor hy stuur.
+     Vrye teks bly vir wat nie in die lys is nie. */
+  var simptoomLabel = el("label", null, "Wat gebeur? Kies die naaste");
+  var simptoomSel = el("select", { id: "hulp-simptoom" });
+  simptoomLabel.appendChild(simptoomSel);
+  var gebeurLabel = el("label", null, "Of beskryf dit self (of voeg by)");
+  var gebeur = el("textarea", { id: "hulp-gebeur", rows: "3" });
   gebeurLabel.appendChild(gebeur);
   var skermLabel = el("label", null, "Op watter skerm");
   var skerm = el("input", { type: "text", id: "hulp-skerm", required: "" });
   skermLabel.appendChild(skerm);
   var stuur = el("button", { type: "submit", class: "btn primary", id: "hulp-stuur" }, "Stuur probleem");
   form.appendChild(vakLabel);
+  form.appendChild(simptoomLabel);
   form.appendChild(gebeurLabel);
   form.appendChild(skermLabel);
   form.appendChild(stuur);
@@ -338,6 +344,7 @@
       lastFocus = document.activeElement;
       pasKonteks();
       renderFaq();
+      vulKeuses();
       closeBtn.focus();
     } else if (!opts.keepFocus && lastFocus && lastFocus.focus) {
       try { lastFocus.focus(); } catch (e) { /* ignore */ }
@@ -405,23 +412,60 @@
 
   /* Die dadelike antwoord: wat Wallie NOU kan doen. Gee die RAG niks terug nie, bly dit leeg —
      ons dink nooit 'n antwoord uit nie (AGENTS.md §2.4). Gee true as daar 'n antwoord was. */
-  function wysAntwoord(vraag, vak) {
+  function toonAntwoord(t) {
     antwoordEl.textContent = "";
     antwoordEl.hidden = true;
+    if (!t || !t.antwoord) return false;
+    var art = el("article", { class: "hulp-qa" });
+    art.appendChild(el("h4", null, "Doen dit solank"));
+    art.appendChild(el("p", null, t.antwoord));
+    antwoordEl.appendChild(art);
+    antwoordEl.hidden = false;
+    return true;
+  }
+
+  function wysAntwoord(vraag, vak) {
     try {
       var rag = window.WALLIE && WALLIE.FOUTRAG;
-      if (!rag || !rag.soek) return false;
-      var t = rag.soek(vraag, { vak: vak });
-      if (!t || !t.antwoord) return false;
-      var art = el("article", { class: "hulp-qa" });
-      art.appendChild(el("h4", null, "Doen dit solank"));
-      art.appendChild(el("p", null, t.antwoord));
-      antwoordEl.appendChild(art);
-      antwoordEl.hidden = false;
-      return true;
+      if (!rag || !rag.soek) return toonAntwoord(null);
+      return toonAntwoord(rag.soek(vraag, { vak: vak }));
     } catch (e) {
-      return false;
+      return toonAntwoord(null);
     }
+  }
+
+  /* Die gekose simptoom se antwoord, direk uit die korpus (geen telling nie). */
+  function wysGekose() {
+    try {
+      var rag = window.WALLIE && WALLIE.FOUTRAG;
+      var id = simptoomSel.value;
+      if (!id || !rag || !rag.antwoordVir) return toonAntwoord(null);
+      return toonAntwoord(rag.antwoordVir(id));
+    } catch (e) {
+      return toonAntwoord(null);
+    }
+  }
+
+  /* Vul die keuselys vir die vak. Die korpus laai asinchronies: is dit nog nie daar nie, probeer ons
+     by die volgende oopmaak of vak-wissel weer. Die huidige keuse bly staan as dit nog bestaan. */
+  function vulKeuses() {
+    try {
+      var rag = window.WALLIE && WALLIE.FOUTRAG;
+      if (rag && rag.laai && rag.gereed && !rag.gereed()) rag.laai();
+      var keuses = rag && rag.keuses ? rag.keuses(String(vakSel.value || huidigeVak() || "")) : [];
+      var was = simptoomSel.value;
+      simptoomSel.textContent = "";
+      simptoomSel.appendChild(el("option", { value: "" }, keuses.length ? "Kies wat gebeur…" : "Iets anders (beskryf dit hier onder)"));
+      var bly = false;
+      keuses.forEach(function (k) {
+        simptoomSel.appendChild(el("option", { value: k.id }, k.teks));
+        if (k.id === was) bly = true;
+      });
+      if (keuses.length) simptoomSel.appendChild(el("option", { value: "" }, "Iets anders (beskryf dit hier onder)"));
+      simptoomSel.value = bly ? was : "";
+      /* style, nie `hidden` nie: `.hulp-vorm label { display: grid }` oorskryf die hidden-attribuut. */
+      simptoomLabel.style.display = keuses.length ? "" : "none";
+    } catch (e) { /* die vorm werk steeds met vrye teks */ }
   }
 
   /* Pa moet dit SIEN. `wallie911.support` word deur niks gelees nie (spek §1 F2), daarom gaan
@@ -440,6 +484,7 @@
           bron: row.bron || "hulp",
           vak: row.vak,
           skerm: row.skerm,
+          simptoom: row.simptoom || "",
           subjectSlug: row.vak,
           href: String(location.href || "").slice(0, 300)
         },
@@ -474,39 +519,51 @@
     if (b) goTo(b.getAttribute("data-hulp-view"));
   });
   soek.addEventListener("input", renderFaq);
-  vakSel.addEventListener("change", function () { vakOuto = false; });
+  vakSel.addEventListener("change", function () { vakOuto = false; vulKeuses(); wysGekose(); });
+  simptoomSel.addEventListener("change", function () {
+    /* Dadelik: die antwoord verskyn sodra hy kies, nog voor hy stuur. */
+    if (wysGekose()) setStatus("Hier is wat jy nou kan doen. Druk 'Stuur probleem' sodat Pa dit ook sien.", true);
+    else setStatus("", false);
+  });
   skerm.addEventListener("input", function () { skermOuto = false; });
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
+    var gekose = simptoomSel.value && simptoomSel.selectedIndex >= 0
+      ? simptoomSel.options[simptoomSel.selectedIndex].textContent : "";
+    var eie = String(gebeur.value || "").trim();
     var row = {
       id: "s_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       vak: String(vakSel.value || "").trim(),
-      gebeur: String(gebeur.value || "").trim(),
-      skerm: String(skerm.value || "").trim()
+      gebeur: [gekose, eie].filter(Boolean).join("\n"),
+      skerm: String(skerm.value || "").trim(),
+      simptoom: simptoomSel.value || ""
     };
     if (!row.vak || !row.gebeur || !row.skerm) {
-      setStatus("Vul die vak, wat gebeur het, en die skerm in.", false);
+      setStatus("Kies die vak, kies of beskryf wat gebeur het, en die skerm.", false);
       return;
     }
     stuur.disabled = true;
     /* Eers Pa in kennis stel (dit staan in die tou en oorleef vanlyn), dan die antwoord wys. */
     meldAanPa(row);
-    var hetAntwoord = wysAntwoord(row.gebeur, row.vak);
+    var hetAntwoord = row.simptoom ? wysGekose() : wysAntwoord(row.gebeur, row.vak);
     insertRow(row).then(function (ok) {
       stuur.disabled = false;
       if (ok) {
         gebeur.value = "";
+        /* Die keuse terug, sodat 'n tweede stuur nie weer dieselfde simptoom stuur nie; die antwoord bly staan. */
+        simptoomSel.value = "";
         setStatus(hetAntwoord ? GESTUUR_MET_ANTWOORD : GESTUUR, true);
         return;
       }
       var q = loadQueue();
       q.push(row);
       if (!saveQueue(q)) {
-        setStatus("Kon nie stoor nie. Maak 'n gewone venster oop, of neem 'n foto en sê vir Pa.", false);
+        setStatus("Kon nie stoor nie. Neem 'n foto van die skerm en stuur dit vir Pa.", false);
         return;
       }
       gebeur.value = "";
+      simptoomSel.value = "";
       setStatus("Geen verbinding nie. Jou probleem is op hierdie toestel gestoor en word gestuur sodra jy weer internet het.", true);
     });
   });
@@ -528,6 +585,8 @@
   document.addEventListener("change", function () { if (open) pasKonteks(); });
   window.addEventListener("hashchange", function () { if (open) pasKonteks(); });
   window.addEventListener("online", flush);
+  /* Die korpus laai asinchronies; vul die keuselys sodra dit daar is (QC rondte 5). */
+  window.addEventListener("foutrag-gereed", vulKeuses);
 
   new MutationObserver(function () {
     if (open && overlayOop()) close({ keepFocus: true });

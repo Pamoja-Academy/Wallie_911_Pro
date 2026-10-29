@@ -1257,12 +1257,63 @@
     renderVerbeter();
   });
 
+  /* Die keuse-pad (28 Okt, Hanno): Wallie kies wat gebeur en die antwoord staan dadelik op die skerm,
+     direk uit die fout-RAG se korpus (geen telling, geen raaiwerk). Vrye teks bly vir die res. */
+  const bugKeuses = () => {
+    const sel = $("#bug-simptoom");
+    if (!sel) return;
+    try {
+      const rag = WALLIE.FOUTRAG;
+      if (rag?.gereed && !rag.gereed()) rag.laai?.();
+      const keuses = rag?.keuses ? rag.keuses($("#bug-subject")?.value || "") : [];
+      const was = sel.value;
+      sel.textContent = "";
+      const opt = (v, t) => { const o = document.createElement("option"); o.value = v; o.textContent = t; return o; };
+      if (keuses.length) sel.appendChild(opt("", "Kies wat gebeur…"));
+      keuses.forEach((k) => sel.appendChild(opt(k.id, k.teks)));
+      sel.appendChild(opt("", "Iets anders (beskryf dit hier onder)"));
+      sel.value = keuses.some((k) => k.id === was) ? was : "";
+    } catch (e) { /* die vorm werk steeds met vrye teks */ }
+  };
+  const bugGekose = () => {
+    const sel = $("#bug-simptoom");
+    const id = sel?.value || "";
+    try {
+      return id ? WALLIE.FOUTRAG?.antwoordVir?.(id) || null : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  const wysBugAntwoord = () => {
+    const box = $("#bug-antwoord");
+    if (!box) return;
+    const t = bugGekose();
+    box.textContent = "";
+    if (t?.antwoord) {
+      const h = document.createElement("h4");
+      h.textContent = "Doen dit nou";
+      const p = document.createElement("p");
+      p.textContent = t.antwoord;
+      box.append(h, p);
+    }
+    box.hidden = !t?.antwoord;
+  };
+  $("#bug-simptoom")?.addEventListener("focus", bugKeuses);
+  $("#bug-simptoom")?.addEventListener("change", wysBugAntwoord);
+  $("#bug-subject")?.addEventListener("change", () => { bugKeuses(); wysBugAntwoord(); });
+  window.addEventListener("hashchange", () => { if (location.hash === "#probleem") bugKeuses(); });
+  if (location.hash === "#probleem") setTimeout(bugKeuses, 0);
+  window.addEventListener("foutrag-gereed", bugKeuses);
+
   $("#bug-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const tipe = document.querySelector('input[name="bugTipe"]:checked')?.value;
-    const detail = $("#bug-detail").value.trim();
+    const simptoomSel = $("#bug-simptoom");
+    const gekoseTeks = simptoomSel?.value ? simptoomSel.options[simptoomSel.selectedIndex].textContent : "";
+    const gekose = bugGekose();
+    const detail = [gekoseTeks, $("#bug-detail").value.trim()].filter(Boolean).join("\n");
     if (!tipe || !detail) {
-      alert("Kies ’n tipe en beskryf die probleem.");
+      alert("Kies ’n tipe, en kies of beskryf die probleem.");
       return;
     }
     const bug = {
@@ -1304,13 +1355,16 @@
     persist();
     $("#bug-detail").value = "";
     $("#bug-code").value = "";
+    /* Keuse terug, sodat 'n tweede stuur nie weer dieselfde simptoom stuur nie; die antwoord staan in die bevestiging. */
+    if ($("#bug-simptoom")) $("#bug-simptoom").value = "";
+    if ($("#bug-antwoord")) $("#bug-antwoord").hidden = true;
     document.querySelectorAll('input[name="bugTipe"]').forEach((r) => (r.checked = false));
     renderBugs();
     /* 28 Okt: die ou teks het hulp "binne ongeveer 10 minute per e-pos" belowe; daar is geen e-pos-pad
        in hierdie app nie (spek §1 F4). Die app gee nou self dadelik die antwoord as die fout-RAG een het. */
     const raad = (() => {
       try {
-        const t = WALLIE.FOUTRAG?.soek(bug.detail, { vak: bug.subjectSlug || "" });
+        const t = gekose || WALLIE.FOUTRAG?.soek(bug.detail, { vak: bug.subjectSlug || "" });
         return t && t.antwoord ? `\n\nDoen dit solank:\n${t.antwoord}` : "";
       } catch (e) {
         return "";
@@ -1322,7 +1376,7 @@
           ? "Dankie — gestuur. Pa sien dit onder Verbeter."
           : uitslag === "tou"
             ? "Dankie — probleem gestoor. Geen verbinding nie: dit gaan deur sodra jy weer internet het."
-            : "Dankie — probleem gestoor op hierdie toestel, maar kon nie gestuur of in die tou gesit word nie (blaaier in privaat modus of geheue vol?). Maak 'n gewone venster oop en probeer weer, of sê vir Pa.") + raad
+            : "Dankie — probleem gestoor op hierdie toestel, maar kon nie gestuur of in die tou gesit word nie (blaaier in privaat modus of geheue vol?). Neem 'n foto van die skerm en stuur dit vir Pa.") + raad
       );
     if (supportBelofte && typeof supportBelofte.then === "function") supportBelofte.then(melding, () => melding("fout"));
     else melding("fout");
