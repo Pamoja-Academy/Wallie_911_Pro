@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Slot · Môre se plan: Môre se TOP-3 (op papier)" font-family="Arial, Helvetica, sans-serif">
+<defs></defs>
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#5cc8ff"/><rect y="50" width="800" height="22" fill="#5cc8ff"/>
+<text x="24" y="27" font-size="15" fill="#04140b" font-weight="800" letter-spacing="2">SLOT · MÔRE SE PLAN</text>
+<text x="24" y="60" font-size="29" fill="#04140b" font-weight="900">Môre se TOP-3 (op papier)</text>
+
+    <rect x="150" y="96" width="500" height="404" rx="12" fill="#f4f1e8"/>
+    <rect x="330" y="84" width="140" height="30" rx="8" fill="#9aa39a"/>
+    <text x="400" y="156" font-size="30" fill="#10140f" font-weight="900" text-anchor="middle">MÔRE SE TOP-3</text>
+    <circle cx="196" cy="214" r="20" fill="#ff6b57"/><text x="196" y="221.6" font-size="21" fill="#fff" font-weight="900" text-anchor="middle">1</text><line x1="228" y1="224" x2="610" y2="224" stroke="#9aa39a" stroke-width="2"/><circle cx="196" cy="278" r="20" fill="#d08b16"/><text x="196" y="285.6" font-size="21" fill="#fff" font-weight="900" text-anchor="middle">2</text><line x1="228" y1="288" x2="610" y2="288" stroke="#9aa39a" stroke-width="2"/><circle cx="196" cy="342" r="20" fill="#0a8f5a"/><text x="196" y="349.6" font-size="21" fill="#fff" font-weight="900" text-anchor="middle">3</text><line x1="228" y1="352" x2="610" y2="352" stroke="#9aa39a" stroke-width="2"/>
+    <text x="184" y="418" font-size="20" fill="#10140f" font-weight="800">Eerste blok:</text><line x1="318" y1="420" x2="470" y2="420" stroke="#9aa39a" stroke-width="2"/><text x="480" y="418" font-size="20" fill="#10140f" font-weight="800">om</text><line x1="518" y1="420" x2="610" y2="420" stroke="#9aa39a" stroke-width="2"/>
+    <text x="400" y="470" font-size="17" fill="#4c6b57" font-weight="800" text-anchor="middle">Kies die 3 foute wat die MEESTE punte kos.</text>
+    <text x="24" y="140" font-size="18" fill="#f2c94c" font-weight="800"><tspan x="24" dy="0">Sit dit</tspan><tspan x="24" dy="23">langs die</tspan><tspan x="24" dy="23">skoot-</tspan><tspan x="24" dy="23">rekenaar.</tspan></text>
+    <text x="776" y="140" font-size="18" fill="#f2c94c" font-weight="800" text-anchor="end"><tspan x="776" dy="0">Rassie</tspan><tspan x="776" dy="23">kies die</tspan><tspan x="776" dy="23">span</tspan><tspan x="776" dy="23">vooraf.</tspan></text>
+</svg>

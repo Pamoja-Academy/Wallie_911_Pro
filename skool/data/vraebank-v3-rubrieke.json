@@ -1,0 +1,399 @@
+{
+  "eat-essay-50": {
+    "naam": "English FAL essay rubric (50 marks)",
+    "kriteria": [
+      {
+        "kriterium": "Content and planning",
+        "punte": 30,
+        "bande": [
+          {
+            "vlak": "Exceptional",
+            "punte": "25–30",
+            "kern": "Striking, mature ideas; very well organised with a clear introduction, body and ending."
+          },
+          {
+            "vlak": "Skilful",
+            "punte": "19–24",
+            "kern": "Relevant, interesting ideas; well organised and coherent."
+          },
+          {
+            "vlak": "Moderate",
+            "punte": "13–18",
+            "kern": "Satisfactory ideas; reasonably organised, some lapses in clarity."
+          },
+          {
+            "vlak": "Elementary",
+            "punte": "7–12",
+            "kern": "Ideas unclear or partly irrelevant; little planning or coherence."
+          },
+          {
+            "vlak": "Inadequate",
+            "punte": "0–6",
+            "kern": "Off topic or no recognisable plan; ideas repetitive or confused."
+          }
+        ]
+      },
+      {
+        "kriterium": "Language, style and editing",
+        "punte": 15,
+        "bande": [
+          {
+            "vlak": "Exceptional",
+            "punte": "13–15",
+            "kern": "Tone, register and vocabulary fit perfectly; virtually error-free."
+          },
+          {
+            "vlak": "Skilful",
+            "punte": "10–12",
+            "kern": "Very appropriate style; generally accurate, mostly free of errors."
+          },
+          {
+            "vlak": "Moderate",
+            "punte": "7–9",
+            "kern": "Adequate style and vocabulary; errors do not block meaning."
+          },
+          {
+            "vlak": "Elementary",
+            "punte": "4–6",
+            "kern": "Limited vocabulary; many errors; meaning sometimes unclear."
+          },
+          {
+            "vlak": "Inadequate",
+            "punte": "0–3",
+            "kern": "Error-ridden and confused; meaning seriously impaired."
+          }
+        ]
+      },
+      {
+        "kriterium": "Structure",
+        "punte": 5,
+        "bande": [
+          {
+            "vlak": "Exceptional",
+            "punte": "5",
+            "kern": "Excellent development; paragraphs and sentences exceptionally well built."
+          },
+          {
+            "vlak": "Skilful",
+            "punte": "4",
+            "kern": "Logical development; varied, well-built sentences and paragraphs."
+          },
+          {
+            "vlak": "Moderate",
+            "punte": "3",
+            "kern": "Relevant details developed; essay still makes sense."
+          },
+          {
+            "vlak": "Elementary",
+            "punte": "2",
+            "kern": "Some valid points; sentences and paragraphs faulty."
+          },
+          {
+            "vlak": "Inadequate",
+            "punte": "0–1",
+            "kern": "Undeveloped; sentences and paragraphs very faulty."
+          }
+        ]
+      }
+    ]
+  },
+  "eat-longer-30": {
+    "naam": "English FAL longer transactional text rubric (30 marks)",
+    "kriteria": [
+      {
+        "kriterium": "Content, planning and format",
+        "punte": 18,
+        "bande": [
+          {
+            "vlak": "Exceptional",
+            "punte": "15–18",
+            "kern": "Mature ideas; full knowledge of the text type; accurate format; stays on topic."
+          },
+          {
+            "vlak": "Skilful",
+            "punte": "11–14",
+            "kern": "Good knowledge of the text type; focused; format with minor slips."
+          },
+          {
+            "vlak": "Moderate",
+            "punte": "8–10",
+            "kern": "Adequate; some digressions; format generally right with some errors."
+          },
+          {
+            "vlak": "Elementary",
+            "punte": "5–7",
+            "kern": "Basic; drifts off topic; format only vaguely applied."
+          },
+          {
+            "vlak": "Inadequate",
+            "punte": "0–4",
+            "kern": "No knowledge of the text type; format rules not applied."
+          }
+        ]
+      },
+      {
+        "kriterium": "Language, style and editing",
+        "punte": 12,
+        "bande": [
+          {
+            "vlak": "Exceptional",
+            "punte": "10–12",
+            "kern": "Tone and register exactly right for purpose and audience; virtually error-free."
+          },
+          {
+            "vlak": "Skilful",
+            "punte": "8–9",
+            "kern": "Very appropriate register; generally accurate."
+          },
+          {
+            "vlak": "Moderate",
+            "punte": "6–7",
+            "kern": "Appropriate register; some grammar errors that do not block meaning."
+          },
+          {
+            "vlak": "Elementary",
+            "punte": "4–5",
+            "kern": "Register less suitable; numerous errors."
+          },
+          {
+            "vlak": "Inadequate",
+            "punte": "0–3",
+            "kern": "Register wrong for the task; error-ridden."
+          }
+        ]
+      }
+    ]
+  },
+  "eat-shorter-20": {
+    "naam": "English FAL shorter transactional text rubric (20 marks)",
+    "kriteria": [
+      {
+        "kriterium": "Content, planning and format",
+        "punte": 12,
+        "bande": [
+          {
+            "vlak": "Exceptional",
+            "punte": "10–12",
+            "kern": "Full knowledge of the text type; all details support the task; accurate format."
+          },
+          {
+            "vlak": "Skilful",
+            "punte": "8–9",
+            "kern": "Good knowledge of the text type; focused; minor format slips."
+          },
+          {
+            "vlak": "Moderate",
+            "punte": "6–7",
+            "kern": "Adequate; some digressions; format partly right."
+          },
+          {
+            "vlak": "Elementary",
+            "punte": "4–5",
+            "kern": "Basic; few supporting details; format vague."
+          },
+          {
+            "vlak": "Inadequate",
+            "punte": "0–3",
+            "kern": "No knowledge of the text type; no format."
+          }
+        ]
+      },
+      {
+        "kriterium": "Language, style and editing",
+        "punte": 8,
+        "bande": [
+          {
+            "vlak": "Exceptional",
+            "punte": "7–8",
+            "kern": "Register exactly right; virtually error-free."
+          },
+          {
+            "vlak": "Skilful",
+            "punte": "5–6",
+            "kern": "Very appropriate register; generally accurate."
+          },
+          {
+            "vlak": "Moderate",
+            "punte": "4",
+            "kern": "Appropriate register; some errors."
+          },
+          {
+            "vlak": "Elementary",
+            "punte": "3",
+            "kern": "Register less suitable; many errors."
+          },
+          {
+            "vlak": "Inadequate",
+            "punte": "0–2",
+            "kern": "Error-ridden; meaning impaired."
+          }
+        ]
+      }
+    ]
+  },
+  "ht-opstel-50": {
+    "naam": "Afrikaans Huistaal: rubriek vir die opstel (50 punte)",
+    "kriteria": [
+      {
+        "kriterium": "Inhoud en beplanning",
+        "punte": 30,
+        "bande": [
+          {
+            "vlak": "Uitsonderlik",
+            "punte": "25–30",
+            "kern": "Treffende, volwasse idees; uitstekend georden met inleiding, liggaam en slot."
+          },
+          {
+            "vlak": "Knap",
+            "punte": "19–24",
+            "kern": "Relevante, interessante idees; goed georden en samehangend."
+          },
+          {
+            "vlak": "Gemiddeld",
+            "punte": "13–18",
+            "kern": "Bevredigende idees; redelik georden, met enkele onduidelikhede."
+          },
+          {
+            "vlak": "Elementêr",
+            "punte": "7–12",
+            "kern": "Idees onduidelik of deels irrelevant; min beplanning."
+          },
+          {
+            "vlak": "Ontoereikend",
+            "punte": "0–6",
+            "kern": "Van die onderwerp af of sonder herkenbare plan."
+          }
+        ]
+      },
+      {
+        "kriterium": "Taal, styl en redigering",
+        "punte": 15,
+        "bande": [
+          {
+            "vlak": "Uitsonderlik",
+            "punte": "13–15",
+            "kern": "Toon, register en woordkeuse pas presies; feitlik foutloos."
+          },
+          {
+            "vlak": "Knap",
+            "punte": "10–12",
+            "kern": "Baie gepaste styl; oor die algemeen korrek."
+          },
+          {
+            "vlak": "Gemiddeld",
+            "punte": "7–9",
+            "kern": "Toereikende styl; foute belemmer nie die betekenis nie."
+          },
+          {
+            "vlak": "Elementêr",
+            "punte": "4–6",
+            "kern": "Beperkte woordeskat; baie foute."
+          },
+          {
+            "vlak": "Ontoereikend",
+            "punte": "0–3",
+            "kern": "Vol foute; betekenis ernstig belemmer."
+          }
+        ]
+      },
+      {
+        "kriterium": "Struktuur",
+        "punte": 5,
+        "bande": [
+          {
+            "vlak": "Uitsonderlik",
+            "punte": "5",
+            "kern": "Uitstekende ontwikkeling; paragrawe en sinne uitstekend gebou."
+          },
+          {
+            "vlak": "Knap",
+            "punte": "4",
+            "kern": "Logiese ontwikkeling; gevarieerde sinne en paragrawe."
+          },
+          {
+            "vlak": "Gemiddeld",
+            "punte": "3",
+            "kern": "Relevante besonderhede ontwikkel; maak steeds sin."
+          },
+          {
+            "vlak": "Elementêr",
+            "punte": "2",
+            "kern": "Enkele geldige punte; sinne en paragrawe gebrekkig."
+          },
+          {
+            "vlak": "Ontoereikend",
+            "punte": "0–1",
+            "kern": "Onontwikkel; sinne en paragrawe baie gebrekkig."
+          }
+        ]
+      }
+    ]
+  },
+  "ht-transaksioneel-25": {
+    "naam": "Afrikaans Huistaal: rubriek vir transaksionele tekste (25 punte)",
+    "kriteria": [
+      {
+        "kriterium": "Inhoud, beplanning en formaat",
+        "punte": 15,
+        "bande": [
+          {
+            "vlak": "Uitsonderlik",
+            "punte": "13–15",
+            "kern": "Volledige kennis van die teksoort; korrekte formaat; bly gefokus."
+          },
+          {
+            "vlak": "Knap",
+            "punte": "10–12",
+            "kern": "Goeie kennis van die teksoort; formaat met klein foute."
+          },
+          {
+            "vlak": "Gemiddeld",
+            "punte": "7–9",
+            "kern": "Toereikend; enkele afdwalings; formaat deels reg."
+          },
+          {
+            "vlak": "Elementêr",
+            "punte": "4–6",
+            "kern": "Basies; dwaal af; formaat vaag toegepas."
+          },
+          {
+            "vlak": "Ontoereikend",
+            "punte": "0–3",
+            "kern": "Geen kennis van die teksoort; geen formaat."
+          }
+        ]
+      },
+      {
+        "kriterium": "Taal, styl en redigering",
+        "punte": 10,
+        "bande": [
+          {
+            "vlak": "Uitsonderlik",
+            "punte": "9–10",
+            "kern": "Toon en register pas presies by doel en gehoor; feitlik foutloos."
+          },
+          {
+            "vlak": "Knap",
+            "punte": "7–8",
+            "kern": "Baie gepaste register; oor die algemeen korrek."
+          },
+          {
+            "vlak": "Gemiddeld",
+            "punte": "5–6",
+            "kern": "Gepaste register; enkele taalfoute."
+          },
+          {
+            "vlak": "Elementêr",
+            "punte": "3–4",
+            "kern": "Register minder gepas; talle foute."
+          },
+          {
+            "vlak": "Ontoereikend",
+            "punte": "0–2",
+            "kern": "Verkeerde register; vol foute."
+          }
+        ]
+      }
+    ]
+  }
+}

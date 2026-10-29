@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <script>if(!/[?&]skool=1(&|$)/.test(location.search)){var q=location.search.slice(1).replace(/(^|&)skool=[^&]*/g,"").replace(/^&/,"");location.replace(location.pathname+"?skool=1"+(q?"&"+q:"")+location.hash);}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Skool-konfigurasie: 'n paar KB, gegenereer uit config/*.json (ADR-001). Raak niks tensy ?skool=1. -->
+  <script src="config/gebundel.js?v=2026-10-28b"></script>
+  <script src="assets/js/preview-guard.js?v=2026-10-28b"></script>
+  <script src="assets/js/toegang.js?v=2026-10-28b"></script>
+  <!-- Foutvanger: moet voor al die ander skrifte laai, anders vang dit nie 'n skrip wat self nie laai nie. -->
+  <script src="assets/js/fout-rag.js?v=2026-10-28b"></script>
+  <script src="assets/js/fout-vanger.js?v=2026-10-28b"></script>
+  <title>Eksamenplan — Springbok SOS Kamp</title>
+  <link rel="stylesheet" href="assets/css/app.css?v=2026-10-28b" />
+  <link rel="stylesheet" href="assets/css/praktiese-modus.css?v=2026-10-28b" />
+  <link rel="stylesheet" href="assets/css/vraebank.css?v=2026-10-28b" />
+  <link rel="stylesheet" href="assets/css/vraebank-v3.css?v=2026-10-28b" />
+  <link rel="stylesheet" href="assets/css/kognitief.css?v=2026-10-28b" />
+  <link rel="icon" href="assets/img/lessons/ui/trui-15.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">15<small>SOS</small></span>
+      <div>
+        <strong>Eksamenplan</strong>
+        <span class="brand-sub">#15 · Springbok SOS · Matric-wêreldbekerkamp</span>
+      </div>
+    </div>
+    <nav class="nav" id="main-nav" aria-label="Hoofkieslys">
+      <button type="button" class="nav-btn active" data-view="missie">Missie</button>
+      <button type="button" class="nav-btn" data-view="leer">Lesse</button>
+      <button type="button" class="nav-btn" data-view="sessie">Sessie</button>
+      <button type="button" class="nav-btn" data-view="foutbank">Foutbank</button>
+      <details class="nav-more">
+        <summary>Meer ▾</summary>
+        <div class="nav-more-menu">
+          <button type="button" class="nav-btn" data-view="oefenvrae">Oefenvrae (RTT V1)</button>
+          <button type="button" class="nav-btn" data-view="skryfwerk">Skryfwerk (V3)</button>
+          <button type="button" class="nav-btn" data-view="vakke">Vakke</button>
+          <button type="button" class="nav-btn" data-view="oplaai">Oplaai</button>
+          <button type="button" class="nav-btn" data-view="pa">Pa</button>
+          <button type="button" class="nav-btn" data-view="verbeter">Verbeter</button>
+          <button type="button" class="nav-btn" data-view="probleem">Probleem</button>
+          <button type="button" class="nav-btn" data-view="docs">Docs</button>
+        </div>
+      </details>
+    </nav>
+    <button type="button" class="sync-pill sync-busy" id="sync-pill" data-level="busy" aria-live="polite" title="Sinkronisering na Pa se konsole">
+      <span class="sync-dot" aria-hidden="true"></span><span id="sync-label">Sinkroniseer…</span>
+    </button>
+    <div class="countdown" id="countdown" title="Aftelling tot die volgende vraestel">
+      <span class="countdown-num" id="days-left">—</span>
+      <span class="countdown-label" id="countdown-label">tot volgende vraestel</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- MISSIE -->
+    <section class="view active" id="view-missie">
+      <div id="next-up" class="next-up" aria-live="polite"></div>
+      <div class="stats-row compact" id="day-stats"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Vandag se matchday-kaarte</h2>
+          <button type="button" class="btn ghost" id="regen-plan">Herbou plan</button>
+        </div>
+        <p class="hint"><strong>Begin</strong> sit die kamera aan. Maak dan die hooftaak oop. Die prent is agtergrond (opsioneel): tik dit om die les te sien.</p>
+        <ol class="block-list md-list" id="block-list"></ol>
+      </div>
+      <div class="md-hero">
+        <img class="md-trui" src="assets/img/lessons/ui/trui-15.svg" alt="Springbok-trui nommer 15" width="240" height="220" />
+        <div class="md-hero-text">
+          <p class="stadium-eyebrow">SOS · Rassie se oproep · trui #15</p>
+          <h1>Eksamenplan</h1>
+          <p class="md-hero-line"><strong><span id="missie-days-left">—</span> dae</strong> tot die volgende vraestel (<span id="missie-next-name">—</span>). Wen die matric-Wêreldbeker: een blok, een prent, een toe-boek op ’n slag.</p>
+          <details class="md-story">
+            <summary>Lees Rassie se oproep</summary>
+            <p>
+              Damian Willemse, Quan Horn, Aphelele Fassi, Cheslin Kolbe en Sacha Feinberg-Mngomezulu
+              het ’n misterieuse siekte. Rassie het jou gebel: jy trek die <strong>#15</strong> aan
+              en speel jouself in die Springbokspan — deur hierdie matric-Wêreldbeker te wen.
+              Teiken: 60% alle vakke · Wisk. Gelett. 80% · Engels 70%. Hard-proctor + Pa kyk saam.
+            </p>
+          </details>
+        </div>
+        <div class="stadium-clock" id="countdown-clock" aria-live="polite">
+          <p class="stadium-eyebrow" id="cd-eyebrow">Volgende vraestel</p>
+          <div class="stadium-digits">
+            <div class="digit-block"><span id="cd-days">—</span><small>dae</small></div>
+            <div class="digit-block"><span id="cd-hours">—</span><small>uur</small></div>
+            <div class="digit-block"><span id="cd-mins">—</span><small>min</small></div>
+            <div class="digit-block"><span id="cd-secs">—</span><small>sek</small></div>
+          </div>
+          <p class="stadium-status" id="cd-status">Laai aftelling…</p>
+        </div>
+      </div>
+
+      <details class="panel vak-aftel-panel"><summary class="vak-aftel-summary">Aftelling per vak</summary><ul class="vak-aftel" id="vak-aftel"></ul></details>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Stuur my log na Pa</h2>
+        </div>
+        <p class="hint">
+          Laai die volle kamp-log (<code>wallie911_v2_bok</code>) af as JSON.
+          Deel dit in een tik na Pa — <strong>…</strong> — via WhatsApp of e-pos.
+        </p>
+        <div class="btn-row">
+          <button type="button" class="btn primary js-export-log">Laai log af (JSON)</button>
+          <button type="button" class="btn ghost js-share-log">Deel met Pa</button>
+          <button type="button" class="btn ghost js-copy-log">Kopieer log</button>
+        </div>
+        <p class="hint js-export-status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- LESSE -->
+    <section class="view" id="view-leer">
+      <div class="hero-strip">
+        <h1>Lesse — kyk, toe-boek, memo</h1>
+        <p class="lede">Een konsep per skerm. Bestudeer die prent, maak toe, skryf wat jy onthou, kyk dan die memo. <strong id="leer-total"></strong></p>
+      </div>
+      <div class="leer-subjects" id="leer-subjects"></div>
+      <div class="leer-gallery" id="leer-gallery"></div>
+    </section>
+
+    <!-- SESSIE -->
+    <section class="view" id="view-sessie">
+      <div class="hero-strip">
+        <h1>Afrigter-sessie (hard observeerder)</h1>
+        <p class="lede">Kamera aan. Bly op hierdie oortjie: wegkyk = waarskuwing, 3× = slot tot Pa-PIN. Die les hieronder oop maak is veilig.</p>
+      </div>
+      <div class="panel sessie-hooftaak" id="sessie-hooftaak" hidden></div>
+      <div id="praktiese-banner" class="praktiese-banner-wrap" aria-live="polite"></div>
+      <div class="panel session-werk" id="session-werk" hidden></div>
+      <div class="session-grid">
+        <div class="panel camera-panel">
+          <video id="camera" autoplay playsinline muted></video>
+          <div class="camera-overlay" id="camera-status">Kamera af</div>
+        </div>
+        <div class="panel session-controls">
+          <label class="field">
+            <span>Vak</span>
+            <select id="session-subject"></select>
+          </label>
+          <label class="field">
+            <span>Duur (minute)</span>
+            <input type="number" id="session-minutes" min="10" max="120" value="45" />
+          </label>
+          <label class="field">
+            <span>Taak (bv. Vraag 1–3 toe-boek)</span>
+            <input type="text" id="session-task" placeholder="Skryf alles wat jy onthou, dan memo…" />
+          </label>
+          <div class="timer-display" id="timer-display">00:00</div>
+          <div class="warn-display" id="warn-display">Waarskuwings: 0 / 3</div>
+          <div class="btn-row">
+            <button type="button" class="btn primary" id="start-session">Begin sessie</button>
+            <button type="button" class="btn danger" id="end-session" disabled>Eindig sessie</button>
+          </div>
+          <div class="btn-row praktiese-start-row" id="praktiese-start-row" hidden>
+            <button type="button" class="btn primary big" id="praktiese-start">Begin praktiese blok (Office)</button>
+            <p class="hint praktiese-sub">Jy mag nou na Word, Excel, Access of Notepad oorskakel. Die tyd tel steeds.</p>
+            <p class="hint praktiese-fout" id="praktiese-fout" role="alert" hidden></p>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn ghost" id="memo-toggle">Maak memo oop (PDF)</button>
+            <input type="file" id="memo-file" accept=".pdf,image/*" hidden />
+          </div>
+          <p class="hint" id="wegkyk-hint">Memo hier in die app tel nie as wegkyk nie (maks 15 min, Pa kry ’n sein). Tab-wissel of ’n ander program tel steeds.</p>
+          <div class="lock-box hidden" id="lock-box">
+            <p><strong>Sessie gesluit.</strong> Pa moet ontsluit.</p>
+            <input type="password" id="unlock-pin" placeholder="Pa-PIN" autocomplete="off" />
+            <button type="button" class="btn primary" id="unlock-btn">Ontsluit</button>
+          </div>
+          <ul class="event-log" id="session-events"></ul>
+        </div>
+      </div>
+      <div class="panel hidden" id="memo-viewer">
+        <iframe id="memo-frame" title="Memo" style="width:100%;height:75vh;border:0;border-radius:8px;background:#fff"></iframe>
+      </div>
+      <div class="panel session-lesson" id="session-lesson"></div>
+    </section>
+
+    <!-- VAKKE -->
+    <section class="view" id="view-vakke">
+      <div class="hero-strip">
+        <h1>Vakke</h1>
+        <p class="lede">Prelim → teiken per vak. Tik ’n prent vir die les; maklike punte-lys onderaan elke kaart.</p>
+      </div>
+      <div class="subject-grid" id="subject-grid"></div>
+    </section>
+
+    <!-- FOUTBANK -->
+    <section class="view" id="view-foutbank">
+      <div class="hero-strip">
+        <h1>Foutbank</h1>
+        <p class="lede">Elke fout = hertoets later. Dit is jou egte leerplan.</p>
+      </div>
+      <div class="panel">
+        <form class="fault-form" id="fault-form">
+          <select id="fault-subject" required></select>
+          <input type="text" id="fault-text" placeholder="Wat was verkeerd / gemis?" required />
+          <button type="submit" class="btn primary">Voeg fout by</button>
+        </form>
+        <ul class="fault-list" id="fault-list"></ul>
+      </div>
+    </section>
+
+    <!-- OEFENVRAE (RTT V1) -->
+    <section class="view" id="view-oefenvrae">
+      <div id="oefenvrae-root"></div>
+    </section>
+
+    <!-- SKRYFWERK (V3) -->
+    <section class="view" id="view-skryfwerk">
+      <div id="skryfwerk-root"></div>
+    </section>
+
+    <!-- OPLAAI -->
+    <section class="view" id="view-oplaai">
+      <div class="hero-strip">
+        <h1>Vraestelle oplaai</h1>
+        <p class="lede">Hibried: laai PDF / foto van vraestel + memo. Metadata bly in hierdie blaaier (lokaal).</p>
+      </div>
+      <div class="panel">
+        <form class="upload-form" id="upload-form">
+          <select id="upload-subject" required></select>
+          <input type="text" id="upload-title" placeholder="Titel (bv. NSC Nov 2024 Toerisme P1)" required />
+          <label class="file-label">Vraestel-lêer <input type="file" id="upload-file" accept=".pdf,image/*" /></label>
+          <label class="file-label">Memo (opsioneel) <input type="file" id="upload-memo" accept=".pdf,image/*" /></label>
+          <button type="submit" class="btn primary">Stoor plaaslik</button>
+        </form>
+        <ul class="paper-list" id="paper-list"></ul>
+      </div>
+    </section>
+
+    <!-- PA -->
+    <section class="view" id="view-pa">
+      <div class="hero-strip">
+        <h1>Pa-dashboard</h1>
+        <p class="lede">Lewendige status · waarskuwings · dag-opsomming. Tydens ’n hard-sessie sien Pa lewendig (met wagwoord) status, tyd, waarskuwings en elke 45 s ’n kamera-foto. Geen deurlopende video nie.</p>
+      </div>
+      <div class="panel" id="remote-panel">
+        <h2>Afstand-waarneming (jy by kliente)</h2>
+        <p class="hint">
+          Pa-konsole (wagwoord) — lewendige status, rooster teenoor werklikheid, surveys en foto’s:
+          <a href="pa-afstand.html" target="_blank" rel="noopener"><strong>pa-afstand.html</strong></a>
+          · Push-topic: <code id="remote-topic">wallie911-pa-15sos-hanno</code>
+          · <a href="https://ntfy.sh/app" target="_blank" rel="noopener">ntfy-app subscribe</a>
+        </p>
+        <p class="hint" id="remote-consent-status">Toestemming: …</p>
+        <p class="hint js-durable-status" aria-live="polite"></p>
+        <p class="hint">As die foon stil is: vra die leerder om die log hier af te laai en te stuur.</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary js-export-log">Laai log af (JSON)</button>
+          <button type="button" class="btn ghost js-share-log">Deel met Pa</button>
+          <button type="button" class="btn ghost js-copy-log">Kopieer log</button>
+        </div>
+        <p class="hint js-export-status" aria-live="polite"></p>
+      </div>
+      <div class="stats-row" id="pa-status-cards"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Pa-PIN</h2>
+        </div>
+        <p class="hint">Verstek-PIN is <code>9110</code>. Verander dit hier (word plaaslik gestoor).</p>
+        <div class="btn-row">
+          <input type="password" id="new-pin" placeholder="Nuwe PIN" autocomplete="off" />
+          <button type="button" class="btn ghost" id="save-pin">Stoor PIN</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Sessie-geskiedenis (vandag)</h2>
+        <ul class="event-log" id="pa-history"></ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Pa-survey (jou oë — nie net sy woord)</h2>
+        </div>
+        <p class="hint">Doen dit ná jy by die buitegebou gekyk het of ná ’n rooi-blok. ±60 sek.</p>
+        <label class="field">
+          <span>Koppel aan sessie</span>
+          <select id="pa-survey-session"></select>
+        </label>
+        <form id="pa-survey-form" class="survey-form"></form>
+        <button type="button" class="btn primary" id="pa-survey-save">Stoor Pa-survey</button>
+      </div>
+    </section>
+
+    <!-- VERBETER -->
+    <section class="view" id="view-verbeter">
+      <div class="hero-strip">
+        <h1>Daaglikse verbeter-lus</h1>
+        <p class="lede">die leerder se survey + jou Pa-check saam. Waar hulle bots, wen jou oë.</p>
+      </div>
+      <div class="stats-row" id="verbeter-stats"></div>
+      <div class="panel">
+        <h2>Vlae</h2>
+        <ul class="flag-list" id="verbeter-flags"></ul>
+      </div>
+      <div class="panel">
+        <h2>Aksies vir môre / volgende blok</h2>
+        <ul class="action-list" id="verbeter-aksies"></ul>
+      </div>
+      <div class="panel">
+        <h2>Rou terugvoer (vandag)</h2>
+        <ul class="event-log" id="verbeter-raw"></ul>
+      </div>
+      <div class="panel">
+        <h2>Probleem-rapportee (app / kurrikulum)</h2>
+        <ul class="event-log" id="verbeter-bugs"></ul>
+      </div>
+    </section>
+
+    <!-- PROBLEEM / ERROR REPORT -->
+    <section class="view" id="view-probleem">
+      <div class="hero-strip">
+        <h1>Iets werk nie</h1>
+        <p class="lede">Rapporteer gou — app/kode of kurrikulum/inhoud. Pa sien dit op Verbeter. Geen skaamte: foute help ons die kamp regmaak.</p>
+      </div>
+      <div class="panel">
+        <form id="bug-form" class="survey-form">
+          <div class="survey-q">
+            <label class="q-label">Wat is stukkend?</label>
+            <div class="choice-row" id="bug-tipe-row">
+              <label><input type="radio" name="bugTipe" value="app" required /> <span>App / knoppie / kamera / sessie (kode)</span></label>
+              <label><input type="radio" name="bugTipe" value="kurrikulum" required /> <span>Kurrikulum / vakinhoud / plan / vraestel</span></label>
+              <label><input type="radio" name="bugTipe" value="proctor" required /> <span>Proctor / kamera / slot / PIN</span></label>
+              <label><input type="radio" name="bugTipe" value="ander" required /> <span>Ander</span></label>
+            </div>
+          </div>
+          <label class="field">
+            <span>Vak (as dit pas)</span>
+            <select id="bug-subject">
+              <option value="">— nie vak-spesifiek —</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Hoe erg?</span>
+            <select id="bug-severity" required>
+              <option value="blokkeer">Blokkeer my — kan nie voortgaan nie</option>
+              <option value="irriterend" selected>Irriterend — werk halfpad</option>
+              <option value="klein">Klein / voorstel</option>
+            </select>
+          </label>
+          <div class="survey-q">
+            <label class="q-label">Beskryf wat gebeur het (en wat jy verwag het)</label>
+            <textarea id="bug-detail" name="detail" required placeholder="Bv. Ek klik Begin op Gasvryheid, kamera vra toestemming, dan niks… / Of: Die Afrikaans-blok sê verkeerde tyd…"></textarea>
+          </div>
+          <label class="field">
+            <span>Foutkode / skermteks (opsioneel — kopieer as jy ’n rooi boodskap sien)</span>
+            <input type="text" id="bug-code" placeholder="Bv. NotAllowedError, Failed to fetch…" />
+          </label>
+          <button type="submit" class="btn primary">Stuur probleem-rapport</button>
+        </form>
+        <p class="hint js-durable-status" aria-live="polite"></p>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Jou rapportee (vandag)</h2>
+          <button type="button" class="btn ghost small" id="bug-refresh">Verfris</button>
+        </div>
+        <ul class="event-log" id="bug-list-wallie"></ul>
+      </div>
+    </section>
+
+    <!-- DOCS -->
+    <section class="view" id="view-docs">
+      <div class="hero-strip">
+        <h1>Dokumente</h1>
+        <p class="lede">Ontwerp en plan as HTML in die browser.</p>
+      </div>
+      <div class="doc-links">
+        <a class="doc-card" href="docs/ontwerp.html">Ontwerp-spesifikasie</a>
+        <a class="doc-card" href="docs/plan.html">Implementasieplan</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Eksamenplan · Springbok SOS-kamp · plaaslik op sy skootrekenaar</span>
+    <span id="live-dot" class="live-dot off">AF</span>
+  </footer>
+
+  <!-- die leerder post-sessie survey (verpligtend) -->
+  <div class="modal hidden" id="wallie-survey-modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Sessie-terugvoer (#15)</h2>
+      <p class="survey-kop" id="wallie-survey-kop"></p>
+      <p class="hint" id="wallie-survey-nota"></p>
+      <p class="hint">Wees eerlik — Pa se check word daarmee vergelyk. Dit verbeter die kamp.</p>
+      <p class="meta" id="wallie-survey-meta"></p>
+      <form id="wallie-survey-form" class="survey-form"></form>
+      <div class="btn-row">
+        <button type="button" class="btn primary" id="wallie-survey-save">Stuur &amp; klaar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Afstand-waarneming toestemming (die leerder het reeds ingestem — bevestig een keer op hierdie toestel) -->
+  <div class="modal hidden" id="remote-consent-modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Waarneming &amp; verslaggewing</h2>
+      <p class="hint">
+        Hard-proctor stuur <strong>lewendige status, waarskuwings, slot-seine, ’n sessie-verslag en jou survey</strong>
+        na Pa se foon (ntfy) en na Pa se wagwoord-beskermde konsole. Elke minuut gaan ook of die oortjie sigbaar is
+        en of daar ’n paar minute geen muis/sleutelbord was nie (net ja/nee en tye — nooit wat jy tik nie). <strong>Nuut:</strong> tydens ’n sessie gaan
+        <strong>elke 45 sekondes ’n klein kamera-foto</strong> na Pa se konsole (net tydens sessies; ou foto’s word ná 3 dae uitgevee).
+        Geen deurlopende video of klank nie. Merk om voort te gaan op hierdie toestel.
+      </p>
+      <label class="field" style="display:flex;gap:.6rem;align-items:flex-start;margin:1rem 0">
+        <input type="checkbox" id="remote-consent-check" style="margin-top:.3rem" />
+        <span>Ek stem in tot afstand-waarneming van sessie-metadata, kamera-foto’s tydens sessies en verslaggewing aan Pa vir hierdie matric-kamp.</span>
+      </label>
+      <div class="btn-row">
+        <button type="button" class="btn primary" id="remote-consent-save">Stoor &amp; gaan aan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Les-kyker: een konsep per skerm -->
+  <div class="les-viewer hidden" id="les-viewer" role="dialog" aria-modal="true" aria-labelledby="les-title">
+    <div class="les-top">
+      <span class="zone-tag" id="les-zone"></span>
+      <span class="les-subject" id="les-subject"></span>
+      <span class="les-count" id="les-count"></span>
+      <button type="button" class="les-close" id="les-close" aria-label="Maak toe">✕</button>
+    </div>
+    <div class="les-stage">
+      <figure class="les-figure" id="les-figure" title="Tik om te vergroot">
+        <img id="les-img" alt="" />
+      </figure>
+      <div class="les-recall" id="les-recall">
+        <p class="les-step">TOE-BOEK</p>
+        <p class="les-prompt" id="les-prompt"></p>
+        <p class="hint">Boek toe, prent weg. Skryf op papier wat jy onthou. Dan memo.</p>
+      </div>
+      <aside class="les-side">
+        <h2 id="les-title"></h2>
+        <ul class="les-cues" id="les-cues"></ul>
+        <div class="les-memo" id="les-memo">
+          <p class="les-step">MEMO</p>
+          <ul id="les-memo-list"></ul>
+        </div>
+        <div class="les-actions" id="les-actions"></div>
+      </aside>
+    </div>
+    <div class="les-nav">
+      <button type="button" class="btn ghost" id="les-prev">◀ Vorige</button>
+      <div class="les-dots" id="les-dots"></div>
+      <button type="button" class="btn ghost" id="les-next">Volgende ▶</button>
+    </div>
+  </div>
+
+  <script src="assets/js/data.js?v=2026-10-28b"></script>
+  <script src="assets/js/storage.js?v=2026-10-28b"></script>
+  <script src="assets/js/pa-konsole/exams.js?v=2026-10-28b"></script>
+  <script src="assets/js/schedule.js?v=2026-10-28b"></script>
+  <script src="assets/js/surveys.js?v=2026-10-28b"></script>
+  <script src="assets/js/proctor.js?v=2026-10-28b"></script>
+  <script src="assets/js/vraebank-store.js?v=2026-10-28b"></script>
+  <script src="assets/js/vraebank-rtt-v1.js?v=2026-10-28b"></script>
+  <script src="assets/js/dbe-vraestelle.js?v=2026-10-28b"></script>
+  <script src="assets/js/dbe-vraestelle-oorblywend.js?v=2026-10-28b"></script>
+  <script src="assets/js/praktiese.js?v=2026-10-28b"></script>
+  <script src="assets/js/praktiese-ui.js?v=2026-10-28b"></script>
+  <script src="assets/js/eksamenmodus.js?v=2026-10-28b"></script>
+  <script src="assets/js/vraebank-ui.js?v=2026-10-28b"></script>
+  <script src="assets/js/eksamenvlak-agtergrond.js?v=2026-10-28b"></script>
+  <script src="assets/js/vraebank-v3.js?v=2026-10-28b"></script>
+  <script src="assets/js/vraebank-v3-ui.js?v=2026-10-28b"></script>
+  <script src="assets/js/live-config.js?v=2026-10-28b"></script>
+  <script src="assets/js/sync.js?v=2026-10-28b"></script>
+  <script src="assets/js/remote.js?v=2026-10-28b"></script>
+  <!-- Generiese skool-laag (kontrak → generator → werk → brug). Doen niks sonder ?skool=1 nie (ADR-007). -->
+  <script src="assets/js/skool/kontrak.js?v=2026-10-28b"></script>
+  <script src="assets/js/skool/plangenerator.js?v=2026-10-28b"></script>
+  <script src="assets/js/skool/werk.js?v=2026-10-28b"></script>
+  <!-- Die leerder se eie keuses (plaaslik, nie in git nie) word net in die skool-modus gelaai;
+       sonder ?skool=1 is daar geen versoek en geen 404 nie. -->
+  <script>
+    if (/(^|[?&])skool=1(&|$)/.test(window.location.search || "")) {
+      document.write('<script src="config/leerder.lokaal.js?v=2026-10-28b"><\/script>');
+    }
+  </script>
+  <script src="assets/js/skool/brug.js?v=2026-10-28b"></script>
+  <script src="assets/js/vroeg-klaar.js?v=2026-10-28b"></script>
+  <script src="assets/js/lessons.js?v=2026-10-28b"></script>
+  <script src="assets/js/ondersteuning.js?v=2026-10-28b"></script>
+  <script src="assets/js/lesson-ui.js?v=2026-10-28b"></script>
+  <script src="assets/js/hulp.js?v=2026-10-28b"></script>
+  <script src="assets/js/app.js?v=2026-10-28b"></script>
+</body>
+</html>

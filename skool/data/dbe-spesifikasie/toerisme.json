@@ -1,0 +1,17 @@
+{
+  "vak": "toerisme",
+  "vraestel": "Toerisme",
+  "geverifieer": true,
+  "punte": 200,
+  "tyd_min": 180,
+  "hoofwerk_bank": null,
+  "afdelings": null,
+  "verifikasie": "Voorblad/memo van die DBE November 2025-vraestel (education.gov.za, nagegaan 15 Okt 2026) en die memo's van 2023-2026 (21 Okt 2026). Geen DBE-teks in die repo nie, net getalle. Toerisme: 200 punte, 3 uur; A (kortvrae) 40 = V1, B 50 = V2-V3, C 50 = V4-V6, D 30 = V7-V8, E 30 = V9-V10.",
+  "afdeling_punte": {
+    "A": 40,
+    "B": 50,
+    "C": 50,
+    "D": 30,
+    "E": 30
+  }
+}

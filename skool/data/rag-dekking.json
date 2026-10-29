@@ -1,0 +1,815 @@
+{
+ "gegenereer": "2026-10-24 15:09",
+ "metode": "Stukke oor die DBE-teks; punte per vraag uit die memo-kop [NN MARKS/PUNTE], anders uit die vraestel se slot-totaal [NN]; die bron wat na die vak se amptelike totaal optel, word geglo.",
+ "korpus": {
+  "dokumente": 181,
+  "bladsye": 3181,
+  "ocr_bladsye": 276,
+  "stukke": 2581
+ },
+ "vraestelle": {
+  "dbe-2023-jun-eng-v1": {
+   "vak": "engels",
+   "sessie": "2023-jun",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    null,
+    10,
+    10,
+    20
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 21,
+   "bladsye": 12
+  },
+  "dbe-2023-jun-gas": {
+   "vak": "gasvryheid",
+   "sessie": "2023-jun",
+   "vraestel": "V1",
+   "vrae": [
+    40,
+    null,
+    40,
+    40,
+    30,
+    30
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 31,
+   "bladsye": 17
+  },
+  "dbe-2023-jun-rtt-v2": {
+   "vak": "rtt",
+   "sessie": "2023-jun",
+   "vraestel": "V2",
+   "vrae": [
+    null,
+    null,
+    5,
+    25,
+    15,
+    10,
+    10,
+    15,
+    25,
+    25
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 31,
+   "bladsye": 15
+  },
+  "dbe-2023-jun-toer": {
+   "vak": "toerisme",
+   "sessie": "2023-jun",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    36,
+    14,
+    32,
+    8,
+    10,
+    14,
+    16,
+    24,
+    6
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 35,
+   "bladsye": 28
+  },
+  "dbe-2023-nov-eng-v1": {
+   "vak": "engels",
+   "sessie": "2023-nov",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    null,
+    10,
+    10,
+    20
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 21,
+   "bladsye": 12
+  },
+  "dbe-2023-nov-gas": {
+   "vak": "gasvryheid",
+   "sessie": "2023-nov",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    null,
+    40,
+    40,
+    30,
+    30
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 30,
+   "bladsye": 15
+  },
+  "dbe-2023-nov-rtt-v2": {
+   "vak": "rtt",
+   "sessie": "2023-nov",
+   "vraestel": "V2",
+   "vrae": [
+    null,
+    null,
+    5,
+    25,
+    15,
+    10,
+    10,
+    15,
+    25,
+    25
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 29,
+   "bladsye": 14
+  },
+  "dbe-2023-nov-toer": {
+   "vak": "toerisme",
+   "sessie": "2023-nov",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    28,
+    22,
+    24,
+    16,
+    10,
+    10,
+    20,
+    null,
+    20
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 31,
+   "bladsye": 25
+  },
+  "dbe-2023-nov-wg-v1": {
+   "vak": "wiskgelett",
+   "sessie": "2023-nov",
+   "vraestel": "V1",
+   "vrae": [
+    29,
+    40,
+    27,
+    33,
+    21
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 21,
+   "bladsye": 13
+  },
+  "dbe-2024-jun-eng-v1": {
+   "vak": "engels",
+   "sessie": "2024-jun",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    null,
+    10,
+    10,
+    20
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 20,
+   "bladsye": 11
+  },
+  "dbe-2024-jun-rtt-v2": {
+   "vak": "rtt",
+   "sessie": "2024-jun",
+   "vraestel": "V2",
+   "vrae": [
+    null,
+    null,
+    5,
+    25,
+    15,
+    10,
+    10,
+    15,
+    25,
+    25
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 27,
+   "bladsye": 15
+  },
+  "dbe-2024-jun-toer": {
+   "vak": "toerisme",
+   "sessie": "2024-jun",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    42,
+    8,
+    32,
+    8,
+    10,
+    14,
+    16,
+    20,
+    10
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 29,
+   "bladsye": 27
+  },
+  "dbe-2024-jun-wg-v1": {
+   "vak": "wiskgelett",
+   "sessie": "2024-jun",
+   "vraestel": "V1",
+   "vrae": [
+    32,
+    31,
+    30,
+    26,
+    31
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 25,
+   "bladsye": 12
+  },
+  "dbe-2024-nov-eng-v1": {
+   "vak": "engels",
+   "sessie": "2024-nov",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    null,
+    10,
+    10,
+    20
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 19,
+   "bladsye": 12
+  },
+  "dbe-2024-nov-gas": {
+   "vak": "gasvryheid",
+   "sessie": "2024-nov",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    null,
+    40,
+    40,
+    30,
+    30
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 39,
+   "bladsye": 19
+  },
+  "dbe-2024-nov-rtt-v2": {
+   "vak": "rtt",
+   "sessie": "2024-nov",
+   "vraestel": "V2",
+   "vrae": [
+    10,
+    10,
+    5,
+    25,
+    15,
+    10,
+    10,
+    15,
+    25,
+    25
+   ],
+   "bron": "vraestel",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 31,
+   "bladsye": 15
+  },
+  "dbe-2024-nov-toer": {
+   "vak": "toerisme",
+   "sessie": "2024-nov",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    36,
+    30,
+    null,
+    10,
+    10,
+    12,
+    18,
+    20,
+    10
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 34,
+   "bladsye": 25
+  },
+  "dbe-2024-nov-v1": {
+   "vak": "rtt",
+   "sessie": "2024-nov",
+   "vraestel": "V1",
+   "vrae": [
+    25,
+    20,
+    21,
+    19,
+    35,
+    15,
+    15
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 20,
+   "bladsye": 16
+  },
+  "dbe-2024-nov-wg-v1": {
+   "vak": "wiskgelett",
+   "sessie": "2024-nov",
+   "vraestel": "V1",
+   "vrae": [
+    29,
+    30,
+    29,
+    31,
+    31
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 25,
+   "bladsye": 12
+  },
+  "dbe-2024-nov-wg-v2": {
+   "vak": "wiskgelett",
+   "sessie": "2024-nov",
+   "vraestel": "V2",
+   "vrae": [
+    26,
+    31,
+    31,
+    29,
+    33
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 22,
+   "bladsye": 12
+  },
+  "dbe-2025-jun-eng-v1": {
+   "vak": "engels",
+   "sessie": "2025-jun",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    null,
+    10,
+    10,
+    20
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 18,
+   "bladsye": 12
+  },
+  "dbe-2025-jun-gas": {
+   "vak": "gasvryheid",
+   "sessie": "2025-jun",
+   "vraestel": "V1",
+   "vrae": [
+    40,
+    null,
+    40,
+    40,
+    30,
+    30
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 29,
+   "bladsye": 16
+  },
+  "dbe-2025-jun-rtt-v2": {
+   "vak": "rtt",
+   "sessie": "2025-jun",
+   "vraestel": "V2",
+   "vrae": [
+    10,
+    10,
+    5,
+    25,
+    15,
+    10,
+    10,
+    15,
+    25,
+    25
+   ],
+   "bron": "vraestel",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 30,
+   "bladsye": 17
+  },
+  "dbe-2025-jun-toer": {
+   "vak": "toerisme",
+   "sessie": "2025-jun",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    36,
+    32,
+    null,
+    10,
+    8,
+    21,
+    9,
+    22,
+    8
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 31,
+   "bladsye": 24
+  },
+  "dbe-2025-jun-v1": {
+   "vak": "rtt",
+   "sessie": "2025-jun",
+   "vraestel": "V1",
+   "vrae": [
+    27,
+    18,
+    16,
+    24,
+    35,
+    15,
+    15
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 21,
+   "bladsye": 18
+  },
+  "dbe-2025-jun-wg-v1": {
+   "vak": "wiskgelett",
+   "sessie": "2025-jun",
+   "vraestel": "V1",
+   "vrae": [
+    29,
+    35,
+    33,
+    25,
+    28
+   ],
+   "bron": "vraestel",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 28,
+   "bladsye": 12
+  },
+  "dbe-2025-jun-wg-v2": {
+   "vak": "wiskgelett",
+   "sessie": "2025-jun",
+   "vraestel": "V2",
+   "vrae": [
+    28,
+    23,
+    27,
+    36,
+    36
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 26,
+   "bladsye": 12
+  },
+  "dbe-2025-nov-afr-v1": {
+   "vak": "afrikaans",
+   "sessie": "2025-nov",
+   "vraestel": "V1",
+   "vrae": [
+    30,
+    null,
+    10,
+    10,
+    10
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 23,
+   "bladsye": 11
+  },
+  "dbe-2025-nov-rtt-v2": {
+   "vak": "rtt",
+   "sessie": "2025-nov",
+   "vraestel": "V2",
+   "vrae": [
+    10,
+    10,
+    5,
+    25,
+    15,
+    10,
+    10,
+    15,
+    25,
+    25
+   ],
+   "bron": "vraestel",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 28,
+   "bladsye": 15
+  },
+  "dbe-2025-nov-toer": {
+   "vak": "toerisme",
+   "sessie": "2025-nov",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    37,
+    13,
+    30,
+    12,
+    8,
+    16,
+    14,
+    20,
+    10
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 29,
+   "bladsye": 27
+  },
+  "dbe-2025-nov-v1": {
+   "vak": "rtt",
+   "sessie": "2025-nov",
+   "vraestel": "V1",
+   "vrae": [
+    22,
+    23,
+    22,
+    18,
+    35,
+    15,
+    15
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 23,
+   "bladsye": 18
+  },
+  "dbe-2025-nov-wg-v1": {
+   "vak": "wiskgelett",
+   "sessie": "2025-nov",
+   "vraestel": "V1",
+   "vrae": [
+    30,
+    32,
+    30,
+    28,
+    30
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 25,
+   "bladsye": 12
+  },
+  "dbe-2025-nov-wg-v2": {
+   "vak": "wiskgelett",
+   "sessie": "2025-nov",
+   "vraestel": "V2",
+   "vrae": [
+    28,
+    34,
+    32,
+    30,
+    26
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 27,
+   "bladsye": 14
+  },
+  "dbe-2026-jun-afr-v1": {
+   "vak": "afrikaans",
+   "sessie": "2026-jun",
+   "vraestel": "V1",
+   "vrae": [
+    30,
+    null,
+    10,
+    10,
+    10
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 25,
+   "bladsye": 13
+  },
+  "dbe-2026-jun-gas": {
+   "vak": "gasvryheid",
+   "sessie": "2026-jun",
+   "vraestel": "V1",
+   "vrae": [
+    40,
+    null,
+    40,
+    40,
+    30,
+    30
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 29,
+   "bladsye": 18
+  },
+  "dbe-2026-jun-rtt-v2": {
+   "vak": "rtt",
+   "sessie": "2026-jun",
+   "vraestel": "V2",
+   "vrae": [
+    10,
+    10,
+    5,
+    25,
+    15,
+    10,
+    10,
+    15,
+    25,
+    25
+   ],
+   "bron": "vraestel",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 36,
+   "bladsye": 16
+  },
+  "dbe-2026-jun-toer": {
+   "vak": "toerisme",
+   "sessie": "2026-jun",
+   "vraestel": "V1",
+   "vrae": [
+    null,
+    32,
+    18,
+    28,
+    12,
+    10,
+    16,
+    14,
+    20,
+    10
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": false,
+   "stem": false,
+   "stukke": 33,
+   "bladsye": 25
+  },
+  "dbe-2026-jun-v1": {
+   "vak": "rtt",
+   "sessie": "2026-jun",
+   "vraestel": "V1",
+   "vrae": [
+    19,
+    26,
+    19,
+    22,
+    35,
+    15,
+    14
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 20,
+   "bladsye": 17
+  },
+  "dbe-2026-jun-wg-v1": {
+   "vak": "wiskgelett",
+   "sessie": "2026-jun",
+   "vraestel": "V1",
+   "vrae": [
+    29,
+    34,
+    29,
+    32,
+    26
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 27,
+   "bladsye": 13
+  },
+  "dbe-2026-jun-wg-v2": {
+   "vak": "wiskgelett",
+   "sessie": "2026-jun",
+   "vraestel": "V2",
+   "vrae": [
+    30,
+    28,
+    31,
+    33,
+    28
+   ],
+   "bron": "memo",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": 26,
+   "bladsye": 13
+  }
+ }
+}

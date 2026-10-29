@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Wiskundige Geletterdheid · Finansies: Enkelvoudige vs saamgestelde rente" font-family="Arial, Helvetica, sans-serif">
+<defs></defs>
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#0a8f5a"/><rect y="50" width="800" height="22" fill="#0a8f5a"/>
+<text x="24" y="27" font-size="15" fill="#ffffff" font-weight="800" letter-spacing="2">WISKUNDIGE GELETTERDHEID · FINANSIES</text>
+<text x="24" y="60" font-size="29" fill="#ffffff" font-weight="900">Enkelvoudige vs saamgestelde rente</text>
+
+    <line x1="70" y1="440" x2="520" y2="440" stroke="#f6f8f3" stroke-width="3"/><line x1="70" y1="120" x2="70" y2="440" stroke="#f6f8f3" stroke-width="3"/>
+    <line x1="66" y1="440" x2="520" y2="440" stroke="#24543a" stroke-width="1"/><text x="62" y="445" font-size="13" fill="#b9d0c0" font-weight="700" text-anchor="end">≈</text><line x1="66" y1="378" x2="520" y2="378" stroke="#24543a" stroke-width="1"/><text x="62" y="383" font-size="13" fill="#b9d0c0" font-weight="700" text-anchor="end">10k</text><line x1="66" y1="316" x2="520" y2="316" stroke="#24543a" stroke-width="1"/><text x="62" y="321" font-size="13" fill="#b9d0c0" font-weight="700" text-anchor="end">11k</text><line x1="66" y1="254" x2="520" y2="254" stroke="#24543a" stroke-width="1"/><text x="62" y="259" font-size="13" fill="#b9d0c0" font-weight="700" text-anchor="end">12k</text><line x1="66" y1="192" x2="520" y2="192" stroke="#24543a" stroke-width="1"/><text x="62" y="197" font-size="13" fill="#b9d0c0" font-weight="700" text-anchor="end">13k</text><line x1="66" y1="130" x2="520" y2="130" stroke="#24543a" stroke-width="1"/><text x="62" y="135" font-size="13" fill="#b9d0c0" font-weight="700" text-anchor="end">14k</text>
+    <rect x="84" y="378" width="40" height="62" rx="4" fill="#5cc8ff"/><rect x="128" y="378" width="40" height="62" rx="4" fill="#f2c94c"/><text x="126" y="466" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="middle">jaar 0</text><rect x="192" y="316" width="40" height="124" rx="4" fill="#5cc8ff"/><rect x="236" y="316" width="40" height="124" rx="4" fill="#f2c94c"/><text x="234" y="466" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="middle">jaar 1</text><rect x="300" y="254" width="40" height="186" rx="4" fill="#5cc8ff"/><rect x="344" y="247.8" width="40" height="192.2" rx="4" fill="#f2c94c"/><text x="342" y="466" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="middle">jaar 2</text><rect x="408" y="192" width="40" height="248" rx="4" fill="#5cc8ff"/><rect x="452" y="172.78000000000003" width="40" height="267.21999999999997" rx="4" fill="#f2c94c"/><text x="448" y="182" font-size="14" fill="#5cc8ff" font-weight="700" text-anchor="end">R13 000</text><text x="472" y="144.78000000000003" font-size="14" fill="#f2c94c" font-weight="700" text-anchor="middle">R13 310</text><text x="450" y="466" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="middle">jaar 3</text>
+    <text x="84" y="112" font-size="17" fill="#f6f8f3" font-weight="700">P = R10 000 · i = 10% · n = 3</text>
+    <rect x="540" y="92" width="236" height="190" rx="14" fill="#123a24" stroke="#5cc8ff" stroke-width="3"/>
+    <text x="558" y="126" font-size="18" fill="#5cc8ff" font-weight="900">ENKELVOUDIG</text>
+    <text x="558" y="166" font-size="22" font-weight="700"><tspan fill="#f6f8f3">A = P(1 + i·n)</tspan></text>
+    <text x="558" y="200" font-size="16" fill="#b9d0c0" font-weight="600"><tspan x="558" dy="0">rente net op die</tspan><tspan x="558" dy="20">beginbedrag</tspan></text>
+    <text x="558" y="266" font-size="30" fill="#5cc8ff" font-weight="900">R13 000</text>
+    <rect x="540" y="296" width="236" height="204" rx="14" fill="#123a24" stroke="#f2c94c" stroke-width="3"/>
+    <text x="558" y="330" font-size="18" fill="#f2c94c" font-weight="900">SAAMGESTEL</text>
+    <text x="558" y="370" font-size="22" font-weight="700"><tspan fill="#f6f8f3">A = P(1 + i)</tspan><tspan fill="#f2c94c">ⁿ</tspan></text>
+    <text x="558" y="404" font-size="16" fill="#b9d0c0" font-weight="600"><tspan x="558" dy="0">rente op rente —</tspan><tspan x="558" dy="20">groei elke jaar meer</tspan></text>
+    <text x="558" y="478" font-size="30" fill="#f2c94c" font-weight="900">R13 310</text>
+</svg>

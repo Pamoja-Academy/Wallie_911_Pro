@@ -1,0 +1,40 @@
+{
+  "vak": "afrikaans",
+  "vraestel": "Afrikaans HT V3 (Skryfwerk)",
+  "geverifieer": true,
+  "punte": 100,
+  "tyd_min": 180,
+  "hoofwerk_bank": "data/vraebank-v3.json",
+  "afdelings": {
+    "A": {
+      "naam": "Opstel",
+      "punte": 50,
+      "subvrae": 1,
+      "tyd_min": 100,
+      "woorde": {
+        "min": 400,
+        "max": 450
+      },
+      "kriteria": [
+        30,
+        15,
+        5
+      ]
+    },
+    "B": {
+      "naam": "Transaksionele tekste",
+      "punte": 25,
+      "subvrae": 1,
+      "tyd_min": 40,
+      "woorde": {
+        "min": 180,
+        "max": 200
+      },
+      "kriteria": [
+        15,
+        10
+      ]
+    }
+  },
+  "verifikasie": "Voorblad van die DBE November 2025-vraestel (education.gov.za, nagegaan 15 Okt 2026). Net getalle, geen DBE-teks in die repo. Afrikaans HT V3: 100 punte, 3 uur; Afdeling A (1 van 5 opstelonderwerpe) 50 punte, 400-450 woorde, ±100 min; Afdeling B 2 x 25 punte, 180-200 woorde elk, ±80 min (2 x 40). Ook: V1 70 punte/2 uur, V2 80 punte/2½ uur."
+}

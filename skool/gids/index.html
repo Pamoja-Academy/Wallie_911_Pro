@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Eksamenplan — gids vir die huis</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0b1f17; color: #e8efe9; font: 17px/1.6 system-ui, "Segoe UI", Arial, sans-serif; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 1.8rem; margin: 0 0 6px; }
+  h2 { font-size: 1.25rem; margin: 40px 0 10px; color: #d4b45a; }
+  h3 { font-size: 1rem; margin: 22px 0 6px; }
+  p, li { color: #d7e5dc; }
+  .lede { color: #a9c7b6; margin: 0 0 24px; }
+  .stap { display: flex; gap: 14px; align-items: flex-start; margin: 14px 0; }
+  .nommer { flex: 0 0 34px; height: 34px; border-radius: 50%; background: #d4b45a; color: #10241a;
+            font-weight: 800; display: grid; place-items: center; }
+  img { width: 100%; height: auto; border-radius: 12px; border: 1px solid #1f5c3f; margin: 10px 0 4px; }
+  .kaart { background: #0e2a1e; border: 1px solid #1f5c3f; border-radius: 14px; padding: 18px 20px; margin: 18px 0; }
+  .waarskuwing { border-color: #7a1f1f; background: #2a0f0f; }
+  code { background: #123526; padding: 2px 6px; border-radius: 6px; font-size: 0.92em; }
+  a { color: #d4b45a; }
+  .klein { font-size: .9rem; color: #a9c7b6; }
+  @media print { body { background: #fff; color: #111; } .kaart { background: #f6f6f6; } h2 { color: #7a5b00; } }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Eksamenplan — die gids vir die huis</h1>
+  <p class="lede">Een bladsy. Geen ontwikkeling, geen installasie. Drie goed: die app live sit, elke seun se laptop opstel, en elke dag werk.</p>
+
+  <div class="kaart">
+    <h2 style="margin-top:0">Deel 1 · Die app live sit (doen jy een keer)</h2>
+    <div class="stap"><div class="nommer">1</div><div>
+      Gaan na <a href="https://app.netlify.com/drop">app.netlify.com/drop</a> in jou blaaier.
+    </div></div>
+    <div class="stap"><div class="nommer">2</div><div>
+      Sleep die vouer <code>dist</code> (op hierdie rekenaar: <code>C:\Users\nHunter\OneDrive\Wallie_911_Deepseek\dist</code>)
+      in die bladsy. Wag tot dit sê die site is live.
+    </div></div>
+    <div class="stap"><div class="nommer">3</div><div>
+      Netlify sê nou "Claim your site". Klik dit en maak 'n <strong>gratis</strong> rekening (geen kaart nodig).
+      Sonder die stap is die adres tydelik en wagwoord-beskerm. Kies daarna <em>Project configuration →
+      Change project name</em> en noem dit iets soos <code>eksamenplan-linden</code>.
+    </div></div>
+    <p class="klein">Skryf die adres neer (of stuur dit vir die seuns). Dit is al — geen kode, geen installasie, geen kaart.</p>
+  </div>
+
+  <h2>Deel 2 · Elke seun se laptop (doen hulle een keer)</h2>
+  <p>Maak die adres oop. Die app vra een keer:</p>
+  <img src="02-kies.png" alt="Die keuse-skerm: kies jou graad en vakke" />
+  <div class="stap"><div class="nommer">1</div><div>Klik op <strong>Graad 9</strong> of <strong>Graad 10</strong>.</div></div>
+  <div class="stap"><div class="nommer">2</div><div>Merk <strong>elke</strong> vak wat hy skryf. Graad 10 vra ten minste 7; Graad 9 merk al sy vakke. Die verpligte vakke is klaar gemerk.</div></div>
+  <div class="stap"><div class="nommer">3</div><div>Klik <strong>Stoor en begin</strong>.</div></div>
+  <p class="klein">Dit word net op daardie laptop gestoor. Om later te verander: sit <code>?opstel=1</code> agter die adres.</p>
+
+  <h2>Deel 3 · Die eerste keer binne</h2>
+  <p>Die app wys vier kort kaartjies wat verduidelik hoe dit werk. Een keer per laptop. Om dit weer te sien: <code>?toer=1</code>.</p>
+  <img src="01-welkom.png" alt="Die welkom-kaartjie" />
+
+  <h2>Deel 4 · Elke dag (drie klikke)</h2>
+  <img src="03-vandag.png" alt="Vandag se blokke" />
+  <div class="stap"><div class="nommer">1</div><div>
+    Die <strong>groot kaart bo</strong> is die werk van nou. Klik die geel <strong>▶ Begin</strong>.
+    (Die lys daaronder is die hele dag — op 'n eksamendag begin dit met "Opstaan", sonder 'n knoppie.)
+  </div></div>
+  <div class="stap"><div class="nommer">2</div><div>
+    Die klok loop. <strong>Geen kamera, geen waarskuwings, geen vraelys</strong> — werk tot die tyd om is
+    (of klik <strong>Eindig sessie</strong>). Los die "Kamera-toesig"-kassie by die opstelling af.
+  </div></div>
+  <img src="04-sessie.png" alt="Die sessieskerm met die klok" />
+  <div class="stap"><div class="nommer">3</div><div>
+    Ná die werk kom <strong>Merk en leer</strong>: die memo wys hoe die punt verdien word.
+    Skryf neer wat hy gemis het. Die laaste blok van die dag is die foutlog: môre se top-3.
+  </div></div>
+  <img src="05-merk.png" alt="Merk en leer in die bloklys" />
+
+  <h2>Deel 5 · As iets nie werk nie</h2>
+  <div class="kaart">
+    <ul>
+      <li><strong>Die app wys nie my vakke nie:</strong> <code>?opstel=1</code> agter die adres, kies weer (dit werk nou een keer, nie op elke herlaai nie).</li>
+      <li><strong>Die rooi lint onder:</strong> "KONFIGURASIE ONGEVERIFIEER" beteken die skool se rooster en vraestelle moet nog nagegaan word. Dis nie 'n fout nie; klik die × om dit vir die dag weg te steek.</li>
+      <li><strong>Ek wil die verduideliking weer sien:</strong> <code>?toer=1</code>.</li>
+      <li><strong>Die bladsy is heeltemal leeg:</strong> herlaai (F5). As dit bly, sê vir my wat op die skerm staan.</li>
+      <li><strong>Die "Hulp"-knoppie</strong> links onder verduidelik die lesse en die foutbank.</li>
+    </ul>
+  </div>
+
+  <h2>Deel 6 · Waar is die data?</h2>
+  <p>
+    Alles bly op die laptop: die keuses, die sessies, die foute. Die app self stuur <strong>niks</strong> na 'n
+    bediener nie (geen Supabase, geen ntfy). Wat wel van buite kom: die blaaier laai die font en, as jy op 'n
+    vraestel klik, die PDF by die bron se eie adres. Dis gewone web-versoeke, soos enige webwerf.
+  </p>
+  <p class="klein">
+    Om te sien wat gestoor is: F12 → <em>Application</em> → <em>Local Storage</em> → <code>linden10_v2_bok</code>
+    (Graad 10) of <code>linden9_v2_bok</code> (Graad 9).
+  </p>
+
+  <div class="kaart waarskuwing">
+    <h2 style="margin-top:0;color:#ffb4a8">Onthou</h2>
+    <p style="margin:0">
+      Die app is 'n <strong>plan</strong>, nie 'n waarborg nie. Tans is net twee vakke se vraestelle gelaai:
+      Lewenswetenskappe (Graad 10, vier vraestelle) en Natuurwetenskappe (Graad 9, een GEC-vraestel). Die res kom nog.
+      Die vraestelle is egte provinsiale/DBE-vraestelle met memo's; die skool se eie vraestel ken ons nie. Waar die memo nie die hele werk verduidelik nie, moet die
+      handboek bykom — die app sê dit eerlik eerder as om te maak of hy alles weet.
+    </p>
+  </div>
+
+</main>
+</body>
+</html>

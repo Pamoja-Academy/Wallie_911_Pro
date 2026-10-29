@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Foutlog &amp; slot — voorblad" font-family="Arial, Helvetica, sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d4a2c"/><stop offset="1" stop-color="#04140b"/></linearGradient></defs>
+<rect width="800" height="520" rx="18" fill="url(#g)"/>
+<rect x="0" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="100" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="200" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="300" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="400" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="500" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="600" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="700" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/>
+<rect x="0" y="0" width="16" height="520" rx="8" fill="#5cc8ff"/>
+<rect x="40" y="34" width="170" height="40" rx="20" fill="#5cc8ff"/><text x="125" y="60.48" font-size="18" fill="#04140b" font-weight="800" text-anchor="middle">SLOT</text>
+
+    <g transform="translate(70,140)">
+      <circle cx="110" cy="110" r="100" fill="#fff"/><circle cx="110" cy="110" r="74" fill="#ff6b57"/>
+      <circle cx="110" cy="110" r="48" fill="#fff"/><circle cx="110" cy="110" r="22" fill="#ff6b57"/>
+      <line x1="220" y1="0" x2="118" y2="102" stroke="#f2c94c" stroke-width="9" stroke-linecap="round"/>
+      <path d="M220,0 l-30,4 l26,26 z" fill="#f2c94c"/>
+    </g>
+<text x="340" y="190" font-size="48" fill="#f6f8f3" font-weight="900">Foutlog &amp; slot</text>
+<text x="340" y="240" font-size="22" fill="#b9d0c0" font-weight="600">Foutbank + môre se top-3</text>
+<text x="340" y="330" font-size="24" fill="#f2c94c" font-weight="700">Sluit elke dag hiermee af.</text>
+<rect x="340" y="430" width="300" height="46" rx="23" fill="#f2c94c"/><text x="490" y="460.92" font-size="22" fill="#10140f" font-weight="800" text-anchor="middle">3 visuele lesse →</text>
+<text x="770" y="500" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="end">#15 · Springbok SOS</text>
+</svg>

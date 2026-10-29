@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Toerisme — voorblad" font-family="Arial, Helvetica, sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d4a2c"/><stop offset="1" stop-color="#04140b"/></linearGradient></defs>
+<rect width="800" height="520" rx="18" fill="url(#g)"/>
+<rect x="0" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="100" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="200" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="300" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="400" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="500" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="600" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="700" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/>
+<rect x="0" y="0" width="16" height="520" rx="8" fill="#f2c94c"/>
+<rect x="40" y="34" width="170" height="40" rx="20" fill="#f2c94c"/><text x="125" y="60.48" font-size="18" fill="#1a1400" font-weight="800" text-anchor="middle">GEEL-SONE</text>
+
+    <g transform="translate(70,140)">
+      <circle cx="110" cy="115" r="95" fill="#5cc8ff"/>
+      <ellipse cx="110" cy="115" rx="40" ry="95" fill="none" stroke="#e9f6ff" stroke-width="5"/>
+      <line x1="15" y1="115" x2="205" y2="115" stroke="#e9f6ff" stroke-width="5"/>
+      <path d="M30,70 Q110,55 190,70 M30,160 Q110,175 190,160" fill="none" stroke="#e9f6ff" stroke-width="4"/>
+      <path d="M150,30 l40,-6 l10,8 l-36,14 l-8,24 l-10,2 l2,-22 l-22,8 l-6,10 l-8,0 l4,-16 l-14,-8 l6,-4 l18,4 z" fill="#f2c94c"/>
+    </g>
+<text x="340" y="190" font-size="48" fill="#f6f8f3" font-weight="900">Toerisme</text>
+<text x="340" y="240" font-size="22" fill="#b9d0c0" font-weight="600">Lees die vraag. Bereken reg.</text>
+<text x="340" y="312" font-size="20" fill="#ff6b57" font-weight="700">Prelim 61%</text><text x="760" y="312" font-size="20" fill="#f2c94c" font-weight="700" text-anchor="end">Teiken 60%</text>
+<rect x="340" y="326" width="420" height="30" rx="15" fill="#06120b" stroke="#2f6b47" stroke-width="2"/>
+<rect x="340" y="326" width="256.20000000000005" height="30" rx="15" fill="#ff6b57"/>
+<line x1="592" y1="316" x2="592" y2="366" stroke="#f2c94c" stroke-width="6"/>
+<text x="340" y="398" font-size="20" fill="#f6f8f3" font-weight="700">Op teiken — vang nou die dom foute</text>
+<rect x="340" y="430" width="300" height="46" rx="23" fill="#f2c94c"/><text x="490" y="460.92" font-size="22" fill="#10140f" font-weight="800" text-anchor="middle">4 visuele lesse →</text>
+<text x="770" y="500" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="end">#15 · Springbok SOS</text>
+</svg>

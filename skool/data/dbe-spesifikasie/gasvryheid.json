@@ -1,0 +1,24 @@
+{
+  "vak": "gasvryheid",
+  "vraestel": "Gasvryheidstudie",
+  "geverifieer": true,
+  "punte": 200,
+  "tyd_min": 180,
+  "hoofwerk_bank": null,
+  "afdelings": null,
+  "verifikasie": "Voorblad/memo van die DBE November 2025-vraestel (education.gov.za, nagegaan 15 Okt 2026) en die memo's van 2023-2026 (21 Okt 2026). Geen DBE-teks in die repo nie, net getalle. Gasvryheidstudie: 200 punte, 3 uur; A (kortvrae) 40 = V1, B 20 = V2, C 80 = V3-V4, D 60 = V5-V6.",
+  "afdeling_punte": {
+    "A": 40,
+    "B": 20,
+    "C": 80,
+    "D": 60
+  },
+  "vrae_punte": [
+    40,
+    20,
+    40,
+    40,
+    30,
+    30
+  ]
+}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Gasvryheidstudie — voorblad" font-family="Arial, Helvetica, sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d4a2c"/><stop offset="1" stop-color="#04140b"/></linearGradient></defs>
+<rect width="800" height="520" rx="18" fill="url(#g)"/>
+<rect x="0" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="100" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="200" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="300" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="400" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="500" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="600" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="700" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/>
+<rect x="0" y="0" width="16" height="520" rx="8" fill="#d4472f"/>
+<rect x="40" y="34" width="170" height="40" rx="20" fill="#d4472f"/><text x="125" y="60.48" font-size="18" fill="#ffffff" font-weight="800" text-anchor="middle">ROOI-SONE</text>
+
+    <g transform="translate(70,140)">
+      <circle cx="60" cy="80" r="46" fill="#fff"/><circle cx="110" cy="58" r="56" fill="#fff"/><circle cx="160" cy="80" r="46" fill="#fff"/>
+      <rect x="40" y="90" width="140" height="70" rx="10" fill="#fff"/>
+      <rect x="40" y="150" width="140" height="34" rx="6" fill="#f2c94c"/>
+      <path d="M20,210 Q110,150 200,210 Z" fill="#b9d0c0"/><rect x="10" y="208" width="200" height="10" rx="5" fill="#b9d0c0"/>
+    </g>
+<text x="340" y="190" font-size="48" fill="#f6f8f3" font-weight="900">Gasvryheidstudie</text>
+<text x="340" y="240" font-size="22" fill="#b9d0c0" font-weight="600">Begrip eers — konsep → toepassing</text>
+<text x="340" y="312" font-size="20" fill="#ff6b57" font-weight="700">Prelim 27%</text><text x="760" y="312" font-size="20" fill="#f2c94c" font-weight="700" text-anchor="end">Teiken 60%</text>
+<rect x="340" y="326" width="420" height="30" rx="15" fill="#06120b" stroke="#2f6b47" stroke-width="2"/>
+<rect x="340" y="326" width="113.39999999999998" height="30" rx="15" fill="#ff6b57"/>
+<line x1="592" y1="316" x2="592" y2="366" stroke="#f2c94c" stroke-width="6"/>
+<text x="340" y="398" font-size="20" fill="#f6f8f3" font-weight="700">Gaping: 33 punte om te wen</text>
+<rect x="340" y="430" width="300" height="46" rx="23" fill="#f2c94c"/><text x="490" y="460.92" font-size="22" fill="#10140f" font-weight="800" text-anchor="middle">4 visuele lesse →</text>
+<text x="770" y="500" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="end">#15 · Springbok SOS</text>
+</svg>

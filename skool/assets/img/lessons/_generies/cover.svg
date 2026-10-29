@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Eksamenplan">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123526"/>
+      <stop offset="1" stop-color="#1f5c3f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#g)"/>
+  <g fill="none" stroke="#d4b45a" stroke-width="3" stroke-linecap="round">
+    <path d="M60 150h200"/>
+    <path d="M80 150V80M140 150V60M200 150V95M260 150V70"/>
+  </g>
+  <circle cx="80" cy="80" r="6" fill="#d4b45a"/>
+  <circle cx="140" cy="60" r="6" fill="#d4b45a"/>
+  <circle cx="200" cy="95" r="6" fill="#d4b45a"/>
+  <circle cx="260" cy="70" r="6" fill="#d4b45a"/>
+  <text x="160" y="182" text-anchor="middle" font-family="system-ui,Segoe UI,Arial" font-size="13" fill="#a9c7b6">Eksamenplan</text>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Afrikaans HT · Transaksionele skryf: Formele brief — uitleg" font-family="Arial, Helvetica, sans-serif">
+<defs></defs>
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#d4472f"/><rect y="50" width="800" height="22" fill="#d4472f"/>
+<text x="24" y="27" font-size="15" fill="#ffffff" font-weight="800" letter-spacing="2">AFRIKAANS HT · TRANSAKSIONELE SKRYF</text>
+<text x="24" y="60" font-size="29" fill="#ffffff" font-weight="900">Formele brief — uitleg</text>
+
+    <rect x="250" y="90" width="300" height="410" rx="6" fill="#f4f1e8"/>
+    <rect x="440" y="106" width="90" height="8" rx="4" fill="#9aa39a"/><rect x="440" y="120" width="80" height="8" rx="4" fill="#9aa39a"/><rect x="440" y="134" width="70" height="8" rx="4" fill="#9aa39a"/><rect x="440" y="154" width="76" height="8" rx="4" fill="#4c6b57"/>
+    <rect x="270" y="180" width="110" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="194" width="96" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="208" width="104" height="8" rx="4" fill="#9aa39a"/>
+    <text x="270" y="238" font-size="14" fill="#10140f" font-weight="700">Geagte mnr. Botha</text>
+    <text x="270" y="262" font-size="13" fill="#10140f" font-weight="900">AANSOEK OM DIE POS</text><rect x="270" y="266" width="148" height="2" fill="#10140f"/>
+    <rect x="270" y="288" width="260" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="302" width="260" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="316" width="160" height="8" rx="4" fill="#9aa39a"/>
+    <rect x="270" y="338" width="260" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="352" width="260" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="366" width="260" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="380" width="190" height="8" rx="4" fill="#9aa39a"/>
+    <rect x="270" y="402" width="260" height="8" rx="4" fill="#9aa39a"/><rect x="270" y="416" width="120" height="8" rx="4" fill="#9aa39a"/>
+    <text x="270" y="446" font-size="14" fill="#10140f" font-weight="700">Die uwe</text>
+    <path d="M272,470 q14,-18 26,0 t26,0 t26,-4" fill="none" stroke="#10140f" stroke-width="2.5"/>
+    <rect x="270" y="482" width="110" height="8" rx="4" fill="#4c6b57"/>
+    <line x1="534" y1="124" x2="566" y2="124" stroke="#f2c94c" stroke-width="2"/><text x="574" y="120" font-size="17" fill="#f2c94c" font-weight="700"><tspan x="574" dy="0">Jou adres</tspan><tspan x="574" dy="20">(bo regs)</tspan></text>
+    <line x1="534" y1="158" x2="566" y2="158" stroke="#f2c94c" stroke-width="2"/><text x="574" y="166" font-size="17" fill="#f2c94c" font-weight="700">Datum</text>
+    <line x1="236" y1="194" x2="266" y2="194" stroke="#f2c94c" stroke-width="2"/><text x="228" y="190" font-size="17" fill="#f2c94c" font-weight="700" text-anchor="end"><tspan x="228" dy="0">Ontvanger:</tspan><tspan x="228" dy="20">titel + adres</tspan></text>
+    <line x1="236" y1="234" x2="266" y2="234" stroke="#f2c94c" stroke-width="2"/><text x="228" y="238" font-size="17" fill="#f2c94c" font-weight="700" text-anchor="end">Aanhef: Geagte …</text>
+    <line x1="236" y1="262" x2="266" y2="262" stroke="#f2c94c" stroke-width="2"/><text x="228" y="268" font-size="17" fill="#f2c94c" font-weight="700" text-anchor="end"><tspan x="228" dy="0">Onderwerp: vet</tspan><tspan x="228" dy="20">of onderstreep</tspan></text>
+    <line x1="534" y1="352" x2="566" y2="352" stroke="#f2c94c" stroke-width="2"/><text x="574" y="334" font-size="17" fill="#f2c94c" font-weight="700"><tspan x="574" dy="0">Inleiding →</tspan><tspan x="574" dy="20">liggaam → slot</tspan><tspan x="574" dy="20">Formeel: ‘u’,</tspan><tspan x="574" dy="20">geen sms-taal</tspan></text>
+    <line x1="236" y1="446" x2="266" y2="446" stroke="#f2c94c" stroke-width="2"/><text x="228" y="442" font-size="17" fill="#f2c94c" font-weight="700" text-anchor="end"><tspan x="228" dy="0">Die uwe +</tspan><tspan x="228" dy="20">handtekening +</tspan><tspan x="228" dy="20">naam</tspan></text>
+</svg>

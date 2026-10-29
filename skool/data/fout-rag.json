@@ -1,0 +1,439 @@
+{
+ "gegenereer_deur": "scripts/bou-fout-rag.js",
+ "metode": "Onttrek uit assets/js/hulp.js (SUPPORT_FAQ, woordeliks), docs/LESSONS-LEARNED.md (lesse met 'n simptoom wat die leerder sien) en docs/SPEK-FOUTVANGER-2026-10-28.md §4 (tegniese foutseine). Elke inskrywing wys na sy bron; tests/fout-rag.test.js faal as 'n bron nie bestaan nie.",
+ "korpus": {
+  "inskrywings": 22,
+  "faq": 11,
+  "lesse": 5,
+  "seine": 6
+ },
+ "inskrywings": [
+  {
+   "id": "faq-ander-tyd",
+   "soort": "faq",
+   "vakke": [
+    "gasvryheid",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Hoe verdeel ek my tyd in die vraestel?"
+   ],
+   "seine": [],
+   "antwoord": "Omtrent 1 minuut per punt. Kyk eers vinnig deur die hele vraestel (5 min), doen die vrae wat jy ken eerste, en hou 10 min aan die einde om antwoorde en eenhede (R, km, ure) na te gaan. Toerisme en Gasvryheid: 3 uur vir 200 punte. Wiskundige Geletterdheid: wys altyd jou bewerking, want dit kry punte al is die antwoord verkeerd.",
+   "bron": "assets/js/hulp.js:98"
+  },
+  {
+   "id": "faq-rtt-maak-oop",
+   "soort": "faq",
+   "vakke": [
+    "rtt"
+   ],
+   "simptome": [
+    "Word, Excel of die datalêer maak nie oop nie."
+   ],
+   "seine": [],
+   "antwoord": "Die app maak nie Word, Excel of Access oop nie: jy werk self in daardie programme. Die datalêer is 'n wagwoordbeskermde .exe en werk net op Windows. Die wagwoord staan in die vraestel se instruksies (gewoonlik bladsy 1-2), nie in die app nie. Die knoppie Datalêers op die sessieskerm maak die DBE-webwerf oop; laai die lêer daar af en hardloop die .exe op Windows.",
+   "bron": "assets/js/hulp.js:50"
+  },
+  {
+   "id": "faq-rtt-praktiese-blok",
+   "soort": "faq",
+   "vakke": [
+    "rtt"
+   ],
+   "simptome": [
+    "Ek moet Word/Excel gebruik, maar die app wil hê ek moet op die blad bly (minimiseer)."
+   ],
+   "seine": [],
+   "antwoord": "Kies RTT (CAT) op die Sessie-skerm, druk Begin sessie en dan die groot knoppie 'Begin praktiese blok (Office)'. Van daar af mag jy die blaaier minimiseer en in Word, Excel, Access of Notepad werk: geen waarskuwing en geen slot nie (tot 3 uur 15 min). Druk 'Klaar met prakties' wanneer jy klaar is. Sonder die praktiese blok tel elke keer wat jy weggaan as 'n waarskuwing, en na 3 sluit die skerm.",
+   "bron": "assets/js/hulp.js:68"
+  },
+  {
+   "id": "faq-rtt-slot",
+   "soort": "faq",
+   "vakke": [
+    "algemeen",
+    "rtt"
+   ],
+   "simptome": [
+    "Die skerm sluit wanneer ek die oortjie verlaat."
+   ],
+   "seine": [],
+   "antwoord": "In 'n gewone sessie tel 'n oortjie wat weg is as een waarskuwing. Na 3 waarskuwings sluit die skerm en die tyd staan stil. Tydens 'n RTT-praktiese blok tel oorskakel na Word, Excel, Access of Notepad nie as wegkyk nie: geen waarskuwing en geen slot nie. Pa sien steeds hoe lank jy weg was.",
+   "bron": "assets/js/hulp.js:62"
+  },
+  {
+   "id": "faq-rtt-stoor",
+   "soort": "faq",
+   "vakke": [
+    "rtt"
+   ],
+   "simptome": [
+    "Hoe stoor ek my RTT-praktiese werk?"
+   ],
+   "seine": [],
+   "antwoord": "Jou Word-, Excel- en Access-werk stoor NIE in die app nie: stoor self in die program (Ctrl+S) met die lêernaam wat die vraestel vra, in 'n vouer soos Dokumente\\RTT-eksamen. Stoor elke 10 minute. Die app hou net die tyd en jou self-nasien-punte. Maak die lêers ná die tyd toe voordat jy met die memo nasien.",
+   "bron": "assets/js/hulp.js:74"
+  },
+  {
+   "id": "faq-rtt-wagwoord",
+   "soort": "faq",
+   "vakke": [
+    "rtt"
+   ],
+   "simptome": [
+    "Die datalêer (.exe) vra 'n wagwoord."
+   ],
+   "seine": [],
+   "antwoord": "Die DBE-datalêers is wagwoordbeskermde .exe-lêers wat net op Windows werk. Die wagwoord staan in die vraestel se instruksies (gewoonlik bladsy 1-2 van die PDF), nie in die app nie. Tik dit presies soos daar (hoof- en kleinletters tel). Waarsku Windows oor die .exe, kies 'More info' en dan 'Run anyway'.",
+   "bron": "assets/js/hulp.js:80"
+  },
+  {
+   "id": "faq-rubriek",
+   "soort": "faq",
+   "vakke": [
+    "afrikaans",
+    "engels",
+    "gasvryheid",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Waar kry ek die rubriek?"
+   ],
+   "seine": [],
+   "antwoord": "Maak 'n skryfitem oop en druk 'Wys memo': die rubriek (die DBE se puntebande), die formaatlys en die modelantwoord verskyn saam onder die vraag. Kyk eers ná jou getimede poging. Vir die ander vakke is die nasienriglyne in die memo van die betrokke vraestel.",
+   "bron": "assets/js/hulp.js:128"
+  },
+  {
+   "id": "faq-sakrekenaar",
+   "soort": "faq",
+   "vakke": [
+    "gasvryheid",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Mag ek 'n sakrekenaar gebruik?"
+   ],
+   "seine": [],
+   "antwoord": "Ja, gebruik 'n gewone sakrekenaar op die tafel, soos in die eksamen (Wiskundige Geletterdheid het dit nodig; Toerisme vir wisselkoerse en tydsones; Gasvryheid vir koste en porsies). Moenie die Windows-sakrekenaar gebruik nie: oorskakel na 'n ander program tel in 'n sessie as 'n waarskuwing.",
+   "bron": "assets/js/hulp.js:92"
+  },
+  {
+   "id": "faq-skryf-tyd-vraag",
+   "soort": "faq",
+   "vakke": [
+    "afrikaans",
+    "engels"
+   ],
+   "simptome": [
+    "Ek raak uit tyd by een vraag (opstel/brief)."
+   ],
+   "seine": [],
+   "antwoord": "Sit 'n horlosie op die tafel en skryf die eindtyd vir elke vraag bo-aan die bladsy voor jy begin. Is die tyd vir 'n vraag verby, skryf 'n slotsin en gaan aan: 'n onklaar opstel met 'n slot kry meer punte as 'n kort transaksionele teks wat ontbreek.",
+   "bron": "assets/js/hulp.js:104"
+  },
+  {
+   "id": "faq-sonder-net",
+   "soort": "faq",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Kan ek sonder internet skryf?"
+   ],
+   "seine": [],
+   "antwoord": "Ja. Skryf op papier met 'n horlosie op die tafel; die app hoef nie aan te wees nie. Het die app reeds gelaai, wys die vraag, memo en rubriek ook sonder internet, en jou self-nasien-uitslag stoor op die toestel. Wat na Pa moet gaan, word gestuur wanneer jy weer internet het. Die RTT (CAT)-skakels na DBE-vraestelle en -datalêers het wel internet nodig: laai dit vooraf af wanneer jy internet het.",
+   "bron": "assets/js/hulp.js:134"
+  },
+  {
+   "id": "faq-tyd",
+   "soort": "faq",
+   "vakke": [
+    "afrikaans",
+    "engels",
+    "gasvryheid",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Hoeveel tyd het ek per skryfvraag?"
+   ],
+   "seine": [],
+   "antwoord": "Engels EAT V3 (100 punte, 2½ uur): opstel 50 punte = 80 min (250–300 woorde); lang transaksionele teks 30 punte = 40 min (120–150 woorde); kort teks 20 punte = 30 min (80–100 woorde). Plan 10% van die tyd, skryf, en hou 5 min vir redigeer en woordtelling. Afrikaans Huistaal V3: volg die punte op die vraestel: ongeveer 1 minuut per punt plus 'n paar minute om te beplan. By die ander vakke se langer antwoorde geld dieselfde: kyk na die punte en gee omtrent 1 minuut per punt.",
+   "bron": "assets/js/hulp.js:122"
+  },
+  {
+   "id": "les-memo-hek",
+   "soort": "les",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die memo wil nie oopmaak nie.",
+    "Ek kan nie die antwoorde sien voordat die tyd om is nie.",
+    "Die knoppie 'Wys memo' doen niks.",
+    "Die memo-knoppie reageer nie.",
+    "Niks gebeur as ek op die memo druk nie."
+   ],
+   "seine": [],
+   "antwoord": "Dit is nie 'n fout nie: in eksamenmodus gaan die memo eers oop as die tyd om is. 'Ek is klaar' maak dit net oop as jy ook regtig die werk gedoen het (omtrent 60% van die tyd). Dit is doelbewus so: 'n memo een klik weg maak die oefening niks werd. Moenie vroeg klaar druk om by die memo te kom nie — dan verloor jy die oefening én Pa sien dit. Is die tyd verby en die memo bly toe, dán is dit 'n fout: rapporteer dit en gaan aan met die volgende vraag op papier.",
+   "bron": "docs/LESSONS-LEARNED.md:8",
+   "bewys": [
+    {
+     "lêer": "assets/js/eksamenmodus.js",
+     "patroon": "Boolean(st.klaar) && minWerkGedoen(st)"
+    }
+   ]
+  },
+  {
+   "id": "les-oortjie-slot",
+   "soort": "les",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die skerm het gesluit terwyl ek die memo in 'n ander oortjie gelees het.",
+    "Die app waarsku my en sluit terwyl ek by die vraestel of memo is.",
+    "Dit sê ek kyk weg maar ek lees die memo."
+   ],
+   "seine": [],
+   "antwoord": "'n Merk- of skrifblok waarvan die vraestel of memo in 'n ander oortjie oop is, mag jou NIE sluit nie. Gebeur dit, is dit 'n fout in die app en nie jou skuld nie. Maak die blad NIE toe of weer oop nie (dit beëindig die sessie): gaan aan met merk; jou tyd en punte bly geldig. By 'n RTT-praktiese blok druk eers 'Begin praktiese blok (Office)', dan tel Word, Excel, Access en Notepad nie as wegkyk nie.",
+   "bron": "docs/LESSONS-LEARNED.md:27"
+  },
+  {
+   "id": "les-selfde-vraestel",
+   "soort": "les",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Dit is dieselfde vraestel as voorheen.",
+    "Ek het hierdie werk al gedoen.",
+    "Dit lyk net na 5 vrae."
+   ],
+   "seine": [],
+   "antwoord": "Die app moet jou nooit 'n vraestel gee wat jy al gehad het nie. Druk die knoppie wat sê jy het dit al gedoen, dan ruil die app na 'n ander amptelike DBE-vraestel. Gebeur dit nie, rapporteer dit. En let op: '5 vrae' is 'n VOLLEDIGE vraestel — vyf hoofvrae met baie subvrae, nie vyf vragies nie.",
+   "bron": "docs/LESSONS-LEARNED.md:25"
+  },
+  {
+   "id": "les-sessie-begin-nie",
+   "soort": "les",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die sessie wil nie begin nie.",
+    "Niks gebeur as ek 'Begin sessie' druk.",
+    "Die app vra vir die kamera en gaan dan nie verder nie.",
+    "Die kamera werk nie en die sessie begin nie."
+   ],
+   "seine": [
+    "notallowederror",
+    "notfounderror",
+    "getusermedia"
+   ],
+   "antwoord": "Die sessie het die kamera nodig; sonder dit begin dit nie, en weer druk gee dieselfde boodskap. Laat die kamera toe in die blaaier (die slotjie langs die adres) en maak die app oop op http://localhost, nie as 'n lêer nie. Werk dit steeds nie: begin NIE die sessie nie — skryf op papier met 'n horlosie op die tafel en merk die blok daarna klaar. Jou minute gaan nie verlore nie.",
+   "bron": "assets/js/proctor.js:64",
+   "bewys": [
+    {
+     "lêer": "assets/js/proctor.js",
+     "patroon": "Hard-modus vereis kamera"
+    },
+    {
+     "lêer": "assets/js/app.js",
+     "patroon": "WALLIE.REMOTE?.startFailed"
+    }
+   ]
+  },
+  {
+   "id": "les-werk-in-die-app",
+   "soort": "les",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die blok sê Pa moet my die vraestel gee.",
+    "Daar is geen werk in die blok nie.",
+    "Ek weet nie wat om te doen in hierdie blok nie."
+   ],
+   "seine": [],
+   "antwoord": "Elke werkblok se vraestel, antwoordeboek en memo moet IN die app wees. Sê 'n blok dat iemand anders jou die vraestel moet gee, is dit 'n fout in die plan: rapporteer dit. Begin solank met die vorige vraestel van dieselfde vak wat wél in die app is, sodat die tyd nie verlore gaan nie.",
+   "bron": "docs/LESSONS-LEARNED.md:24"
+  },
+  {
+   "id": "sein-dbe-skakel",
+   "soort": "sein",
+   "vakke": [
+    "afrikaans",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die DBE-skakel laai nie.",
+    "Die vraestel-PDF maak nie oop nie.",
+    "Die memo-skakel is dood."
+   ],
+   "seine": [
+    "education.gov.za",
+    "linkclick"
+   ],
+   "antwoord": "Die DBE se webwerf antwoord nie. Probeer een keer weer. Bly dit dood, is die skakel verouderd: laat weet vir Pa. Gaan solank aan met die vrae wat reeds in die app staan, of met die vorige vraestel van dieselfde vak.",
+   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76"
+  },
+  {
+   "id": "sein-netwerk",
+   "soort": "sein",
+   "vakke": [
+    "algemeen"
+   ],
+   "simptome": [
+    "Die aanwyser bly op 'wag'.",
+    "Dit sê geen verbinding nie.",
+    "Dit stuur nie na Pa nie."
+   ],
+   "seine": [
+    "aborterror",
+    "failed to fetch",
+    "networkerror",
+    "timeout",
+    "err_internet_disconnected"
+   ],
+   "antwoord": "Geen internet nie. Dit is nie 'n fout nie: alles bly op hierdie toestel en gaan self deur sodra jy weer aanlyn is. Moenie wag of herlaai nie — gaan aan met die werk. Die vraag, memo en rubriek werk ook sonder internet as die blad reeds gelaai het.",
+   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76"
+  },
+  {
+   "id": "sein-rag-dekking",
+   "soort": "sein",
+   "vakke": [
+    "algemeen"
+   ],
+   "simptome": [
+    "Die sessieskerm sê die werk is nog nie nagegaan nie."
+   ],
+   "seine": [
+    "rag-dekking"
+   ],
+   "antwoord": "Net die nagaan-reël is weg, nie jou werk nie. Die vraestel, die tyd en die memo werk steeds. Gaan aan met die blok.",
+   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76"
+  },
+  {
+   "id": "sein-skrip-laai-nie",
+   "soort": "sein",
+   "vakke": [
+    "algemeen"
+   ],
+   "simptome": [
+    "'n Skerm is leeg.",
+    "'n Knoppie doen niks.",
+    "Die blad lyk stukkend."
+   ],
+   "seine": [
+    "hulpbron|script",
+    "hulpbron|link",
+    "loading chunk",
+    "net::err_abort"
+   ],
+   "antwoord": "'n Deel van die app het nie gelaai nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. Werk op papier aan met dieselfde vraestel en merk die blok daarna klaar: jou minute tel.",
+   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76",
+   "sein_algemeen": true,
+   "bewys": [
+    {
+     "lêer": "assets/js/app.js",
+     "patroon": "outcome: \"onderbreek\""
+    }
+   ]
+  },
+  {
+   "id": "sein-stoor-vol",
+   "soort": "sein",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels"
+   ],
+   "simptome": [
+    "Dit sê 'Kon nie stoor nie'.",
+    "My punte stoor nie.",
+    "My self-nasien stoor nie."
+   ],
+   "seine": [
+    "quotaexceedederror",
+    "exceeded the quota",
+    "securityerror",
+    "setitem"
+   ],
+   "antwoord": "Jou blaaier is in privaat modus, of die geheue is vol. Moenie nou 'n ander venster oopmaak terwyl 'n sessie loop nie: dit tel as wegkyk. Neem solank 'n foto van jou bladsy en skryf jou punt in die foutbank, sodat niks verlore gaan nie; probeer weer ná die sessie.",
+   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76"
+  },
+  {
+   "id": "sein-typeerror",
+   "soort": "sein",
+   "vakke": [
+    "algemeen"
+   ],
+   "simptome": [
+    "'n Knoppie doen niks.",
+    "Die app hang.",
+    "Niks gebeur as ek klik nie.",
+    "Die app reageer glad nie meer nie.",
+    "Die knoppie reageer nie."
+   ],
+   "seine": [
+    "is not a function",
+    "cannot read properties",
+    "undefined is not an object",
+    "null is not an object"
+   ],
+   "antwoord": "Daar is 'n fout in die app, nie in jou werk nie. Moenie die blad herlaai nie: dit beëindig 'n lopende sessie. Gaan aan op papier en merk die blok klaar wanneer jy klaar is. Jy hoef niks te tik nie.",
+   "bron": "docs/SPEK-FOUTVANGER-2026-10-28.md:76",
+   "bewys": [
+    {
+     "lêer": "assets/js/app.js",
+     "patroon": "outcome: \"onderbreek\""
+    }
+   ]
+  }
+ ]
+}

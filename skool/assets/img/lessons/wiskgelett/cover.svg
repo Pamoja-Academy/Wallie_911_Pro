@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Wiskundige Geletterdheid — voorblad" font-family="Arial, Helvetica, sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d4a2c"/><stop offset="1" stop-color="#04140b"/></linearGradient></defs>
+<rect width="800" height="520" rx="18" fill="url(#g)"/>
+<rect x="0" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="100" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="200" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="300" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="400" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="500" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="600" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/><rect x="700" y="0" width="50" height="520" fill="#ffffff" opacity="0.025"/>
+<rect x="0" y="0" width="16" height="520" rx="8" fill="#0a8f5a"/>
+<rect x="40" y="34" width="170" height="40" rx="20" fill="#0a8f5a"/><text x="125" y="60.48" font-size="18" fill="#ffffff" font-weight="800" text-anchor="middle">GROEN-SONE</text>
+
+    <g transform="translate(70,140)">
+      <rect x="10" y="130" width="40" height="70" rx="6" fill="#5cc8ff"/>
+      <rect x="64" y="96" width="40" height="104" rx="6" fill="#3ddc84"/>
+      <rect x="118" y="60" width="40" height="140" rx="6" fill="#f2c94c"/>
+      <rect x="172" y="24" width="40" height="176" rx="6" fill="#ff6b57"/>
+      <path d="M20,110 L84,74 L138,40 L196,6" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+      <line x1="0" y1="206" x2="222" y2="206" stroke="#fff" stroke-width="6"/>
+    </g>
+<text x="340" y="150" font-size="40" fill="#f6f8f3" font-weight="900"><tspan x="340" dy="0">Wiskundige</tspan><tspan x="340" dy="44">Geletterdheid</tspan></text>
+<text x="340" y="240" font-size="22" fill="#b9d0c0" font-weight="600">Daagliks. Teiken 80%.</text>
+<text x="340" y="312" font-size="20" fill="#ff6b57" font-weight="700">Prelim 66%</text><text x="760" y="312" font-size="20" fill="#f2c94c" font-weight="700" text-anchor="end">Teiken 80%</text>
+<rect x="340" y="326" width="420" height="30" rx="15" fill="#06120b" stroke="#2f6b47" stroke-width="2"/>
+<rect x="340" y="326" width="277.20000000000005" height="30" rx="15" fill="#ff6b57"/>
+<line x1="676" y1="316" x2="676" y2="366" stroke="#f2c94c" stroke-width="6"/>
+<text x="340" y="398" font-size="20" fill="#f6f8f3" font-weight="700">Gaping: 14 punte om te wen</text>
+<rect x="340" y="430" width="300" height="46" rx="23" fill="#f2c94c"/><text x="490" y="460.92" font-size="22" fill="#10140f" font-weight="800" text-anchor="middle">5 visuele lesse →</text>
+<text x="770" y="500" font-size="16" fill="#b9d0c0" font-weight="700" text-anchor="end">#15 · Springbok SOS</text>
+</svg>

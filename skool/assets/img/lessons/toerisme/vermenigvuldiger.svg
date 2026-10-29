@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Toerisme · Ekonomie: Die vermenigvuldiger-effek" font-family="Arial, Helvetica, sans-serif">
+<defs><marker id="ah3ddc84" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3ddc84"/></marker><marker id="ahff6b57" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ff6b57"/></marker></defs>
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#f2c94c"/><rect y="50" width="800" height="22" fill="#f2c94c"/>
+<text x="24" y="27" font-size="15" fill="#1a1400" font-weight="800" letter-spacing="2">TOERISME · EKONOMIE</text>
+<text x="24" y="60" font-size="29" fill="#1a1400" font-weight="900">Die vermenigvuldiger-effek</text>
+
+    <circle cx="230" cy="300" r="196" fill="#0d3a24" stroke="#3ddc84" stroke-width="3" stroke-dasharray="10 8"/>
+    <circle cx="230" cy="300" r="134" fill="#11492d" stroke="#3ddc84" stroke-width="3" stroke-dasharray="10 8"/>
+    <circle cx="230" cy="300" r="70" fill="#f2c94c"/>
+    <text x="230" y="294" font-size="20" fill="#10140f" font-weight="900" text-anchor="middle">Toeris</text>
+    <text x="230" y="322" font-size="24" fill="#10140f" font-weight="900" text-anchor="middle">R1 000</text>
+    <rect x="150" y="188" width="160" height="36" rx="18" fill="#5cc8ff"/><text x="230" y="212.48" font-size="18" fill="#10140f" font-weight="800" text-anchor="middle">Hotel &amp; gids</text>
+    <rect x="110" y="124" width="240" height="36" rx="18" fill="#3ddc84"/><text x="230" y="148.48" font-size="18" fill="#10140f" font-weight="800" text-anchor="middle">Lone · boere · winkels</text>
+    <rect x="130" y="446" width="200" height="36" rx="18" fill="#ffffff"/><text x="230" y="470.12" font-size="17" fill="#10140f" font-weight="800" text-anchor="middle">Meer werk + belasting</text>
+    <line x1="390" y1="214" x2="470" y2="166" stroke="#3ddc84" stroke-width="5" stroke-linecap="round" marker-end="url(#ah3ddc84)"/><line x1="420" y1="316" x2="470" y2="316" stroke="#ff6b57" stroke-width="5" stroke-linecap="round" marker-end="url(#ahff6b57)"/>
+    <rect x="476" y="92" width="300" height="140" rx="14" fill="#123a24" stroke="#3ddc84" stroke-width="3"/>
+    <text x="494" y="128" font-size="22" fill="#3ddc84" font-weight="900">Geld sirkuleer</text>
+    <text x="494" y="160" font-size="17" fill="#f6f8f3" font-weight="600"><tspan x="494" dy="0">Elke rand word weer en</tspan><tspan x="494" dy="22">weer gespandeer → méér</tspan><tspan x="494" dy="22">inkomste en werk.</tspan></text>
+    <rect x="476" y="246" width="300" height="150" rx="14" fill="#3a1712" stroke="#ff6b57" stroke-width="3"/>
+    <text x="494" y="282" font-size="22" fill="#ff6b57" font-weight="900">LEKKASIE</text>
+    <text x="494" y="314" font-size="17" fill="#f6f8f3" font-weight="600"><tspan x="494" dy="0">Geld verlaat die land:</tspan><tspan x="494" dy="22">ingevoerde goedere,</tspan><tspan x="494" dy="22">buitelandse eienaars</tspan><tspan x="494" dy="22">→ kleiner effek.</tspan></text>
+    <rect x="476" y="410" width="300" height="90" rx="14" fill="#f2c94c"/>
+    <text x="494" y="446" font-size="22" fill="#10140f" font-weight="900">Koop plaaslik</text>
+    <text x="494" y="476" font-size="19" fill="#10140f" font-weight="700">= groter effek</text>
+</svg>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eksamenplan</title>
+  <!-- Skool-ingang: dieselfde app, skoolmodus. Werk op enige statiese gasheer (GitHub Pages, Netlify,
+       Vercel, Cloudflare) en hou enige parameters (?graad=9, ?opstel=1, ?toer=1) heel. -->
+  <script>
+    (function () {
+      var q = location.search ? location.search.slice(1) : "";
+      /* Moenie ?skool= twee keer insit as iemand dit al bygesit het nie. */
+      q = q.replace(/(^|&)skool=[^&]*/g, "").replace(/^&/, "");
+      location.replace("index.html?skool=1" + (q ? "&" + q : "") + location.hash);
+    })();
+  </script>
+</head>
+<body>
+  <noscript>Die eksamenplan het JavaScript nodig. Skakel dit aan en herlaai.</noscript>
+</body>
+</html>
