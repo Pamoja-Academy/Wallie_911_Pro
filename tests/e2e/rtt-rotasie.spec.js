@@ -26,6 +26,8 @@ async function rttKaarte(page) {
           slug: knop ? knop.dataset.slug : "",
           taak: knop ? decodeURIComponent(knop.dataset.title || "") : "",
           konsep: knop ? knop.dataset.concept || "" : "",
+          /* LL-23: 'n merk-/voor-eksamen-kaart het bewus geen les nie */
+          sonderLes: !el.querySelector(".md-concept small"),
           teks: el.innerText
         };
       })
@@ -51,7 +53,8 @@ test("1. opeenvolgende RTT-blokke wys nooit dieselfde werk of dieselfde les-kaar
     const p = await dagOpen(context, dag, { eerste: dag === DAE[0] ? page : null });
     const kaarte = (await rttKaarte(p)).map((k) => ({ ...k, dag }));
     expect(kaarte.length, `${dag}: RTT-blokke op die skerm`).toBeGreaterThan(0);
-    eersteVanDag.push(kaarte[0]);
+    /* LL-23: die eerste kaart MET 'n les (merk-blokke het geen les nie) */
+    eersteVanDag.push(kaarte.find((k) => k.konsep) || kaarte[0]);
     alles.push(...kaarte);
     if (p !== page) await p.close();
   }
@@ -61,7 +64,8 @@ test("1. opeenvolgende RTT-blokke wys nooit dieselfde werk of dieselfde les-kaar
     const a = alles[i - 1];
     const b = alles[i];
     expect(b.taak, `${b.dag}/${b.id} se taak = ${a.dag}/${a.id} se taak`).not.toBe(a.taak);
-    expect(b.konsep, `${b.dag}/${b.id} se les-kaart = ${a.dag}/${a.id} se les-kaart`).not.toBe(a.konsep);
+    /* LL-23: 'n merk-blok het geen les-kaart nie (leë konsep); vergelyk net blokke wat albei 'n kaart het. */
+    if (a.konsep && b.konsep) expect(b.konsep, `${b.dag}/${b.id} se les-kaart = ${a.dag}/${a.id} se les-kaart`).not.toBe(a.konsep);
   }
 
   /* (b) Die eerste blok van ’n nuwe dag herhaal nooit gister se eerste les-kaart nie (die 10/11 Okt-fout). */
@@ -381,7 +385,11 @@ test("7. drie herlaaie verander niks: elke blok hou sy les-kaart en sy werk", as
 
   const eerste = await rttKaarte(page);
   expect(eerste.length).toBeGreaterThan(10);
-  expect(eerste.every((k) => k.konsep), "elke kaart het ’n les-kaart").toBe(true);
+  /* LL-23: elke kaart BEHALWE merk/voor-eksamen het 'n les-kaart */
+  const soorte = await page.evaluate(() => Object.fromEntries(WALLIE.app.state().blocks.map((b) => [b.id, b.soort || ""])));
+  const metLes = eerste.filter((k) => soorte[k.id] !== "merk" && soorte[k.id] !== "voor-eksamen");
+  expect(metLes.length).toBeGreaterThan(5);
+  expect(metLes.every((k) => k.konsep), "elke kaart (buiten merk/voor-eksamen) het ’n les-kaart").toBe(true);
 
   for (let i = 1; i <= 3; i++) {
     await page.reload();
