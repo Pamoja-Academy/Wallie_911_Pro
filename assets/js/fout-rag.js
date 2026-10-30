@@ -272,7 +272,12 @@ window.WALLIE = window.WALLIE || {};
         gesien[teks] = true;
         (isEie && vak !== "algemeen" ? eie : alg).push({ id: e.id, teks: teks });
       });
-      return eie.concat(alg);
+      /* LL-23: inhoudsfoute ("dit is prakties", "dit is in Engels") staan altyd bo-aan: die foutvanger sien hulle nooit. */
+      var lys = eie.concat(alg);
+      var soortVan = {};
+      korpus.inskrywings.forEach(function (e) { soortVan[e.id] = e.soort; });
+      return lys.filter(function (k) { return soortVan[k.id] === "inhoud"; })
+        .concat(lys.filter(function (k) { return soortVan[k.id] !== "inhoud"; }));
     } catch (e) {
       return [];
     }

@@ -88,6 +88,51 @@ function faqUitHulp() {
 /* Net die lesse waar die app iets aan Wallie gedoen het wat hy op die skerm sien. Die antwoord is
    wat hy op daardie oomblik moet doen — nie die ontwikkelaar se regstelling nie. */
 const UIT_LESSE = [
+  /* 30 Okt, LL-23: INHOUDSFOUTE. Die foutvanger sien dit nooit; Wallie moet dit kan KIES en presies kan sê. */
+  {
+    id: "inhoud-prakties-by-teorie",
+    soort: "inhoud",
+    ll: "LL-23",
+    vakke: ["rtt", "engels", "afrikaans", "gasvryheid", "toerisme", "wiskgelett", "algemeen"],
+    simptome: [
+      "Die blok wys praktiese werk, maar ek skryf teorie.",
+      "Dit gee my praktiese vrae wat ek nie gaan skryf nie.",
+      "Die Office-knoppie of 'n Excel-les verskyn by 'n teorievraestel."
+    ],
+    seine: [],
+    bewys: [{ lêer: "assets/js/lesson-ui.js", patroon: 'b.soort === "voor-eksamen"' }],
+    antwoord:
+      "Dit is 'n fout in die plan, nie joune nie. Jou werk is net die DBE-vraestel bo-aan die blok (Vraestel en Memo). " +
+      "Ignoreer enige les of Office-knoppie wat nie by daardie vraestel pas nie. Druk 'Stuur probleem' sodat Pa die blok regmaak."
+  },
+  {
+    id: "inhoud-engels",
+    soort: "inhoud",
+    ll: "LL-23",
+    vakke: ["rtt", "engels", "afrikaans", "gasvryheid", "toerisme", "wiskgelett", "algemeen"],
+    simptome: [
+      "Die vraag of les is in Engels, nie in Afrikaans nie.",
+      "Ek moet Google Translate gebruik om die vraag te verstaan."
+    ],
+    seine: [],
+    antwoord:
+      "Werk uit die amptelike DBE-vraestel bo-aan die blok: dit is in jou eksamentaal (Afrikaans, behalwe by Engels). " +
+      "Ignoreer enigiets anders in die app wat in Engels is; jy hoef niks te vertaal nie. Druk 'Stuur probleem' sodat Pa dit regmaak."
+  },
+  {
+    id: "inhoud-verkeerde-werk",
+    soort: "inhoud",
+    ll: "LL-23",
+    vakke: ["rtt", "engels", "afrikaans", "gasvryheid", "toerisme", "wiskgelett", "algemeen"],
+    simptome: [
+      "Die blok se werk pas nie by my eksamen nie.",
+      "Dit is die verkeerde vraestel of die verkeerde vak."
+    ],
+    seine: [],
+    antwoord:
+      "Doen die blok uit die DBE-vraestel van die vak wat jy volgende skryf (sien die aftelling op die Missie-skerm). " +
+      "Ignoreer die res. Skryf in die blokkie hier onder wat verkeerd is en druk 'Stuur probleem', sodat Pa presies weet wat om reg te maak."
+  },
   {
     id: "les-oortjie-slot",
     ll: "LL-20",
@@ -210,7 +255,7 @@ function lesInskrywings() {
     if (!reël) throw new Error(bronRel + ': "' + soek + '" nie gevind nie');
     const uit = {
       id: e.id,
-      soort: "les",
+      soort: e.soort || "les",
       vakke: e.vakke.slice().sort(),
       simptome: e.simptome,
       /* Seine word altyd klein gestoor: die soektog vergelyk teen 'n klein gemaakte boodskap. */

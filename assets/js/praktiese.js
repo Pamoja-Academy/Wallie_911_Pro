@@ -108,7 +108,17 @@
     canStart() {
       if (!store()) return false;
       if (this.active()) return false;
-      return currentSubject() === SUBJECT;
+      if (currentSubject() !== SUBJECT) return false;
+      /* 30 Okt (LL-23): 'n RTT-sessie met 'n TEORIE-vraestel (V2) het "Begin praktiese blok (Office)" gewys. Net 'n
+         praktiese vraestel (of 'n RTT-blok sonder vraestel) mag dit wys. */
+      try {
+        const w = window.WALLIE?.DBE?.aktief?.();
+        const it = w && w.id ? window.WALLIE.DBE.item(w.id) : null;
+        if (it && /teorie|V2/i.test(it.titel || "")) return false;
+      } catch {
+        /* geen katalogus: gedra soos voorheen */
+      }
+      return true;
     },
 
     start() {

@@ -2,7 +2,7 @@
  "gegenereer_deur": "scripts/bou-fout-rag.js",
  "metode": "Onttrek uit assets/js/hulp.js (SUPPORT_FAQ, woordeliks), docs/LESSONS-LEARNED.md (lesse met 'n simptoom wat Wallie sien) en docs/SPEK-FOUTVANGER-2026-10-28.md §4 (tegniese foutseine). Elke inskrywing wys na sy bron; tests/fout-rag.test.js faal as 'n bron nie bestaan nie.",
  "korpus": {
-  "inskrywings": 22,
+  "inskrywings": 25,
   "faq": 11,
   "lesse": 5,
   "seine": 6
@@ -170,6 +170,73 @@
    "seine": [],
    "antwoord": "Engels EAT V3 (100 punte, 2½ uur): opstel 50 punte = 80 min (250–300 woorde); lang transaksionele teks 30 punte = 40 min (120–150 woorde); kort teks 20 punte = 30 min (80–100 woorde). Plan 10% van die tyd, skryf, en hou 5 min vir redigeer en woordtelling. Afrikaans Huistaal V3: volg die punte op die vraestel: ongeveer 1 minuut per punt plus 'n paar minute om te beplan. By die ander vakke se langer antwoorde geld dieselfde: kyk na die punte en gee omtrent 1 minuut per punt.",
    "bron": "assets/js/hulp.js:122"
+  },
+  {
+   "id": "inhoud-engels",
+   "soort": "inhoud",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die vraag of les is in Engels, nie in Afrikaans nie.",
+    "Ek moet Google Translate gebruik om die vraag te verstaan."
+   ],
+   "seine": [],
+   "antwoord": "Werk uit die amptelike DBE-vraestel bo-aan die blok: dit is in jou eksamentaal (Afrikaans, behalwe by Engels). Ignoreer enigiets anders in die app wat in Engels is; jy hoef niks te vertaal nie. Druk 'Stuur probleem' sodat Pa dit regmaak.",
+   "bron": "docs/LESSONS-LEARNED.md:30"
+  },
+  {
+   "id": "inhoud-prakties-by-teorie",
+   "soort": "inhoud",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die blok wys praktiese werk, maar ek skryf teorie.",
+    "Dit gee my praktiese vrae wat ek nie gaan skryf nie.",
+    "Die Office-knoppie of 'n Excel-les verskyn by 'n teorievraestel."
+   ],
+   "seine": [],
+   "antwoord": "Dit is 'n fout in die plan, nie joune nie. Jou werk is net die DBE-vraestel bo-aan die blok (Vraestel en Memo). Ignoreer enige les of Office-knoppie wat nie by daardie vraestel pas nie. Druk 'Stuur probleem' sodat Pa die blok regmaak.",
+   "bron": "docs/LESSONS-LEARNED.md:30",
+   "bewys": [
+    {
+     "lêer": "assets/js/lesson-ui.js",
+     "patroon": "b.soort === \"voor-eksamen\""
+    }
+   ]
+  },
+  {
+   "id": "inhoud-verkeerde-werk",
+   "soort": "inhoud",
+   "vakke": [
+    "afrikaans",
+    "algemeen",
+    "engels",
+    "gasvryheid",
+    "rtt",
+    "toerisme",
+    "wiskgelett"
+   ],
+   "simptome": [
+    "Die blok se werk pas nie by my eksamen nie.",
+    "Dit is die verkeerde vraestel of die verkeerde vak."
+   ],
+   "seine": [],
+   "antwoord": "Doen die blok uit die DBE-vraestel van die vak wat jy volgende skryf (sien die aftelling op die Missie-skerm). Ignoreer die res. Skryf in die blokkie hier onder wat verkeerd is en druk 'Stuur probleem', sodat Pa presies weet wat om reg te maak.",
+   "bron": "docs/LESSONS-LEARNED.md:30"
   },
   {
    "id": "les-memo-hek",
