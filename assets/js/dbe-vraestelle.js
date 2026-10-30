@@ -278,6 +278,8 @@ window.WALLIE = window.WALLIE || {};
     if (blok && Number.isFinite(blok.punte) && (!blok.werk || !werk || blok.werk.id === werk.id)) return blok.punte;
     const p = werk ? item(werk.id) : null;
     if (!p) return null;
+    /* 30 Okt (QC): 'n keusevraestel (letterkunde) se vrae tel op na meer as die vraestel; die heel vraestel tel sy eie totaal */
+    if (werk.tipe === "vraestel" && Number.isFinite(p.totaal)) return p.totaal;
     const nrs = vraagNommers(werk);
     if (!nrs.length || nrs.some((n) => !Number.isInteger(Number(n)) || !p.vrae[Number(n) - 1])) return null;
     return nrs.reduce((s, n) => s + p.vrae[Number(n) - 1], 0);

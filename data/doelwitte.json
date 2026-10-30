@@ -41,11 +41,10 @@
       "eksamen": "Toerisme", "vak": "toerisme", "katalogus": "toer", "punte": 200, "duur_min": 180,
       "aanvaar": "Op teiken (prelim 61 teen 60): die doel is om nie punte te verloor nie. Die week is vol (4 eksamens in 5 dae); afdeling A + B (90 punte) op die oggend van die eksamen = 85 min."
     },
-    { "eksamen": "Gasvryheidstudie", "vak": "gasvryheid", "katalogus": "gas", "punte": 200, "duur_min": 180 }
+    { "eksamen": "Gasvryheidstudie", "vak": "gasvryheid", "katalogus": "gas", "punte": 200, "duur_min": 180 },
+    { "eksamen": "Afrikaans HT V1 · Taal", "vak": "afrikaans", "katalogus": "afr-v1", "punte": 70, "duur_min": 120 },
+    { "eksamen": "Engels EAT V2 · Letterkunde", "vak": "engels", "katalogus": "eng-v2", "punte": 70, "duur_min": 150 },
+    { "eksamen": "Afrikaans HT V2 · Letterkunde", "vak": "afrikaans", "katalogus": "afr-v2", "punte": 80, "duur_min": 150 }
   ],
-  "oop": [
-    { "eksamen": "Afrikaans HT V1 · Taal", "teen": "2026-10-24", "wat": "Planne 7-10 Nov uit die Nov 2025- en Jun 2026-vraestelle (katalogus 'afr-v1'); opsomming en taal C eerste." },
-    { "eksamen": "Engels EAT V2 · Letterkunde", "teen": "2026-10-24", "wat": "Hanno moet die voorgeskrewe werke bevestig; dan kontekstuele vrae uit ou V2-vraestelle." },
-    { "eksamen": "Afrikaans HT V2 · Letterkunde", "teen": "2026-10-24", "wat": "Hanno moet die voorgeskrewe werke bevestig; ongesiene gedig (10 punte) is suiwer tegniek." }
-  ]
+  "oop": []
 }

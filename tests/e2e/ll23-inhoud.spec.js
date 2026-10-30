@@ -43,8 +43,10 @@ test("LL-23: RTT V2-merkblok (29 Okt 09:00) — geen agtergrond-les, geen Office
   await expect(kaart).not.toContainText("Agtergrond");
   await expect(page.locator('.md-card[data-id="2026-10-29-reels"]')).not.toContainText("Agtergrond");
   await page.locator('.start-block[data-block="2026-10-29-merk-rtt-v2-c"]').click();
-  const nee = page.getByText("Nee, dis nuut vir my");
-  if (await nee.count()) await nee.first().click();
+  /* Wag deterministies: óf die omruil-vraag, óf die vraestel-skakel moet eers verskyn (nie 'n onmiddellike telling nie). */
+  const nee = page.getByText("Nee, dis nuut vir my").first();
+  await expect(nee.or(page.getByRole("link", { name: /Vraestel/ }).first())).toBeVisible();
+  if (await nee.isVisible()) await nee.click();
   await expect(page.locator("#session-lesson")).not.toContainText("Agtergrond");
   await expect(page.locator("#session-lesson")).not.toContainText("COUNTIF");
   await expect(page.locator("#praktiese-start-row")).toBeHidden();
@@ -59,8 +61,40 @@ test("LL-23: Toerisme 30 Okt — merk- en laaste-kyk-blok sonder agtergrond-les;
     await expect(page.locator(`.md-card[data-id="${id}"]`)).not.toContainText("Agtergrond");
   }
   await page.locator('.start-block[data-block="2026-10-30-toer-a"]').click();
-  const nee = page.getByText("Nee, dis nuut vir my");
-  if (await nee.count()) await nee.first().click();
+  /* Wag deterministies: óf die omruil-vraag, óf die vraestel-skakel moet eers verskyn (nie 'n onmiddellike telling nie). */
+  const nee = page.getByText("Nee, dis nuut vir my").first();
+  await expect(nee.or(page.getByRole("link", { name: /Vraestel/ }).first())).toBeVisible();
+  if (await nee.isVisible()) await nee.click();
   await expect(page.getByRole("link", { name: /Vraestel/ }).first()).toHaveAttribute("href", /education\.gov\.za/);
   await expect(page.locator("#praktiese-start-row")).toBeHidden();
 });
+
+/* 30 Okt: die planne 7-20 Nov. Elke letterkunde- en taal-blok wys sy amptelike DBE-vraestel op die skerm. */
+for (const [tyd, id, titel] of [
+  ["2026-11-07T08:29:00+02:00", "2026-11-07-afr1-a", "Mei/Junie 2026 Afrikaans HT V1 (taal)"],
+  ["2026-11-12T07:59:00+02:00", "2026-11-12-eng2-a", "Mei/Junie 2026 English FAL P2 (literature)"],
+  ["2026-11-16T07:59:00+02:00", "2026-11-16-afr2-e", "Mei/Junie 2025 Afrikaans HT V2 (letterkunde)"]
+]) {
+  test(`plan 7-20 Nov: ${id} wys sy DBE-vraestel en geen agtergrond-les nie`, async ({ page, context }) => {
+    const mock = new MockBackend({ mode: "v1" });
+    await mock.attach(context);
+    await boot(page, { time: new Date(tyd) });
+    await page.goto("/#missie");
+    const kaart = page.locator(`.md-card[data-id="${id}"]`);
+    await expect(kaart).toContainText(titel);
+    await expect(kaart).not.toContainText("Agtergrond");
+    await page.locator(`.start-block[data-block="${id}"]`).click();
+    /* Wag deterministies: óf die omruil-vraag, óf die vraestel-skakel moet eers verskyn (nie 'n onmiddellike telling nie). */
+    const nee = page.getByText("Nee, dis nuut vir my").first();
+    await expect(nee.or(page.getByRole("link", { name: /Vraestel/ }).first())).toBeVisible();
+    if (await nee.isVisible()) await nee.click();
+    await expect(page.getByRole("link", { name: /Vraestel/ }).first()).toHaveAttribute("href", /education\.gov\.za\/LinkClick/);
+    await expect(page.locator("#session-lesson")).not.toContainText("Agtergrond");
+    /* QC 30 Okt (B1): 'n keusevraestel wys sy eie totaal (80), nie die som van al 17 vrae (350) nie */
+    if (id.endsWith("afr2-e")) {
+      await expect(page.locator("body")).toContainText("Keusevraestel: beantwoord 5 van die 17 vrae");
+      await expect(page.locator("body")).toContainText("80 punte");
+      await expect(page.locator("body")).not.toContainText("350 punte");
+    }
+  });
+}
