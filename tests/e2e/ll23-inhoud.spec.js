@@ -89,7 +89,8 @@ test("Toerisme 30 Okt MCQ: 20 vinnige vrae in die app (geen buite-PDF)", async (
 for (const [tyd, id, titel] of [
   ["2026-11-07T08:29:00+02:00", "2026-11-07-afr1-a", "Mei/Junie 2026 Afrikaans HT V1 (taal)"],
   ["2026-11-12T07:59:00+02:00", "2026-11-12-eng2-a", "Mei/Junie 2026 English FAL P2 (literature)"],
-  ["2026-11-16T07:59:00+02:00", "2026-11-16-afr2-e", "Mei/Junie 2025 Afrikaans HT V2 (letterkunde)"]
+  ["2026-11-16T07:59:00+02:00", "2026-11-16-afr2-e", "Mei/Junie 2025 Afrikaans HT V2 (letterkunde)"],
+  ["2026-11-12T11:04:00+02:00", "2026-11-12-afr2-dr1", "November 2024 Afrikaans HT V2 (letterkunde)"]
 ]) {
   test(`plan 7-20 Nov: ${id} wys sy DBE-vraestel en geen agtergrond-les nie`, async ({ page, context }) => {
     const mock = new MockBackend({ mode: "v1" });
