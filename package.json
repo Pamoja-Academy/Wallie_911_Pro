@@ -3,7 +3,7 @@
   "private": true,
   "description": "Statiese app; package.json is net vir toetse (Playwright + PGlite).",
   "scripts": {
-    "test": "node scripts/proctor-test.js && node scripts/smoke-parse.js && node tests/sql-migration.test.js && playwright test && node tests/vraebank-store.test.js && node tests/vraebank.test.js && node tests/preview-guard.test.js && node tests/dbe-vraestelle.test.js && node tests/ondersteuning.test.js && node tests/fout-rag.test.js && node tests/fout-vanger.test.js && node tests/vraebank-v3.test.js && node tests/weergawe.test.js && node tests/eksamenmodus.test.js && node tests/agtergrond.test.js && node tests/vroeg-klaar.test.js && node tests/eksamenvlak-hek.test.js && node tests/plan-v5.test.js && node tests/plan-nov.test.js && node tests/roete.test.js && node tests/vraelys.test.js",
+    "test": "node scripts/proctor-test.js && node scripts/smoke-parse.js && node tests/sql-migration.test.js && playwright test && node tests/vraebank-store.test.js && node tests/vraebank.test.js && node tests/preview-guard.test.js && node tests/dbe-vraestelle.test.js && node tests/ondersteuning.test.js && node tests/fout-rag.test.js && node tests/fout-vanger.test.js && node tests/vraebank-v3.test.js && node tests/weergawe.test.js && node tests/eksamenmodus.test.js && node tests/agtergrond.test.js && node tests/vroeg-klaar.test.js && node tests/eksamenvlak-hek.test.js && node tests/plan-v5.test.js && node tests/plan-nov.test.js && node tests/roete.test.js && node tests/vraelys.test.js && node tests/toerisme-mcq.test.js",
     "test:skoon": "node scripts/test-skoon.js",
     "test:sql": "node tests/sql-migration.test.js",
     "test:e2e": "playwright test",

@@ -374,7 +374,7 @@ tik("belofte", () => {
 /* --- 11. hulpbron wat nie laai nie --- */
 tik("hulpbron", () => {
   const t = bou({ rag: () => null });
-  t.fire("error", { target: { tagName: "SCRIPT", src: "http://localhost:9123/assets/js/ondersteuning.js?v=2026-10-30b" } });
+  t.fire("error", { target: { tagName: "SCRIPT", src: "http://localhost:9123/assets/js/ondersteuning.js?v=2026-10-30c" } });
   assert(t.bugReports.length === 1, "skrif wat nie laai nie word gerapporteer");
   assert(t.soekOproepe[0] && t.soekOproepe[0].q === "404 assets/js/ondersteuning.js", "navraag = '404 <pad>'; kry " + (t.soekOproepe[0] && t.soekOproepe[0].q));
   assert(/hulpbron\|script\|assets\/js\/ondersteuning\.js/.test(t.soekOproepe[0].opts.sein), "sein sonder ?v=; kry " + t.soekOproepe[0].opts.sein);

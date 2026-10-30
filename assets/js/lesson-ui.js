@@ -572,6 +572,11 @@
     const blok = blokById(sessieBlokId) || huidigeBlok();
     if (blok) sessieBlokId = blok.id;
     renderSessieHooftaak(blok);
+    /* Vinnige MCQ-blok (30 Okt Toerisme): geen DBE-PDF — die vrae is IN die app. */
+    if (blok && blok.mcq && WALLIE.toerismeMcq?.render(el, blok)) {
+      stopMemoTimer();
+      return;
+    }
     const werk = blok ? werkVan(blok.id) : null;
     const ekstra = (blok?.werk_ekstra || []).filter((w) => DBE()?.skakels(w));
     const hoof = DBE()?.skakels(werk) ? werk : null;

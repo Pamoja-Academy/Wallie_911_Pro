@@ -31,6 +31,7 @@ const steps = [
   "node tests/plan-nov.test.js",
   "node tests/roete.test.js",
   "node tests/vraelys.test.js",
+  "node tests/toerisme-mcq.test.js",
   "node scripts/eksamenvlak-hek.js",
 ];
 

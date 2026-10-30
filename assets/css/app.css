@@ -1086,6 +1086,21 @@ body.les-open { overflow: hidden; }
 /* Sessie: die vraestel (DBE-skakels) */
 .session-werk { margin-top: 0; }
 .session-werk[hidden] { display: none; }
+
+/* Toerisme vinnige MCQ (30 Okt) */
+.toer-mcq-vraag { font-size: max(17px, 1.05rem); line-height: 1.5; font-weight: 700; margin: 0.5rem 0 0.75rem; }
+.toer-mcq-opsies { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0 1rem; }
+.toer-mcq-opsie { text-align: left; white-space: normal; min-height: 44px; }
+.toer-mcq-opsie.reg { outline: 2px solid var(--ok, #3d9a6a); }
+.toer-mcq-opsie.fout { outline: 2px solid var(--danger, #c44); }
+.toer-mcq-terugvoer { margin: 0.75rem 0; padding: 0.75rem 1rem; border-radius: var(--radius); border-left: 4px solid var(--accent); background: var(--bg-2, #152018); }
+.toer-mcq-terugvoer.reg { border-left-color: var(--ok, #3d9a6a); }
+.toer-mcq-terugvoer.fout { border-left-color: var(--danger, #c44); }
+.toer-mcq-telling { font-size: 1.25rem; font-weight: 800; }
+.toer-mcq-hersien { padding-left: 1.2rem; }
+.toer-mcq-hersien li { margin: 0.75rem 0; }
+.toer-mcq-hersien li.reg strong::before { content: "✓ "; color: var(--ok, #3d9a6a); }
+.toer-mcq-hersien li.fout strong::before { content: "✗ "; color: var(--danger, #c44); }
 .werk-blok-titel { margin: 0 0 0.75rem; font-size: 1.15rem; font-weight: 800; color: #e3efe7; }
 .werk-hoof, .werk-ekstra { border-top: 1px solid var(--line); padding-top: 0.6rem; margin-top: 0.6rem; }
 .werk-hoof:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
