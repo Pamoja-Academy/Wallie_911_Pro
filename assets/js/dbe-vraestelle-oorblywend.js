@@ -31,6 +31,87 @@
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=IrUS0WtPgbM%3d&tabid=5742&portalid=0&mid=14812",
       vrae: [30, 10, 10, 10, 10]
     },
+    /* ---- 30 Okt (Hanno: "bou dit"): planne 7-20 Nov. Elke skakel op 30 Okt afgelaai: HTTP 200, application/pdf, die jaar
+       op die voorblad nagegaan, en die inhoudsopgawe gelees. md5 van Afr V2 Nov 2025 en Eng P2 Mei/Junie 2025 = DBE-cache.
+       Afrikaans V1 70 = A 30 (V1) + B 10 (V2) + C 30 (V3-5); A 50 min, B 30 min, C 40 min (instruksiebladsy).
+       Afrikaans V2 80 = A 30: gesiene gedigte V1-4 (10 elk, kies 2) + ongesiene gedig V5 (10, VERPLIG);
+                        B roman 25: Onderwereld V6 (opstel) / V7 (kontekstueel); C drama 25: V14-17.
+                        Een opstel- en een kontekstuele vraag oor B en C. Tyd: A 40, B 55, C 55 min.
+       Engels P2 70     = 2 van 4 afdelings, 35 elk (+-75 min): V1-2 roman, V3 Macbeth, V5 kortverhale (5.1+5.2), V6 poesie (6.1+6.2).
+       Wallie se werke (Hanno, 30 Okt): Afr roman Onderwereld; Afr drama ONGEVERIFIEER; Engels Macbeth + kortverhale + poesie.
+       Uitgesluit: DBE Nov 2025 English FAL P2 (die skakel wys na die Mei/Junie 2025-lêer; net die memo is reg). ---- */
+    "dbe-2025-jun-afr-v1": {
+      id: "dbe-2025-jun-afr-v1",
+      vak: "afrikaans",
+      titel: "DBE Mei/Junie 2025 Afrikaans HT V1 (taal) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=7eCoQ0EJ0XQ%3d&tabid=5475&portalid=0&mid=14211",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=LdtbtBH9IbU%3d&tabid=5475&portalid=0&mid=14211",
+      vrae: [30, 10, 10, 10, 10]
+    },
+    "dbe-2024-nov-afr-v1": {
+      id: "dbe-2024-nov-afr-v1",
+      vak: "afrikaans",
+      titel: "DBE November 2024 Afrikaans HT V1 (taal) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=d3LjwjOF7Ms%3d&tabid=5193&portalid=0&mid=13690",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=jEQyoUkCGWc%3d&tabid=5193&portalid=0&mid=13690",
+      vrae: [30, 10, 10, 10, 10]
+    },
+    "dbe-2026-jun-afr-v2": {
+      id: "dbe-2026-jun-afr-v2",
+      vak: "afrikaans",
+      titel: "DBE Mei/Junie 2026 Afrikaans HT V2 (letterkunde) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=UxlXI5zOVfY%3d&tabid=5956&portalid=0&mid=15108",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=2pZDNCcwNOM%3d&tabid=5956&portalid=0&mid=15108",
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+    },
+    "dbe-2025-nov-afr-v2": {
+      id: "dbe-2025-nov-afr-v2",
+      vak: "afrikaans",
+      titel: "DBE November 2025 Afrikaans HT V2 (letterkunde) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=BUnjVEmATIE%3d&tabid=5742&portalid=0&mid=14812",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=IPY2wyMz5KA%3d&tabid=5742&portalid=0&mid=14812",
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+    },
+    "dbe-2025-jun-afr-v2": {
+      id: "dbe-2025-jun-afr-v2",
+      vak: "afrikaans",
+      titel: "DBE Mei/Junie 2025 Afrikaans HT V2 (letterkunde) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=EPJmZ5KEJwQ%3d&tabid=5475&portalid=0&mid=14211",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=8UJFzvFbUnE%3d&tabid=5475&portalid=0&mid=14211",
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+    },
+    "dbe-2024-nov-afr-v2": {
+      id: "dbe-2024-nov-afr-v2",
+      vak: "afrikaans",
+      titel: "DBE November 2024 Afrikaans HT V2 (letterkunde) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=76_kG60Daz8%3d&tabid=5193&portalid=0&mid=13690",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=HpPcG0wwAQg%3d&tabid=5193&portalid=0&mid=13690",
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+    },
+    "dbe-2026-jun-eng-v2": {
+      id: "dbe-2026-jun-eng-v2",
+      vak: "engels",
+      titel: "DBE Mei/Junie 2026 English FAL P2 (literature)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=bPHG3jHTAFI%3d&tabid=5956&portalid=0&mid=15109",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=BF_KofHzVOk%3d&tabid=5956&portalid=0&mid=15109",
+      vrae: [35, 35, 35, 35, 35, 35]
+    },
+    "dbe-2025-jun-eng-v2": {
+      id: "dbe-2025-jun-eng-v2",
+      vak: "engels",
+      titel: "DBE Mei/Junie 2025 English FAL P2 (literature)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=E3kkv7eqk4A%3d&tabid=5475&portalid=0&mid=14212",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=8sOD--gde2M%3d&tabid=5475&portalid=0&mid=14212",
+      vrae: [35, 35, 35, 35, 35, 35]
+    },
+    "dbe-2024-nov-eng-v2": {
+      id: "dbe-2024-nov-eng-v2",
+      vak: "engels",
+      titel: "DBE November 2024 English FAL P2 (literature)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=ko5NmgVF4bA%3d&tabid=5193&portalid=0&mid=13691",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=KzaTJSPMnhk%3d&tabid=5193&portalid=0&mid=13691",
+      vrae: [35, 35, 35, 35, 35, 35]
+    },
     "dbe-2025-jun-eng-v1": {
       id: "dbe-2025-jun-eng-v1",
       vak: "engels",
@@ -245,7 +326,19 @@
       ["dbe-2024-nov-gas"],
       ["dbe-2023-nov-gas"],
       ["dbe-2023-jun-gas"],
-      ["dbe-2026-jun-wg-v2"]
+      ["dbe-2026-jun-wg-v2"],
+      /* 7-20 Nov: elke vraestel word in die plan gebruik, dus geen ongebruikte vervanger nie (die app vra steeds) */
+      ["dbe-2026-jun-afr-v1"],
+      ["dbe-2025-nov-afr-v1"],
+      ["dbe-2025-jun-afr-v1"],
+      ["dbe-2024-nov-afr-v1"],
+      ["dbe-2026-jun-afr-v2"],
+      ["dbe-2025-nov-afr-v2"],
+      ["dbe-2025-jun-afr-v2"],
+      ["dbe-2024-nov-afr-v2"],
+      ["dbe-2026-jun-eng-v2"],
+      ["dbe-2025-jun-eng-v2"],
+      ["dbe-2024-nov-eng-v2"]
     );
   }
 })();
