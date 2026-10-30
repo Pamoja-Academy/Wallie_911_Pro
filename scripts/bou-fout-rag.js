@@ -102,8 +102,9 @@ const UIT_LESSE = [
     seine: [],
     bewys: [{ lêer: "assets/js/lesson-ui.js", patroon: 'b.soort === "voor-eksamen"' }],
     antwoord:
-      "Dit is 'n fout in die plan, nie joune nie. Jou werk is net die DBE-vraestel bo-aan die blok (Vraestel en Memo). " +
-      "Ignoreer enige les of Office-knoppie wat nie by daardie vraestel pas nie. Druk 'Stuur probleem' sodat Pa die blok regmaak."
+      "Dit is 'n fout in die plan, nie joune nie. Is daar 'n DBE-vraestel bo-aan die blok, werk net daaruit en ignoreer die les of " +
+      "Office-knoppie wat nie daarby pas nie. Is daar geen vraestel nie, werk uit jou handboek of notas vir die vraestel wat jy " +
+      "volgende skryf. Druk 'Stuur probleem' sodat Pa die blok regmaak."
   },
   {
     id: "inhoud-engels",
@@ -116,8 +117,9 @@ const UIT_LESSE = [
     ],
     seine: [],
     antwoord:
-      "Werk uit die amptelike DBE-vraestel bo-aan die blok: dit is in jou eksamentaal (Afrikaans, behalwe by Engels). " +
-      "Ignoreer enigiets anders in die app wat in Engels is; jy hoef niks te vertaal nie. Druk 'Stuur probleem' sodat Pa dit regmaak."
+      "Die amptelike DBE-vraestelle in die app is in jou eksamentaal (Afrikaans, behalwe by Engels). Is daar een bo-aan die blok, " +
+      "werk daaruit; anders uit jou handboek of notas. Ignoreer wat in Engels is; jy hoef niks te vertaal nie. " +
+      "Druk 'Stuur probleem' sodat Pa dit regmaak."
   },
   {
     id: "inhoud-verkeerde-werk",
@@ -130,8 +132,8 @@ const UIT_LESSE = [
     ],
     seine: [],
     antwoord:
-      "Doen die blok uit die DBE-vraestel van die vak wat jy volgende skryf (sien die aftelling op die Missie-skerm). " +
-      "Ignoreer die res. Skryf in die blokkie hier onder wat verkeerd is en druk 'Stuur probleem', sodat Pa presies weet wat om reg te maak."
+      "Werk vir die vak wat jy volgende skryf (sien die aftelling op die Missie-skerm): uit 'n DBE-vraestel as die app een het, " +
+      "anders uit jou handboek of notas. Skryf in die blokkie hier onder wat verkeerd is en druk 'Stuur probleem', sodat Pa presies weet wat om reg te maak."
   },
   {
     id: "les-oortjie-slot",
