@@ -57,7 +57,7 @@ test("LL-23: Toerisme 30 Okt — merk- en laaste-kyk-blok sonder agtergrond-les;
   await mock.attach(context);
   await boot(page, { time: new Date("2026-10-30T07:59:00+02:00") });
   await page.goto("/#missie");
-  for (const id of ["2026-10-30-toer-a", "2026-10-30-merk-toer-a", "2026-10-30-laaste-kyk"]) {
+  for (const id of ["2026-10-30-toer-a", "2026-10-30-merk-toer-a", "2026-10-30-mcq-vinnig", "2026-10-30-laaste-kyk"]) {
     await expect(page.locator(`.md-card[data-id="${id}"]`)).not.toContainText("Agtergrond");
   }
   await page.locator('.start-block[data-block="2026-10-30-toer-a"]').click();
@@ -67,6 +67,22 @@ test("LL-23: Toerisme 30 Okt — merk- en laaste-kyk-blok sonder agtergrond-les;
   if (await nee.isVisible()) await nee.click();
   await expect(page.getByRole("link", { name: /Vraestel/ }).first()).toHaveAttribute("href", /education\.gov\.za/);
   await expect(page.locator("#praktiese-start-row")).toBeHidden();
+});
+
+test("Toerisme 30 Okt MCQ: 20 vinnige vrae in die app (geen buite-PDF)", async ({ page, context }) => {
+  const mock = new MockBackend({ mode: "v1" });
+  await mock.attach(context);
+  await boot(page, { time: new Date("2026-10-30T09:54:00+02:00") });
+  await page.goto("/#missie");
+  const kaart = page.locator('.md-card[data-id="2026-10-30-mcq-vinnig"]');
+  await expect(kaart).toContainText("20 vinnige MCQs");
+  await expect(kaart).not.toContainText("Agtergrond");
+  await page.locator('.start-block[data-block="2026-10-30-mcq-vinnig"]').click();
+  await expect(page.locator("#session-werk .toer-mcq-vraag")).toBeVisible();
+  await expect(page.locator("#session-werk .toer-mcq-opsie")).toHaveCount(4);
+  await expect(page.locator("#session-lesson")).not.toContainText("Agtergrond");
+  await page.locator("#session-werk .toer-mcq-opsie").first().click();
+  await expect(page.locator("#session-werk .toer-mcq-terugvoer")).toBeVisible();
 });
 
 /* 30 Okt: die planne 7-20 Nov. Elke letterkunde- en taal-blok wys sy amptelike DBE-vraestel op die skerm. */

@@ -687,9 +687,13 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       { suffix: "merk-toer-a", kind: "geel", slug: "toerisme", start: "09:25", end: "09:55", soort: "merk",
         title: "Merk Toerisme Vraag 1 tot 3 met die DBE-memo (Mei/Junie 2026)", detail: "",
         werk: { tipe: "vrae", id: "dbe-2026-jun-toer", nrs: [1, 2, 3] } },
-      { suffix: "laaste-kyk", kind: "geel", slug: "toerisme", start: "10:10", end: "10:30", soort: "voor-eksamen",
+      { suffix: "mcq-vinnig", kind: "geel", slug: "toerisme", start: "09:55", end: "10:25", soort: "voor-eksamen", punte: 20,
+        title: "Toerisme: 20 vinnige MCQs (doeane, groen/rooi, UTC, kaartwerk, minister)",
+        detail: "Uit jou notas + SARS/DBE-patroon. Een vraag op 'n slag; sien dadelik of dit reg is.",
+        mcq: "toer-vinnig" },
+      { suffix: "laaste-kyk", kind: "geel", slug: "toerisme", start: "10:25", end: "10:40", soort: "voor-eksamen",
         title: "Toerisme: laaste kyk (wisselkoers, tydsones, punte bepaal lengte)", detail: "Geen nuwe werk nie. Tas: ID, toelatingsbrief, sakrekenaar." },
-      { suffix: "rus", kind: "break", slug: "break", start: "10:30", end: "13:00", soort: "pouse",
+      { suffix: "rus", kind: "break", slug: "break", start: "10:40", end: "13:00", soort: "pouse",
         title: "Rus en middagete (eet voor 13:00)", detail: "" },
       { suffix: "eksamen", kind: "break", slug: "break", start: "14:00", end: "17:00", soort: "pouse",
         title: "TOERISME-EKSAMEN (skool) 14:00-17:00", detail: "200 punte, 3 uur. Sterkte!" },
@@ -1043,6 +1047,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       if (b.item) blok.item = b.item;
       if (b.werk) blok.werk = b.werk;
       if (b.werk_ekstra) blok.werk_ekstra = b.werk_ekstra;
+      if (b.mcq) blok.mcq = b.mcq;
       return blok;
     });
     return {
