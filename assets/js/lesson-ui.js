@@ -124,6 +124,10 @@
     const punte = d.punte(werk, blok);
     if (!nrs.length && punte == null) return "";
     /* 21 Okt: "Vraag 1 (29) · … · Vraag 5 (26)" het soos 5 klein vragies gelyk. 'n Volle Wisk. Gel.-vraestel sê dit voluit. */
+    if (werk.tipe === "vraestel" && d.item(werk.id)?.beantwoord) {
+      /* 30 Okt (QC): 'n keusevraestel is nie "17 hoofvrae" nie: hy beantwoord net 'n paar */
+      return `<p class="werk-vrae"><strong>Keusevraestel:</strong> beantwoord ${d.item(werk.id).beantwoord} van die ${nrs.length} vrae (sien die kontrolelys voor in die vraestel)${punte != null ? ` — ${punte} punte` : ""}. Al die vrae staan in die Vraestel (PDF).</p>`;
+    }
     if (werk.tipe === "vraestel" && d.item(werk.id)?.vak) {
       return `<p class="werk-vrae"><strong>Volledige vraestel:</strong> ${nrs.length} hoofvrae, elk met baie subvrae (Vraag 1–${nrs.length})${punte != null ? ` — ${punte} punte` : ""}. Al die vrae staan in die Vraestel (PDF).</p>`;
     }

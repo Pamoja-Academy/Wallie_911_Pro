@@ -90,5 +90,11 @@ for (const [tyd, id, titel] of [
     if (await nee.isVisible()) await nee.click();
     await expect(page.getByRole("link", { name: /Vraestel/ }).first()).toHaveAttribute("href", /education\.gov\.za\/LinkClick/);
     await expect(page.locator("#session-lesson")).not.toContainText("Agtergrond");
+    /* QC 30 Okt (B1): 'n keusevraestel wys sy eie totaal (80), nie die som van al 17 vrae (350) nie */
+    if (id.endsWith("afr2-e")) {
+      await expect(page.locator("body")).toContainText("Keusevraestel: beantwoord 5 van die 17 vrae");
+      await expect(page.locator("body")).toContainText("80 punte");
+      await expect(page.locator("body")).not.toContainText("350 punte");
+    }
   });
 }

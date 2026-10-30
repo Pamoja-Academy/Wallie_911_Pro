@@ -62,7 +62,10 @@
       titel: "DBE Mei/Junie 2026 Afrikaans HT V2 (letterkunde) (Afr)",
       vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=UxlXI5zOVfY%3d&tabid=5956&portalid=0&mid=15108",
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=2pZDNCcwNOM%3d&tabid=5956&portalid=0&mid=15108",
-      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
+      /* Keusevraestel: die vrae tel op na 350, maar hy beantwoord 5 (2 gesiene gedigte, die ongesiene, 1 roman, 1 drama) = 80 */
+      totaal: 80,
+      beantwoord: 5
     },
     "dbe-2025-nov-afr-v2": {
       id: "dbe-2025-nov-afr-v2",
@@ -70,7 +73,10 @@
       titel: "DBE November 2025 Afrikaans HT V2 (letterkunde) (Afr)",
       vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=BUnjVEmATIE%3d&tabid=5742&portalid=0&mid=14812",
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=IPY2wyMz5KA%3d&tabid=5742&portalid=0&mid=14812",
-      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
+      /* Keusevraestel: die vrae tel op na 350, maar hy beantwoord 5 (2 gesiene gedigte, die ongesiene, 1 roman, 1 drama) = 80 */
+      totaal: 80,
+      beantwoord: 5
     },
     "dbe-2025-jun-afr-v2": {
       id: "dbe-2025-jun-afr-v2",
@@ -78,7 +84,10 @@
       titel: "DBE Mei/Junie 2025 Afrikaans HT V2 (letterkunde) (Afr)",
       vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=EPJmZ5KEJwQ%3d&tabid=5475&portalid=0&mid=14211",
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=8UJFzvFbUnE%3d&tabid=5475&portalid=0&mid=14211",
-      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
+      /* Keusevraestel: die vrae tel op na 350, maar hy beantwoord 5 (2 gesiene gedigte, die ongesiene, 1 roman, 1 drama) = 80 */
+      totaal: 80,
+      beantwoord: 5
     },
     "dbe-2024-nov-afr-v2": {
       id: "dbe-2024-nov-afr-v2",
@@ -86,7 +95,10 @@
       titel: "DBE November 2024 Afrikaans HT V2 (letterkunde) (Afr)",
       vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=76_kG60Daz8%3d&tabid=5193&portalid=0&mid=13690",
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=HpPcG0wwAQg%3d&tabid=5193&portalid=0&mid=13690",
-      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+      vrae: [10, 10, 10, 10, 10, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
+      /* Keusevraestel: die vrae tel op na 350, maar hy beantwoord 5 (2 gesiene gedigte, die ongesiene, 1 roman, 1 drama) = 80 */
+      totaal: 80,
+      beantwoord: 5
     },
     "dbe-2026-jun-eng-v2": {
       id: "dbe-2026-jun-eng-v2",
@@ -94,7 +106,10 @@
       titel: "DBE Mei/Junie 2026 English FAL P2 (literature)",
       vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=bPHG3jHTAFI%3d&tabid=5956&portalid=0&mid=15109",
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=BF_KofHzVOk%3d&tabid=5956&portalid=0&mid=15109",
-      vrae: [35, 35, 35, 35, 35, 35]
+      vrae: [35, 35, 35, 35, 35, 35],
+      /* Keusevraestel: 2 van 4 afdelings, 35 elk = 70 */
+      totaal: 70,
+      beantwoord: 2
     },
     "dbe-2025-jun-eng-v2": {
       id: "dbe-2025-jun-eng-v2",
@@ -102,7 +117,10 @@
       titel: "DBE Mei/Junie 2025 English FAL P2 (literature)",
       vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=E3kkv7eqk4A%3d&tabid=5475&portalid=0&mid=14212",
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=8sOD--gde2M%3d&tabid=5475&portalid=0&mid=14212",
-      vrae: [35, 35, 35, 35, 35, 35]
+      vrae: [35, 35, 35, 35, 35, 35],
+      /* Keusevraestel: 2 van 4 afdelings, 35 elk = 70 */
+      totaal: 70,
+      beantwoord: 2
     },
     "dbe-2024-nov-eng-v2": {
       id: "dbe-2024-nov-eng-v2",
@@ -110,7 +128,10 @@
       titel: "DBE November 2024 English FAL P2 (literature)",
       vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=ko5NmgVF4bA%3d&tabid=5193&portalid=0&mid=13691",
       memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=KzaTJSPMnhk%3d&tabid=5193&portalid=0&mid=13691",
-      vrae: [35, 35, 35, 35, 35, 35]
+      vrae: [35, 35, 35, 35, 35, 35],
+      /* Keusevraestel: 2 van 4 afdelings, 35 elk = 70 */
+      totaal: 70,
+      beantwoord: 2
     },
     "dbe-2025-jun-eng-v1": {
       id: "dbe-2025-jun-eng-v1",

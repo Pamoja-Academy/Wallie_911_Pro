@@ -62,6 +62,12 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
     if (!kat) fails.push(`${b.id}: eerskomende eksamen "${volgende.n}" het geen katalogus-tipe in doelwitte.json nie`);
     else if (!p.id.endsWith(`-${kat}`)) fails.push(`${b.id}: gee ${p.id}, maar die eerskomende ${(b.subjectSlug || b.slug)}-eksamen is "${volgende.n}" (${kat})`);
     for (const n of b.werk.nrs || []) if (!(Number(n) >= 1 && Number(n) <= p.vrae.length)) fails.push(`${b.id}: Vraag ${n} bestaan nie in ${p.id}`);
+    /* QC 30 Okt (B1): die punte wat die skerm wys. Heel vraestel = sy totaal (keusevraestel: `totaal`); vrae = hul som. */
+    const verwag = b.werk.tipe === "vraestel" ? (Number.isFinite(p.totaal) ? p.totaal : p.vrae.reduce((x, y) => x + y, 0)) : (b.werk.nrs || []).reduce((x, n) => x + p.vrae[Number(n) - 1], 0);
+    const sonderBlokPunte = W.DBE.punte(b.werk, null);
+    if (sonderBlokPunte !== verwag) fails.push(`${b.id}: die skerm wys ${sonderBlokPunte} punte, verwag ${verwag}`);
+    if (Number.isFinite(b.punte) && b.punte !== verwag) fails.push(`${b.id}: blok sê ${b.punte} punte, die vraestel gee ${verwag}`);
+    if (/-(afr|eng)-v2$/.test(p.id) && !(Number.isFinite(p.totaal) && p.beantwoord)) fails.push(`${p.id}: keusevraestel sonder totaal/beantwoord`);
   }
 }
 if (dae < 20) fails.push(`net ${dae} dae nagegaan`);
