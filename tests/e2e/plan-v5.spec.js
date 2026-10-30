@@ -265,7 +265,9 @@ for (const vp of VIEWPORTS) {
           expect(k.hoof, `${k.id}: hooftaak gewys`).toContain("Hooftaak");
           /* 21 Okt: 'n eksamenproef (skrif met 'n DBE-vraestel) wys GEEN agtergrond-les nie (Wallie: "dieselfde 5 vrae") */
           const blokRaw = await page.evaluate((id) => WALLIE.app.state().blocks.find((b) => b.id === id), k.id);
-          if (blokRaw && blokRaw.soort === "skrif" && blokRaw.werk) {
+          /* 30 Okt, LL-23: ook 'n MERK- en 'n VOOR-EKSAMEN-blok wys geen agtergrond-les nie. Hierdie toets het vroeër geëis
+             dat hulle een kry; dit het op 29 Okt 'n praktiese Excel-les by die RTT V2-teorie-merkblok gewys. */
+          if (blokRaw && ((blokRaw.soort === "skrif" && blokRaw.werk) || blokRaw.soort === "merk" || blokRaw.soort === "voor-eksamen")) {
             expect(k.les, `${k.id}: proef sonder agtergrond-les`).not.toContain("Agtergrond (opsioneel)");
             /* Bugbot (PR #44): ook die prentjie open geen les nie */
             await expect(page.locator(`#block-list .md-card[data-id="${k.id}"] .open-lesson`), `${k.id}: geen les-knoppie`).toHaveCount(0);

@@ -68,7 +68,15 @@ for (const vp of VIEWPORTS) {
 
         const lys = await kaarte(page);
         expect(lys.length, `${dag}: studie-kaarte op die skerm`).toBeGreaterThan(3);
+        /* 30 Okt, LL-23: 'n merk- of voor-eksamen-blok wys GEEN agtergrond-les nie (29 Okt het die RTT V2-merkblok 'n
+           praktiese Excel-les gewys). Daardie kaarte moet net die hooftaak hê. */
+        const soorte = await page.evaluate(() => Object.fromEntries(WALLIE.app.state().blocks.map((b) => [b.id, b.soort || ""])));
         for (const k of lys) {
+          if (soorte[k.id] === "merk" || soorte[k.id] === "voor-eksamen") {
+            expect(k.les, `${k.id}: merk/voor-eksamen sonder agtergrond-les`).not.toContain("Agtergrond (opsioneel)");
+            expect(k.hoof, `${k.id}: hooftaak is gewys`).toContain("Hooftaak");
+            continue;
+          }
           expect(k.prentGelaai, `${k.id} (${k.vak}): prent gelaai (${k.prentBron})`).toBe(true);
           expect(k.prentBron, `${k.id}: prent kom uit die vak se les-gids`).toMatch(/^assets\/img\/lessons\/[a-z]+\/[a-z0-9-]+\.svg$/);
           expect(k.les, `${k.id} (${k.vak}): les is gemerk as agtergrond`).toContain("Agtergrond (opsioneel)");

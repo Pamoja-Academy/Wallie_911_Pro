@@ -19,7 +19,7 @@ test("LL-23: geen agtergrond-les by 'n blok met 'n vraestel, 'n merk- of 'n voor
       gesien += 1;
       const blokke = ((WALLIE.buildDayPlan(dag) || {}).blocks || []).filter((b) => b.kind !== "break");
       blokke.forEach((b) => {
-        if (b.werk || b.soort === "merk" || b.soort === "voor-eksamen") {
+        if ((b.soort === "skrif" && b.werk) || b.soort === "merk" || b.soort === "voor-eksamen") {
           tel += 1;
           const html = WALLIE.lessonUI._kaart(Object.assign({ subjectSlug: b.slug }, b));
           if (html && /Agtergrond \(opsioneel\)/i.test(html)) uit.push(dag + " " + b.id);

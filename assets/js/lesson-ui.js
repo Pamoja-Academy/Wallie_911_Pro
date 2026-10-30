@@ -275,8 +275,9 @@
      werk gelyk. 'n Eksamenproef (skrif met 'n DBE-vraestel) kry daarom GEEN agtergrond-les nie: net die vraestel. */
   /* 30 Okt (Wallie se stemnotas, 29 Okt 09:07-09:10): die RTT V2-MERKblok (teorie) het 'n praktiese Excel-les met Engelse
      formules as agtergrond gewys, en die net-lees-blok voor die eksamen ook. Elke blok met 'n DBE-vraestel (skryf OF merk)
-     en elke voor-eksamen-blok ("net lees, geen nuwe werk") kry dus GEEN agtergrond-les nie: net die eksamenwerk. LL-23. */
-  const isProef = (b) => Boolean(b && (b.werk || b.soort === "merk" || b.soort === "voor-eksamen"));
+     en elke voor-eksamen-blok ("net lees, geen nuwe werk") kry dus GEEN agtergrond-les nie: net die eksamenwerk. LL-23.
+     'n Toets- of les-blok met 'n vraestel hou sy les (11 Okt, Hanno: "die vraestel kom BY die les"). */
+  const isProef = (b) => Boolean(b && ((b.soort === "skrif" && b.werk) || b.soort === "merk" || b.soort === "voor-eksamen"));
 
   function matchdayCard(b, done, occurrence, ctx = {}) {
     const kindLabel = KIND_LABEL[b.kind] || b.kind;
@@ -293,7 +294,9 @@
       </li>`;
     }
     const slug = b.subjectSlug;
-    const c = isProef(b) ? null : pickConcept(slug, occurrence, b.id);
+    /* LL-23: 'n merk-/voor-eksamen-blok skuif die les-rotasie steeds aan (soos voorheen), maar WYS die les nie. */
+    const gekies = b.soort === "skrif" && b.werk ? null : pickConcept(slug, occurrence, b.id);
+    const c = isProef(b) ? null : gekies;
     const img = c ? WALLIE.lessonImg(slug, c.id) : WALLIE.lessonImg(slug, "cover");
     const werk = ctx.werk || null;
     const opsomming = werkOpsomming(b, werk);
@@ -382,7 +385,8 @@
       return;
     }
     const seen = state.blocks.filter((b) => b.subjectSlug === next.subjectSlug).indexOf(next);
-    const c = isProef(next) ? null : pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
+    const gekiesNext = next.soort === "skrif" && next.werk ? null : pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
+    const c = isProef(next) ? null : gekiesNext;
     const werk = werkKaart(state)[next.id] || null;
     const opsomming = werkOpsomming(next, werk);
     const time = next.start && next.end ? `${next.start}–${next.end} · ` : "";
@@ -657,7 +661,7 @@
     /* 21 Okt (Hanno: "dieselfde vrae as voorheen"): tydens 'n eksamenproef (skrif met 'n DBE-vraestel) GEEN agtergrond-les
        nie. Die 5 Wisk. Gel.-kaarte se toe-boek-vrae het elke sessie herhaal; in 'n proef is net die vraestel die werk. */
     const sessieBlok = blokById(sessieBlokId);
-    if (sessieBlok && (sessieBlok.werk || sessieBlok.soort === "merk" || sessieBlok.soort === "voor-eksamen")) {
+    if (sessieBlok && ((sessieBlok.soort === "skrif" && sessieBlok.werk) || sessieBlok.soort === "merk" || sessieBlok.soort === "voor-eksamen")) {
       el.innerHTML = "";
       return;
     }
