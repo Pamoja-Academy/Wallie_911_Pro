@@ -68,6 +68,11 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
     if (sonderBlokPunte !== verwag) fails.push(`${b.id}: die skerm wys ${sonderBlokPunte} punte, verwag ${verwag}`);
     if (Number.isFinite(b.punte) && b.punte !== verwag) fails.push(`${b.id}: blok sê ${b.punte} punte, die vraestel gee ${verwag}`);
     if (/-(afr|eng)-v2$/.test(p.id) && !(Number.isFinite(p.totaal) && p.beantwoord)) fails.push(`${p.id}: keusevraestel sonder totaal/beantwoord`);
+    /* Net Wallie se eie werke (Hanno, 30 Okt): Afr V2 = gedigte V1-5, Onderwêreld V6-7, Krismis van Map Jacobs V14-15;
+       Engels P2 = Macbeth V3, kortverhale V5, poësie V6. Nooit 'n ander roman of drama nie. */
+    const EIE = { "afr-v2": [1, 2, 3, 4, 5, 6, 7, 14, 15], "eng-v2": [3, 5, 6] };
+    const tipe = Object.keys(EIE).find((t) => p.id.endsWith("-" + t));
+    if (tipe) for (const n of b.werk.nrs || []) if (!EIE[tipe].includes(Number(n))) fails.push(`${b.id}: Vraag ${n} van ${p.id} is nie een van Wallie se werke nie`);
   }
 }
 if (dae < 20) fails.push(`net ${dae} dae nagegaan`);

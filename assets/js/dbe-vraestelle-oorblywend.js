@@ -38,7 +38,7 @@
                         B roman 25: Onderwereld V6 (opstel) / V7 (kontekstueel); C drama 25: V14-17.
                         Een opstel- en een kontekstuele vraag oor B en C. Tyd: A 40, B 55, C 55 min.
        Engels P2 70     = 2 van 4 afdelings, 35 elk (+-75 min): V1-2 roman, V3 Macbeth, V5 kortverhale (5.1+5.2), V6 poesie (6.1+6.2).
-       Wallie se werke (Hanno, 30 Okt): Afr roman Onderwereld; Afr drama ONGEVERIFIEER; Engels Macbeth + kortverhale + poesie.
+       Wallie se werke (Hanno, 30 Okt): Afr roman Onderwereld; Afr drama Krismis van Map Jacobs (V14 opstel / V15 kontekstueel, Hanno 30 Okt); Engels Macbeth + kortverhale + poesie.
        Uitgesluit: DBE Nov 2025 English FAL P2 (die skakel wys na die Mei/Junie 2025-lêer; net die memo is reg). ---- */
     "dbe-2025-jun-afr-v1": {
       id: "dbe-2025-jun-afr-v1",

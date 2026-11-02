@@ -791,8 +791,8 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
     ],
     /* ---- 30 Okt (Hanno: "bou dit", LL-02/LL-23): 7-20 Nov. Afrikaans V1 (Wo 11 Nov 09:00, 70 punte, 2 u), Engels V2
        (Do 19 Nov 09:00, 70, 2½ u) en Afrikaans V2 (Vr 20 Nov 09:00, 80, 2½ u). Elke werkblok het 'n amptelike DBE-vraestel
-       (katalogus, 30 Okt nagegaan). Werke (Hanno, 30 Okt): Afr roman Onderwêreld; Afr drama ONGEVERIFIEER (hy kies die
-       drama wat hy in die klas gedoen het); Engels Macbeth (V3), kortverhale (V5), poësie (V6): op die dag kies hy 2. ---- */
+       (katalogus, 30 Okt nagegaan). Werke (Hanno, 30 Okt): Afr roman Onderwêreld; Afr drama Krismis van Map Jacobs
+       (V14 opstel / V15 kontekstueel); Engels Macbeth (V3), kortverhale (V5), poësie (V6): op die dag kies hy 2. ---- */
     "2026-11-07": [
       { suffix: "opstaan", kind: "break", slug: "break", start: "08:00", end: "08:30", soort: "pouse",
         title: "Opstaan, ontbyt", detail: "" },
@@ -881,7 +881,14 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       { suffix: "merk-afr2-a", kind: "rooi", slug: "afrikaans", start: "10:35", end: "10:50", soort: "merk",
         title: "Merk Afrikaans V2 Vraag 5 met die DBE-memo (Mei/Junie 2026)", detail: "",
         werk: { tipe: "vrae", id: "dbe-2026-jun-afr-v2", nrs: [5] } },
-      { suffix: "klaar", kind: "break", slug: "break", start: "10:50", end: "10:50", soort: "pouse",
+      { suffix: "afr2-dr1", kind: "rooi", slug: "afrikaans", start: "11:05", end: "12:00", soort: "skrif", punte: 25,
+        title: "Afrikaans V2: DBE November 2024, Vraag 14 (Krismis van Map Jacobs, opstel 400-450 woorde), getimed (25 punte, 55 min)",
+        detail: "Die memo sluit eers oop as die tyd om is.",
+        werk: { tipe: "vrae", id: "dbe-2024-nov-afr-v2", nrs: [14] } },
+      { suffix: "merk-afr2-dr1", kind: "rooi", slug: "afrikaans", start: "12:10", end: "12:40", soort: "merk",
+        title: "Merk Afrikaans V2 Vraag 14 met die DBE-memo (November 2024)", detail: "",
+        werk: { tipe: "vrae", id: "dbe-2024-nov-afr-v2", nrs: [14] } },
+      { suffix: "klaar", kind: "break", slug: "break", start: "12:40", end: "12:40", soort: "pouse",
         title: "Klaar. Skerms af 21:30.", detail: "" }
     ],
     "2026-11-13": [
@@ -901,7 +908,14 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
       { suffix: "merk-eng2-b", kind: "geel", slug: "engels", start: "11:30", end: "12:00", soort: "merk",
         title: "Merk English P2 Vraag 5 met die DBE-memo (Mei/Junie 2026)", detail: "",
         werk: { tipe: "vrae", id: "dbe-2026-jun-eng-v2", nrs: [5] } },
-      { suffix: "klaar", kind: "break", slug: "break", start: "12:00", end: "12:00", soort: "pouse",
+      { suffix: "afr2-dr2", kind: "rooi", slug: "afrikaans", start: "13:00", end: "13:55", soort: "skrif", punte: 25,
+        title: "Afrikaans V2: DBE Mei/Junie 2026, Vraag 15 (Krismis van Map Jacobs, kontekstueel), getimed (25 punte, 55 min)",
+        detail: "Die memo sluit eers oop as die tyd om is.",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-afr-v2", nrs: [15] } },
+      { suffix: "merk-afr2-dr2", kind: "rooi", slug: "afrikaans", start: "14:05", end: "14:35", soort: "merk",
+        title: "Merk Afrikaans V2 Vraag 15 met die DBE-memo (Mei/Junie 2026)", detail: "",
+        werk: { tipe: "vrae", id: "dbe-2026-jun-afr-v2", nrs: [15] } },
+      { suffix: "klaar", kind: "break", slug: "break", start: "14:35", end: "14:35", soort: "pouse",
         title: "Klaar. Skerms af 21:30.", detail: "" }
     ],
     "2026-11-14": [
@@ -942,7 +956,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         title: "Opstaan, ontbyt", detail: "" },
       { suffix: "afr2-e", kind: "rooi", slug: "afrikaans", start: "08:00", end: "10:30", soort: "skrif", punte: 80,
         title: "Afrikaans V2 proef: DBE Mei/Junie 2025, volledige vraestel (80 punte, 2½ uur)",
-        detail: "Twee gesiene gedigte (V1-4), die ongesiene gedig (V5, verplig), Onderwêreld (V6 of V7) en die drama wat jy in die klas gedoen het (Krismis van Map Jacobs V14/15 of Mis V16/17): een opstel en een kontekstueel. A 40, B 55, C 55 min. Die memo sluit eers oop as die tyd om is.",
+        detail: "Twee gesiene gedigte (V1-4), die ongesiene gedig (V5, verplig), Onderwêreld (V6 of V7) en Krismis van Map Jacobs (V14 of V15): een opstel en een kontekstueel. A 40, B 55, C 55 min. Die memo sluit eers oop as die tyd om is.",
         werk: { tipe: "vraestel", id: "dbe-2025-jun-afr-v2" } },
       { suffix: "merk-afr2-e", kind: "rooi", slug: "afrikaans", start: "10:45", end: "11:45", soort: "merk",
         title: "Merk Afrikaans V2-proef met die DBE-memo (Mei/Junie 2025)", detail: "Skryf jou punt per vraag neer.",
