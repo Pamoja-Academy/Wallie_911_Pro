@@ -58,6 +58,7 @@ Hanno se boodskap is die skriftelike goedkeuring vir 'n bediener wat LL-21 verei
 - [x] Ontwerp besluit, tak `hulp-klets` gemaak.
 - [x] `hulp-api/` gebou en gekoppel aan Vercel-projek `wallie-hulp` (`vercel link`). **Nog NIE ontplooi nie:** Claude Code se outomatiese modus het `vercel deploy --prod` geblokkeer; Hanno moet dit goedkeur. Verwagte URL: https://wallie-hulp.vercel.app/api/klets. Ná die ontplooiing: maak seker die URL stem ooreen met `WALLIE.KLETS_URL` in `assets/js/hulp-klets.js` en die toets se `URL_KLETS`.
 - [x] `hulp-klets.js` + `hulp-klets.css` + index.html. **Ontwerp-aanpassing:** daar was reeds 'n swewende Hulp-knoppie (`#hulp-fab`, hulp.js). Daarom is daar nie 'n tweede knoppie nie: die klets staan bo-aan die bestaande Hulp-paneel, en die knoppie heet nou "💬 Hulp nou".
+- [x] QC-ronde 1 (BLOCK) reggemaak: eerlike bewoording ("word aan Pa gestuur"), 503 by model-fout → app val terug op vaste kennisbank, geen vraestel-hulp tydens 'n lopende skrif/toets/opstel-blok, bediener-logika in `hulp-api/lib/kern.js` met uitvoerbare toets `tests/hulp-api.test.js` (7/7), 15 s / 0 herprobeer, kleiner versoeke.
 - [x] Toetse (`tests/hulp-klets.test.js` 9/9, `tests/e2e/hulp-klets.spec.js` 3/3, `hulp.spec.js` 11/11), weergawe 2026-11-03a, LL-24, AGENTS §2 reël 10.
 - [ ] Ontplooi bediener → één egte POST vanaf Origin https://pamoja-academy.github.io (kyk dat `bron` = "claude" is, nie "fout" nie; "fout" beteken die Gateway/OIDC/`output_config` werk nie: lees `vercel logs`).
 - [ ] PR, CI, QC, saamvoeg, live nagegaan

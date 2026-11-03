@@ -339,7 +339,7 @@ test("geen boodskap in die app belowe hulp per e-pos nie", async () => {
   const fs = require("fs");
   const path = require("path");
   const root = path.join(__dirname, "..", "..");
-  for (const lêer of ["assets/js/hulp.js", "assets/js/app.js", "assets/js/fout-vanger.js"]) {
+  for (const lêer of ["assets/js/hulp.js", "assets/js/app.js", "assets/js/fout-vanger.js", "assets/js/hulp-klets.js", "hulp-api/lib/kern.js"]) {
     const bron = fs.readFileSync(path.join(root, lêer), "utf8").replace(/\r\n/g, "\n");
     bron.split("\n").forEach((reël, i) => {
       /* kommentaar mag die ou belofte beskryf; teks wat Wallie sien, nooit */

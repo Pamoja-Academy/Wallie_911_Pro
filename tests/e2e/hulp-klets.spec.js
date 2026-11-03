@@ -39,6 +39,7 @@ test("klets: vraag → antwoord met aksie; konteks gaan saam; Pa kry 'n kopie", 
   expect(Array.isArray(liggaam.konteks.vandag)).toBe(true);
 
   await runUntil(page, async () => backend.ntfy.some((n) => /Wallie vra \(Hulp nou\): die memo/.test(n.body)), { label: "Pa se push" });
+  await runUntil(page, async () => JSON.stringify(backend.calls).includes("klets_"), { label: "probleem-event in die tou na Pa se konsole" });
 
   await antwoord.locator(".klets-aksie").click();
   await expect(page.locator("#hulp-paneel")).toBeHidden();
@@ -53,8 +54,25 @@ test("klets: bot onbereikbaar → terugval-antwoord, Pa dringend ingelig", async
   await maakOop(page);
   await page.fill("#klets-invoer", "die app hang");
   await page.press("#klets-invoer", "Enter");
-  await expect(page.locator(".klets-hulp").last()).toContainText(/Pa het jou vraag/);
+  /* Eerlik (LL-22): die vraag word gestuur; ons beweer nie dat Pa dit al het nie. */
+  await expect(page.locator(".klets-hulp").last()).toContainText(/word (dringend )?aan Pa gestuur/);
+  await expect(page.locator(".klets-hulp").last()).not.toContainText(/Pa het/);
   await runUntil(page, async () => backend.ntfy.some((n) => /die app hang/.test(n.body) && n.priority === "4"), { label: "dringende push" });
+});
+
+test("klets: model faal (503, bron fout) → vaste kennisbank, nie 'n leë troos nie", async ({ page, context }) => {
+  await new MockBackend({ mode: "v1" }).attach(context);
+  await page.route(URL_KLETS, (route) =>
+    route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ antwoord: "BEDIENER-TROOS", aksies: [], ernstig: true, bron: "fout" }) })
+  );
+  await boot(page);
+  await page.goto("/#missie");
+  await maakOop(page);
+  await page.fill("#klets-invoer", "die memo maak nie oop nie");
+  await page.click("#klets-stuur");
+  const a = page.locator(".klets-hulp").last();
+  await expect(a).toContainText(/aan Pa gestuur/);
+  await expect(a).not.toContainText("BEDIENER-TROOS");
 });
 
 test("klets: Foutbank se knoppie maak die klets oop; sigbaar in fokusmodus en op 'n foon", async ({ page, context }) => {

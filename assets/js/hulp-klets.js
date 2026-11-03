@@ -20,8 +20,8 @@
     foutbank: "📝 Foutbank"
   };
   var WAG_MS = 20000;
-  var GROET = "Hallo Wallie. Sê wat nie werk nie of waarmee jy vassit. Ek antwoord dadelik, en Pa kry outomaties 'n kopie.";
-  var GEEN_DIENS = "Ek kon nou nie die hulpdiens bereik nie. Pa het jou vraag dringend gekry. Doen solank die volgende blok op jou Missie-skerm, of werk op papier.";
+  var GROET = "Hallo Wallie. Sê wat nie werk nie of waarmee jy vassit. Ek antwoord dadelik, en jou vraag word ook aan Pa gestuur.";
+  var GEEN_DIENS = "Ek kon nou nie die hulpdiens bereik nie. Jou vraag word dringend aan Pa gestuur (sodra jy aanlyn is). Doen solank die volgende blok op jou Missie-skerm, of werk op papier.";
 
   /* ---------- suiwer funksies (getoets in tests/hulp-klets.test.js) ---------- */
 
@@ -34,11 +34,11 @@
     var o = opsies || {};
     var s = state || {};
     var tyd = hhmm(nou);
-    var blokke = (s.blocks || []).slice(0, 20).map(function (b) {
+    var blokke = (s.blocks || []).slice(0, 14).map(function (b) {
       return {
         id: b.id,
         tyd: (b.start || "?") + "–" + (b.end || "?"),
-        titel: String(b.title || "").slice(0, 160),
+        titel: String(b.title || "").slice(0, 100),
         soort: b.soort || b.kind || null,
         vak: b.subjectSlug || null,
         klaar: Boolean(b.done)
@@ -50,13 +50,13 @@
     var foutbank = (s.faults || [])
       .filter(function (f) { return f && !f.resolved; })
       .slice(0, 10)
-      .map(function (f) { return { vak: f.subjectSlug || f.subject || null, teks: String(f.text || "").slice(0, 300) }; });
+      .map(function (f) { return { vak: f.subjectSlug || f.subject || null, teks: String(f.text || "").slice(0, 200) }; });
     return {
       weergawe: WALLIE.APP_VERSION || null,
       skerm: o.skerm || null,
       tyd: tyd,
       datum: s.planDate || null,
-      huidigeBlok: huidig ? { id: huidig.id, titel: String(huidig.title || "").slice(0, 160), tyd: huidig.start + "–" + huidig.end, soort: huidig.soort || null } : null,
+      huidigeBlok: huidig ? { id: huidig.id, titel: String(huidig.title || "").slice(0, 160), tyd: huidig.start + "–" + huidig.end, soort: huidig.soort || null, klaar: Boolean(huidig.done) } : null,
       vandag: blokke,
       foutbank: foutbank,
       onlangseFoute: (o.foute || []).slice(-5),
@@ -81,7 +81,7 @@
       t = null;
     }
     if (t && t.antwoord) {
-      return { antwoord: t.antwoord + "\n\n(Die hulpdiens is nou nie bereikbaar nie; hierdie antwoord kom uit die app se vaste foutbank. Pa het jou vraag gekry.)", aksies: [], ernstig: true, bron: "vanlyn" };
+      return { antwoord: t.antwoord + "\n\n(Die hulpdiens is nou nie bereikbaar nie; hierdie antwoord kom uit die app se vaste foutbank. Jou vraag word aan Pa gestuur.)", aksies: [], ernstig: true, bron: "vanlyn" };
     }
     return { antwoord: GEEN_DIENS, aksies: ["missie"], ernstig: true, bron: "geen" };
   }
@@ -171,6 +171,17 @@
     } catch (e) { /* Pa-melding mag nooit die klets breek nie */ }
   }
 
+  /* Bly onder die bediener se 16 KB: kort antwoorde in die geskiedenis, en laat die oudste val as dit te groot is. */
+  function liggaam(vraag, konteks) {
+    var g = geskiedenis.slice(-8).map(function (m) { return { rol: m.rol, teks: String(m.teks).slice(0, 1200) }; });
+    var json = JSON.stringify({ vraag: vraag, geskiedenis: g, konteks: konteks });
+    while (json.length > 14000 && g.length) {
+      g.shift();
+      json = JSON.stringify({ vraag: vraag, geskiedenis: g, konteks: konteks });
+    }
+    return json;
+  }
+
   async function vra(vraag) {
     var state = WALLIE.app && typeof WALLIE.app.state === "function" ? WALLIE.app.state() : {};
     var konteks = bouKonteks(state, new Date(), { skerm: skerm(), foute: onlangseFoute(), aanlyn: W.navigator ? W.navigator.onLine : true });
@@ -180,13 +191,14 @@
       var r = await fetch(WALLIE.KLETS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vraag: vraag, geskiedenis: geskiedenis.slice(-8), konteks: konteks }),
+        body: liggaam(vraag, konteks),
         signal: beheer ? beheer.signal : undefined
       });
       var d = await r.json().catch(function () { return null; });
       var uit = ontleedAntwoord(d);
+      /* 503 / bron "fout" of "weier": die model het misluk (bv. krediet op) → die vaste kennisbank, nie 'n leë troos nie. */
       if (!r.ok && r.status !== 429) throw new Error("status " + r.status);
-      if (!uit.antwoord) throw new Error("leeg");
+      if (!uit.antwoord || uit.bron === "fout" || uit.bron === "weier") throw new Error("geen model-antwoord");
       return uit;
     } catch (e) {
       return terugval(vraag);
@@ -238,7 +250,7 @@
     invoer.addEventListener("keydown", function (e) {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); stuur(); }
     });
-    stuurKnop = el("button", "btn primary klets-stuur", "Stuur");
+    stuurKnop = el("button", "btn primary klets-stuur", "Vra");
     stuurKnop.type = "submit";
     stuurKnop.id = "klets-stuur";
     vorm.appendChild(invoer);

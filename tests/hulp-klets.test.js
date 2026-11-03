@@ -53,7 +53,9 @@ t("antwoord: gemors gee leë antwoord (dan val die app terug)", () => {
 
 t("terugval sonder kennisbank: eerlike boodskap, ernstig, Missie-aksie", () => {
   const u = K.terugval("enigiets");
-  assert.ok(/Pa het jou vraag dringend gekry/.test(u.antwoord));
+  assert.ok(/word dringend aan Pa gestuur/.test(u.antwoord));
+  /* LL-22: nooit beweer dat Pa dit reeds het nie (die tou/push kan nog hang) */
+  assert.ok(!/Pa het/.test(u.antwoord));
   assert.strictEqual(u.ernstig, true);
   assert.deepStrictEqual(u.aksies, ["missie"]);
 });
@@ -74,10 +76,11 @@ t("bediener se kennis is presies die app se kennisbank (data/fout-rag.json)", ()
 
 t("bediener: geen sleutel of geheim in die kode; CORS net Pages + plaaslike toets", () => {
   const s = fs.readFileSync(path.join(root, "hulp-api", "api", "klets.js"), "utf8");
-  assert.ok(!/sk-ant-|ANTHROPIC_API_KEY|AI_GATEWAY_API_KEY/.test(s));
-  assert.ok(s.includes('"https://pamoja-academy.github.io"'));
+  const kern = fs.readFileSync(path.join(root, "hulp-api", "lib", "kern.js"), "utf8");
+  assert.ok(!/sk-ant-|ANTHROPIC_API_KEY|AI_GATEWAY_API_KEY/.test(s + kern));
+  assert.ok(kern.includes('"https://pamoja-academy.github.io"'));
   assert.ok(s.includes("getVercelOidcToken"));
-  for (const a of Object.keys(K.AKSIES)) assert.ok(s.includes(`"${a}"`), "bediener ken aksie " + a);
+  for (const a of Object.keys(K.AKSIES)) assert.ok(kern.includes(`"${a}"`), "bediener ken aksie " + a);
 });
 
 t("app: knoppie en stylblad is in index.html; geen nuwe localStorage-skryf nie", () => {
