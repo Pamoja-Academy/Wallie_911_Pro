@@ -63,6 +63,10 @@ Hanno se boodskap is die skriftelike goedkeuring vir 'n bediener wat LL-21 verei
 - [x] QC-ronde 1 (BLOCK) reggemaak: eerlike bewoording ("word aan Pa gestuur"), 503 by model-fout → app val terug op vaste kennisbank, geen vraestel-hulp tydens 'n lopende skrif/toets/opstel-blok, bediener-logika in `hulp-api/lib/kern.js` met uitvoerbare toets `tests/hulp-api.test.js` (7/7), 15 s / 0 herprobeer, kleiner versoeke.
 - [x] QC-ronde 2: MERGE OK. Reggemaak: `klaar` uit `completedBlocks`, `sessieLoop`-slot, groet "Ek probeer dadelik help".
 - [x] Toetse (`tests/hulp-klets.test.js` 9/9, `tests/hulp-api.test.js` 7/7, `tests/e2e/hulp-klets.spec.js` 4/4, `hulp.spec.js` 11/11), weergawe 2026-11-03a, LL-24, AGENTS §2 reël 10.
+- [x] Kaart bygevoeg deur Hanno: gratis $5/maand dek GEEN Claude-model nie (Opus/Sonnet/Haiku 5.5 en Haiku 4.5: 403 "Free tier users do not have access"). Hanno wil NIE betaalde krediet koop nie (3 Nov).
+- [x] Gratis modelle getoets (3 Nov): nvidia/nemotron-3.5-lightning-free werk maar swak Afrikaans, 11–30 s, belofte-taal → NIE gebruik. beam-free en gemini-3-flash: 403; ling-3.1-flash: 503.
+- [x] Bediener: Claude eerste, dan **Gemini 2.5 Flash** met Hanno se eie gratis sleutel as Vercel-omgewingsveranderlike `GEMINI_API_KEY` (geen sleutel in repo). Ontplooi.
+- [ ] **Hanno:** maak 'n gratis sleutel by https://aistudio.google.com/apikey en plak dit as `GEMINI_API_KEY` (Production) by https://vercel.com/hannos-project-team/wallie-hulp/settings/environment-variables, dan Redeploy. Agent: herhaal die egte POST; verwag `bron:"claude"` (die bediener sê nie watter model nie; kyk `vercel logs` vir "gebruik Gemini").
 - [ ] Saamvoeg, live nagegaan (version.json = 2026-11-03a).
 - [ ] Ná die kaart: egte POST gee `bron:"claude"`; bestedingsplafon of Vercel-firewall-limiet op `wallie-hulp` (die Origin-kontrole is nie verifikasie nie).
 - [ ] WhatsApp vir Wallie (eerlik, LL-22): "Iets werk nie in die app? Druk 💬 Hulp nou. Jy kry dadelik raad, en jou vraag word ook aan Pa gestuur."
