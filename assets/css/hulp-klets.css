@@ -1,0 +1,13 @@
+/* Hulp nou: die klets bo-aan die Hulp-paneel (#hulp-paneel). Gebruik die app se kleure (--panel, --text, --line, --accent). */
+.klets { display: flex; flex-direction: column; gap: 0.5rem; margin: 0 0 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+.klets-log { display: flex; flex-direction: column; gap: 0.6rem; max-height: 22rem; overflow-y: auto; }
+.klets-msg { max-width: 92%; padding: 0.55rem 0.75rem; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.45; }
+.klets-wallie { align-self: flex-end; background: var(--bok-green-deep, #0b4d36); color: var(--text); }
+.klets-hulp { align-self: flex-start; background: var(--bg); color: var(--text); border: 1px solid var(--line); }
+.klets-wag { opacity: 0.7; font-style: italic; }
+.klets-aksie { display: block; width: 100%; margin-top: 0.5rem; min-height: var(--hit, 48px); }
+.klets-vorm { display: flex; gap: 0.5rem; align-items: stretch; }
+.klets-invoer { flex: 1; resize: none; font: inherit; padding: 0.55rem 0.7rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.klets-stuur { min-width: 4.5rem; min-height: var(--hit, 48px); }
+.klets-ander { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.foutbank-klets-wenk { margin: 0 0 0.8rem; }
