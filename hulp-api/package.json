@@ -1,0 +1,11 @@
+{
+  "name": "wallie-hulp",
+  "private": true,
+  "type": "module",
+  "description": "Wallie se hulp-chatbot (Hulp nou): een Vercel-funksie, Claude via Vercel AI Gateway met OIDC (geen API-sleutel).",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.135.0",
+    "@vercel/oidc": "4.0.1"
+  }
+}

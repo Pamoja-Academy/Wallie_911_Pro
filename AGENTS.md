@@ -29,6 +29,11 @@ Eksamenrooster: `assets/js/pa-konsole/exams.js`. Dagplanne: `VASTE_PLANNE` in `a
    in `WALLIE.DBE.KATALOGUS`; elke skakel is afgelaai en nagegaan (HTTP 200, PDF) en die punte per vraag kom uit die vraestel of memo.
    'n Blok waarvan die werk in 'n ander oortjie oop is, is soort `skrif` (geen oortjie-slot nie). Toets: `tests/plan-v5.test.js`.
 
+10. **Hulp nou (3 Nov, LL-24)**: Hanno het skriftelik een bediener goedgekeur: `hulp-api/` (Vercel-projek `wallie-hulp`, span `hannos-project-team`),
+   Claude via Vercel AI Gateway met OIDC (geen API-sleutel in die repo nie). Dit lees en skryf GEEN Wallie-data nie; die app stuur net konteks,
+   en die app meld elke vraag by Pa (`probleem`). `hulp-api/kennis/fout-rag.json` moet gelyk wees aan `data/fout-rag.json` (toets).
+   Oordrag: `docs/OORDRAG-AI-HULPBOT-2026-11-03.md`.
+
 ## 3. Werkwyse (projekbestuur)
 - **Eers data, dan mening.** Status = Supabase SELECT op `wallie911.live`/`events` + `git log origin/master` + live `version.json`.
 - **Plan vooruit**: daar moet altyd 'n vaste dagplan wees vir die volgende 5 dae en vir elke eksamendag
