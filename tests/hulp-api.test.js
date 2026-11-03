@@ -29,6 +29,7 @@ const req = (o) => ({ method: "POST", headers: { origin: PAGES, "x-forwarded-for
     assert.ok(s.includes(korpus.inskrywings[0].antwoord.slice(0, 40)));
     assert.ok(/NOOIT DBE-vraagnommers, punte, bladsye of memo-antwoorde uitdink/.test(s));
     assert.ok(/Blameer Wallie nooit/.test(s));
+    assert.ok(/konteks\.sessieLoop true/.test(s));
     assert.ok(/huidigeBlok\.soort "skrif"/.test(s) && /Moenie vrae van die vraestel beantwoord/.test(s));
     assert.ok(!/Pa het|gekry|per e-pos|binne 10 minute (?!reg)/.test(s.replace("geen \"dit sal binne 10 minute reg wees\" nie", "")), "geen belofte of 'Pa het'");
   });

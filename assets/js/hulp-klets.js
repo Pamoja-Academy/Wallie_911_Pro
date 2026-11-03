@@ -20,7 +20,7 @@
     foutbank: "📝 Foutbank"
   };
   var WAG_MS = 20000;
-  var GROET = "Hallo Wallie. Sê wat nie werk nie of waarmee jy vassit. Ek antwoord dadelik, en jou vraag word ook aan Pa gestuur.";
+  var GROET = "Hallo Wallie. Sê wat nie werk nie of waarmee jy vassit. Ek probeer dadelik help, en jou vraag word ook aan Pa gestuur.";
   var GEEN_DIENS = "Ek kon nou nie die hulpdiens bereik nie. Jou vraag word dringend aan Pa gestuur (sodra jy aanlyn is). Doen solank die volgende blok op jou Missie-skerm, of werk op papier.";
 
   /* ---------- suiwer funksies (getoets in tests/hulp-klets.test.js) ---------- */
@@ -33,6 +33,8 @@
   function bouKonteks(state, nou, opsies) {
     var o = opsies || {};
     var s = state || {};
+    /* Klaar-merke staan in state.completedBlocks[id] (app.js), nie op die blok self nie. */
+    var klaarLys = s.completedBlocks || {};
     var tyd = hhmm(nou);
     var blokke = (s.blocks || []).slice(0, 14).map(function (b) {
       return {
@@ -41,7 +43,7 @@
         titel: String(b.title || "").slice(0, 100),
         soort: b.soort || b.kind || null,
         vak: b.subjectSlug || null,
-        klaar: Boolean(b.done)
+        klaar: Boolean(klaarLys[b.id])
       };
     });
     var huidig = (s.blocks || []).find(function (b) {
@@ -56,7 +58,9 @@
       skerm: o.skerm || null,
       tyd: tyd,
       datum: s.planDate || null,
-      huidigeBlok: huidig ? { id: huidig.id, titel: String(huidig.title || "").slice(0, 160), tyd: huidig.start + "–" + huidig.end, soort: huidig.soort || null, klaar: Boolean(huidig.done) } : null,
+      huidigeBlok: huidig ? { id: huidig.id, titel: String(huidig.title || "").slice(0, 160), tyd: huidig.start + "–" + huidig.end, soort: huidig.soort || null, klaar: Boolean(klaarLys[huidig.id]) } : null,
+      /* Die eksamenklok loop van "Begin" af, nie die rooster nie: tydens 'n sessie (ook oortyd) geen inhoud-hulp nie. */
+      sessieLoop: Boolean(o.sessieLoop),
       vandag: blokke,
       foutbank: foutbank,
       onlangseFoute: (o.foute || []).slice(-5),
@@ -81,7 +85,7 @@
       t = null;
     }
     if (t && t.antwoord) {
-      return { antwoord: t.antwoord + "\n\n(Die hulpdiens is nou nie bereikbaar nie; hierdie antwoord kom uit die app se vaste foutbank. Jou vraag word aan Pa gestuur.)", aksies: [], ernstig: true, bron: "vanlyn" };
+      return { antwoord: t.antwoord + "\n\n(Die hulpdiens is nou nie bereikbaar nie; hierdie antwoord kom uit die app se vaste hulp-antwoorde. Jou vraag word aan Pa gestuur.)", aksies: [], ernstig: true, bron: "vanlyn" };
     }
     return { antwoord: GEEN_DIENS, aksies: ["missie"], ernstig: true, bron: "geen" };
   }
@@ -184,7 +188,7 @@
 
   async function vra(vraag) {
     var state = WALLIE.app && typeof WALLIE.app.state === "function" ? WALLIE.app.state() : {};
-    var konteks = bouKonteks(state, new Date(), { skerm: skerm(), foute: onlangseFoute(), aanlyn: W.navigator ? W.navigator.onLine : true });
+    var konteks = bouKonteks(state, new Date(), { skerm: skerm(), foute: onlangseFoute(), aanlyn: W.navigator ? W.navigator.onLine : true, sessieLoop: document.body.classList.contains("fokus-sessie") });
     var beheer = typeof AbortController === "function" ? new AbortController() : null;
     var wekker = beheer ? setTimeout(function () { beheer.abort(); }, WAG_MS) : null;
     try {

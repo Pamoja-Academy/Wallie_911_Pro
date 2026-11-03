@@ -16,14 +16,17 @@ t("konteks: huidige blok, oop foutbank-items, geen opgeloste nie", () => {
     planDate: "2026-11-03",
     blocks: [
       { id: "a", start: "08:00", end: "11:00", title: "Gasvryheid proef 3", soort: "skrif", subjectSlug: "gasvryheid" },
-      { id: "b", start: "11:15", end: "12:15", title: "Merk proef 3", soort: "merk", done: true }
+      { id: "b", start: "11:15", end: "12:15", title: "Merk proef 3", soort: "merk" }
     ],
+    completedBlocks: { b: 1793700000000 },
     faults: [
       { subjectSlug: "gasvryheid", text: "memo maak nie oop nie", resolved: false },
       { subjectSlug: "engels", text: "ou fout", resolved: true }
     ]
   };
-  const k = K.bouKonteks(state, new Date(2026, 10, 3, 9, 30), { skerm: "sessie", foute: ["x"], aanlyn: true });
+  const k = K.bouKonteks(state, new Date(2026, 10, 3, 9, 30), { skerm: "sessie", foute: ["x"], aanlyn: true, sessieLoop: true });
+  assert.strictEqual(k.sessieLoop, true);
+  assert.strictEqual(k.huidigeBlok.klaar, false);
   assert.strictEqual(k.huidigeBlok.id, "a");
   assert.strictEqual(k.tyd, "09:30");
   assert.strictEqual(k.skerm, "sessie");
