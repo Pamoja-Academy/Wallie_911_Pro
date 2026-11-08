@@ -38,6 +38,10 @@ Eksamenrooster: `assets/js/pa-konsole/exams.js`. Dagplanne: `VASTE_PLANNE` in `a
 - **Eers data, dan mening.** Status = Supabase SELECT op `wallie911.live`/`events` + `git log origin/master` + live `version.json`.
 - **Plan vooruit**: daar moet altyd 'n vaste dagplan wees vir die volgende 5 dae en vir elke eksamendag
   (anders val die app terug op die generiese rotasie — sien LL-02).
+- **Voorbereiding per eksamen = slim spotting, nie net vraestelle nie (8 Nov, LL-25)**: ontleed eers die laaste 4 jaar se DBE-vraestelle
+  vir dié vraestel (wat kom elke jaar, hoeveel punte), en bou dan: eksamentegniek/spotting-kaart → teorie-kaart → dril van herhalende
+  vrae (uit ongesiene vraestelle, subvrae met nagegaande punte) → merk → een spoedkursus vir die swaar 10–20% → volle afdeling onder
+  eksamentoestande → herdoen van verlore maklike punte. Die eksamendag self: net 'n kontrolelys, geen nuwe werk nie.
 - **Klein PR's**, elk met eie toetse; stapel as nodig en rebase met `git rebase --onto origin/master <ou-basis>` ná 'n squash-merge.
 - **Weergawe**: by elke vrystelling bump `?v=` in `index.html`, `version.json` en `WALLIE.APP_VERSION` saam (`tests/weergawe.test.js`).
 - **Modelle en rolle** (koste-effektief, kwaliteit eerste):

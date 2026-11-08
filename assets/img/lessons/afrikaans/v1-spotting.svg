@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Afrikaans HT · V1: V1: slim spotting" font-family="Arial, Helvetica, sans-serif">
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#d4472f"/><rect y="50" width="800" height="22" fill="#d4472f"/>
+<text x="24" y="27" font-size="15" fill="#ffffff" font-weight="800" letter-spacing="2">AFRIKAANS HT · V1</text>
+<text x="24" y="60" font-size="27" fill="#ffffff" font-weight="900">V1: slim spotting</text>
+<rect x="24" y="100" width="752" height="78" rx="12" fill="#0e2a1a" stroke="#5cc8ff" stroke-width="3"/>
+<circle cx="54" cy="139.0" r="17" fill="#5cc8ff"/><text x="54" y="147.0" font-size="21" fill="#10140f" font-weight="900" text-anchor="middle">1</text>
+<text x="84" y="132" font-size="19" fill="#ffffff" font-weight="700">Lees eers AL die vrae (5 min); merk M (maklik), T (taalreël), S</text>
+<text x="84" y="160" font-size="19" fill="#ffffff" font-weight="700">(swaar)</text>
+<rect x="24" y="190" width="752" height="78" rx="12" fill="#0e2a1a" stroke="#ff6b57" stroke-width="3"/>
+<circle cx="54" cy="229.0" r="17" fill="#ff6b57"/><text x="54" y="237.0" font-size="21" fill="#10140f" font-weight="900" text-anchor="middle">2</text>
+<text x="84" y="222" font-size="19" fill="#ffffff" font-weight="700">M: haal aan · EEN woord · kies &#x27;n letter (net nommer + letter) ·</text>
+<text x="84" y="250" font-size="19" fill="#ffffff" font-weight="700">waar/onwaar + bewys</text>
+<rect x="24" y="280" width="752" height="78" rx="12" fill="#0e2a1a" stroke="#f2c94c" stroke-width="3"/>
+<circle cx="54" cy="319.0" r="17" fill="#f2c94c"/><text x="54" y="327.0" font-size="21" fill="#10140f" font-weight="900" text-anchor="middle">3</text>
+<text x="84" y="312" font-size="19" fill="#ffffff" font-weight="700">T ná M: lydend, ontkenning, indirek, bysin, stam, homoniem —</text>
+<text x="84" y="340" font-size="19" fill="#ffffff" font-weight="700">elke jaar</text>
+<rect x="24" y="370" width="752" height="78" rx="12" fill="#0e2a1a" stroke="#7ee08a" stroke-width="3"/>
+<circle cx="54" cy="409.0" r="17" fill="#7ee08a"/><text x="54" y="417.0" font-size="21" fill="#10140f" font-weight="900" text-anchor="middle">4</text>
+<text x="84" y="402" font-size="19" fill="#ffffff" font-weight="700">S laaste: standpunt + bewys + effek · TWEE = twee aparte punte ·</text>
+<text x="84" y="430" font-size="19" fill="#ffffff" font-weight="700">Tyd: A 50 · B 30 · C 40 min</text>
+</svg>

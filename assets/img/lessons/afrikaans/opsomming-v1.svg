@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="Afrikaans HT · V1: Opsomming: 7 + 3" font-family="Arial, Helvetica, sans-serif">
+<rect width="800" height="520" rx="18" fill="#071d11"/>
+<rect width="800" height="72" rx="18" fill="#d4472f"/><rect y="50" width="800" height="22" fill="#d4472f"/>
+<text x="24" y="27" font-size="15" fill="#ffffff" font-weight="800" letter-spacing="2">AFRIKAANS HT · V1</text>
+<text x="24" y="60" font-size="29" fill="#ffffff" font-weight="900">Opsomming: 7 + 3</text>
+<rect x="24" y="120" width="752" height="56" rx="12" fill="#0e2a1a" stroke="#5cc8ff" stroke-width="3"/>
+<circle cx="56" cy="148.0" r="18" fill="#5cc8ff"/><text x="56" y="156.0" font-size="22" fill="#10140f" font-weight="900" text-anchor="middle">1</text>
+<text x="88" y="156" font-size="21" fill="#ffffff" font-weight="700">10 punte = 7 feite (1 elk) + 3 taalpunte</text>
+<rect x="24" y="190" width="752" height="86" rx="12" fill="#0e2a1a" stroke="#ff6b57" stroke-width="3"/>
+<circle cx="56" cy="233.0" r="18" fill="#ff6b57"/><text x="56" y="241.0" font-size="22" fill="#10140f" font-weight="900" text-anchor="middle">2</text>
+<text x="88" y="226" font-size="21" fill="#ffffff" font-weight="700">Eie woorde, volsinne, EEN paragraaf, ≤ 90 woorde; skryf die</text>
+<text x="88" y="256" font-size="21" fill="#ffffff" font-weight="700">woordgetal</text>
+<rect x="24" y="290" width="752" height="86" rx="12" fill="#0e2a1a" stroke="#f2c94c" stroke-width="3"/>
+<circle cx="56" cy="333.0" r="18" fill="#f2c94c"/><text x="56" y="341.0" font-size="22" fill="#10140f" font-weight="900" text-anchor="middle">3</text>
+<text x="88" y="326" font-size="21" fill="#ffffff" font-weight="700">Aanhalings kos taalpunte (6–7 aanhalings = 0 vir taal); geen</text>
+<text x="88" y="356" font-size="21" fill="#ffffff" font-weight="700">titel nie</text>
+<rect x="24" y="390" width="752" height="56" rx="12" fill="#0e2a1a" stroke="#7ee08a" stroke-width="3"/>
+<circle cx="56" cy="418.0" r="18" fill="#7ee08a"/><text x="56" y="426.0" font-size="22" fill="#10140f" font-weight="900" text-anchor="middle">4</text>
+<text x="88" y="426" font-size="21" fill="#ffffff" font-weight="700">Metode: onderstreep 7 feite → 1 sin per feit → tel die woorde</text>
+</svg>

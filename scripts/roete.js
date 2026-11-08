@@ -63,7 +63,9 @@ function bereken() {
     const ekwivalente = minute / v.duur_min;
     /* Terugvoer: 'n merk-blok met dieselfde vraestel en vrae op dieselfde dag, of die volgende dag (bv. 'n 3-uur-proef wat 17:00 eindig) */
     const volgende = (d) => dagSleutel(new Date(new Date(d).getTime() + 86400000));
-    const sonderMerk = werk.filter((r) => !merke.some((m) => (m.dag === r.dag || m.dag === volgende(r.dag)) && m.werk === r.werk && m.nrs === r.nrs));
+    /* 8 Nov (QC PR 56): een merk-blok mag die vrae van meer as een dril dek (dan is die memo eers ná al die werk oop) */
+    const dek = (m, r) => m.nrs === r.nrs || r.nrs.split(",").every((n) => m.nrs.split(",").includes(n));
+    const sonderMerk = werk.filter((r) => !merke.some((m) => (m.dag === r.dag || m.dag === volgende(r.dag)) && m.werk === r.werk && dek(m, r)));
     const dae = new Set(werk.map((r) => r.dag)).size;
     const genoeg = ekwivalente >= R - 1e-9;
     const spasieer = R < 2 || dae >= 2;

@@ -829,6 +829,42 @@
    "stukke": null,
    "bladsye": 13
   },
+  "dbe-2023-jun-afr-v1": {
+   "vak": "afrikaans",
+   "sessie": "2023-jun",
+   "vraestel": "V1",
+   "vrae": [
+    30,
+    10,
+    10,
+    10,
+    10
+   ],
+   "bron": "inhoudsopgawe",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": null,
+   "bladsye": 13
+  },
+  "dbe-2024-jun-afr-v1": {
+   "vak": "afrikaans",
+   "sessie": "2024-jun",
+   "vraestel": "V1",
+   "vrae": [
+    30,
+    10,
+    10,
+    10,
+    10
+   ],
+   "bron": "inhoudsopgawe",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": null,
+   "bladsye": 13
+  },
   "dbe-2024-nov-afr-v1": {
    "vak": "afrikaans",
    "sessie": "2024-nov",

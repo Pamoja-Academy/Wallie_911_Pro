@@ -15,6 +15,33 @@
   const K = window.WALLIE && window.WALLIE.DBE && window.WALLIE.DBE.KATALOGUS;
   if (!K) return;
   Object.assign(K, {
+    /* ---- 8 Nov (LL-25, "slim spotting"): twee Afr V1-vraestelle wat Wallie nog NIE gesien het nie, vir die herhalende-vrae-drils.
+       Skakels uit wallie-rag/manifest.json (HTTP 200, application/pdf, md5 aangeteken); voorblad: "AFRIKAANS HUISTAAL V1 2023"
+       (SS/NSS Mei/Junie 2023) en "DBE/Mei/Junie 2024". Elke memo se inhoud teen sy vraestel nagegaan (bv. "voorskroot", "Sjoe").
+       `subvrae`: punte per subvraag, uit die punte-hakies in die vraestel (V3, V4 en V5 tel elk op tot 10).
+       Nov 2023 is uitgesluit: die memo-skakel gee die Nov 2022-memo. ---- */
+    "dbe-2023-jun-afr-v1": {
+      id: "dbe-2023-jun-afr-v1",
+      vak: "afrikaans",
+      titel: "DBE Mei/Junie 2023 Afrikaans HT V1 (taal) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=nw9xQ54CLac%3d&tabid=4504&portalid=0&mid=12283",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=TKz3shJ72Sg%3d&tabid=4504&portalid=0&mid=12283",
+      vrae: [30, 10, 10, 10, 10],
+      subvrae: { "3.5": 1, "3.8": 1, "4.2.2": 1, "4.5": 1, "5.1": 2, "5.2": 1, "5.3": 2, "5.4": 2, "5.5": 1, "5.6": 1, "5.7": 1 }
+    },
+    "dbe-2024-jun-afr-v1": {
+      id: "dbe-2024-jun-afr-v1",
+      vak: "afrikaans",
+      titel: "DBE Mei/Junie 2024 Afrikaans HT V1 (taal) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=sTL2Bua2EYE%3d&tabid=4933&portalid=0&mid=13113",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=PWGOKTHqcOM%3d&tabid=4933&portalid=0&mid=13113",
+      vrae: [30, 10, 10, 10, 10],
+      subvrae: {
+        "3.1": 1, "3.2": 2, "3.3": 1, "3.4": 1, "3.5": 3, "3.6": 1, "3.7": 1,
+        "4.1": 1, "4.2": 1, "4.3": 1, "4.4": 2, "4.5": 1, "4.6": 1, "4.7": 2, "4.8": 1,
+        "5.1": 1, "5.2": 2, "5.3": 1, "5.4": 2, "5.5": 1, "5.6": 1, "5.7": 1, "5.8": 1
+      }
+    },
     "dbe-2026-jun-afr-v1": {
       id: "dbe-2026-jun-afr-v1",
       vak: "afrikaans",
@@ -353,6 +380,8 @@
       ["dbe-2025-nov-afr-v1"],
       ["dbe-2025-jun-afr-v1"],
       ["dbe-2024-nov-afr-v1"],
+      ["dbe-2023-jun-afr-v1"],
+      ["dbe-2024-jun-afr-v1"],
       ["dbe-2026-jun-afr-v2"],
       ["dbe-2025-nov-afr-v2"],
       ["dbe-2025-jun-afr-v2"],
