@@ -173,7 +173,7 @@ WALLIE.LESSONS = {
         cues: [
           "Lydend: voorwerp vorentoe + word (nou) / is (verlede) + deur …; ge- by die ww, maar nie by be-, ver-, her-, ont- nie (voorberei). Geen voorwerp? Daar word … (Daar word sleg geslaap.)",
           "Ontkenning: dubbele nie; iemand → niemand, iets → niks, altyd → nooit",
-          "Indirekte rede: dat + ww agter; ek → hy/sy; is → was, kan → kon, sal → sou; hier → daar, vandag → daardie dag, gister → die vorige dag, môre → die volgende dag; vraag → of",
+          "Indirekte rede: dat + ww agter; ek → hy/sy; ná \"het gesê\" (verlede): is → was, kan → kon, sal → sou; hier → daar, vandag → daardie dag, gister → die vorige dag, môre → die volgende dag; vraag → of",
           "Bysinne (ww agter): byvoeglik (wat/wie: beskryf 'n naamwoord) · bywoordelik (omdat, toe, as: rede/tyd/voorwaarde) · naamwoordelik (dat, of) · want/en/maar: woordorde bly"
         ],
         toeBoek: "(1) \"Die kok het die kos voorberei.\" → lydend. (2) Ma het gesê: \"Ek was gister moeg.\" → indirek. (3) \"Iemand het gebel.\" → ontkennend. (4) Benoem die bysin: \"Ek bly tuis omdat ek siek is.\"",

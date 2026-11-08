@@ -902,7 +902,7 @@ WALLIE.buildDayPlan = function buildDayPlan(dateStr) {
         detail: "Lees; bedek; skryf die stappe uit die kop. Gebruik dit in die proef." },
       { suffix: "afr1-d", kind: "rooi", slug: "afrikaans", start: "08:00", end: "10:00", soort: "skrif", punte: 70,
         title: "Afrikaans V1 proef 3: DBE November 2024, volledige vraestel soos Woensdag (70 punte, 2 uur)",
-        detail: "Alles saam: spotting, taalreëls, die swaar-formule en die opsomming-reëls. Tyd: A 50, B 30, C 40 min. Jy mag self die volgorde kies; tip: begin by C (seker punte). Die memo sluit eers oop as die tyd om is.",
+        detail: "Alles saam: spotting, taalreëls, die swaar-formule en die opsomming-reëls. Tyd: A 50, B 30, C 40 min. Die memo sluit eers oop as die tyd om is.",
         werk: { tipe: "vraestel", id: "dbe-2024-nov-afr-v1" } },
       { suffix: "merk-afr1-d", kind: "rooi", slug: "afrikaans", start: "10:15", end: "11:15", soort: "merk",
         title: "Merk Afrikaans V1-proef 3 met die DBE-memo (November 2024)",
