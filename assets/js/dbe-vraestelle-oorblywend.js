@@ -42,6 +42,23 @@
         "5.1": 1, "5.2": 2, "5.3": 1, "5.4": 2, "5.5": 1, "5.6": 1, "5.7": 1, "5.8": 1
       }
     },
+    /* ---- 8 Nov 17:40 (Hanno: "ten minste 7 ure" Ma en Di): nog een ongesiene Afr V1, Mei/Junie 2022 (DBE-bladsy
+       2022MayJuneExamPapers.aspx). Vraestel md5 2b9f430f75b59101c1b2c8ec130225d1, memo md5 8114b4f82ac50775b4932b0c1f3b82e7,
+       albei HTTP 200 application/pdf; voorblad "AFRIKAANS HUISTAAL V1 2022", memo "DBE/Junie 2022" (Volkswagen-advertensie,
+       strokiesprent, artikel: dieselfde tekste). `subvrae` uit die punte-hakies in die vraestel; V1 30, V2 10, V3-5 elk 10. ---- */
+    "dbe-2022-jun-afr-v1": {
+      id: "dbe-2022-jun-afr-v1",
+      vak: "afrikaans",
+      titel: "DBE Mei/Junie 2022 Afrikaans HT V1 (taal) (Afr)",
+      vraestel: "https://www.education.gov.za/LinkClick.aspx?fileticket=TXm7d81iih0%3d&tabid=3138&portalid=0&mid=10542",
+      memo: "https://www.education.gov.za/LinkClick.aspx?fileticket=fYHJ2uR0Bpc%3d&tabid=3138&portalid=0&mid=10542",
+      vrae: [30, 10, 10, 10, 10],
+      subvrae: {
+        "3.1": 1, "3.2": 2, "3.3": 1, "3.4": 1, "3.5": 1, "3.6": 1, "3.7": 1, "3.8": 2,
+        "4.1": 1, "4.2": 1, "4.3": 2, "4.4": 1, "4.5": 1, "4.6": 1, "4.7": 2, "4.8": 1,
+        "5.1": 1, "5.2": 2, "5.3": 1, "5.4": 1, "5.5": 2, "5.6": 1, "5.7": 1, "5.8": 1
+      }
+    },
     "dbe-2026-jun-afr-v1": {
       id: "dbe-2026-jun-afr-v1",
       vak: "afrikaans",
@@ -382,6 +399,7 @@
       ["dbe-2024-nov-afr-v1"],
       ["dbe-2023-jun-afr-v1"],
       ["dbe-2024-jun-afr-v1"],
+      ["dbe-2022-jun-afr-v1"],
       ["dbe-2026-jun-afr-v2"],
       ["dbe-2025-nov-afr-v2"],
       ["dbe-2025-jun-afr-v2"],

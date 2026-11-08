@@ -100,6 +100,13 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
     if (b.soort === "skrif" && b.werk && oop.has(b.werk.id)) fails.push(`${b.id}: ${b.werk.id} se memo is reeds vroeër oopgemaak`);
     if (b.soort === "merk" && b.werk) oop.add(b.werk.id);
   }
+  /* 8 Nov 17:40 (Hanno: "hy moet ten minste 7 ure môre en Dinsdag se sessies hê"): Ma en Di elk ≥ 7 uur werk
+     (les, skrif, merk, herdoen; nie pouses of tas pak nie). */
+  const hm = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  for (const dag of ["2026-11-09", "2026-11-10"]) {
+    const min = W.buildDayPlan(dag).blocks.filter((b) => ["les", "skrif", "merk", "herdoen"].includes(b.soort)).reduce((s, b) => s + hm(b.end) - hm(b.start), 0);
+    if (min < 420) fails.push(`${dag}: net ${min} min werk, Hanno vra ten minste 7 uur (420 min)`);
+  }
   for (const k of ["v1-spotting", "opsomming-v1", "swaar-formule", "leesbegrip-spotting"]) if (!voor.some((b) => b.kaart === k)) fails.push(`kaart ${k} kom nie voor die V1-eksamen nie (LL-25)`);
   for (const b of W.buildDayPlan("2026-11-11").blocks) if (b.werk) fails.push(`${b.id}: nuwe werk op die eksamendag`);
   for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUTCDate() + 1))

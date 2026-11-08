@@ -65,7 +65,7 @@ for (const p of Object.values(K)) {
   if (p.vraestel === p.memo) fails.push(`${p.id}: vraestel en memo is dieselfde skakel`);
 }
 /* 26 tot 30 Okt; +2 Afr V1, +4 Afr V2, +3 Engels P2 (planne 7-20 Nov) */
-if (nuut !== 37) fails.push(`oorblywende katalogus: ${nuut} vraestelle, verwag 37 (8 Nov: +Afr V1 Jun 2023 en Jun 2024, LL-25)`);
+if (nuut !== 38) fails.push(`oorblywende katalogus: ${nuut} vraestelle, verwag 38 (8 Nov: +Afr V1 Jun 2023, Jun 2024 en Jun 2022, LL-25)`);
 const gas = spec("gasvryheid").afdeling_punte;
 if (!gas || gas.A + gas.B + gas.C + gas.D !== 200) fails.push("gasvryheid.json: afdelings A-D moet 200 wees");
 const toer = spec("toerisme").afdeling_punte;
