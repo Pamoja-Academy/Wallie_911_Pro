@@ -829,6 +829,24 @@
    "stukke": null,
    "bladsye": 13
   },
+  "dbe-2022-jun-afr-v1": {
+   "vak": "afrikaans",
+   "sessie": "2022-jun",
+   "vraestel": "V1",
+   "vrae": [
+    30,
+    10,
+    10,
+    10,
+    10
+   ],
+   "bron": "vraestel",
+   "gedek": true,
+   "volledig": true,
+   "stem": true,
+   "stukke": null,
+   "bladsye": 14
+  },
   "dbe-2023-jun-afr-v1": {
    "vak": "afrikaans",
    "sessie": "2023-jun",
