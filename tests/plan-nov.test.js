@@ -94,7 +94,13 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
       fails.push(`${dag}: geen dril van herhalende vrae (subvrae) nie (LL-25)`);
   }
   const voor = ["2026-11-08", "2026-11-09", "2026-11-10"].flatMap((d) => W.buildDayPlan(d).blocks);
-  for (const k of ["v1-spotting", "opsomming-v1", "swaar-formule"]) if (!voor.some((b) => b.kaart === k)) fails.push(`kaart ${k} kom nie voor die V1-eksamen nie (LL-25)`);
+  /* QC PR 56: geen skryfblok uit 'n vraestel waarvan die memo reeds in 'n vroeëre merkblok oopgemaak is nie (AGENTS §2.6) */
+  const oop = new Set();
+  for (const b of voor) {
+    if (b.soort === "skrif" && b.werk && oop.has(b.werk.id)) fails.push(`${b.id}: ${b.werk.id} se memo is reeds vroeër oopgemaak`);
+    if (b.soort === "merk" && b.werk) oop.add(b.werk.id);
+  }
+  for (const k of ["v1-spotting", "opsomming-v1", "swaar-formule", "leesbegrip-spotting"]) if (!voor.some((b) => b.kaart === k)) fails.push(`kaart ${k} kom nie voor die V1-eksamen nie (LL-25)`);
   for (const b of W.buildDayPlan("2026-11-11").blocks) if (b.werk) fails.push(`${b.id}: nuwe werk op die eksamendag`);
   for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUTCDate() + 1))
     for (const b of W.buildDayPlan(d.toISOString().slice(0, 10)).blocks)

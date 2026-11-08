@@ -155,7 +155,7 @@ WALLIE.LESSONS = {
         titel: "V1: slim spotting — vang al die maklike punte",
         cues: [
           "Lees eers AL die vrae (5 min); merk M (maklik), T (taalreël), S (swaar)",
-          "M: haal aan · EEN woord · kies 'n letter (net nommer + letter)",
+          "M: haal aan · EEN woord · kies 'n letter (net nommer + letter) · waar/onwaar + bewys",
           "T ná M: lydend, ontkenning, indirek, bysin, stam, homoniem — elke jaar",
           "S laaste: standpunt + bewys + effek · TWEE = twee aparte punte · Tyd: A 50 · B 30 · C 40 min"
         ],
@@ -171,27 +171,27 @@ WALLIE.LESSONS = {
         id: "sinsveranderinge",
         titel: "Sinsveranderinge wat elke jaar kom",
         cues: [
-          "Lydend: voorwerp vorentoe + word/is + ge-ww + deur … (bedrywend: omgekeerd; is ge- → het ge-)",
+          "Lydend: voorwerp vorentoe + word (nou) / is (verlede) + deur …; ge- by die ww, maar nie by be-, ver-, her-, ont- nie (voorberei). Geen voorwerp? Daar word … (Daar word sleg geslaap.)",
           "Ontkenning: dubbele nie; iemand → niemand, iets → niks, altyd → nooit",
-          "Indirekte rede: dat + werkwoord agter; ek → hy/sy, hier → daar, nou → toe; vraag → of",
-          "Bysin: wat/wie + werkwoord agter · want/en/maar: woordorde bly · omdat/dat: werkwoord agter"
+          "Indirekte rede: dat + ww agter; ek → hy/sy; is → was, kan → kon, sal → sou; hier → daar, vandag → daardie dag, gister → die vorige dag, môre → die volgende dag; vraag → of",
+          "Bysinne (ww agter): byvoeglik (wat/wie: beskryf 'n naamwoord) · bywoordelik (omdat, toe, as: rede/tyd/voorwaarde) · naamwoordelik (dat, of) · want/en/maar: woordorde bly"
         ],
-        toeBoek: "(1) \"Die kok het die kos voorberei.\" → lydend. (2) Hy sê: \"Ek is moeg.\" → indirek. (3) \"Iemand het gebel.\" → ontkennend. (4) Verbind met omdat: \"Ek bly tuis. Ek is siek.\"",
+        toeBoek: "(1) \"Die kok het die kos voorberei.\" → lydend. (2) Ma het gesê: \"Ek was gister moeg.\" → indirek. (3) \"Iemand het gebel.\" → ontkennend. (4) Benoem die bysin: \"Ek bly tuis omdat ek siek is.\"",
         memo: [
-          "(1) Die kos is deur die kok voorberei.",
-          "(2) Hy sê dat hy moeg is.",
+          "(1) Die kos is deur die kok voorberei. (voorberei kry nie ge- nie)",
+          "(2) Ma het gesê dat sy die vorige dag moeg was.",
           "(3) Niemand het gebel nie.",
-          "(4) Ek bly tuis omdat ek siek is."
+          "(4) \"omdat ek siek is\" = bywoordelike bysin (rede)."
         ]
       },
       {
         id: "woordvorming-spelling",
         titel: "Woordvorming, klanke en spelling",
         cues: [
-          "Stam: haal voor- en agtervoegsels af (on-vriend-e-lik → vriend)",
-          "Samestelling = stam + stam · afleiding = stam + voor- of agtervoegsel",
-          "Teenwoordige deelwoord: stam + -ende (spelende) · intensief: yskoud, doodmoeg",
-          "Lettergrepe: een klinkerklank per greep (ge-sond-heid) · tweeklank: ei, ui, ou, eu"
+          "Stam: haal voor- en agtervoegsels af (on-vriend-e-lik → vriend) · samestelling = stam + stam · afleiding = stam + voor-/agtervoegsel",
+          "Teenwoordige deelwoord: stam + -end(e): spelend, golf → golwend (f → w) · intensief: yskoud, doodmoeg",
+          "Lettergrepe: een klinkerklank per greep (ge-sond-heid) · tweeklank: ei, y, ui, ou, eu (klein, ys, huis, koud, neus)",
+          "Deelteken (ë, ï) wys 'n nuwe lettergreep: geëet, opvlieënd · pleonasme = onnodige herhaling (eerste debuut)"
         ],
         toeBoek: "(1) Stam van \"onvriendelik\"? (2) Teenwoordige deelwoord van \"speel\" in 'n sin. (3) Intensiewe vorm van \"koud\". (4) Verdeel \"gesondheid\" in lettergrepe.",
         memo: [
@@ -219,7 +219,7 @@ WALLIE.LESSONS = {
       },
       {
         id: "swaar-formule",
-        titel: "Spoedkursus: die swaar 20% (Motiveer, evalueer, ironie)",
+        titel: "Spoedkursus: die swaar vrae (Motiveer, evalueer, ironie)",
         cues: [
           "Formule: standpunt + bewys (woord, reël, raampie) + effek op die leser",
           "TWEE feite = twee aparte bewyse · Evalueer = ja/nee + rede uit die teks",
@@ -248,6 +248,23 @@ WALLIE.LESSONS = {
           "Stappe: lees die vraag (watter 7?) → onderstreep 7 feite → skryf elk in eie woorde → een paragraaf → tel en skryf die getal.",
           "Taalpunte weg: aanhalings, puntsgewys i.p.v. 'n paragraaf, nie volsinne nie.",
           "Meer as 90 woorde: hou by 7 kort sinne van ±12 woorde."
+        ]
+      },
+      {
+        id: "leesbegrip-spotting",
+        titel: "Leesbegrip (30 punte): slim spotting",
+        cues: [
+          "Lees eers die vrae, dan die teks; onderstreep die reëls of paragrawe wat die vraag noem",
+          "Haal aan / EEN woord / waar of onwaar + bewys: die antwoord staan in die teks, kopieer presies",
+          "Verduidelik / Waarom: eie woorde, volsinne, soveel feite as punte (2 punte = 2 feite)",
+          "Stylfiguur: noem + effek (vergelyking: soos · metafoor: direk, sonder soos · personifikasie: mens-eienskap · hiperbool: oordrywing)"
+        ],
+        toeBoek: "Wat doen jy by: (1) \"Haal EEN woord aan wat …\" (2) \"Waarom … ? (2)\" (3) \"Waar of onwaar? Haal 'n frase aan om jou antwoord te staaf.\" (4) \"Benoem die stylfiguur en verduidelik die effek.\"",
+        memo: [
+          "(1) Een woord presies uit die teks, in aanhalingstekens.",
+          "(2) Twee aparte feite in eie woorde, in volsinne.",
+          "(3) Waar of Onwaar + die presiese frase uit die teks.",
+          "(4) Noem die stylfiguur + wat dit by die leser doen."
         ]
       }
     ]

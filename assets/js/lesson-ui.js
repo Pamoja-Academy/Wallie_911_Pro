@@ -41,10 +41,15 @@
   function pickConcept(slug, occurrence = 0, blockId = null, kaart = null) {
     const L = lesson(slug);
     if (!L) return null;
-    /* 8 Nov (LL-25): 'n teorie-blok noem sy kaart; dan geen rotasie nie */
-    const gevra = kaart ? L.concepts.find((x) => x.id === kaart) : null;
-    if (gevra) return gevra;
     const g = WALLIE.rttGeskiedenis;
+    /* 8 Nov (LL-25): 'n teorie-blok noem sy kaart; dan geen rotasie nie. Ook die sessie-paaie wat net die blok-id gee
+       (renderSessionLesson, showView("sessie")) kry die blok se kaart, en dit word vasgelê sodat niks dit later vervang nie (Bugbot). */
+    const kaartId = kaart || (blockId ? blokById(blockId)?.kaart : null);
+    const gevra = kaartId ? L.concepts.find((x) => x.id === kaartId) : null;
+    if (gevra) {
+      if (blockId && g && g.kaartVanBlok(blockId) !== gevra.id) g.noteKaart(blockId, slug, gevra.id);
+      return gevra;
+    }
     if (blockId && g) {
       const vas = g.kaartVanBlok(blockId);
       const c = vas ? L.concepts.find((x) => x.id === vas) : null;
@@ -141,7 +146,11 @@
     });
     const tot = punte != null ? ` — ${punte} punte` : "";
     /* QC 21 Okt (7a): ook 'n deel van 'n Wisk. Gel.-vraestel is hoofvrae met subvrae, nie 2 vragies nie */
-    const vol = d.item(werk.id)?.vak ? ". Dit is hoofvrae met baie subvrae: al die vrae staan in die Vraestel (PDF)." : "";
+    /* 8 Nov (QC PR 56, LL-18): 'n dril van subvrae ("5.3") is NIE hoofvrae nie; dan sê ons net waar hulle staan */
+    const subvrae = nrs.some((n) => !Number.isInteger(Number(n)));
+    const vol = subvrae
+      ? ". Doen net hierdie subvrae: hulle staan in die Vraestel (PDF)."
+      : d.item(werk.id)?.vak ? ". Dit is hoofvrae met baie subvrae: al die vrae staan in die Vraestel (PDF)." : "";
     return `<p class="werk-vrae"><strong>Doen:</strong> ${esc(dele.join(" · "))}${tot}${vol}</p>`;
   }
 

@@ -25,6 +25,17 @@ test("LL-25: elke Afr V1 les-blok wys sy eie kaart; drils wys subvrae en punte",
   expect(uit.length).toBeGreaterThanOrEqual(7);
   expect(uit.filter((x) => !x.ok)).toEqual([]);
 
+  /* Bugbot (PR 56): die sessie-pad gee net die blok-id; dit moet steeds die blok se eie kaart kry en dit vaslê */
+  const sessie = await page.evaluate(() => {
+    const st = WALLIE.app.state();
+    const b = (st.blocks || []).find((x) => x.id === "2026-11-08-kaart-spot");
+    if (!b) return { geenBlok: true };
+    const c = WALLIE.lessonUI.pickConcept("afrikaans", 0, b.id);
+    const weer = WALLIE.lessonUI.pickConcept("afrikaans", 0, b.id);
+    return { eerste: c && c.id, tweede: weer && weer.id, vas: WALLIE.rttGeskiedenis ? WALLIE.rttGeskiedenis.kaartVanBlok(b.id) : "v1-spotting" };
+  });
+  expect(sessie).toEqual({ eerste: "v1-spotting", tweede: "v1-spotting", vas: "v1-spotting" });
+
   /* Die spotting-kaart is die blok wat nou (15:31) aan die beurt is */
   await expect(page.locator('.md-card[data-id="2026-11-08-kaart-spot"]')).toContainText("V1: slim spotting");
 
