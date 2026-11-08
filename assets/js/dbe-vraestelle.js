@@ -281,14 +281,17 @@ window.WALLIE = window.WALLIE || {};
     /* 30 Okt (QC): 'n keusevraestel (letterkunde) se vrae tel op na meer as die vraestel; die heel vraestel tel sy eie totaal */
     if (werk.tipe === "vraestel" && Number.isFinite(p.totaal)) return p.totaal;
     const nrs = vraagNommers(werk);
-    if (!nrs.length || nrs.some((n) => !Number.isInteger(Number(n)) || !p.vrae[Number(n) - 1])) return null;
-    return nrs.reduce((s, n) => s + p.vrae[Number(n) - 1], 0);
+    /* 8 Nov (LL-25): subvrae ("5.3") tel uit die katalogus se nagegaande `subvrae`-punte */
+    const een = (n) => (Number.isInteger(Number(n)) ? p.vrae[Number(n) - 1] : p.subvrae && p.subvrae[String(n)]);
+    if (!nrs.length || nrs.some((n) => !een(n))) return null;
+    return nrs.reduce((s, n) => s + een(n), 0);
   }
 
   /* Punte per hele vraag, vir die lysie op die sessieskerm ("V5 · 35 punte"). */
   function vraagPunte(werk, nr) {
     const p = werk ? item(werk.id) : null;
     const i = Number(nr);
+    if (p && !Number.isInteger(i) && p.subvrae && p.subvrae[String(nr)]) return p.subvrae[String(nr)];
     if (!p || !Number.isInteger(i) || !p.vrae[i - 1]) return null;
     return p.vrae[i - 1];
   }

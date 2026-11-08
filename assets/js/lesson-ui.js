@@ -38,9 +38,12 @@
      nuwe kaart aanskuif. Voorheen het die eerste blok van ELKE dag konsep [0] gewys — Wallie het 10 en
      11 Okt presies dieselfde kaart gekry. Die kaart van ’n blok word een keer gekies en gestoor, dus
      verander ’n herlaai (of ’n "reg"-merk) dit nie. */
-  function pickConcept(slug, occurrence = 0, blockId = null) {
+  function pickConcept(slug, occurrence = 0, blockId = null, kaart = null) {
     const L = lesson(slug);
     if (!L) return null;
+    /* 8 Nov (LL-25): 'n teorie-blok noem sy kaart; dan geen rotasie nie */
+    const gevra = kaart ? L.concepts.find((x) => x.id === kaart) : null;
+    if (gevra) return gevra;
     const g = WALLIE.rttGeskiedenis;
     if (blockId && g) {
       const vas = g.kaartVanBlok(blockId);
@@ -299,7 +302,7 @@
     }
     const slug = b.subjectSlug;
     /* LL-23: 'n merk-/voor-eksamen-blok skuif die les-rotasie steeds aan (soos voorheen), maar WYS die les nie. */
-    const gekies = b.soort === "skrif" && b.werk ? null : pickConcept(slug, occurrence, b.id);
+    const gekies = b.soort === "skrif" && b.werk ? null : pickConcept(slug, occurrence, b.id, b.kaart);
     const c = isProef(b) ? null : gekies;
     const img = c ? WALLIE.lessonImg(slug, c.id) : WALLIE.lessonImg(slug, "cover");
     const werk = ctx.werk || null;
@@ -389,7 +392,7 @@
       return;
     }
     const seen = state.blocks.filter((b) => b.subjectSlug === next.subjectSlug).indexOf(next);
-    const gekiesNext = next.soort === "skrif" && next.werk ? null : pickConcept(next.subjectSlug, Math.max(0, seen), next.id);
+    const gekiesNext = next.soort === "skrif" && next.werk ? null : pickConcept(next.subjectSlug, Math.max(0, seen), next.id, next.kaart);
     const c = isProef(next) ? null : gekiesNext;
     const werk = werkKaart(state)[next.id] || null;
     const opsomming = werkOpsomming(next, werk);

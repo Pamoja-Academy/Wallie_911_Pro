@@ -15,7 +15,7 @@ const ctx = { console };
 ctx.window = ctx;
 ctx.localStorage = { getItem: () => null, setItem() {}, removeItem() {} };
 vm.createContext(ctx);
-for (const lêer of ["assets/js/data.js", "assets/js/pa-konsole/exams.js", "assets/js/schedule.js", "assets/js/dbe-vraestelle.js", "assets/js/dbe-vraestelle-oorblywend.js"]) {
+for (const lêer of ["assets/js/data.js", "assets/js/pa-konsole/exams.js", "assets/js/schedule.js", "assets/js/dbe-vraestelle.js", "assets/js/dbe-vraestelle-oorblywend.js", "assets/js/lessons.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, lêer), "utf8"), ctx, { filename: lêer });
 }
 const W = ctx.WALLIE;
@@ -61,9 +61,13 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
     const kat = katVan[volgende.n];
     if (!kat) fails.push(`${b.id}: eerskomende eksamen "${volgende.n}" het geen katalogus-tipe in doelwitte.json nie`);
     else if (!p.id.endsWith(`-${kat}`)) fails.push(`${b.id}: gee ${p.id}, maar die eerskomende ${(b.subjectSlug || b.slug)}-eksamen is "${volgende.n}" (${kat})`);
-    for (const n of b.werk.nrs || []) if (!(Number(n) >= 1 && Number(n) <= p.vrae.length)) fails.push(`${b.id}: Vraag ${n} bestaan nie in ${p.id}`);
+    for (const n of b.werk.nrs || []) {
+      if (!(parseInt(String(n), 10) >= 1 && parseInt(String(n), 10) <= p.vrae.length)) fails.push(`${b.id}: Vraag ${n} bestaan nie in ${p.id}`);
+      /* 8 Nov (LL-25): 'n subvraag moet in die katalogus se nagegaande `subvrae` staan */
+      if (!Number.isInteger(Number(n)) && !(p.subvrae && p.subvrae[String(n)])) fails.push(`${b.id}: subvraag ${n} het geen nagegaande punte in ${p.id}.subvrae nie`);
+    }
     /* QC 30 Okt (B1): die punte wat die skerm wys. Heel vraestel = sy totaal (keusevraestel: `totaal`); vrae = hul som. */
-    const verwag = b.werk.tipe === "vraestel" ? (Number.isFinite(p.totaal) ? p.totaal : p.vrae.reduce((x, y) => x + y, 0)) : (b.werk.nrs || []).reduce((x, n) => x + p.vrae[Number(n) - 1], 0);
+    const verwag = b.werk.tipe === "vraestel" ? (Number.isFinite(p.totaal) ? p.totaal : p.vrae.reduce((x, y) => x + y, 0)) : (b.werk.nrs || []).reduce((x, n) => x + (Number.isInteger(Number(n)) ? p.vrae[Number(n) - 1] : (p.subvrae || {})[String(n)]), 0);
     const sonderBlokPunte = W.DBE.punte(b.werk, null);
     if (sonderBlokPunte !== verwag) fails.push(`${b.id}: die skerm wys ${sonderBlokPunte} punte, verwag ${verwag}`);
     if (Number.isFinite(b.punte) && b.punte !== verwag) fails.push(`${b.id}: blok sê ${b.punte} punte, die vraestel gee ${verwag}`);
@@ -74,6 +78,27 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
     const tipe = Object.keys(EIE).find((t) => p.id.endsWith("-" + t));
     if (tipe) for (const n of b.werk.nrs || []) if (!EIE[tipe].includes(Number(n))) fails.push(`${b.id}: Vraag ${n} van ${p.id} is nie een van Wallie se werke nie`);
   }
+}
+/* LL-25 (8 Nov, Hanno: "slim spotting", nie net vraestelle nie): vir Afrikaans V1 (Wo 11 Nov) moet elke voorbereidingsdag
+   (8-10 Nov) 'n teorie-kaart (les met 'n bestaande `kaart`) EN 'n dril van herhalende vrae (skrif met subvrae) hê; die
+   eksamentegniek-kaart (v1-spotting) kom voor die eksamen; die eksamendag self gee geen nuwe werk nie; en die Nov 2023-vraestel
+   (verkeerde memo op education.gov.za) word nooit gegee nie. */
+{
+  const kaarte = new Set(((ctx.WALLIE.LESSONS || {}).afrikaans || { concepts: [] }).concepts.map((c) => c.id));
+  for (const dag of ["2026-11-08", "2026-11-09", "2026-11-10"]) {
+    const bl = W.buildDayPlan(dag).blocks.filter((b) => b.subjectSlug === "afrikaans");
+    const les = bl.filter((b) => b.soort === "les" && b.kaart);
+    if (!les.length) fails.push(`${dag}: Afrikaans V1-voorbereiding sonder 'n teorie-kaart (LL-25)`);
+    for (const b of les) if (!kaarte.has(b.kaart)) fails.push(`${b.id}: kaart ${b.kaart} bestaan nie in lessons.js`);
+    if (dag !== "2026-11-10" && !bl.some((b) => b.soort === "skrif" && (b.werk?.nrs || []).some((n) => !Number.isInteger(Number(n)))))
+      fails.push(`${dag}: geen dril van herhalende vrae (subvrae) nie (LL-25)`);
+  }
+  const voor = ["2026-11-08", "2026-11-09", "2026-11-10"].flatMap((d) => W.buildDayPlan(d).blocks);
+  for (const k of ["v1-spotting", "opsomming-v1", "swaar-formule"]) if (!voor.some((b) => b.kaart === k)) fails.push(`kaart ${k} kom nie voor die V1-eksamen nie (LL-25)`);
+  for (const b of W.buildDayPlan("2026-11-11").blocks) if (b.werk) fails.push(`${b.id}: nuwe werk op die eksamendag`);
+  for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUTCDate() + 1))
+    for (const b of W.buildDayPlan(d.toISOString().slice(0, 10)).blocks)
+      if ([b.werk, ...(b.werk_ekstra || [])].some((w) => w && /2023-nov-afr-v1/.test(w.id))) fails.push(`${b.id}: Nov 2023 Afr V1 (verkeerde memo)`);
 }
 if (dae < 20) fails.push(`net ${dae} dae nagegaan`);
 if (werkBlokke < 40) fails.push(`net ${werkBlokke} werk-blokke nagegaan: die hek moet werklike blokke toets`);
