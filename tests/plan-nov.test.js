@@ -125,12 +125,56 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
       if (b.werk || ["skrif", "merk", "herdoen", "toets"].includes(b.soort)) fails.push(`${b.id}: vraestelwerk na Wallie se "hou op om vir my vraestelle te gee" (LL-27)`);
       if (b.soort === "les" && hm(b.end) - hm(b.start) > 25) fails.push(`${b.id}: ${hm(b.end) - hm(b.start)} min, Wallie vra 25 min werk + 5 min rus (LL-27)`);
       if (b.kaart && b.subjectSlug === "engels" && !engKaarte.has(b.kaart)) fails.push(`${b.id}: kaart ${b.kaart} bestaan nie in lessons.js`);
-      /* Bugbot PR 58: 'n Afrikaanse les sonder kaart kry 'n V1-taalkaart (pickConcept); V2-letterkunde vra 'n V2-kaart */
-      if (b.soort === "les" && b.subjectSlug === "afrikaans" && !["gedig-v2", "letterkunde-v2"].includes(b.kaart)) fails.push(`${b.id}: Afrikaans V2-les sonder 'n V2-kaart (wys anders 'n V1-taalkaart)`);
       if (b.kaart) gesien.add(b.kaart);
     }
   }
   for (const k of ["macbeth-bedryf-1-2", "macbeth-bedryf-3-5", "macbeth-karakters", "macbeth-temas"]) if (!gesien.has(k)) fails.push(`kaart ${k} kom nie voor Engels V2 nie (LL-27)`);
+}
+
+/* LL-28 (18 Nov 11:09, Wallie se stemnota + Hanno): die les-blokke het die ou PEEL-kaart (Okt) drie keer herhaal, elke kaart
+   had net EEN toe-boek-vraag, en Wallie moes self die DBE-memo op education.gov soek. Vir die laaste dae voor 'n eksamen
+   (18-19 Nov) faal die hek as:
+   - 'n les-blok nie sy eie kaart noem nie (sonder kaart roteer pickConcept ou kaarte in), of die kaart nie bestaan nie;
+   - dieselfde kaart twee keer gebruik word (geen herhaling nie);
+   - 'n kaart minder as 5 vrae in sy toe-boek of minder as 5 memo-reëls het (substansie, en die memo is IN die kaart);
+   - 'n Engelse DBE-uittreksel uit 'n vraestel kom wat Wallie al in 'n blok gekry het (LL-18: geen gesiene vraestel);
+   - die eerste DBE-uittreksel vir Macbeth (V3) of vir die kortverhale (V5) nie eers die DBE-nasienreëls gee nie
+     (Hanno: teorie en eksamentegniek EERSTE). */
+{
+  const LS = ctx.WALLIE.LESSONS || {};
+  const kaartVan = (slug, id) => ((LS[slug] || { concepts: [] }).concepts || []).find((c) => c.id === id);
+  const vrae = (t) => (String(t || "").match(/(^|\n)\s*(\d+\)|\d+\.\d+\.\d+)/g) || []).length;
+  /* Watter Engelse V2-vraestelle het Wallie al in 'n blok gekry (alle dae tot 17 Nov)? */
+  const gekry = new Set();
+  for (let d = new Date("2026-10-01T12:00:00Z"); d <= new Date("2026-11-17T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 1)) {
+    for (const b of W.buildDayPlan(d.toISOString().slice(0, 10)).blocks) if (b.werk && b.werk.id) gekry.add(b.werk.id);
+  }
+  const MAAND = { JUN: "jun", NOV: "nov" };
+  const gebruik = new Map();
+  const eersteDbe = {};
+  for (const dag of ["2026-11-18", "2026-11-19"]) {
+    for (const b of W.buildDayPlan(dag).blocks) {
+      if (b.soort !== "les") continue;
+      if (!b.kaart) { fails.push(`${b.id}: les-blok sonder eie kaart (roteer ou kaarte in, LL-28)`); continue; }
+      const c = kaartVan(b.subjectSlug, b.kaart);
+      if (!c) { fails.push(`${b.id}: kaart ${b.kaart} bestaan nie vir ${b.subjectSlug}`); continue; }
+      if (gebruik.has(b.kaart)) fails.push(`${b.id}: kaart ${b.kaart} herhaal (ook in ${gebruik.get(b.kaart)}) (LL-28)`);
+      gebruik.set(b.kaart, b.id);
+      if (vrae(c.toeBoek) < 5) fails.push(`${b.id}: kaart ${b.kaart} het ${vrae(c.toeBoek)} vrae (min 5, LL-28)`);
+      if ((c.memo || []).length < 5) fails.push(`${b.id}: kaart ${b.kaart} het ${(c.memo || []).length} memo-reëls (min 5, LL-28)`);
+      const m = String(c.toeBoek || "").match(/DBE (JUN|NOV) (\d{4})/);
+      if (b.subjectSlug === "engels" && m) {
+        const id = `dbe-${m[2]}-${MAAND[m[1]]}-eng-v2`;
+        if (gekry.has(id)) fails.push(`${b.id}: ${id} is al aan Wallie gegee (LL-18/LL-28)`);
+        const soort = /\n3\.\d\.\d/.test(c.toeBoek) ? "Macbeth" : /\n5\.\d\.\d/.test(c.toeBoek) ? "kortverhale" : null;
+        if (soort && !eersteDbe[soort]) {
+          eersteDbe[soort] = b.id;
+          if (!/HOW THE DBE MARKS IT/.test(c.toeBoek)) fails.push(`${b.id}: eerste DBE-${soort}-uittreksel sonder die nasienreëls eerste (LL-28)`);
+        }
+      }
+    }
+  }
+  for (const s of ["Macbeth", "kortverhale"]) if (!eersteDbe[s]) fails.push(`geen DBE-${s}-uittreksel met memo voor Engels V2 nie (LL-28)`);
 }
 if (dae < 20) fails.push(`net ${dae} dae nagegaan`);
 if (werkBlokke < 40) fails.push(`net ${werkBlokke} werk-blokke nagegaan: die hek moet werklike blokke toets`);

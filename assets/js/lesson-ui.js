@@ -750,6 +750,9 @@
     img.alt = c.titel;
     $("#les-cues").innerHTML = c.cues.map((q) => `<li>${esc(q)}</li>`).join("");
     $("#les-prompt").textContent = c.toeBoek;
+    $("#les-prompt").classList.toggle("lang", String(c.toeBoek || "").length > 280);
+    /* Bugbot PR 60: by 'n DBE-uittreksel bly die uittreksel en vrae sigbaar langs die memo, sodat hy kan nasien. */
+    v.classList.toggle("met-uittreksel", String(c.toeBoek || "").length > 280);
     $("#les-memo-list").innerHTML = c.memo.map((m) => `<li>${esc(m)}</li>`).join("");
     $("#les-dots").innerHTML = L.concepts
       .map((x, i) => {
