@@ -266,6 +266,40 @@ WALLIE.LESSONS = {
           "(3) Waar of Onwaar + die presiese frase uit die teks.",
           "(4) Noem die stylfiguur + wat dit by die leser doen."
         ]
+      },
+      {
+        id: "gedig-v2",
+        titel: "Afrikaans V2: 'n gesiene gedig in 4 stappe",
+        cues: [
+          "Tema: waaroor gaan die gedig? Een sin, in jou eie woorde",
+          "Toon en stemming: een woord (bv. bitter, nostalgies) + die woorde in die gedig wat dit wys",
+          "Stylfigure: noem dit + die EFFEK (vergelyking, metafoor, personifikasie, herhaling, kontras)",
+          "Bou: titel, strofes, enjambement, rym of die slotreël: wat doen dit met die betekenis?"
+        ],
+        toeBoek: "Kies een van jou gesiene gedigte. Skryf uit die kop: die tema in een sin, die toon met twee woorde as bewys, en twee stylfigure met hul effek.",
+        memo: [
+          "Tema: 'n volsin oor die gedig se boodskap, nie 'n opsomming van wat gebeur nie.",
+          "Toon: een woord + aanhaling (\"…\") as bewys.",
+          "Stylfiguur: naam + aanhaling + effek. Sonder die effek kry jy gewoonlik net die helfte van die punte.",
+          "Kyk in jou aantekeninge na wat jy gemis het en lees net daardie deel weer."
+        ]
+      },
+      {
+        id: "letterkunde-v2",
+        titel: "Afrikaans V2: roman en drama (opstel of kontekstueel)",
+        cues: [
+          "Ken vir elke werk: hoofkarakters (een eienskap + toneel), konflik, keerpunte, einde, temas",
+          "Kontekstueel: lees die uittreksel, plaas dit (wat gebeur net voor en net ná?), antwoord in volsinne",
+          "Opstel (400-450 woorde): inleiding met jou standpunt → 3-4 paragrawe met voorbeelde uit die werk → slot",
+          "Een werk 'n opstel, die ander kontekstueel: kies die werk wat jy die beste ken vir die opstel"
+        ],
+        toeBoek: "Kies Onderwêreld of Krismis van Map Jacobs. Noem uit die kop: twee hoofkarakters met een eienskap elk, die grootste konflik, en twee temas.",
+        memo: [
+          "Elke eienskap het 'n toneel uit die werk as bewys nodig, anders is dit net 'n mening.",
+          "Konflik: wie of wat staan teenoor mekaar, en hoe eindig dit?",
+          "Tema: 'n volsin oor wat die werk oor die lewe sê, nie net een woord nie.",
+          "Wat jy nie kon onthou nie: lees dit nou in jou aantekeninge."
+        ]
       }
     ]
   },
@@ -407,6 +441,71 @@ WALLIE.LESSONS = {
         memo: [
           "Tom said (that) he would finish it the next day.",
           "I → he · will → would · tomorrow → the next day."
+        ]
+      },
+      /* 18 Nov (Wallie: "hou op om vir my vraestelle te gee"; Macbeth-inhoud is sy swak punt): inhoud, nie vraestelle nie. */
+      {
+        id: "macbeth-bedryf-1-2",
+        titel: "Macbeth: Acts 1–2 (the prophecy and the murder)",
+        cues: [
+          "Act 1: the witches: Thane of Cawdor, then king; Banquo’s sons will be kings. Duncan makes Macbeth Cawdor",
+          "Act 1: Lady Macbeth (“unsex me here”) mocks his doubts (“We will proceed no further”) and plans the murder",
+          "Act 2: the dagger speech; Macbeth kills Duncan; Lady Macbeth smears the sleeping guards with blood",
+          "Act 2: Macduff finds the body; Macbeth kills the guards; Malcolm and Donalbain flee; Macbeth is crowned"
+        ],
+        toeBoek: "Close your notes. Tell the story of Acts 1 and 2 in 5 sentences. Who says “Fair is foul, and foul is fair”, and what does it warn us about?",
+        memo: [
+          "Witches’ prophecy → Cawdor comes true → Lady Macbeth pushes → Duncan murdered in his sleep → Macbeth becomes king.",
+          "The witches say it (Act 1, Scene 1): things are not what they seem. This is the theme of appearance and reality.",
+          "Check: did you say WHY Macbeth hesitates (Duncan is his king, his relative and his guest)?"
+        ]
+      },
+      {
+        id: "macbeth-bedryf-3-5",
+        titel: "Macbeth: Acts 3–5 (tyrant and downfall)",
+        cues: [
+          "Act 3: Macbeth has Banquo murdered; Fleance escapes; Banquo’s ghost appears at the banquet",
+          "Act 4: the apparitions: beware Macduff · none of woman born can harm you · safe until Birnam Wood comes",
+          "Act 4: Macduff’s wife and children are killed; in England, Malcolm tests Macduff’s loyalty",
+          "Act 5: Lady Macbeth sleepwalks and dies; Birnam branches move; Macduff (“untimely ripped”) kills Macbeth"
+        ],
+        toeBoek: "Close your notes. How does each of the three apparitions come true in Act 5?",
+        memo: [
+          "Beware Macduff: Macduff kills Macbeth.",
+          "None of woman born: Macduff was born by caesarean (“untimely ripped”), so the promise was a trick.",
+          "Birnam Wood: Malcolm’s soldiers carry branches cut from Birnam Wood, so the wood ‘moves’ to Dunsinane."
+        ]
+      },
+      {
+        id: "macbeth-karakters",
+        titel: "Macbeth: the characters (trait + proof)",
+        cues: [
+          "Macbeth: brave soldier → ambitious murderer → cold tyrant (“I am in blood stepped in so far”)",
+          "Lady Macbeth: strong and ruthless at first → guilt, sleepwalking, death",
+          "Banquo: hears the same prophecy but does NOT act on it (a foil to Macbeth)",
+          "Macduff: loyal to Scotland, loses his family, takes revenge · Duncan: a good, trusting king"
+        ],
+        toeBoek: "How do Macbeth and Lady Macbeth change from Act 1 to Act 5? Give one example of each.",
+        memo: [
+          "They swap places: in Act 1 she is strong and he doubts; in Act 5 he is hard and cold and she breaks down.",
+          "Macbeth: “We will proceed no further” (Act 1) → he has Macduff’s family killed without hesitating (Act 4).",
+          "Lady Macbeth: “unsex me here” (Act 1) → she sleepwalks and tries to wash the blood off her hands (Act 5)."
+        ]
+      },
+      {
+        id: "macbeth-temas",
+        titel: "Macbeth: themes and how the questions ask",
+        cues: [
+          "Ambition: unchecked ambition destroys Macbeth and Scotland · fate vs free will: Macbeth CHOOSES to kill",
+          "Appearance vs reality: “look like th’ innocent flower, but be the serpent under’t”",
+          "Guilt: blood and sleeplessness (“Macbeth does murder sleep”)",
+          "Questions: context · tone + a word as proof · dramatic irony · Do you agree? = opinion + reason"
+        ],
+        toeBoek: "Explain the dramatic irony when Duncan arrives at Inverness and says the castle has a pleasant seat.",
+        memo: [
+          "Dramatic irony: the audience knows something the character does not.",
+          "Duncan thinks he is safe and welcome; we know the Macbeths plan to kill him there that night.",
+          "Full marks: what the character thinks + what the audience knows."
         ]
       }
     ]

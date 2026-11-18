@@ -113,6 +113,25 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
     for (const b of W.buildDayPlan(d.toISOString().slice(0, 10)).blocks)
       if ([b.werk, ...(b.werk_ekstra || [])].some((w) => w && /2023-nov-afr-v1/.test(w.id))) fails.push(`${b.id}: Nov 2023 Afr V1 (verkeerde memo)`);
 }
+/* LL-27 (18 Nov, Wallie se antwoord op Pa se vraelys: "Hou op om vir my vraestelle te gee"): Wo 18 en Do 19 Nov
+   (voor Engels V2 en Afrikaans V2) gee geen vraestel-, merk- of herdoenblokke nie; die Macbeth-inhoudkaarte kom voor
+   die Engels V2-eksamen; elke kaart bestaan; elke werkblok is hoogstens 25 min (25 min werk, 5 min rus). */
+{
+  const engKaarte = new Set(((ctx.WALLIE.LESSONS || {}).engels || { concepts: [] }).concepts.map((c) => c.id));
+  const hm = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  const gesien = new Set();
+  for (const dag of ["2026-11-18", "2026-11-19"]) {
+    for (const b of W.buildDayPlan(dag).blocks) {
+      if (b.werk || ["skrif", "merk", "herdoen", "toets"].includes(b.soort)) fails.push(`${b.id}: vraestelwerk na Wallie se "hou op om vir my vraestelle te gee" (LL-27)`);
+      if (b.soort === "les" && hm(b.end) - hm(b.start) > 25) fails.push(`${b.id}: ${hm(b.end) - hm(b.start)} min, Wallie vra 25 min werk + 5 min rus (LL-27)`);
+      if (b.kaart && b.subjectSlug === "engels" && !engKaarte.has(b.kaart)) fails.push(`${b.id}: kaart ${b.kaart} bestaan nie in lessons.js`);
+      /* Bugbot PR 58: 'n Afrikaanse les sonder kaart kry 'n V1-taalkaart (pickConcept); V2-letterkunde vra 'n V2-kaart */
+      if (b.soort === "les" && b.subjectSlug === "afrikaans" && !["gedig-v2", "letterkunde-v2"].includes(b.kaart)) fails.push(`${b.id}: Afrikaans V2-les sonder 'n V2-kaart (wys anders 'n V1-taalkaart)`);
+      if (b.kaart) gesien.add(b.kaart);
+    }
+  }
+  for (const k of ["macbeth-bedryf-1-2", "macbeth-bedryf-3-5", "macbeth-karakters", "macbeth-temas"]) if (!gesien.has(k)) fails.push(`kaart ${k} kom nie voor Engels V2 nie (LL-27)`);
+}
 if (dae < 20) fails.push(`net ${dae} dae nagegaan`);
 if (werkBlokke < 40) fails.push(`net ${werkBlokke} werk-blokke nagegaan: die hek moet werklike blokke toets`);
 
