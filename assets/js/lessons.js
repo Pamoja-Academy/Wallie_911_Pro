@@ -381,6 +381,91 @@ WALLIE.LESSONS = {
           "6) Elke punt: een gebeurtenis + een sin oor hoe dit die standpunt bewys.",
           "Opstel: 400-450 woorde, ±4-5 paragrawe."
         ]
+      },
+      {
+        id: "afr-dbe-gedig",
+        titel: "Afrikaans V2: so sien die DBE na + gesiene gedig 'Susan Boyle' (Nov 2023)",
+        cues: [
+          "Ja/Nee of Waar/Onwaar: 0 punte, net die rede tel",
+          "Beeldspraak: benoem + verduidelik",
+          "Ironie: albei kante vir een punt",
+          "Afdeling A: 2 gesiene gedigte + die ongesiene gedig (verpligtend)"
+        ],
+        toeBoek: "SO SIEN DIE DBE NA (uit die memo's):\n• Ja/Nee, Stem saam, Waar/Onwaar: 0 punte. Net die REDE tel.\n• Beeldspraak (2): benoem + verduidelik (wat word met wat vergelyk, en waarom).\n• Ironie: BEIDE kante (wat verwag word EN wat werklik gebeur), anders 0.\n• 'Haal … opeenvolgende woorde aan': presies soveel woorde.\n• 'Noem TWEE/DRIE …': elke feit = 1 punt; gee presies soveel.\n• Spelfoute tel nie, tensy dit die betekenis verander. Skryf EEN antwoord: die eerste een word nagesien.\n• Die eksamen (80): Afdeling A = 2 gesiene gedigte (10 elk) + die ONGESIENE gedig (10, verpligtend). Afdeling B (Onderwêreld) en C (Krismis van Map Jacobs): EEN opstel (400-450 woorde, 25) en EEN kontekstueel (25), nie twee van dieselfde nie.\n\nDBE NOV 2023 · VRAAG 2 · 'Susan Boyle' – Kobus Grobler\ndaar staan jy inskrywing 43212\nvoor die pilatusse van Britain's got talent\naangeja soos 'n skaap\nmiserabel vaal in die lig verguis\ndie monobrou en die kapsel raam\njou vertelsel van 'n klein Nasaret\nSimon spot, skares jou uit:\njy is die grap van die jaar\nmet die eerste woorde van I dreamed a dream\nhet jy vanuit vernederende vooroordeel\nhulle en miljoene ander op YouTube\nin ongeloof laat aanskou\nhoe jy jare se troeteltalent\naan die hele wêreld skenk\n\nSkryf jou antwoorde (±15 min), wys dan die memo:\n2.1 Waarna verwys \"43212\" (r. 1) letterlik EN watter afleiding oor Susan Boyle kan hieruit gemaak word? (2)\n2.2 Benoem en verduidelik die beeldspraak in versreël 2. (2)\n2.3 Susan Boyle word in r. 3 en 4 as 'n patetiese karakter voorgestel. Watter halfrym versterk dit? (1)\n2.4 Dink jy haar liedjiekeuse in r. 9 is gepas? Motiveer. (1)\n2.5.1 Wat word deur \"troeteltalent\" (r. 13) geïmpliseer EN hoe word die woord uitgehef? (2)\n2.5.2 Watter TWEE opeenvolgende woorde kontrasteer met \"troeteltalent\"? (1)\n2.6 Waarom kan die slotreëls (r. 13-14, teenoor r. 7-8) as 'n ironiese uitkoms vir haar beskou word? (1)",
+        memo: [
+          "2.1 Sy is deelnemer nommer 43212 / daar was baie deelnemers voor haar ✓ EN sy is net 'n nommer / naamloos / haar wenkans is skraal ✓.",
+          "2.2 Metafoor ✓ EN die beoordelaars word vergelyk met regters (Pilatus) wat 'n oordeel oor haar vel ✓.",
+          "2.3 a-assonansie of s-alliterasie ✓.",
+          "2.4 Ja: sy het gedroom om sukses te behaal, en die lied het dié droom waar gemaak ✓. ('Nee' kan nie.)",
+          "2.5.1 Sy het haar talent jare lank vertroetel / vir haarself gehou ✓ EN uitgehef deur agterplasing / t-klank-herhaling / nuutskepping / rymposisie ✓.",
+          "2.5.2 \"hele wêreld\" of \"wêreld skenk\" ✓.",
+          "2.6 Almal het verwag sy sou misluk en belaglik wees, MAAR haar talent het haar wêreldroem besorg ✓ (albei kante vir 1 punt).",
+          "Tel jou punte uit 10. Elke punt wat jy verloor het: lees die reël bo-aan weer."
+        ]
+      },
+      {
+        id: "afr-dbe-onderwereld",
+        titel: "Afrikaans V2: Onderwêreld kontekstueel (DBE Nov 2023, Teks A)",
+        cues: [
+          "Greg (hoofseun, ek-verteller) en Eckardt (die nuweling, kuberkraker)",
+          "Greg se pa: Turret Media, PNR, die waarheid oor John",
+          "Titel: die onderwêreld van kuberkrakery en korrupsie",
+          "Kontekstueel: plaas die uittreksel, antwoord in volsinne"
+        ],
+        toeBoek: "DBE NOV 2023 · VRAAG 7 · ONDERWÊRELD · TEKS A\n\"Sorry, Ma, ek kyk 'n bietjie rond. Ons kon mos nooit sien waaroor die Matrieks van die vorige jare so te kere gaan nie.\"\n\"Ons het die koelsak in die motor vergeet. Daar is 'n paar eet- en drinkgoedjies in wat ek vir jou saamgebring het vir jou yskas. Sal jy dit gou gaan haal, asseblief?\"\nEk sit net af na die trap toe, toe ek 'n vreemde gesig tussen die ander ouens raaksien. Donkerkop, ongeskeer. Strakgesig. Sy oë kyk 'n oomblik lank na my van onder sy donker wenkbroue, flits dan weer weg. Hy stap af met die gang. Oor sy skouer hang daar 'n laptopsak. In een hand hou hy 'n stuk gevoude papier en 'n sportsak vas, in die ander 'n tas.\nEn ek kan dit sommer ruik: 'n nuweling. Kan jy nou meer? In ons laaste jaar. Sy pa moet connections uit 'n ander wêreld hê.\n\"Is jy seker jy is op die regte vloer?\" vra ek toe ek hom inhaal.\n\"Ek kan tel,\" sê hy, terwyl sy oë 'n oomblik lank op my vasgenael bly.\nMoeilikheid, sien ek. Hierdie ou soek moeilikheid.\n\"Ja, maar kan jy tot vyf tel? Hierdie vloer is net vir Matrieks.\"\n\"Zero's en One's is al wat jy nodig het,\" sê hy.\nEk frons, weet nie wat hy bedoel nie. Ek kan sien hy weet dit.\n\"Wie's jy?\" vra ek.\nHy bly 'n oomblik stil en kyk my net aan, sê dan: \"Eckardt. My naam is Eckardt.\" Toe draai hy om en loop verder die gang af.\n\nSkryf jou antwoorde (±20 min), wys dan die memo:\n7.1 Watter tyd van die skooljaar is hier ter sprake? (1)\n7.2 Wat kan jy oor Greg en sy ma se verhouding aflei EN hoe verskil dit van sy verhouding met sy pa? (2)\n7.3.1 Waarom is Greg se antagonisme teenoor Eckardt by hulle eerste ontmoeting ongeregverdig? (2)\n7.3.2 Tot watter slotsom kom Greg uiteindelik oor sy eerste indrukke van Eckardt? (1)\n7.4 Watter rol speel Eckardt se oë later tydens die Trapper-ritueel? (1)\n7.5 \"Sy pa moet connections uit 'n ander wêreld hê\": hoe word dit in die slot enersyds reg en andersyds verkeerd bewys? (2)\n7.6.1 Waarna verwys \"Zero's en One's\" EN by watter betekenis van die titel sluit dit aan? (2)\n7.6.2 Wat het daartoe gelei dat Greg later by \"Zero's en One's\" betrokke raak EN wat was die gevolg? (2)\n7.7 Watter onsekerheid bestaan in die slot oor Eckardt se naam? (1)\nOpstelvraag van dieselfde vraestel (oefen net die plan): Bespreek hoe die tema van magsmisbruik op Greg van toepassing is (400-450 woorde).",
+        memo: [
+          "7.1 Die begin van die jaar / eerste dag van sy matriekjaar in die koshuis ✓.",
+          "7.2 Hy en sy ma: innige / goeie verhouding (sy is oorbeskermend) ✓ EN met sy pa: baie swak, sy pa domineer hom ✓.",
+          "7.3.1 Enige twee: hy is hoofseun en moet almal met respek hanteer; hy moes besef 'n nuweling het hulp nodig; hy oordeel net op uiterlike voorkoms ✓✓.",
+          "7.3.2 Hy was reg: Eckardt is 'n indringer / pas nie in nie / bring vir Greg moeilikheid ✓.",
+          "7.4 Eckardt se oë herinner Greg aan sy broer John / bring sy onverwerkte emosies na vore, sodat hy Eckardt nie laat ontgroen nie ✓.",
+          "7.5 Reg: Greg se pa se verhouding met Dok Pienaar / die wêreld van korrupsie het met sy inskrywing te doen ✓ EN verkeerd: Eckardt se pa is oorlede; Eckardt het homself ingeskryf ✓.",
+          "7.6.1 Die taal van die rekenaarwêreld ✓ EN die onderwêreld van kuberkrakery ✓.",
+          "7.6.2 Eckardt het sy nuuskierigheid geprikkel / hom leer kraak ✓ EN gevolg: hy ontbloot sy pa en Dok Pienaar se rol in PNR / skeep sy pligte en skoolwerk af / begin lieg ✓.",
+          "7.7 Greg (en die joernalis) weet nie of Eckardt sy regte naam is of ook net 'n skuilnaam soos Ekk-0 nie ✓.",
+          "Opstelplan: inleiding (standpunt) → 3-4 paragrawe, elk 'n argument + gebeurtenis uit die roman → slot. Tel jou punte uit 14."
+        ]
+      },
+      {
+        id: "afr-dbe-krismis",
+        titel: "Afrikaans V2: Krismis van Map Jacobs kontekstueel (DBE Jun 2024, Teks I)",
+        cues: [
+          "Map kom op parole uit die tronk, net voor Krismis (Desember)",
+          "Antie Grootmeisie, sy ma, is stom sedert die aanval",
+          "Ironie: Map glo alles sal regkom; die werklikheid is anders",
+          "Neweteks (toneelaanwysings) wys wat die karakters NIE sê nie"
+        ],
+        toeBoek: "DBE JUN 2024 · VRAAG 15 · KRISMIS VAN MAP JACOBS · TEKS I (Map praat met sy ma in die tronk)\nMAP: Hy gee vir jou sy genade!\nStilte.\nMAP: Maar dis wáár, Ma! Ma!\nSy knik.\nMAP: Ek en die Apostel, ons bid saam hierso binnekant, hý het die Here vir my gebring … Het Ma al vir Blanchie gesê van my, lat ek vir Ma gesê het ek het die Here gekry, hierso … Ma moet tog vir haar sê. En sê oek vir haar dis nou amper tyd lat ek ytkom, dis definitely die sewende van annermaand. En vra vir haar, kan sy nie weer kom visit nie, sê vir haar sy moenie bang wies nie, ek is 'n anner man, ôldou ek is of course oek nog Map Jacobs … sê vir haar, Ma …\nStilte\nMAP: Sal Ma vir haar sê?\nSy knik \"ja\", maar is die ene ontsteltenis.\nMAP: Promise …\nSy knik.\nMAP: Ek het nooit gewiet dit kan só wies nie. Die Here Jesus, Hy maak vir jou werklik vry! Apostel George, hy't vir my gewys, die lig! Ma moet vir my glo, lat ek 'n kind van die Here Jesus geword het hierso … Ek wiet hulle sê ons ammal praat maar so ná so 'n lang tyd hierso binnekant, maar 'is nie waar nie, Ma, 'is nie waar nie!\nGeluide.\nMAP: 'Is in die kombuis, die skottelgoed. Dis net om die hoek, in die gang af …\nStilte.\nMAP: Ek sweer alles sal nou regkom, Ma … Hulle moet my net 'n kans gee daar buitekant …\n\nSkryf jou antwoorde (±20 min), wys dan die memo:\n15.1 Vir wie vra Map net voor dié toneel om verskoning? (1)\n15.2 Vir watter TWEE uitkomste bid Map vir sy toekoms? (2)\n15.3.1 Na watter maand verwys \"annermaand\"? (1)\n15.3.2 Hoe skakel jou antwoord op 15.3.1 met die titel van die drama? Noem TWEE verbande. (2)\n15.4 Dink jy dit is geregverdig dat Map nie sy volle vonnis uitgedien het nie? Motiveer met TWEE redes. (2)\n15.5 Waarom is die neweteks \"Sy knik 'ja', maar is die ene ontsteltenis\" effektief? Gee TWEE redes. (2)\n15.6 \"Ek sweer alles sal nou regkom, Ma … Hulle moet my net 'n kans gee daar buitekant\": hoekom is dit ironies? Noem DRIE werklikhede wat die ironie bewys. (4)",
+        memo: [
+          "15.1 Sy ma, Antie Grootmeisie ✓.",
+          "15.2 Enige twee: dat die paroolraad hom vroeër vrylaat; dat sy ma glo hy het verander / hom vergewe; dat Blanchie hom vergewe; dat die samelewing hom aanvaar / werk gee ✓✓.",
+          "15.3.1 Desember ✓.",
+          "15.3.2 Krismis (Kersfees) is in Desember ✓; Map se vrylating is in Desember ✓.",
+          "15.4 Ja: versagtende omstandighede (hy het homself oorgegee); hy het by die tronkreëls gehou. OF Nee: hy het toegelaat dat sy ma en sussie aangeval word; hy het Ivan Philander doelbewus vermoor ✓✓. ('Ja/Nee' alleen = 0.)",
+          "15.5 Sy is nog stom, wat wys sy het hom nog nie vergewe nie ✓; sy is ontsteld oor wat buite aangaan: Blanchie (salon, model, verhoudings met wit mans) wil niks met Map te doen hê nie ✓.",
+          "15.6 Map verwag alles sal regkom, MAAR niks werk vir hom uit nie ✓ (albei kante). Enige drie: hy kry nie werk nie; hy is 'n tronkvoël vol tatoeëermerke; die Krismisorkes wil hom nie terugvat nie; Blanchie vermy hom; Cavernelis aanvaar hom steeds nie ✓✓✓.",
+          "Tel jou punte uit 14."
+        ]
+      },
+      {
+        id: "afr-dbe-ongesien",
+        titel: "Afrikaans V2: die ONGESIENE gedig (verpligtend, 10 punte): 'Bont' (DBE Nov 2023)",
+        cues: [
+          "Lees die gedig twee keer: eers waaroor, dan hoe",
+          "Spreker, toon, beeldspraak, klank (rym, alliterasie, assonansie)",
+          "Struktuur: herhaling, refrein, polisindeton (baie 'en')",
+          "Elke punt = een feit uit die gedig, met die woorde as bewys"
+        ],
+        toeBoek: "DBE NOV 2023 · VRAAG 5 (ongesien, verpligtend) · 'Bont' – Luan Pettit\nMy erfenis is meer as 'n taal,\ndis my tong se trippel oor Tsitsikamma,\nsuutjies se sus en toemaar se troos.\nDis bliksem se befoeterdheid en voetsek sê se vuishou.\nDis 'n flerrie wat haar flikkers gooi en\ndie slof en plof van 'n knus pantoffel.\nMy erfenis is bont.\n\nMy erfenis is meer as 'n land,\ndis sonligspatsels wat dans tussen golwe\nen wiegende blertse rooi papawers tussen vaal grasvlaktes.\nDis die Sederberg se skurwe knoetse\nen huisies soos kardoesies wat rus\nonder 'n blink gespikkelde Karoonag.\nMy erfenis is bont.\n\nMy erfenis is meer as kultuur.\nDis hoendervleis-lekker en die knop in my keel\nas Nkosi weerklink deur 'n skare, groen en geel.\nDis boer-maak-'n-plan-vasbyt en Ubuntu-oemf,\ndis braaivleis en stoepsit en kuier tot laat,\n'n oopbekglimlag. 'n Afrikahanddruk.\nMy erfenis is bont.\n\nSkryf jou antwoorde (±15 min), wys dan die memo:\n5.1 Watter tipe spreker vind ons in die gedig? (1)\n5.2 Benoem die halfrym in versreël 2. Dink jy die gebruik daarvan is geslaagd? Motiveer. (2)\n5.3 Benoem en verduidelik die beeldspraak in \"gespikkelde Karoonag\". (2)\n5.4 Lei af wat die spreker met \"My erfenis is bont\" bedoel deur EEN woord uit elke strofe neer te skryf wat elk op 'n ander aspek dui. (3)\n5.5 Wat is die funksie van die polisindeton (die herhaalde \"en\") in die derde strofe se \"braaivleis en stoepsit en kuier\"? (1)\n5.6 Watter woord in die gedig dui op die ryke verskeidenheid van die land? (1)",
+        memo: [
+          "5.1 Eerstepersoons- / ek-spreker ✓.",
+          "5.2 t-alliterasie ✓ EN ja: die herhaalde t-klank lig die speelsheid van die taal uit / versterk die 'trippel'-gedagte ✓. ('Nee' kan nie.)",
+          "5.3 Metafoor ✓ EN daar is soveel sterre in die Karoonag dat dit soos blink spikkels lyk ✓.",
+          "5.4 Strofe 1: taal; strofe 2: land (golwe / grasvlaktes / Sederberg / Karoonag); strofe 3: kultuur (Ubuntu / Nkosi / Afrikahanddruk) ✓✓✓.",
+          "5.5 Die herhaling van \"en\" verbind die ontspannings-aktiwiteite tot een geheel / hef die ontspanne atmosfeer uit ✓.",
+          "5.6 \"bont\" ✓.",
+          "Tel jou punte uit 10. Die ongesiene gedig is 10 gewaarborgde punte as jy elke keer die woorde as bewys gee."
+        ]
       }
     ]
   },
