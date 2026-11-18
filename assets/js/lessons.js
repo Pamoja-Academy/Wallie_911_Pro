@@ -266,6 +266,40 @@ WALLIE.LESSONS = {
           "(3) Waar of Onwaar + die presiese frase uit die teks.",
           "(4) Noem die stylfiguur + wat dit by die leser doen."
         ]
+      },
+      {
+        id: "gedig-v2",
+        titel: "Afrikaans V2: 'n gesiene gedig in 4 stappe",
+        cues: [
+          "Tema: waaroor gaan die gedig? Een sin, in jou eie woorde",
+          "Toon en stemming: een woord (bv. bitter, nostalgies) + die woorde in die gedig wat dit wys",
+          "Stylfigure: noem dit + die EFFEK (vergelyking, metafoor, personifikasie, herhaling, kontras)",
+          "Bou: titel, strofes, enjambement, rym of die slotreël: wat doen dit met die betekenis?"
+        ],
+        toeBoek: "Kies een van jou gesiene gedigte. Skryf uit die kop: die tema in een sin, die toon met twee woorde as bewys, en twee stylfigure met hul effek.",
+        memo: [
+          "Tema: 'n volsin oor die gedig se boodskap, nie 'n opsomming van wat gebeur nie.",
+          "Toon: een woord + aanhaling (\"…\") as bewys.",
+          "Stylfiguur: naam + aanhaling + effek. Sonder die effek kry jy gewoonlik net die helfte van die punte.",
+          "Kyk in jou aantekeninge na wat jy gemis het en lees net daardie deel weer."
+        ]
+      },
+      {
+        id: "letterkunde-v2",
+        titel: "Afrikaans V2: roman en drama (opstel of kontekstueel)",
+        cues: [
+          "Ken vir elke werk: hoofkarakters (een eienskap + toneel), konflik, keerpunte, einde, temas",
+          "Kontekstueel: lees die uittreksel, plaas dit (wat gebeur net voor en net ná?), antwoord in volsinne",
+          "Opstel (400-450 woorde): inleiding met jou standpunt → 3-4 paragrawe met voorbeelde uit die werk → slot",
+          "Een werk 'n opstel, die ander kontekstueel: kies die werk wat jy die beste ken vir die opstel"
+        ],
+        toeBoek: "Kies Onderwêreld of Krismis van Map Jacobs. Noem uit die kop: twee hoofkarakters met een eienskap elk, die grootste konflik, en twee temas.",
+        memo: [
+          "Elke eienskap het 'n toneel uit die werk as bewys nodig, anders is dit net 'n mening.",
+          "Konflik: wie of wat staan teenoor mekaar, en hoe eindig dit?",
+          "Tema: 'n volsin oor wat die werk oor die lewe sê, nie net een woord nie.",
+          "Wat jy nie kon onthou nie: lees dit nou in jou aantekeninge."
+        ]
       }
     ]
   },

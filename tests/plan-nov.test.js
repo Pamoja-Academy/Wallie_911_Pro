@@ -125,6 +125,8 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
       if (b.werk || ["skrif", "merk", "herdoen", "toets"].includes(b.soort)) fails.push(`${b.id}: vraestelwerk na Wallie se "hou op om vir my vraestelle te gee" (LL-27)`);
       if (b.soort === "les" && hm(b.end) - hm(b.start) > 25) fails.push(`${b.id}: ${hm(b.end) - hm(b.start)} min, Wallie vra 25 min werk + 5 min rus (LL-27)`);
       if (b.kaart && b.subjectSlug === "engels" && !engKaarte.has(b.kaart)) fails.push(`${b.id}: kaart ${b.kaart} bestaan nie in lessons.js`);
+      /* Bugbot PR 58: 'n Afrikaanse les sonder kaart kry 'n V1-taalkaart (pickConcept); V2-letterkunde vra 'n V2-kaart */
+      if (b.soort === "les" && b.subjectSlug === "afrikaans" && !["gedig-v2", "letterkunde-v2"].includes(b.kaart)) fails.push(`${b.id}: Afrikaans V2-les sonder 'n V2-kaart (wys anders 'n V1-taalkaart)`);
       if (b.kaart) gesien.add(b.kaart);
     }
   }
