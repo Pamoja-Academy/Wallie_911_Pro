@@ -414,11 +414,10 @@ WALLIE.LESSONS = {
         id: "macbeth-bedryf-1-2",
         titel: "Macbeth: Acts 1–2 (the prophecy and the murder)",
         cues: [
-          "1: The witches: Macbeth will be Thane of Cawdor, then king; Banquo’s sons will be kings",
-          "1: Duncan makes Macbeth Thane of Cawdor, then names Malcolm his heir. Lady Macbeth: “unsex me here”",
-          "1: Macbeth doubts (“We will proceed no further”); she mocks his manhood and plans the murder at Inverness",
-          "2: The dagger speech; Macbeth kills Duncan; Lady Macbeth takes the daggers back and smears the guards with blood",
-          "2: Macduff finds the body; Macbeth kills the guards; Malcolm flees to England, Donalbain to Ireland; Macbeth is crowned"
+          "Act 1: the witches: Thane of Cawdor, then king; Banquo’s sons will be kings. Duncan makes Macbeth Cawdor",
+          "Act 1: Lady Macbeth (“unsex me here”) mocks his doubts (“We will proceed no further”) and plans the murder",
+          "Act 2: the dagger speech; Macbeth kills Duncan; Lady Macbeth smears the sleeping guards with blood",
+          "Act 2: Macduff finds the body; Macbeth kills the guards; Malcolm and Donalbain flee; Macbeth is crowned"
         ],
         toeBoek: "Close your notes. Tell the story of Acts 1 and 2 in 5 sentences. Who says “Fair is foul, and foul is fair”, and what does it warn us about?",
         memo: [
@@ -431,11 +430,10 @@ WALLIE.LESSONS = {
         id: "macbeth-bedryf-3-5",
         titel: "Macbeth: Acts 3–5 (tyrant and downfall)",
         cues: [
-          "3: Macbeth fears Banquo and has him murdered; Fleance escapes. At the banquet Macbeth sees Banquo’s ghost",
-          "4: The apparitions: beware Macduff · no man born of a woman can harm you · safe until Birnam Wood comes to Dunsinane",
-          "4: Macbeth has Macduff’s wife and children killed. In England, Malcolm tests Macduff’s loyalty",
-          "5: Lady Macbeth sleepwalks (“Out, damned spot!”) and dies. Macbeth: “Tomorrow, and tomorrow, and tomorrow”",
-          "5: The soldiers carry Birnam branches; Macduff was “untimely ripped” from his mother’s womb; he kills Macbeth; Malcolm is king"
+          "Act 3: Macbeth has Banquo murdered; Fleance escapes; Banquo’s ghost appears at the banquet",
+          "Act 4: the apparitions: beware Macduff · none of woman born can harm you · safe until Birnam Wood comes",
+          "Act 4: Macduff’s wife and children are killed; in England, Malcolm tests Macduff’s loyalty",
+          "Act 5: Lady Macbeth sleepwalks and dies; Birnam branches move; Macduff (“untimely ripped”) kills Macbeth"
         ],
         toeBoek: "Close your notes. How does each of the three apparitions come true in Act 5?",
         memo: [
@@ -448,11 +446,10 @@ WALLIE.LESSONS = {
         id: "macbeth-karakters",
         titel: "Macbeth: the characters (trait + proof)",
         cues: [
-          "Macbeth: brave soldier → ambitious murderer → tyrant who feels nothing (“I am in blood stepped in so far”)",
+          "Macbeth: brave soldier → ambitious murderer → cold tyrant (“I am in blood stepped in so far”)",
           "Lady Macbeth: strong and ruthless at first → guilt, sleepwalking, death",
           "Banquo: hears the same prophecy but does NOT act on it (a foil to Macbeth)",
-          "Macduff: loyal to Scotland, suspicious of Macbeth, loses his family, takes revenge",
-          "Duncan: a good, trusting king (“There’s no art to find the mind’s construction in the face”)"
+          "Macduff: loyal to Scotland, loses his family, takes revenge · Duncan: a good, trusting king"
         ],
         toeBoek: "How do Macbeth and Lady Macbeth change from Act 1 to Act 5? Give one example of each.",
         memo: [
@@ -465,11 +462,10 @@ WALLIE.LESSONS = {
         id: "macbeth-temas",
         titel: "Macbeth: themes and how the questions ask",
         cues: [
-          "Ambition: unchecked ambition destroys Macbeth and Scotland",
+          "Ambition: unchecked ambition destroys Macbeth and Scotland · fate vs free will: Macbeth CHOOSES to kill",
           "Appearance vs reality: “look like th’ innocent flower, but be the serpent under’t”",
           "Guilt: blood and sleeplessness (“Macbeth does murder sleep”)",
-          "Fate vs free will: the witches predict, but Macbeth CHOOSES to kill",
-          "Questions: context (what happened just before?) · tone + a word as proof · dramatic irony · Do you agree? = opinion + reason"
+          "Questions: context · tone + a word as proof · dramatic irony · Do you agree? = opinion + reason"
         ],
         toeBoek: "Explain the dramatic irony when Duncan arrives at Inverness and says the castle has a pleasant seat.",
         memo: [
