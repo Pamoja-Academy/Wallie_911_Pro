@@ -143,7 +143,7 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
 {
   const LS = ctx.WALLIE.LESSONS || {};
   const kaartVan = (slug, id) => ((LS[slug] || { concepts: [] }).concepts || []).find((c) => c.id === id);
-  const vrae = (t) => (String(t || "").match(/(^|\n)\s*(\d+\)|\d+\.\d+\.\d+)/g) || []).length;
+  const vrae = (t) => (String(t || "").match(/(^|\n)\s*(\d+\)|\d+\.\d+(\.\d+)?\s)/g) || []).length;
   /* Watter Engelse V2-vraestelle het Wallie al in 'n blok gekry (alle dae tot 17 Nov)? */
   const gekry = new Set();
   for (let d = new Date("2026-10-01T12:00:00Z"); d <= new Date("2026-11-17T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 1)) {
@@ -163,6 +163,15 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
       if (vrae(c.toeBoek) < 5) fails.push(`${b.id}: kaart ${b.kaart} het ${vrae(c.toeBoek)} vrae (min 5, LL-28)`);
       if ((c.memo || []).length < 5) fails.push(`${b.id}: kaart ${b.kaart} het ${(c.memo || []).length} memo-reëls (min 5, LL-28)`);
       const m = String(c.toeBoek || "").match(/DBE (JUN|NOV) (\d{4})/);
+      /* Afrikaans V2 (LL-28): ook geen gesiene vraestel nie, en die eerste DBE-kaart gee eers die nasienreëls. */
+      if (b.subjectSlug === "afrikaans" && m) {
+        const id = `dbe-${m[2]}-${MAAND[m[1]]}-afr-v2`;
+        if (gekry.has(id)) fails.push(`${b.id}: ${id} is al aan Wallie gegee (LL-18/LL-28)`);
+        if (!eersteDbe.afrikaans) {
+          eersteDbe.afrikaans = b.id;
+          if (!/SO SIEN DIE DBE NA/.test(c.toeBoek)) fails.push(`${b.id}: eerste Afrikaanse DBE-kaart sonder die nasienreëls eerste (LL-28)`);
+        }
+      }
       if (b.subjectSlug === "engels" && m) {
         const id = `dbe-${m[2]}-${MAAND[m[1]]}-eng-v2`;
         if (gekry.has(id)) fails.push(`${b.id}: ${id} is al aan Wallie gegee (LL-18/LL-28)`);
@@ -174,7 +183,7 @@ for (let d = new Date("2026-10-30T12:00:00Z"); d <= laaste; d.setUTCDate(d.getUT
       }
     }
   }
-  for (const s of ["Macbeth", "kortverhale"]) if (!eersteDbe[s]) fails.push(`geen DBE-${s}-uittreksel met memo voor Engels V2 nie (LL-28)`);
+  for (const s of ["Macbeth", "kortverhale", "afrikaans"]) if (!eersteDbe[s]) fails.push(`geen DBE-${s}-uittreksel met memo voor die eksamen nie (LL-28)`);
 }
 if (dae < 20) fails.push(`net ${dae} dae nagegaan`);
 if (werkBlokke < 40) fails.push(`net ${werkBlokke} werk-blokke nagegaan: die hek moet werklike blokke toets`);
