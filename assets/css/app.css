@@ -1059,6 +1059,8 @@ body.les-open { overflow: hidden; }
 .les-viewer.mode-toe .les-recall { display: block; }
 .les-viewer.mode-memo .les-cues { display: none; }
 .les-viewer.mode-memo .les-memo { display: block; }
+.les-viewer.mode-memo.met-uittreksel .les-figure { display: none; }
+.les-viewer.mode-memo.met-uittreksel .les-recall { display: block; }
 
 @media (max-width: 900px) {
   .md-hero { grid-template-columns: 84px 1fr; }
