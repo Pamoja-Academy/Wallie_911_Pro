@@ -750,6 +750,7 @@
     img.alt = c.titel;
     $("#les-cues").innerHTML = c.cues.map((q) => `<li>${esc(q)}</li>`).join("");
     $("#les-prompt").textContent = c.toeBoek;
+    $("#les-prompt").classList.toggle("lang", String(c.toeBoek || "").length > 280);
     $("#les-memo-list").innerHTML = c.memo.map((m) => `<li>${esc(m)}</li>`).join("");
     $("#les-dots").innerHTML = L.concepts
       .map((x, i) => {

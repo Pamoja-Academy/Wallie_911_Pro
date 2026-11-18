@@ -1015,7 +1015,9 @@ body.les-open { overflow: hidden; }
   background: #0b2516;
 }
 .les-step { margin: 0 0 0.5rem; font-weight: 900; letter-spacing: 0.14em; color: var(--accent); }
-.les-prompt { font-size: clamp(1.25rem, 2.4vw, 1.7rem); font-weight: 800; line-height: 1.35; margin: 0 0 1rem; }
+.les-prompt { font-size: clamp(1.25rem, 2.4vw, 1.7rem); font-weight: 800; line-height: 1.35; margin: 0 0 1rem; white-space: pre-line; }
+/* LL-28: 'n DBE-uittreksel met vrae in die toe-boek-kaart: gewone leesgrootte, links. */
+.les-prompt.lang { font-size: 1rem; font-weight: 500; line-height: 1.55; text-align: left; max-height: 60vh; overflow-y: auto; }
 .les-side h2 { margin: 0 0 0.6rem; font-family: var(--display); font-size: clamp(1.3rem, 2.4vw, 1.8rem); }
 .les-cues { margin: 0 0 1rem; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
 .les-cues li {
